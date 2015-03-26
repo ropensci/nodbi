@@ -6,6 +6,11 @@
 \usage{
 docdb_get(conn, docid)
 }
+\arguments{
+\item{conn}{Connection object, result of call to src}
+
+\item{docid}{Document ID}
+}
 \description{
 Get documents
 }
@@ -16,6 +21,17 @@ library("jsonlite")
 doc <- fromJSON("http://api.gbif.org/v1/species/2704179")
 res <- docdb_create(conn, doc)
 docdb_get(conn, res$id)
+
+doc2 <- fromJSON("http://api.gbif.org/v1/species/2704174")
+docout <- docdb_create(conn, doc2)
+docdb_get(conn, docout$id)
+
+# entire data.frame
+conn <- src_couchdb()
+docout <- docdb_create(conn, mtcars)
+docdb_get(conn, pluck(docout, "id", "")[1])
+docdb_get(conn, pluck(docout, "id", "")[1:5])
+docdb_get(conn, pluck(docout, "id", ""))
 }
 }
 

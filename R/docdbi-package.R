@@ -1,16 +1,7 @@
-#' Query, manipulate, etc. data in document DB's
+#' Document database connector
 #'
-#' Currently supported DB's are:
-#'
-#' \itemize{
-#'  \item Elasticsearch
-#'  \item Solr
-#'  \item CouchDB
-#' }
-#'
-#' @name docplyr-package
-#' @aliases docplyr
+#' @name docdbi-package
+#' @aliases docdbi
 #' @docType package
-#' @author Scott Chamberlain \email{myrmecocystus@@gmail.com}
 #' @keywords package
 NULL

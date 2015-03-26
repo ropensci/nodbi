@@ -4,7 +4,12 @@
 \alias{docdb_create}
 \title{Create a document}
 \usage{
-docdb_create(conn, doc)
+docdb_create(conn, docid)
+}
+\arguments{
+\item{conn}{Connection object, result of call to src}
+
+\item{docid}{Document ID}
 }
 \description{
 Create a document
@@ -15,6 +20,9 @@ conn <- src_couchdb()
 library("jsonlite")
 doc <- fromJSON("http://api.gbif.org/v1/species/2704179")
 docdb_create(conn, doc)
+
+doc2 <- fromJSON("http://api.gbif.org/v1/species/2704174")
+docdb_create(conn, doc2)
 }
 }
 
