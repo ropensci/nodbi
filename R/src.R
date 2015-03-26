@@ -1,6 +1,6 @@
 #' Setup a database connection
 #'
-#' @importFrom sofa cushions cushion ping db_list
+#' @import sofa
 #' @name src
 #' @param db Database name. We use the default database docdbi if none given. If the
 #' database already exists, we do nothing.
