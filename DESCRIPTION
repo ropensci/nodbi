@@ -1,0 +1,16 @@
+Package: docdbi
+Title: Document database connector
+Description: Simplified document database manipulation and analysis.
+Version: 0.0.1.99
+Authors@R: person("Scott", "Chamberlain", role = c("aut", "cre"),
+    email = "myrmecocystus@gmail.com")
+License: MIT + file LICENSE
+LazyData: true
+URL: https://github.com/ropensci/docdbi
+BugReports: https://github.com/ropensci/docdbi/issues
+Roxygen: list(wrap = FALSE)
+Imports:
+    httr,
+    sofa
+Suggests:
+    roxygen2
