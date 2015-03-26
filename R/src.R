@@ -1,5 +1,6 @@
 #' Setup a database connection
 #'
+#' @export
 #' @import sofa
 #' @name src
 #' @param db Database name. We use the default database docdbi if none given. If the
@@ -29,7 +30,7 @@ src_couchdb <- function(db = NULL, type = "localhost", port = 5984, user = NULL,
   dbinfo <- db_info(dbname = defdb)
   if(!is.null(dbinfo$error)) db_create(dbname=defdb)
   dbout <- sofa::db_info(dbname = defdb)
-  structure(c(info, cush), class=c("src_couchdb","src"), type="couchdb", dbs=dbs, dbname=dbinfo$db_name)
+  structure(c(info, cush), class=c("src_couchdb","docdb_src"), type="couchdb", dbs=dbs, dbname=dbinfo$db_name)
 }
 
 #' @export
