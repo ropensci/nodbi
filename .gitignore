@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 docdbi.Rproj
+docdbi.Rcheck
+*.tar.gz
