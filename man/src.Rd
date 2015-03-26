@@ -5,9 +5,13 @@
 \alias{src_couchdb}
 \title{Setup a database connection}
 \usage{
-src_couchdb(type = "localhost", port = 5984, user = NULL, pwd = NULL)
+src_couchdb(db = NULL, type = "localhost", port = 5984, user = NULL,
+  pwd = NULL)
 }
 \arguments{
+\item{db}{Database name. We use the default database docdbi if none given. If the
+database already exists, we do nothing.}
+
 \item{type}{One of localhost, cloudant, or iriscouch. This is what's used to determine
 how to structure the URL to make the request.}
 
@@ -31,6 +35,7 @@ Setup a database connection
 \examples{
 \dontrun{
 src_couchdb()
+src_couchdb("newdb")
 }
 }
 
