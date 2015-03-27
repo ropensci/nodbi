@@ -9,7 +9,11 @@ docdb_create(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{value}{Document}
+\item{key}{A key}
+
+\item{value}{A value}
+
+\item{...}{Ignored for now}
 }
 \description{
 Create documents
@@ -28,6 +32,10 @@ key="mtcars2"
 value=mtcars
 docdb_create(src, key, value)
 docdb_get(src, key)
+
+# etcd
+src <- src_etcd()
+docdb_create(src, "hello", "world")
 }
 }
 

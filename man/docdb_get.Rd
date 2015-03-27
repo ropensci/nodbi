@@ -10,6 +10,8 @@ docdb_get(src, docid, ...)
 \item{src}{source object, result of call to src}
 
 \item{docid}{Document ID}
+
+\item{...}{Ignored for now}
 }
 \description{
 Get documents
@@ -34,6 +36,11 @@ docdb_get(src, "mtcars")
 docdb_get(conn, pluck(docout, "id", "")[1])
 docdb_get(conn, pluck(docout, "id", "")[1:5])
 docdb_get(conn, pluck(docout, "id", ""))
+
+# etcd
+src <- src_etcd()
+docdb_create(src, "hello", "world")
+docdb_get(src, "hello")
 }
 }
 

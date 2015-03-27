@@ -2,7 +2,9 @@
 #'
 #' @export
 #' @param src source object, result of call to src
-#' @param value Document
+#' @param key A key
+#' @param value A value
+#' @param ... Ignored for now
 #' @examples \dontrun{
 #' conn <- src_couchdb()
 #' library("jsonlite")
@@ -16,6 +18,10 @@
 #' value=mtcars
 #' docdb_create(src, key, value)
 #' docdb_get(src, key)
+#'
+#' # etcd
+#' src <- src_etcd()
+#' docdb_create(src, "hello", "world")
 #' }
 docdb_create <- function(src, key, value, ...){
   UseMethod("docdb_create")
@@ -23,7 +29,12 @@ docdb_create <- function(src, key, value, ...){
 
 #' @export
 docdb_create.src_couchdb <- function(src, key, value, ...){
-  dbinfo <- db_info(dbname = key)
-  if(!is.null(dbinfo$error)) db_create(dbname=key)
-  bulk_create(doc = value, cushion = src$type, dbname = key)
+  dbinfo <- sofa::db_info(dbname = key)
+  if(!is.null(dbinfo$error)) sofa::db_create(dbname=key)
+  sofa::bulk_create(doc = value, cushion = src$type, dbname = key)
+}
+
+#' @export
+docdb_create.src_etcd <- function(src, key, value, ...){
+  etseed::create(key = key, value = value, ...)
 }

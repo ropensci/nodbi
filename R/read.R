@@ -4,6 +4,7 @@
 #' @import data.table
 #' @param src source object, result of call to src
 #' @param docid Document ID
+#' @param ... Ignored for now
 #' @examples \dontrun{
 #' conn <- src_couchdb()
 #' library("jsonlite")
@@ -23,6 +24,11 @@
 #' docdb_get(conn, pluck(docout, "id", "")[1])
 #' docdb_get(conn, pluck(docout, "id", "")[1:5])
 #' docdb_get(conn, pluck(docout, "id", ""))
+#'
+#' # etcd
+#' src <- src_etcd()
+#' docdb_create(src, "hello", "world")
+#' docdb_get(src, "hello")
 #' }
 docdb_get <- function(src, docid, ...){
   UseMethod("docdb_get")
@@ -30,7 +36,12 @@ docdb_get <- function(src, docid, ...){
 
 #' @export
 docdb_get.src_couchdb <- function(src, docid, ...){
-  dropmeta(rbindlist(pluck(alldocs(cushion = src$type, dbname = docid, include_docs = TRUE)$rows, "doc")))
+  dropmeta(rbindlist(pluck(sofa::alldocs(cushion = src$type, dbname = docid, include_docs = TRUE)$rows, "doc")))
+}
+
+#' @export
+docdb_get.src_etcd <- function(src, docid, ...){
+  etseed::key(docid)
 }
 
 dropmeta <- function(x) {

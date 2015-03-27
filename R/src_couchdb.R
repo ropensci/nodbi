@@ -1,17 +1,11 @@
 #' Setup a database connection
 #'
 #' @export
-#' @import sofa
-#' @name src
-#' @param host Host url
+#' @param type One of localhost, cloudant, or iriscouch. This is what's used to determine
+#' how to structure the URL to make the request.
 #' @param port Port number
 #' @param user Username, if any
 #' @param pwd Password, if any
-#' @param key API key, if any
-#' @param x Input to print method
-#' @param type One of localhost, cloudant, or iriscouch. This is what's used to determine
-#' how to structure the URL to make the request.
-#' @param ... further args passed on, or ignored
 #' @examples \dontrun{
 #' src_couchdb()
 #' src_couchdb("newdb")
@@ -20,8 +14,8 @@
 #' @export
 #' @rdname src
 src_couchdb <- function(type = "localhost", port = 5984, user = NULL, pwd = NULL){
-  if(type != "localhost") cushion(type, port = port, user = user, pwd = pwd)
-  cush <- cushions()[[type]]
+  if(type != "localhost") sofa::cushion(type, port = port, user = user, pwd = pwd)
+  cush <- sofa::cushions()[[type]]
   info <- sofa::ping()
   dbs <- sofa::db_list()
 #   defdb <- defaultdb(db)
