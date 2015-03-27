@@ -1,0 +1,52 @@
+docdbi
+========
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+## Install
+
+```{r eval=FALSE}
+install.packages("devtools")
+devtools::install_github("ropensci/docdbi")
+```
+
+```{r}
+library("docdbi")
+```
+
+## CouchDB
+
+```{r}
+src <- src_couchdb()
+docout <- docdb_create(src, key = "mtcars", value = mtcars)
+docdb_get(src, "mtcars")
+```
+
+## Redis
+
+```{r}
+docdb_src_rrlite()
+```
+
+## etcd 
+
+```{r}
+src <- src_etcd()
+docdb_create(src, "hi", "there")
+docdb_get(src, "hi")
+```
+
+## Meta
+
+* [Please report any issues or bugs](https://github.com/ropensci/docdbi/issues).
+* License: MIT
+* Get citation information for `docdbi` in R doing `citation(package = 'docdbi')`
+
+[![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
