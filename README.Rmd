@@ -39,7 +39,7 @@ docdb_src_rrlite()
 
 ```{r}
 src <- src_etcd()
-docdb_create(src, "hi", "there")
+ff <- docdb_create(src, "hi", "there")
 docdb_get(src, "hi")
 ```
 
