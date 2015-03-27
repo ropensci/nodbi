@@ -26,7 +26,7 @@ library("docdbi")
 ```{r}
 src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars", value = mtcars)
-docdb_get(src, "mtcars")
+head( docdb_get(src, "mtcars") )
 ```
 
 ## Redis
