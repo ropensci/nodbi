@@ -4,12 +4,12 @@
 \alias{docdb_get}
 \title{Get documents}
 \usage{
-docdb_get(conn, docid)
+docdb_get(src, docid, ...)
 }
 \arguments{
-\item{conn}{Connection object, result of call to src}
-
 \item{docid}{Document ID}
+
+\item{conn}{Connection object, result of call to src}
 }
 \description{
 Get documents

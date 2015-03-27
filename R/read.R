@@ -21,13 +21,13 @@
 #' docdb_get(conn, pluck(docout, "id", "")[1:5])
 #' docdb_get(conn, pluck(docout, "id", ""))
 #' }
-docdb_get <- function(conn, docid){
+docdb_get <- function(src, docid, ...){
   UseMethod("docdb_get")
 }
 
 #' @export
-docdb_get.src_couchdb <- function(conn, docid){
-  tmp <- lapply(docid, function(z) doc_get(cushion = conn$type, dbname = attr(conn, "dbname"), docid = z))
+docdb_get.src_couchdb <- function(src, docid, ...){
+  tmp <- lapply(docid, function(z) doc_get(cushion = src$type, dbname = attr(src, "dbname"), docid = z))
   df <- rbindlist(unname(tmp))
   dropmeta(df)
 }

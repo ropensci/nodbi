@@ -2,17 +2,17 @@
 % Please edit documentation in R/create.R
 \name{docdb_create}
 \alias{docdb_create}
-\title{Create a document}
+\title{Create documents}
 \usage{
-docdb_create(conn, docid)
+docdb_create(src, value, ...)
 }
 \arguments{
-\item{conn}{Connection object, result of call to src}
+\item{value}{Document}
 
-\item{docid}{Document ID}
+\item{conn}{Connection object, result of call to src}
 }
 \description{
-Create a document
+Create documents
 }
 \examples{
 \dontrun{
