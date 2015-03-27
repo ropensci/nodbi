@@ -3,8 +3,6 @@
 #' @export
 #' @import sofa
 #' @name src
-#' @param db Database name. We use the default database docdbi if none given. If the
-#' database already exists, we do nothing.
 #' @param host Host url
 #' @param port Port number
 #' @param user Username, if any
@@ -21,22 +19,22 @@
 
 #' @export
 #' @rdname src
-src_couchdb <- function(db = NULL, type = "localhost", port = 5984, user = NULL, pwd = NULL){
+src_couchdb <- function(type = "localhost", port = 5984, user = NULL, pwd = NULL){
   if(type != "localhost") cushion(type, port = port, user = user, pwd = pwd)
   cush <- cushions()[[type]]
   info <- sofa::ping()
   dbs <- sofa::db_list()
-  defdb <- defaultdb(db)
-  dbinfo <- db_info(dbname = defdb)
-  if(!is.null(dbinfo$error)) db_create(dbname=defdb)
-  dbout <- sofa::db_info(dbname = defdb)
-  structure(c(info, cush), class=c("src_couchdb","docdb_src"), type="couchdb", dbs=dbs, dbname=dbinfo$db_name)
+#   defdb <- defaultdb(db)
+#   dbinfo <- db_info(dbname = defdb)
+#   if(!is.null(dbinfo$error)) db_create(dbname=defdb)
+#   dbout <- sofa::db_info(dbname = defdb)
+  structure(c(info, cush), class=c("src_couchdb","docdb_src"), type="couchdb", dbs=dbs)
 }
 
 #' @export
 print.src_couchdb <- function(x, ...){
   cat(sprintf("src: %s %s [%s/%s]", attr(x, "type"), x$version, x$type, x$port), sep = "\n")
-  cat(sprintf("db: %s", attr(x, "dbname")), sep = "\n")
+#   cat(sprintf("db: %s", attr(x, "dbname")), sep = "\n")
   cat(doc_wrap("databases: ", paste0(attr(x, "dbs"), collapse = ", "), width=80), "\n", sep = "")
 }
 

@@ -7,9 +7,9 @@
 docdb_get(src, docid, ...)
 }
 \arguments{
-\item{docid}{Document ID}
+\item{src}{source object, result of call to src}
 
-\item{conn}{Connection object, result of call to src}
+\item{docid}{Document ID}
 }
 \description{
 Get documents
@@ -27,8 +27,10 @@ docout <- docdb_create(conn, doc2)
 docdb_get(conn, docout$id)
 
 # entire data.frame
-conn <- src_couchdb()
-docout <- docdb_create(conn, mtcars)
+src <- src_couchdb()
+docout <- docdb_create(src, key = "mtcars", value = mtcars)
+docdb_get(src, "mtcars")
+
 docdb_get(conn, pluck(docout, "id", "")[1])
 docdb_get(conn, pluck(docout, "id", "")[1:5])
 docdb_get(conn, pluck(docout, "id", ""))

@@ -1,7 +1,8 @@
 #' Get documents
 #'
 #' @export
-#' @param conn Connection object, result of call to src
+#' @import data.table
+#' @param src source object, result of call to src
 #' @param docid Document ID
 #' @examples \dontrun{
 #' conn <- src_couchdb()
@@ -15,8 +16,10 @@
 #' docdb_get(conn, docout$id)
 #'
 #' # entire data.frame
-#' conn <- src_couchdb()
-#' docout <- docdb_create(conn, mtcars)
+#' src <- src_couchdb()
+#' docout <- docdb_create(src, key = "mtcars", value = mtcars)
+#' docdb_get(src, "mtcars")
+#'
 #' docdb_get(conn, pluck(docout, "id", "")[1])
 #' docdb_get(conn, pluck(docout, "id", "")[1:5])
 #' docdb_get(conn, pluck(docout, "id", ""))
@@ -27,9 +30,7 @@ docdb_get <- function(src, docid, ...){
 
 #' @export
 docdb_get.src_couchdb <- function(src, docid, ...){
-  tmp <- lapply(docid, function(z) doc_get(cushion = src$type, dbname = attr(src, "dbname"), docid = z))
-  df <- rbindlist(unname(tmp))
-  dropmeta(df)
+  dropmeta(rbindlist(pluck(alldocs(cushion = src$type, dbname = docid, include_docs = TRUE)$rows, "doc")))
 }
 
 dropmeta <- function(x) {

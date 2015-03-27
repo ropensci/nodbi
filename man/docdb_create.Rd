@@ -4,12 +4,12 @@
 \alias{docdb_create}
 \title{Create documents}
 \usage{
-docdb_create(src, value, ...)
+docdb_create(src, key, value, ...)
 }
 \arguments{
-\item{value}{Document}
+\item{src}{source object, result of call to src}
 
-\item{conn}{Connection object, result of call to src}
+\item{value}{Document}
 }
 \description{
 Create documents
@@ -23,6 +23,11 @@ docdb_create(conn, doc)
 
 doc2 <- fromJSON("http://api.gbif.org/v1/species/2704174")
 docdb_create(conn, doc2)
+
+key="mtcars2"
+value=mtcars
+docdb_create(src, key, value)
+docdb_get(src, key)
 }
 }
 
