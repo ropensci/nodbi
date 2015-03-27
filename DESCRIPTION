@@ -12,4 +12,5 @@ Roxygen: list(wrap = FALSE)
 Imports:
     sofa
 Suggests:
-    roxygen2
+    roxygen2,
+    rrlite

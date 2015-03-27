@@ -10,6 +10,8 @@ before_install:
 
 install:
   - ./travis-tool.sh install_deps
+  - ./travis-tool.sh install_github ropensci/sofa
+  - ./travis-tool.sh install_github richfitz/rrlite
 
 script: ./travis-tool.sh run_tests
 
