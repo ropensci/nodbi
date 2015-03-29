@@ -1,5 +1,5 @@
 docdbi
-========
+======
 
 ```{r echo=FALSE}
 knitr::opts_chunk$set(
@@ -19,6 +19,15 @@ devtools::install_github("ropensci/docdbi")
 
 ```{r}
 library("docdbi")
+```
+
+## Initialize connections
+
+```{r collapse=FALSE}
+docdb_src_rrlite()
+src_couchdb()
+src_elasticsearch()
+src_etcd()
 ```
 
 ## CouchDB
@@ -42,10 +51,56 @@ ff <- docdb_create(src, "/mtcars", mtcars)
 head( docdb_get(src, "/mtcars") )
 ```
 
+## Elasticsearch
+
+Put the `iris` dataset into ES
+
+```{r echo=FALSE, eval=FALSE}
+src <- src_elasticsearch()
+if(elastic::index_exists("iris")) invisible(docdb_delete(src, "iris"))
+```
+
+```{r eval=FALSE}
+src <- src_elasticsearch()
+ff <- docdb_create(src, "iris", iris)
+head( docdb_get(src, "iris") )
+```
+
+Put part of the `diamonds` dataset into ES
+
+```{r echo=FALSE, eval=FALSE}
+if(elastic::index_exists("diamonds_small")) invisible(docdb_delete(src, "diamonds_small"))
+```
+
+```{r eval=FALSE, eval=FALSE}
+library("ggplot2")
+ff <- docdb_create(src, "diamonds_small", diamonds[1:1000,])
+head( docdb_get(src, "diamonds_small") )
+```
+
 ## Redis
 
 ```{r}
 docdb_src_rrlite()
+```
+
+## Use with dplyr
+
+```{r}
+library("dplyr")
+src <- src_elasticsearch()
+```
+
+```{r}
+docdb_get(src, "iris") %>% 
+  group_by(Species) %>% 
+  summarise(mean = mean(Petal.Length))
+```
+
+```{r}
+docdb_get(src, "diamonds_small") %>% 
+  group_by(cut) %>% 
+  summarise(mean_depth = mean(depth), mean_price = mean(price))
 ```
 
 ## Meta
