@@ -39,8 +39,8 @@ docdb_get(conn, pluck(docout, "id", ""))
 
 # etcd
 src <- src_etcd()
-docdb_create(src, "hello", "world")
-docdb_get(src, "hello")
+docdb_create(src, "/hello", "world")
+docdb_get(src, "/hello")
 }
 }
 

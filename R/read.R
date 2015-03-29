@@ -27,8 +27,8 @@
 #'
 #' # etcd
 #' src <- src_etcd()
-#' docdb_create(src, "hello", "world")
-#' docdb_get(src, "hello")
+#' docdb_create(src, "/hello", "world")
+#' docdb_get(src, "/hello")
 #' }
 docdb_get <- function(src, docid, ...){
   UseMethod("docdb_get")
@@ -41,7 +41,10 @@ docdb_get.src_couchdb <- function(src, docid, ...){
 
 #' @export
 docdb_get.src_etcd <- function(src, docid, ...){
-  etseed::key(docid)
+  tmp <- etseed::key(docid, recursive = TRUE)
+  rbindlist(
+    lapply(pluck(tmp$node$nodes, "value"), jsonlite::fromJSON)
+  )
 }
 
 dropmeta <- function(x) {

@@ -39,8 +39,8 @@ docdb_src_rrlite()
 
 ```{r}
 src <- src_etcd()
-ff <- docdb_create(src, "hi", "there")
-docdb_get(src, "hi")
+ff <- docdb_create(src, "/mtcars", mtcars)
+docdb_get(src, "/mtcars")
 ```
 
 ## Meta

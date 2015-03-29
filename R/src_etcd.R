@@ -10,7 +10,7 @@ src_etcd <- function() {
   structure(list(version=ver, type="etcd"), class=c("src_etcd","docdb_src"))
 }
 
-##' @export
+#' @export
 print.src_etcd <- function(x, ...) {
   cat(sprintf("src: %s\n", x$version))
 }

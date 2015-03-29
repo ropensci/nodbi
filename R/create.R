@@ -2,9 +2,10 @@
 #'
 #' @export
 #' @param src source object, result of call to src
-#' @param key A key
+#' @param key A key. See Details.
 #' @param value A value
-#' @param ... Ignored for now
+#' @param ... Ignored
+#' @details Note that with etcd, you have to prefix a key with a forward slash.
 #' @examples \dontrun{
 #' conn <- src_couchdb()
 #' library("jsonlite")
@@ -21,7 +22,10 @@
 #'
 #' # etcd
 #' src <- src_etcd()
-#' docdb_create(src, "hello", "world")
+#' docdb_create(src, "/hello", "world")
+#' ## a data.frame
+#' docdb_create(src, key = "/newmtcars7", value = mtcars)
+#' docdb_get(src, "/newmtcars7")
 #' }
 docdb_create <- function(src, key, value, ...){
   UseMethod("docdb_create")
@@ -36,5 +40,13 @@ docdb_create.src_couchdb <- function(src, key, value, ...){
 
 #' @export
 docdb_create.src_etcd <- function(src, key, value, ...){
-  etseed::create(key = key, value = value, ...)
+  invisible(etseed::create(key = key, dir = TRUE))
+  cl <- class(value)
+  switch(cl,
+         data.frame = {
+           for(i in 1:NROW(value)){
+             etseed::create(paste0(key, "/", i), jsonlite::toJSON(value[i,]))
+           }
+         }
+  )
 }

@@ -9,14 +9,17 @@ docdb_create(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{A key}
+\item{key}{A key. See Details.}
 
 \item{value}{A value}
 
-\item{...}{Ignored for now}
+\item{...}{Ignored}
 }
 \description{
 Create documents
+}
+\details{
+Note that with etcd, you have to prefix a key with a forward slash.
 }
 \examples{
 \dontrun{
@@ -35,7 +38,10 @@ docdb_get(src, key)
 
 # etcd
 src <- src_etcd()
-docdb_create(src, "hello", "world")
+docdb_create(src, "/hello", "world")
+## a data.frame
+docdb_create(src, key = "/newmtcars7", value = mtcars)
+docdb_get(src, "/newmtcars7")
 }
 }
 
