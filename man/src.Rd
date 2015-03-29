@@ -22,7 +22,6 @@ Setup a database connection
 \examples{
 \dontrun{
 src_couchdb()
-src_couchdb("newdb")
 }
 }
 

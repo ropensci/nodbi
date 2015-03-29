@@ -8,7 +8,6 @@
 #' @param pwd Password, if any
 #' @examples \dontrun{
 #' src_couchdb()
-#' src_couchdb("newdb")
 #' }
 
 #' @export
