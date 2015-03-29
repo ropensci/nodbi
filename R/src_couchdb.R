@@ -9,9 +9,6 @@
 #' @examples \dontrun{
 #' src_couchdb()
 #' }
-
-#' @export
-#' @rdname src
 src_couchdb <- function(type = "localhost", port = 5984, user = NULL, pwd = NULL){
   if(type != "localhost") sofa::cushion(type, port = port, user = user, pwd = pwd)
   cush <- sofa::cushions()[[type]]
