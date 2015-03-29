@@ -5,7 +5,7 @@
 #' of the database backends. Each has their own unique set of parameters.
 #'
 #' \itemize{
-#'  \item Redis - \code{\link{src_rrlite}}
+#'  \item Redis - \code{src_rrlite}
 #'  \item CouchDB - \code{\link{src_couchdb}}
 #'  \item Etcd - \code{\link{src_etcd}}
 #'  \item Elasticsearch - \code{\link{src_elasticsearch}}
