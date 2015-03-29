@@ -29,18 +29,23 @@ docout <- docdb_create(src, key = "mtcars", value = mtcars)
 head( docdb_get(src, "mtcars") )
 ```
 
-## Redis
-
-```{r}
-docdb_src_rrlite()
-```
-
 ## etcd 
+
+```{r echo=FALSE}
+src <- src_etcd()
+invisible(docdb_delete(src, "/mtcars"))
+```
 
 ```{r}
 src <- src_etcd()
 ff <- docdb_create(src, "/mtcars", mtcars)
-docdb_get(src, "/mtcars")
+head( docdb_get(src, "/mtcars") )
+```
+
+## Redis
+
+```{r}
+docdb_src_rrlite()
 ```
 
 ## Meta
