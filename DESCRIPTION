@@ -1,9 +1,13 @@
 Package: docdbi
-Title: Document database connector
+Title: NoSQL Database Connector
 Description: Simplified document database manipulation and analysis.
 Version: 0.0.1.99
-Authors@R: person("Scott", "Chamberlain", role = c("aut", "cre"),
-    email = "myrmecocystus@gmail.com")
+Authors@R: c(person("Scott", "Chamberlain", role = c("aut", "cre"),
+    email = "myrmecocystus@gmail.com"),
+    person("Rich", "FitzJohn", role = "aut",
+    email = "rich.fitzjohn@gmail.com"),
+    person("Jeroen", "Ooms", role = "aut",
+    email = "jeroen.ooms@stat.ucla.edu"))
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/ropensci/docdbi
