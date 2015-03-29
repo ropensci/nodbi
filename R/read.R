@@ -1,7 +1,7 @@
 #' Get documents
 #'
 #' @export
-#' @import data.table
+#' @import data.table jsonlite
 #' @param src source object, result of call to src
 #' @param docid Document ID
 #' @param ... Ignored for now
