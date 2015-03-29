@@ -16,4 +16,5 @@ Suggests:
     roxygen2,
     sofa,
     rrlite,
-    etseed
+    etseed,
+    elastic
