@@ -18,6 +18,12 @@ Delete documents
 }
 \examples{
 \dontrun{
+# couchdb
+src <- src_couchdb()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
+docdb_delete(src, "mtcars")
+
 # etcd
 src <- src_etcd()
 docdb_create(src, "/iris", iris)
