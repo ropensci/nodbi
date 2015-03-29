@@ -41,6 +41,11 @@ docdb_get(conn, pluck(docout, "id", ""))
 src <- src_etcd()
 docdb_create(src, "/hello", "world")
 docdb_get(src, "/hello")
+
+# Elasticsearch
+src <- src_elasticsearch()
+docdb_create(src, "iris", iris)
+docdb_get(src, "iris")
 }
 }
 

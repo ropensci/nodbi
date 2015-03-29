@@ -16,6 +16,12 @@
 #' docdb_create(src, "/iris", iris)
 #' docdb_get(src, "/iris")
 #' docdb_delete(src, "/iris")
+#'
+#' # elasticsearch
+#' src <- src_elasticsearch()
+#' docdb_create(src, "iris", iris)
+#' docdb_get(src, "iris")
+#' docdb_delete(src, "iris")
 #' }
 docdb_delete <- function(src, key, ...){
   UseMethod("docdb_delete")
@@ -29,4 +35,9 @@ docdb_delete.src_couchdb <- function(src, key, ...){
 #' @export
 docdb_delete.src_etcd <- function(src, key, ...){
   etseed::delete(key, dir = TRUE, recursive = TRUE)
+}
+
+#' @export
+docdb_delete.src_elasticsearch <- function(src, key, ...){
+  elastic::index_delete(key, verbose = FALSE)
 }

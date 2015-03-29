@@ -42,6 +42,12 @@ docdb_create(src, "/hello", "world")
 ## a data.frame
 docdb_create(src, key = "/newmtcars7", value = mtcars)
 docdb_get(src, "/newmtcars7")
+
+# Elasticsearch
+src <- src_elasticsearch()
+docdb_create(src, key = "mtcars", value = mtcars)
+docdb_create(src, key = "iris", value = iris)
+docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
 }
 }
 

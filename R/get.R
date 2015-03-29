@@ -29,6 +29,11 @@
 #' src <- src_etcd()
 #' docdb_create(src, "/hello", "world")
 #' docdb_get(src, "/hello")
+#'
+#' # Elasticsearch
+#' src <- src_elasticsearch()
+#' docdb_create(src, "iris", iris)
+#' docdb_get(src, "iris")
 #' }
 docdb_get <- function(src, docid, ...){
   UseMethod("docdb_get")
@@ -47,15 +52,15 @@ docdb_get.src_etcd <- function(src, docid, ...){
   )
 }
 
+#' @export
+docdb_get.src_elasticsearch <- function(src, docid, ...){
+  ids <- pluck(elastic::Search(docid, source = FALSE, size = 1000)$hits$hits, "_id", "")
+  tmp <- elastic::docs_mget(index = docid, type = docid, ids = ids)
+  rbindlist(pluck(tmp$docs, "_source"))
+}
+
 dropmeta <- function(x) {
   x$`_id` <- NULL
   x$`_rev` <- NULL
   x
 }
-
-# to_df <- function(x) {
-#   x$`_id` <- NULL
-#   x$`_rev` <- NULL
-#   x
-# #   as.data.frame(rbind(x), stringsAsFactors = FALSE)
-# }

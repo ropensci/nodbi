@@ -29,6 +29,12 @@ src <- src_etcd()
 docdb_create(src, "/iris", iris)
 docdb_get(src, "/iris")
 docdb_delete(src, "/iris")
+
+# elasticsearch
+src <- src_elasticsearch()
+docdb_create(src, "iris", iris)
+docdb_get(src, "iris")
+docdb_delete(src, "iris")
 }
 }
 
