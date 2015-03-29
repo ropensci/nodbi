@@ -1,4 +1,4 @@
-#' Setup a database connection for Elasticsearch
+#' Setup an Elasticsearch database connection
 #'
 #' @export
 #' @param base the base url, defaults to localhost (http://127.0.0.1)

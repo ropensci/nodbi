@@ -2,12 +2,12 @@
 % Please edit documentation in R/src_etcd.R
 \name{src_etcd}
 \alias{src_etcd}
-\title{Setup an etcd database connection}
+\title{Setup an Etcd database connection}
 \usage{
 src_etcd()
 }
 \description{
-Setup an etcd database connection
+Setup an Etcd database connection
 }
 \examples{
 \dontrun{

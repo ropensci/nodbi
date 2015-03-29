@@ -2,7 +2,7 @@
 % Please edit documentation in R/src_couchdb.R
 \name{src_couchdb}
 \alias{src_couchdb}
-\title{Setup a database connection}
+\title{Setup a CouchDB database connection}
 \usage{
 src_couchdb(type = "localhost", port = 5984, user = NULL, pwd = NULL)
 }
@@ -17,7 +17,7 @@ how to structure the URL to make the request.}
 \item{pwd}{Password, if any}
 }
 \description{
-Setup a database connection
+Setup a CouchDB database connection
 }
 \examples{
 \dontrun{

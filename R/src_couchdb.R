@@ -1,4 +1,4 @@
-#' Setup a database connection
+#' Setup a CouchDB database connection
 #'
 #' @export
 #' @param type One of localhost, cloudant, or iriscouch. This is what's used to determine

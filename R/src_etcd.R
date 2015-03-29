@@ -1,4 +1,4 @@
-#' Setup an etcd database connection
+#' Setup an Etcd database connection
 #'
 #' @export
 #' @examples \dontrun{

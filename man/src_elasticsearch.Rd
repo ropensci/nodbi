@@ -2,7 +2,7 @@
 % Please edit documentation in R/src_elasticsearch.R
 \name{src_elasticsearch}
 \alias{src_elasticsearch}
-\title{Setup a database connection for Elasticsearch}
+\title{Setup an Elasticsearch database connection}
 \usage{
 src_elasticsearch(base = "http://127.0.0.1", port = 9200, user = NULL,
   pwd = NULL, key = NULL, force = FALSE, ...)
@@ -23,7 +23,7 @@ src_elasticsearch(base = "http://127.0.0.1", port = 9200, user = NULL,
 \item{...}{Further args passed on to print for the es_conn class.}
 }
 \description{
-Setup a database connection for Elasticsearch
+Setup an Elasticsearch database connection
 }
 \examples{
 \dontrun{
