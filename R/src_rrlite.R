@@ -6,13 +6,13 @@
 ##' @examples
 ##' con <- docdb_src_rrlite()
 ##' class(con)
-docdb_src_rrlite <- function(filename = ":memory:", db = NULL) {
+src_rrlite <- function(filename = ":memory:", db = NULL) {
   con <- rrlite::hirlite(filename)
   ret <- list(type="rrlite",
               version=packageVersion("rrlite"),
               con=con,
               db=db)
-  class(ret) <- c("docdb_src_rrlite", "docdb_src")
+  class(ret) <- c("src_rrlite", "docdb_src")
   ret
 }
 

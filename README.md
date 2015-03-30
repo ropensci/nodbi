@@ -20,7 +20,7 @@ library("docdbi")
 
 
 ```r
-docdb_src_rrlite()
+src_rrlite()
 ```
 
 ```
@@ -121,7 +121,7 @@ head( docdb_get(src, "diamonds_small") )
 
 
 ```r
-docdb_src_rrlite()
+src_rrlite()
 #> src: rrlite 0.1.0 [:memory:]
 ```
 

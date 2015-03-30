@@ -70,6 +70,11 @@ docdb_create.src_elasticsearch <- function(src, key, value, ...){
   )
 }
 
+#' @export
+docdb_create.src_rrlite <- function(src, key, value, ...) {
+  rrlite::to_redis(value, key, src$con, ...)
+}
+
 # make_bulk("mtcars", mtcars, "~/mtcars.json")
 # make_bulk("iris", iris, "~/iris.json")
 # make_bulk("diamonds", diamonds, "~/diamonds.json")

@@ -21,4 +21,5 @@ Suggests:
     sofa,
     rrlite,
     etseed,
-    elastic
+    elastic,
+    testthat

@@ -24,7 +24,7 @@ library("docdbi")
 ## Initialize connections
 
 ```{r collapse=FALSE}
-docdb_src_rrlite()
+src_rrlite()
 src_couchdb()
 src_elasticsearch()
 src_etcd()
@@ -81,7 +81,7 @@ head( docdb_get(src, "diamonds_small") )
 ## Redis
 
 ```{r}
-docdb_src_rrlite()
+src_rrlite()
 ```
 
 ## Use with dplyr

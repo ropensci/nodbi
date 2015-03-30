@@ -59,6 +59,11 @@ docdb_get.src_elasticsearch <- function(src, docid, ...){
   rbindlist(pluck(tmp$docs, "_source"))
 }
 
+#' @export
+docdb_get.src_rrlite <- function(src, docid, ...) {
+  rrlite::from_redis(docid, src$con, ...)
+}
+
 dropmeta <- function(x) {
   x$`_id` <- NULL
   x$`_rev` <- NULL
