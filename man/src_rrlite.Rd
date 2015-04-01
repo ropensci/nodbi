@@ -15,7 +15,7 @@ src_rrlite(filename = ":memory:", db = NULL)
 Setup an rrlite database connection
 }
 \examples{
-con <- docdb_src_rrlite()
+con <- src_rrlite()
 class(con)
 }
 

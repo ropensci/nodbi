@@ -4,7 +4,7 @@
 ##' @param db Prefix for the keys
 ##' @export
 ##' @examples
-##' con <- docdb_src_rrlite()
+##' con <- src_rrlite()
 ##' class(con)
 src_rrlite <- function(filename = ":memory:", db = NULL) {
   con <- rrlite::hirlite(filename)
