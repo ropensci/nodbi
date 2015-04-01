@@ -8,5 +8,12 @@
 \description{
 Document database connector
 }
+\author{
+Scott Chamberlain \email{myrmecocystus@gmail.com}
+
+Rich FitzJohn \email{rich.fitzjohn@gmail.com}
+
+Jeroen Ooms \email{jeroen.ooms@stat.ucla.edu}
+}
 \keyword{package}
 
