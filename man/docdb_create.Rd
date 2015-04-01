@@ -23,23 +23,13 @@ Note that with etcd, you have to prefix a key with a forward slash.
 }
 \examples{
 \dontrun{
-conn <- src_couchdb()
-library("jsonlite")
-doc <- fromJSON("http://api.gbif.org/v1/species/2704179")
-docdb_create(conn, doc)
+# CouchDB
+src <- src_couchdb()
+docdb_create(src, "mtcars2", mtcars)
+docdb_get(src, "mtcars2")
 
-doc2 <- fromJSON("http://api.gbif.org/v1/species/2704174")
-docdb_create(conn, doc2)
-
-key="mtcars2"
-value=mtcars
-docdb_create(src, key, value)
-docdb_get(src, key)
-
-# etcd
+# Etcd
 src <- src_etcd()
-docdb_create(src, "/hello", "world")
-## a data.frame
 docdb_create(src, key = "/newmtcars7", value = mtcars)
 docdb_get(src, "/newmtcars7")
 
@@ -48,6 +38,11 @@ src <- src_elasticsearch()
 docdb_create(src, key = "mtcars", value = mtcars)
 docdb_create(src, key = "iris", value = iris)
 docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
+
+# Redis
+src <- src_rrlite()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
 }
 }
 

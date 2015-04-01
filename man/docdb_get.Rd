@@ -18,26 +18,12 @@ Get documents
 }
 \examples{
 \dontrun{
-conn <- src_couchdb()
-library("jsonlite")
-doc <- fromJSON("http://api.gbif.org/v1/species/2704179")
-res <- docdb_create(conn, doc)
-docdb_get(conn, res$id)
-
-doc2 <- fromJSON("http://api.gbif.org/v1/species/2704174")
-docout <- docdb_create(conn, doc2)
-docdb_get(conn, docout$id)
-
-# entire data.frame
+# CouchDB
 src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars", value = mtcars)
 docdb_get(src, "mtcars")
 
-docdb_get(conn, pluck(docout, "id", "")[1])
-docdb_get(conn, pluck(docout, "id", "")[1:5])
-docdb_get(conn, pluck(docout, "id", ""))
-
-# etcd
+# Etcd
 src <- src_etcd()
 docdb_create(src, "/hello", "world")
 docdb_get(src, "/hello")
@@ -46,6 +32,11 @@ docdb_get(src, "/hello")
 src <- src_elasticsearch()
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
+
+# Redis
+src <- src_rrlite()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
 }
 }
 
