@@ -25,6 +25,11 @@
 #' src <- src_rrlite()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
+#' 
+#' # Mongo
+#' src <- src_mongo()
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_get(src, "mtcars")
 #' }
 docdb_get <- function(src, docid, ...){
   UseMethod("docdb_get")
@@ -53,6 +58,13 @@ docdb_get.src_elasticsearch <- function(src, docid, ...){
 #' @export
 docdb_get.src_rrlite <- function(src, docid, ...) {
   rrlite::from_redis(docid, src$con, ...)
+}
+
+#' @export
+docdb_get.src_mongo <- function(src, docid, ...) {
+  collection <- mongolite:::mongo_collection_new(src$con, src$db, docid)
+  cursor <- mongolite:::mongo_collection_find(collection, ...)
+  mongolite:::mongo_stream_in(cursor, verbose = FALSE)
 }
 
 dropmeta <- function(x) {

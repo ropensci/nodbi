@@ -70,6 +70,15 @@ docdb_create.src_rrlite <- function(src, key, value, ...) {
   rrlite::to_redis(value, key, src$con, ...)
 }
 
+#' @export
+docdb_create.src_mongo <- function(src, key, value, ...){
+  stopifnot(is(src, "src_mongo"))
+  stopifnot(is.data.frame(value))
+  collection <- mongolite:::mongo_collection_new(src$con, src$db, key)
+  mongolite:::mongo_stream_out(value, collection, verbose = FALSE, ...)
+  invisible(collection)
+}
+
 # make_bulk("mtcars", mtcars, "~/mtcars.json")
 # make_bulk("iris", iris, "~/iris.json")
 # make_bulk("diamonds", diamonds, "~/diamonds.json")

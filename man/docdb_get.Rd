@@ -37,6 +37,11 @@ docdb_get(src, "iris")
 src <- src_rrlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
+
+# Mongo
+src <- src_mongo()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
 }
 }
 

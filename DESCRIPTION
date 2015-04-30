@@ -1,7 +1,7 @@
 Package: docdbi
 Title: NoSQL Database Connector
 Description: Simplified document database manipulation and analysis.
-Version: 0.0.1.99
+Version: 0.0.1.9000
 Authors@R: c(person("Scott", "Chamberlain", role = c("aut", "cre"),
     email = "myrmecocystus@gmail.com"),
     person("Rich", "FitzJohn", role = "aut",
@@ -22,4 +22,5 @@ Suggests:
     rrlite,
     etseed,
     elastic,
+    mongolite (>= 0.2.9100),
     testthat

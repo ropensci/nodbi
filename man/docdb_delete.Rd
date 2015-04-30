@@ -35,6 +35,12 @@ src <- src_elasticsearch()
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
 docdb_delete(src, "iris")
+
+# mongo
+src <- src_mongo()
+docdb_create(src, "iris", iris)
+docdb_get(src, "iris")
+docdb_delete(src, "iris")
 }
 }
 
