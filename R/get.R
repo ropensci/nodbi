@@ -25,7 +25,7 @@
 #' src <- src_rrlite()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
-#' 
+#'
 #' # Mongo
 #' src <- src_mongo()
 #' docdb_create(src, "mtcars", mtcars)
@@ -51,7 +51,7 @@ docdb_get.src_etcd <- function(src, docid, ...){
 #' @export
 docdb_get.src_elasticsearch <- function(src, docid, ...){
   ids <- pluck(elastic::Search(docid, source = FALSE, size = 1000)$hits$hits, "_id", "")
-  tmp <- elastic::docs_mget(index = docid, type = docid, ids = ids)
+  tmp <- elastic::docs_mget(index = docid, type = docid, ids = ids, verbose = FALSE)
   rbindlist(pluck(tmp$docs, "_source"))
 }
 
