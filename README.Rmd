@@ -2,6 +2,31 @@ docdbi
 ======
 
 ```{r echo=FALSE}
+library("knitr")
+hook_output <- knitr::knit_hooks$get("output")
+knitr::knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(if (abs(lines[1])>1) more else NULL, 
+            x[lines], 
+            if (length(x)>lines[abs(length(lines))]) more else NULL
+           )
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+})
+
 knitr::opts_chunk$set(
   comment = "#>",
   collapse = TRUE,
@@ -23,11 +48,24 @@ library("docdbi")
 
 ## Initialize connections
 
-```{r collapse=FALSE}
-src_rrlite()
+```{r}
 src_couchdb()
+```
+
+```{r}
 src_elasticsearch()
+```
+
+```{r}
 src_etcd()
+```
+
+```{r}
+src_mongo()
+```
+
+```{r output.lines=1:10}
+src_rrlite()
 ```
 
 ## CouchDB
@@ -55,32 +93,38 @@ head( docdb_get(src, "/mtcars") )
 
 Put the `iris` dataset into ES
 
-```{r echo=FALSE, eval=FALSE}
+```{r echo=FALSE}
 src <- src_elasticsearch()
-if(elastic::index_exists("iris")) invisible(docdb_delete(src, "iris"))
+if (elastic::index_exists("iris")) invisible(docdb_delete(src, "iris"))
 ```
 
 ```{r eval=FALSE}
 src <- src_elasticsearch()
 ff <- docdb_create(src, "iris", iris)
 head( docdb_get(src, "iris") )
+#>   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+#>          5.0         3.6          1.4         0.2  setosa
+#>          4.9         3.1          1.5         0.1  setosa
+#>          4.8         3.4          1.6         0.2  setosa
+#>          5.4         3.9          1.3         0.4  setosa
+#>          5.1         3.3          1.7         0.5  setosa
+#>          5.2         3.4          1.4         0.2  setosa
 ```
 
-Put part of the `diamonds` dataset into ES
+## MongoDB
 
-```{r echo=FALSE, eval=FALSE}
-if(elastic::index_exists("diamonds_small")) invisible(docdb_delete(src, "diamonds_small"))
-```
-
-```{r eval=FALSE, eval=FALSE}
+```{r}
 library("ggplot2")
-ff <- docdb_create(src, "diamonds_small", diamonds[1:1000,])
-head( docdb_get(src, "diamonds_small") )
+src <- src_mongo()
+ff <- docdb_create(src, "diamonds_small", diamonds)
+ff_m <- docdb_get(src, "diamonds_small")
+head(diamonds)
+head(ff_m)
 ```
 
 ## Redis
 
-```{r}
+```{r output.lines=1:10}
 src_rrlite()
 ```
 

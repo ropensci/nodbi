@@ -20,18 +20,7 @@ library("docdbi")
 
 
 ```r
-src_rrlite()
-```
-
-```
-#> src: rrlite 0.1.0 [:memory:]
-```
-
-```r
 src_couchdb()
-```
-
-```
 #> src: couchdb 1.6.1 [localhost/5984]
 #> databases: _replicator, _users, adsfa, adsfdsf, bulkfromchr, bulkfromlist,
 #>      bulktest, bulktest2, bulktest3, bulktest4, bulktest5, cachecall, diamonds,
@@ -40,23 +29,45 @@ src_couchdb()
 #>      stuff, stuff2, test
 ```
 
+
 ```r
 src_elasticsearch()
+#> src: elasticsearch 1.5.2 [http://127.0.0.1:9200]
+#> databases: flowers, animals, flights, asdfdf, things2, twitter, -----,
+#>      afjaljfalsfjalksdfadf, arrests, stuff_m, diam, logstash-2018.02.28, stuff,
+#>      gbif, gbifnewgeo, geoshape, stuff_x, afjaljfalsfjalksdf, diamfromlist,
+#>      plos, diamonds, stuff_i, pos, shakespeare2, stuff_e, stuff_g, geonames,
+#>      gbifgeo, yep, diamonds_small, iris, stuff_k, things, shakespeare, stuff_j,
+#>      gbifgeopoint, stuff_w, hello
 ```
 
-```
-#> src: elasticsearch 1.5.0 [http://127.0.0.1:9200]
-#> databases: stuff, geonames, gbif, mtcars, twitter, iris, gbifgeopoint,
-#>      gbifnewgeo, logstash-2018.02.28, plos, shakespeare, things2, gbifgeo,
-#>      shakespeare2, geoshape, diamonds_small, things
-```
 
 ```r
 src_etcd()
+#> src: etcd 0.4.6
 ```
 
+
+```r
+src_mongo()
+#> MongoDB 3.0.2 (uptime: 2562s)
+#> URL: Scotts-MBP/test
 ```
-#> src: etcd 0.4.6
+
+
+```r
+src_rrlite()
+#> $type
+#> [1] "rrlite"
+#> 
+#> $version
+#> [1] '0.2.0'
+#> 
+#> $con
+#> <redis_api>
+#>   Public:
+#>     APPEND: function
+...
 ```
 
 ## CouchDB
@@ -85,12 +96,12 @@ src <- src_etcd()
 ff <- docdb_create(src, "/mtcars", mtcars)
 head( docdb_get(src, "/mtcars") )
 #>     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
-#> 1: 32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
-#> 2: 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
-#> 3: 19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
-#> 4: 26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
-#> 5: 18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
-#> 6: 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+#> 1: 14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+#> 2: 24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+#> 3: 17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+#> 4: 33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+#> 5: 30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+#> 6: 13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
 ```
 
 ## Elasticsearch
@@ -104,17 +115,39 @@ Put the `iris` dataset into ES
 src <- src_elasticsearch()
 ff <- docdb_create(src, "iris", iris)
 head( docdb_get(src, "iris") )
+#>   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+#>          5.0         3.6          1.4         0.2  setosa
+#>          4.9         3.1          1.5         0.1  setosa
+#>          4.8         3.4          1.6         0.2  setosa
+#>          5.4         3.9          1.3         0.4  setosa
+#>          5.1         3.3          1.7         0.5  setosa
+#>          5.2         3.4          1.4         0.2  setosa
 ```
 
-Put part of the `diamonds` dataset into ES
-
-
+## MongoDB
 
 
 ```r
 library("ggplot2")
-ff <- docdb_create(src, "diamonds_small", diamonds[1:1000,])
-head( docdb_get(src, "diamonds_small") )
+src <- src_mongo()
+ff <- docdb_create(src, "diamonds_small", diamonds)
+ff_m <- docdb_get(src, "diamonds_small")
+head(diamonds)
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+#> 5  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+#> 6  0.24 Very Good     J    VVS2  62.8    57   336 3.94 3.96 2.48
+head(ff_m)
+#>   carat       cut color clarity depth table price    x    y    z
+#> 1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+#> 2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+#> 3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+#> 4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+#> 5  0.31      Good     J     SI2  63.3    58   335 4.34 4.35 2.75
+#> 6  0.24 Very Good     J    VVS2  62.8    57   336 3.94 3.96 2.48
 ```
 
 ## Redis
@@ -122,7 +155,17 @@ head( docdb_get(src, "diamonds_small") )
 
 ```r
 src_rrlite()
-#> src: rrlite 0.1.0 [:memory:]
+#> $type
+#> [1] "rrlite"
+#> 
+#> $version
+#> [1] '0.2.0'
+#> 
+#> $con
+#> <redis_api>
+#>   Public:
+#>     APPEND: function
+...
 ```
 
 ## Use with dplyr
@@ -138,12 +181,7 @@ src <- src_elasticsearch()
 docdb_get(src, "iris") %>% 
   group_by(Species) %>% 
   summarise(mean = mean(Petal.Length))
-#> Source: local data table [3 x 2]
-#> 
-#>      Species  mean
-#> 1     setosa 1.462
-#> 2 versicolor 4.260
-#> 3  virginica 5.552
+#> Error: IndexMissingException[[iris] missing]
 ```
 
 
