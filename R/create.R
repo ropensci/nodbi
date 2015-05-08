@@ -45,8 +45,9 @@ docdb_create.src_etcd <- function(src, key, value, ...){
   cl <- class(value)
   switch(cl,
          data.frame = {
-           for(i in 1:NROW(value)){
-             etseed::create(paste0(key, "/", i), jsonlite::toJSON(value[i,]))
+           for (i in 1:NROW(value)) {
+             etseed::create_inorder(key, jsonlite::toJSON(value[i, ]))
+             # etseed::create(paste0(key, "/", i), jsonlite::toJSON(value[i, ]))
            }
          }
   )

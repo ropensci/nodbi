@@ -42,7 +42,7 @@ docdb_get.src_couchdb <- function(src, docid, ...){
 
 #' @export
 docdb_get.src_etcd <- function(src, docid, ...){
-  tmp <- etseed::key(docid, recursive = TRUE)
+  tmp <- etseed::key(docid, recursive = TRUE, sorted = TRUE)
   rbindlist(
     lapply(pluck(tmp$node$nodes, "value"), jsonlite::fromJSON)
   )
