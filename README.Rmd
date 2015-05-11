@@ -1,4 +1,4 @@
-docdbi
+nodbi
 ======
 
 ```{r echo=FALSE}
@@ -17,8 +17,8 @@ knitr::knit_hooks$set(output = function(x, options) {
        x <- c(head(x, lines), more)
      }
    } else {
-     x <- c(if (abs(lines[1])>1) more else NULL, 
-            x[lines], 
+     x <- c(if (abs(lines[1])>1) more else NULL,
+            x[lines],
             if (length(x)>lines[abs(length(lines))]) more else NULL
            )
    }
@@ -39,11 +39,11 @@ knitr::opts_chunk$set(
 
 ```{r eval=FALSE}
 install.packages("devtools")
-devtools::install_github("ropensci/docdbi")
+devtools::install_github("ropensci/nodbi")
 ```
 
 ```{r}
-library("docdbi")
+library("nodbi")
 ```
 
 ## Initialize connections
@@ -76,7 +76,7 @@ docout <- docdb_create(src, key = "mtcars", value = mtcars)
 head( docdb_get(src, "mtcars") )
 ```
 
-## etcd 
+## etcd
 
 ```{r echo=FALSE}
 src <- src_etcd()
@@ -136,21 +136,21 @@ src <- src_elasticsearch()
 ```
 
 ```{r}
-docdb_get(src, "iris") %>% 
-  group_by(Species) %>% 
+docdb_get(src, "iris") %>%
+  group_by(Species) %>%
   summarise(mean = mean(Petal.Length))
 ```
 
 ```{r}
-docdb_get(src, "diamonds_small") %>% 
-  group_by(cut) %>% 
+docdb_get(src, "diamonds_small") %>%
+  group_by(cut) %>%
   summarise(mean_depth = mean(depth), mean_price = mean(price))
 ```
 
 ## Meta
 
-* [Please report any issues or bugs](https://github.com/ropensci/docdbi/issues).
+* [Please report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 * License: MIT
-* Get citation information for `docdbi` in R doing `citation(package = 'docdbi')`
+* Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
 
 [![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)

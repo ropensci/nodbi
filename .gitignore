@@ -3,4 +3,6 @@
 .RData
 docdbi.Rproj
 docdbi.Rcheck
+nodbi.Rproj
+nodbi.Rcheck
 *.tar.gz

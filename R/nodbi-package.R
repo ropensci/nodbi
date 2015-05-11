@@ -1,7 +1,7 @@
 #' Document database connector
 #'
-#' @name docdbi-package
-#' @aliases docdbi
+#' @name nodbi-package
+#' @aliases nodbi
 #' @docType package
 #' @author Scott Chamberlain \email{myrmecocystus@@gmail.com}
 #' @author Rich FitzJohn \email{rich.fitzjohn@@gmail.com}

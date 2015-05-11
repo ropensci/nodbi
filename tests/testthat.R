@@ -1,4 +1,4 @@
 library(testthat)
-library(docdbi)
+library(nodbi)
 
-test_check("docdbi")
+test_check("nodbi")

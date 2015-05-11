@@ -1,4 +1,4 @@
-docdbi
+nodbi
 ======
 
 
@@ -8,12 +8,12 @@ docdbi
 
 ```r
 install.packages("devtools")
-devtools::install_github("ropensci/docdbi")
+devtools::install_github("ropensci/nodbi")
 ```
 
 
 ```r
-library("docdbi")
+library("nodbi")
 ```
 
 ## Initialize connections
@@ -24,7 +24,7 @@ src_couchdb()
 #> src: couchdb 1.6.1 [localhost/5984]
 #> databases: _replicator, _users, adsfa, adsfdsf, bulkfromchr, bulkfromlist,
 #>      bulktest, bulktest2, bulktest3, bulktest4, bulktest5, cachecall, diamonds,
-#>      docdbi, hello_earth, iris, iriscolumns, irisrows, leothelion, leothelion2,
+#>      nodbi, hello_earth, iris, iriscolumns, irisrows, leothelion, leothelion2,
 #>      mapuris, mran, mtcars, mtcars2, mtcarsdb, mydb, newdb, newdbs, newnew,
 #>      stuff, stuff2, test
 ```
@@ -201,8 +201,8 @@ docdb_get(src, "diamonds_small") %>%
 
 ## Meta
 
-* [Please report any issues or bugs](https://github.com/ropensci/docdbi/issues).
+* [Please report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 * License: MIT
-* Get citation information for `docdbi` in R doing `citation(package = 'docdbi')`
+* Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
 
 [![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
