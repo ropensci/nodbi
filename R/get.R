@@ -22,7 +22,7 @@
 #' docdb_get(src, "iris")
 #'
 #' # Redis
-#' src <- src_rrlite()
+#' src <- src_redis()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
 #'
@@ -56,8 +56,8 @@ docdb_get.src_elasticsearch <- function(src, docid, ...){
 }
 
 #' @export
-docdb_get.src_rrlite <- function(src, docid, ...) {
-  rrlite::from_redis(docid, src$con, ...)
+docdb_get.src_redis <- function(src, docid, ...) {
+  RedisAPI::redis_object_get(docid, src$con, ...)
 }
 
 #' @export

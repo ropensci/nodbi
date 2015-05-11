@@ -34,7 +34,7 @@ docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
 
 # Redis
-src <- src_rrlite()
+src <- src_redis()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 

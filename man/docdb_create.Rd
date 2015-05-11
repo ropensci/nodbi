@@ -40,7 +40,7 @@ docdb_create(src, key = "iris", value = iris)
 docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
 
 # Redis
-src <- src_rrlite()
+src <- src_redis()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 }

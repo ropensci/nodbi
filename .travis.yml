@@ -2,6 +2,7 @@ language: c
 
 services:
   - couchdb
+  - redis
 
 before_install:
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
@@ -11,7 +12,7 @@ before_install:
 install:
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github ropensci/sofa
-  - ./travis-tool.sh install_github richfitz/rrlite
+-  - Rscript -e 'library(devtools); library(methods); options(repos=c(CRAN="http://cran.rstudio.com")); devtools::install_git("https://github.com/ropensci/rrlite", args="--recursive")'
 
 script: ./travis-tool.sh run_tests
 

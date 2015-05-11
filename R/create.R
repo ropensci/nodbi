@@ -24,7 +24,7 @@
 #' docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
 #'
 #' # Redis
-#' src <- src_rrlite()
+#' src <- src_redis()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
 #' }
@@ -67,8 +67,8 @@ docdb_create.src_elasticsearch <- function(src, key, value, ...){
 }
 
 #' @export
-docdb_create.src_rrlite <- function(src, key, value, ...) {
-  rrlite::to_redis(value, key, src$con, ...)
+docdb_create.src_redis <- function(src, key, value, ...) {
+  RedisAPI::redis_object_set(key, value, src$con, ...)
 }
 
 #' @export

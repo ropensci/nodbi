@@ -18,6 +18,7 @@ Imports:
 Suggests:
     roxygen2,
     sofa,
+    RedisAPI (>= 0.1.1),
     rrlite,
     etseed,
     elastic,

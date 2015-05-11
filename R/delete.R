@@ -54,3 +54,8 @@ docdb_delete.src_mongo <- function(src, key, ...){
   collection <- mongolite:::mongo_collection_new(src$con, src$db, key)
   mongolite:::mongo_collection_drop(collection)
 }
+
+#' @export
+docdb_delete.src_redis <- function(src, key, ...) {
+  RedisAPI::redis_object_del(key, src$con, ...)
+}
