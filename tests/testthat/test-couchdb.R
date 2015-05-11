@@ -1,8 +1,9 @@
 context("couchdb")
 
-src <- src_couchdb()
 
 test_that("Source", {
+  skip_if_no_couchdb()
+  src <- src_couchdb()
   expect_is(src, "docdb_src")
   expect_is(src, "src_couchdb")
   expect_is(unclass(src), "list")
@@ -12,6 +13,9 @@ test_that("Source", {
 df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
 
 test_that("db into couchdb", {
+  skip_if_no_couchdb()
+  src <- src_couchdb()
+
   # delete if exists
   invisible(tryCatch(docdb_delete(src, "df"), error = function(e) e))
 
@@ -20,7 +24,10 @@ test_that("db into couchdb", {
   expect_equal(data.frame(d2), df)
 })
 
-test_that("delete in mongo works", {
+test_that("delete in couchdb works", {
+  skip_if_no_couchdb()
+  src <- src_couchdb()
+
   # delete if exists
   invisible(tryCatch(docdb_delete(src, "df"), error = function(e) e))
 

@@ -1,8 +1,9 @@
 context("etcd")
 
-src <- src_etcd()
 
 test_that("Source", {
+  skip_if_no_etcd()
+  src <- src_etcd()
   expect_is(src, "docdb_src")
   expect_is(src, "src_etcd")
   expect_is(unclass(src), "list")
@@ -12,6 +13,9 @@ test_that("Source", {
 df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
 
 test_that("db into etcd", {
+  skip_if_no_etcd()
+  src <- src_etcd()
+
   # delete if exists
   invisible(tryCatch(docdb_delete(src, "/df"), error = function(e) e))
 
@@ -21,6 +25,9 @@ test_that("db into etcd", {
 })
 
 test_that("delete in etcd works", {
+  skip_if_no_etcd()
+  src <- src_etcd()
+
   # delete if exists
   invisible(tryCatch(docdb_delete(src, "/df"), error = function(e) e))
 
