@@ -65,7 +65,7 @@ src_mongo()
 ```
 
 ```{r output.lines=1:10}
-src_rrlite()
+src_rlite()
 ```
 
 ## CouchDB
@@ -113,19 +113,19 @@ head( docdb_get(src, "iris") )
 
 ## MongoDB
 
-```{r}
+```{r output.lines=1:10}
 library("ggplot2")
 src <- src_mongo()
 ff <- docdb_create(src, "diamonds_small", diamonds)
-ff_m <- docdb_get(src, "diamonds_small")
-head(diamonds)
-head(ff_m)
+docdb_get(src, "diamonds_small")
 ```
 
 ## Redis
 
 ```{r output.lines=1:10}
-src_rrlite()
+src <- src_redis()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
 ```
 
 ## Use with dplyr
@@ -133,12 +133,6 @@ src_rrlite()
 ```{r}
 library("dplyr")
 src <- src_elasticsearch()
-```
-
-```{r}
-docdb_get(src, "iris") %>%
-  group_by(Species) %>%
-  summarise(mean = mean(Petal.Length))
 ```
 
 ```{r}
