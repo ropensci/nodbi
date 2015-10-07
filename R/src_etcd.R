@@ -7,10 +7,12 @@
 #' }
 src_etcd <- function() {
   ver <- etseed::version()
-  structure(list(version=ver, type="etcd"), class=c("src_etcd","docdb_src"))
+  structure(c(ver, type = "etcd"), class = c("src_etcd", "docdb_src"))
 }
 
 #' @export
 print.src_etcd <- function(x, ...) {
-  cat(sprintf("src: %s\n", x$version))
+  cat("src:\n")
+  cat(sprintf("  etcd server: %s\n", x$etcdserver))
+  cat(sprintf("  etcd cluster: %s\n", x$etcdcluster))
 }
