@@ -1,7 +1,7 @@
 ##' Setup an Redis database connection
 ##' @title Setup an Redis database connection
-##' @param filename Name of the database to use
-##' @param db Prefix for the keys
+##' @param host Host URI
+##' @param port Port number
 ##' @export
 ##' @examples
 ##' con <- src_redis()

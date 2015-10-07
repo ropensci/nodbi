@@ -7,9 +7,9 @@
 src_redis(host = "127.0.0.1", port = 6379)
 }
 \arguments{
-\item{filename}{Name of the database to use}
+\item{host}{Host URI}
 
-\item{db}{Prefix for the keys}
+\item{port}{Port number}
 }
 \description{
 Setup an Redis database connection
