@@ -3,6 +3,24 @@ nodbi
 
 
 
+## Dependencies not on CRAN
+
+You don't need to install these, only the ones that you want to use in `nodbi`.
+We put all database drivers in `Suggests`, so this package doesn't require
+any one database drive package unless you invoke the function that uses that 
+thing. 
+
+
+```r
+install.packages("devtools")
+devtools::install_github("ropensci/sofa")
+devtools::install_github("ropensci/etseed")
+devtools::install_github("ropensci/rrlite")
+devtools::install_github("ropensci/RedisAPI")
+```
+
+`mongolite` and `elastic` are on CRAN
+
 ## Install
 
 
@@ -18,32 +36,57 @@ library("nodbi")
 
 ## Initialize connections
 
+Start CouchDB in your shell of choice by, e.g.: `couchdb`
+
 
 ```r
 src_couchdb()
 #> src: couchdb 1.6.1 [localhost/5984]
-#> databases: _replicator, _users, adsfa, adsfdsf, bulkfromchr, bulkfromlist
+#> databases: _replicator, _users, adsfa, adsfdsf, bulkfromchr, bulkfromlist,
+#>      bulktest, bulktest2, bulktest3, bulktest4, bulktest5, cachecall, diamonds,
+#>      docdbi, hello_earth, iris, iriscolumns, irisrows, leothelion, leothelion2,
+#>      mapuris, mran, mtcars, mtcars2, mtcarsdb, mydb, newdb, newdbs, newnew,
+#>      sofadb, stuff, stuff2, test, testiris, xiris
+```
+
+Start Elaticsearch in your shell of choice by, e.g.:
+
+```sh
+cd /usr/local/elasticsearch && bin/elasticsearch
 ```
 
 
 ```r
 src_elasticsearch()
-#> src: elasticsearch 1.5.2 [http://127.0.0.1:9200]
-#> databases: flowers, animals, flights, asdfdf, things2
+#> src: elasticsearch 1.7.2 [http://127.0.0.1:9200]
+#> databases: flowers, shite, animals, asdfdf, things2, twitter, testrgdal, -----,
+#>      arrests, flights, testlist, diam, logstash-2018.02.28, stuff, bbbbbbb,
+#>      gbif, afjaljfalsfjalksdfadf, stuff_m, gbifnewgeo, geoshape, stuff_x,
+#>      afjaljfalsfjalksdf, diamfromlist, diamonds, stuff_i, pos, shakespeare2,
+#>      stuff_e, stuff_g, geonames, gbifgeo, yep, diamonds_small, foobar, stuff_k,
+#>      things, shakespeare, stuff_j, gbifgeopoint, stuff_w, hello
 ```
+
+Start etcd in your shell of choice after installing etcd (https://github.com/coreos/etcd/releases/tag/v2.2.0) by, e.g.: `etcd`
 
 
 ```r
 src_etcd()
-#> src: etcd 0.4.6
+#> src: 2.2.0
+#>  src: 2.2.0
 ```
+
+Start MongoDB in your shell of choice by: `mongod`
 
 
 ```r
 src_mongo()
-#> MongoDB 3.0.2 (uptime: 1298s)
+#> MongoDB 3.0.5 (uptime: 176s)
 #> URL: Scotts-MBP/test
 ```
+
+You don't need to start a server for Redis - we use [rlite][rlite], 
+a serverless Redis engine
 
 
 ```r
@@ -140,7 +183,7 @@ docdb_get(src, "diamonds_small")
 
 
 ```r
-src <- src_redis()
+src <- src_rlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 #>                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
@@ -172,6 +215,7 @@ docdb_get(src, "diamonds_small") %>%
 #> Source: local data table [5 x 3]
 #> 
 #>         cut mean_depth mean_price
+#>       (chr)      (dbl)      (dbl)
 #> 1      Good   62.38090   2185.303
 #> 2 Very Good   61.74602   2365.310
 #> 3     Ideal   61.67477   2503.051
@@ -184,5 +228,8 @@ docdb_get(src, "diamonds_small") %>%
 * [Please report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 * License: MIT
 * Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
+* Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 [![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+
+[rlite]: https://github.com/seppo0010/rlite
