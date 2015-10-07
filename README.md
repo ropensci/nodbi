@@ -72,8 +72,9 @@ Start etcd in your shell of choice after installing etcd (https://github.com/cor
 
 ```r
 src_etcd()
-#> src: 2.2.0
-#>  src: 2.2.0
+#> src:
+#>   etcd server: 2.2.0
+#>   etcd cluster: 2.2.0
 ```
 
 Start MongoDB in your shell of choice by: `mongod`
@@ -81,12 +82,31 @@ Start MongoDB in your shell of choice by: `mongod`
 
 ```r
 src_mongo()
-#> MongoDB 3.0.5 (uptime: 176s)
+#> MongoDB 3.0.5 (uptime: 987s)
 #> URL: Scotts-MBP/test
 ```
 
-You don't need to start a server for Redis - we use [rlite][rlite], 
-a serverless Redis engine
+If you want to use classic Redis server, we do that through the [RedisAPi][redisapi] 
+package, and you'll need to start up Redis by e.g,. `redis-server` in your shell. 
+
+
+```r
+src_redis()
+#> $type
+#> [1] "redis"
+#> 
+#> $version
+#> [1] '0.1.4'
+#> 
+#> $con
+#> <redis_api>
+#>   Public:
+#>     APPEND: function
+...
+```
+
+But if you want to use serverless Redis via [rlite][rlite], we do that through using 
+with the [rrlite][rrlite] R package - and no need to start a server, of course.
 
 
 ```r
@@ -233,3 +253,5 @@ docdb_get(src, "diamonds_small") %>%
 [![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
 
 [rlite]: https://github.com/seppo0010/rlite
+[redisapi]: https://github.com/ropensci/RedisAPI
+[rrlite]: https://github.com/ropensci/rrlite
