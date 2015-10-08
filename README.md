@@ -3,6 +3,24 @@ nodbi
 
 
 
+
+`nodbi` provides a single UI for interacting with many NoSQL databases. 
+
+So far we support the following DBs:
+
+* MongoDB
+* Redis (server and serverless)
+* CouchDB
+* Elasticsearch
+* etcd
+
+Currently we have support for data.frame's for the following operations
+
+* Create - all DBs
+* Get - all DBs
+* Delete - all DBs
+* Update - just CouchDB (others coming)
+
 ## Dependencies not on CRAN
 
 You don't need to install these, only the ones that you want to use in `nodbi`.
@@ -45,7 +63,7 @@ src_couchdb()
 #> databases: _replicator, _users, adsfa, adsfdsf, bulkfromchr, bulkfromlist,
 #>      bulktest, bulktest2, bulktest3, bulktest4, bulktest5, cachecall, diamonds,
 #>      docdbi, hello_earth, iris, iriscolumns, irisrows, leothelion, leothelion2,
-#>      mapuris, mran, mtcars, mtcars2, mtcarsdb, mydb, newdb, newdbs, newnew,
+#>      mapuris, mran, mtcars2, mtcars3, mtcarsdb, mydb, newdb, newdbs, newnew,
 #>      sofadb, stuff, stuff2, test, testiris, xiris
 ```
 
@@ -61,10 +79,11 @@ src_elasticsearch()
 #> src: elasticsearch 1.7.2 [http://127.0.0.1:9200]
 #> databases: flowers, shite, animals, asdfdf, things2, twitter, testrgdal, -----,
 #>      arrests, flights, testlist, diam, logstash-2018.02.28, stuff, bbbbbbb,
-#>      gbif, afjaljfalsfjalksdfadf, stuff_m, gbifnewgeo, geoshape, stuff_x,
-#>      afjaljfalsfjalksdf, diamfromlist, diamonds, stuff_i, pos, shakespeare2,
-#>      stuff_e, stuff_g, geonames, gbifgeo, yep, diamonds_small, foobar, stuff_k,
-#>      things, shakespeare, stuff_j, gbifgeopoint, stuff_w, hello
+#>      gbif, afjaljfalsfjalksdfadf, stuff_m, testes, gbifnewgeo, geoshape,
+#>      stuff_x, afjaljfalsfjalksdf, diamfromlist, diamonds, stuff_i, pos,
+#>      shakespeare2, stuff_e, iris_data, stuff_g, geonames, gbifgeo, yep,
+#>      diamonds_small, foobar, stuff_k, things, shakespeare, stuff_j,
+#>      gbifgeopoint, stuff_w, hello
 ```
 
 Start etcd in your shell of choice after installing etcd (https://github.com/coreos/etcd/releases/tag/v2.2.0) by, e.g.: `etcd`
@@ -82,7 +101,7 @@ Start MongoDB in your shell of choice by: `mongod`
 
 ```r
 src_mongo()
-#> MongoDB 3.0.5 (uptime: 987s)
+#> MongoDB 3.0.5 (uptime: 141s)
 #> URL: Scotts-MBP/test
 ```
 
@@ -131,13 +150,13 @@ src_rlite()
 src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars", value = mtcars)
 head( docdb_get(src, "mtcars") )
-#>     mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#> 1: 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
-#> 2: 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
-#> 3: 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
-#> 4: 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
-#> 5: 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
-#> 6: 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
+#>     mpg cyl disp  hp drat    wt  qsec vs am gear carb letter
+#> 1: 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4      n
+#> 2: 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4      o
+#> 3: 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1      y
+#> 4: 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1      d
+#> 5: 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2      q
+#> 6: 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1      u
 ```
 
 ## etcd
@@ -149,13 +168,13 @@ head( docdb_get(src, "mtcars") )
 src <- src_etcd()
 ff <- docdb_create(src, "/mtcars", mtcars)
 head( docdb_get(src, "/mtcars") )
-#>     mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#> 1: 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
-#> 2: 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
-#> 3: 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
-#> 4: 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
-#> 5: 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
-#> 6: 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
+#>     mpg cyl disp  hp drat    wt  qsec vs am gear carb letter
+#> 1: 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4      n
+#> 2: 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4      o
+#> 3: 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1      y
+#> 4: 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1      d
+#> 5: 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2      q
+#> 6: 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1      u
 ```
 
 ## Elasticsearch

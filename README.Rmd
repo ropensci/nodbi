@@ -35,6 +35,24 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+`nodbi` provides a single UI for interacting with many NoSQL databases. 
+
+So far we support the following DBs:
+
+* MongoDB
+* Redis (server and serverless)
+* CouchDB
+* Elasticsearch
+* etcd
+
+Currently we have support for data.frame's for the following operations
+
+* Create - all DBs
+* Get - all DBs
+* Delete - all DBs
+* Update - just CouchDB (others coming)
+
 ## Dependencies not on CRAN
 
 You don't need to install these, only the ones that you want to use in `nodbi`.
