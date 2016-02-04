@@ -12,7 +12,7 @@ before_install:
 install:
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github ropensci/sofa
--  - Rscript -e 'library(devtools); library(methods); options(repos=c(CRAN="http://cran.rstudio.com")); devtools::install_git("https://github.com/ropensci/rrlite", args="--recursive")'
+  - Rscript -e 'library(devtools); library(methods); options(repos=c(CRAN="http://cran.rstudio.com")); devtools::install_git("https://github.com/ropensci/rrlite", args="--recursive")'
 
 script: ./travis-tool.sh run_tests
 
@@ -23,3 +23,5 @@ notifications:
   email:
     on_success: change
     on_failure: change
+  slack:
+    secure: MIahHdXUhj4BLer8KfpDN+PmSzLPak59m2xyBgHvJuHp9RFLpXcOToyE0CF1Lbt8caxlox0FSmuqfqa0s+HrQhYOB6uAcFunDVOGV//MJrkms53LZqCqo2wrvEBastmv4Xv7+e5vBSG+M4bzRdf5MWn8QBTzzPeyJLkuOuu9V20=
