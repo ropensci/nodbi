@@ -13,6 +13,7 @@ addons:
 
 r_github_packages:
   - richfitz/redux
+  - ropensci/RedisAPI
   - ropensci/rrlite
 
 after_failure:
