@@ -6,6 +6,11 @@ services:
   - couchdb
   - redis
 
+addons:
+  apt:
+    packages:
+      - libhiredis-dev
+
 r_github_packages:
   - richfitz/redux
   - ropensci/rrlite
