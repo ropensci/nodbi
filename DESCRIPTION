@@ -23,5 +23,5 @@ Suggests:
     elastic (>= 0.7.8),
     mongolite (>= 0.9.1),
     testthat
-Remotes: ropensci/rrlite, richfitz/redux
+Remotes: richfitz/redux, ropensci/rrlite
 RoxygenNote: 6.0.1

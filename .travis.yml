@@ -6,6 +6,10 @@ services:
   - couchdb
   - redis
 
+r_github_packages:
+  - richfitz/redux
+  - ropensci/rrlite
+
 after_failure:
   - ./travis-tool.sh dump_logs
 
