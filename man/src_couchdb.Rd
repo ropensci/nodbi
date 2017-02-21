@@ -4,17 +4,18 @@
 \alias{src_couchdb}
 \title{Setup a CouchDB database connection}
 \usage{
-src_couchdb(type = "localhost", port = 5984, user = NULL, pwd = NULL)
+src_couchdb(host = "127.0.0.1", port = 5984, path = NULL,
+  transport = "http", user = NULL, pwd = NULL, headers = NULL)
 }
 \arguments{
-\item{type}{One of localhost, cloudant, or iriscouch. This is what's used to determine
-how to structure the URL to make the request.}
-
 \item{port}{Port number}
 
 \item{user}{Username, if any}
 
 \item{pwd}{Password, if any}
+
+\item{type}{One of localhost, cloudant, or iriscouch. This is what's
+used to determine how to structure the URL to make the request.}
 }
 \description{
 Setup a CouchDB database connection

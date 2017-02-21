@@ -20,8 +20,8 @@ Get documents
 \dontrun{
 # CouchDB
 src <- src_couchdb()
-docout <- docdb_create(src, key = "mtcars", value = mtcars)
-docdb_get(src, "mtcars")
+docout <- docdb_create(src, key = "mtcars2", value = mtcars)
+docdb_get(src, "mtcars2")
 
 # Etcd
 src <- src_etcd()

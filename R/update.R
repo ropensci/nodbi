@@ -9,20 +9,19 @@
 #' @examples \dontrun{
 #' # CouchDB
 #' src <- src_couchdb()
-#' docdb_create(src, "mtcars3", mtcars)
-#' docdb_get(src, "mtcars3")
+#' docdb_create(src, "mtcars2", mtcars)
+#' docdb_get(src, "mtcars2")
 #'
 #' mtcars$letter <- sample(letters, NROW(mtcars), replace = TRUE)
-#' docdb_update(src, "mtcars3", mtcars)
-#' docdb_get(src, "mtcars3")
+#' docdb_update(src, "mtcars2", mtcars)
+#' docdb_get(src, "mtcars2")
 #' }
-docdb_update <- function(src, key, value, ...){
+docdb_update <- function(src, key, value, ...) {
   UseMethod("docdb_update")
 }
 
 #' @export
-docdb_update.src_couchdb <- function(src, key, value, ...){
-  dbinfo <- sofa::db_info(dbname = key)
-  if (!is.null(dbinfo$error)) sofa::db_create(dbname = key)
-  sofa::bulk_update(doc = value, cushion = src$type, dbname = key)
+docdb_update.src_couchdb <- function(src, key, value, ...) {
+  if (!key %in% attr(src, "dbs")) sofa::db_create(src[[1]], dbname = key)
+  sofa::db_bulk_update(src[[1]], dbname = key, doc = value, ...)
 }

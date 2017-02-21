@@ -1,5 +1,5 @@
 nodbi
-======
+=====
 
 ```{r echo=FALSE}
 library("knitr")
@@ -60,15 +60,7 @@ We put all database drivers in `Suggests`, so this package doesn't require
 any one database drive package unless you invoke the function that uses that 
 thing. 
 
-```{r eval=FALSE}
-install.packages("devtools")
-devtools::install_github("ropensci/sofa")
-devtools::install_github("ropensci/etseed")
-devtools::install_github("ropensci/rrlite")
-devtools::install_github("ropensci/RedisAPI")
-```
-
-`mongolite` and `elastic` are on CRAN
+`sofa`, `mongolite`, `elastic`, and `etseed` are on CRAN
 
 ## Install
 
@@ -200,12 +192,12 @@ docdb_get(src, "diamonds_small") %>%
 
 ## Meta
 
-* [Please report any issues or bugs](https://github.com/ropensci/nodbi/issues).
+* Please [report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 * License: MIT
 * Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
 * Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-[![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+[![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
 
 [rlite]: https://github.com/seppo0010/rlite
 [redisapi]: https://github.com/ropensci/RedisAPI

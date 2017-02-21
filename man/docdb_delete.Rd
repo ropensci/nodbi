@@ -19,7 +19,7 @@ Delete documents
 \examples{
 \dontrun{
 # couchdb
-src <- src_couchdb()
+(src <- src_couchdb())
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 docdb_delete(src, "mtcars")

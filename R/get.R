@@ -8,8 +8,8 @@
 #' @examples \dontrun{
 #' # CouchDB
 #' src <- src_couchdb()
-#' docout <- docdb_create(src, key = "mtcars", value = mtcars)
-#' docdb_get(src, "mtcars")
+#' docout <- docdb_create(src, key = "mtcars2", value = mtcars)
+#' docdb_get(src, "mtcars2")
 #'
 #' # Etcd
 #' src <- src_etcd()
@@ -36,8 +36,11 @@ docdb_get <- function(src, docid, ...){
 }
 
 #' @export
-docdb_get.src_couchdb <- function(src, docid, ...){
-  dropmeta(rbindlist(pluck(sofa::alldocs(cushion = src$type, dbname = docid, include_docs = TRUE)$rows, "doc")))
+docdb_get.src_couchdb <- function(src, docid, ...) {
+  dropmeta(
+    data.table::setDF(data.table::rbindlist(
+    pluck(sofa::db_alldocs(src[[1]], dbname = docid,
+                           include_docs = TRUE, ...)$rows, "doc"))))
 }
 
 #' @export
@@ -50,8 +53,10 @@ docdb_get.src_etcd <- function(src, docid, ...){
 
 #' @export
 docdb_get.src_elasticsearch <- function(src, docid, ...){
-  ids <- pluck(elastic::Search(docid, source = FALSE, size = 1000)$hits$hits, "_id", "")
-  tmp <- elastic::docs_mget(index = docid, type = docid, ids = ids, verbose = FALSE)
+  ids <- pluck(elastic::Search(docid, source = FALSE,
+                               size = 1000)$hits$hits, "_id", "")
+  tmp <- elastic::docs_mget(index = docid, type = docid, ids = ids,
+                            verbose = FALSE)
   rbindlist(pluck(tmp$docs, "_source"))
 }
 

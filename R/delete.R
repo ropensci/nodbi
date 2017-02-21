@@ -6,7 +6,7 @@
 #' @param ... Ignored for now
 #' @examples \dontrun{
 #' # couchdb
-#' src <- src_couchdb()
+#' (src <- src_couchdb())
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
 #' docdb_delete(src, "mtcars")
@@ -22,7 +22,7 @@
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' docdb_delete(src, "iris")
-#' 
+#'
 #' # mongo
 #' src <- src_mongo()
 #' docdb_create(src, "iris", iris)
@@ -34,22 +34,22 @@ docdb_delete <- function(src, key, ...){
 }
 
 #' @export
-docdb_delete.src_couchdb <- function(src, key, ...){
-  sofa::db_delete(cushion = src$type, dbname = key)
+docdb_delete.src_couchdb <- function(src, key, ...) {
+  sofa::db_delete(src[[1]], dbname = key, ...)
 }
 
 #' @export
-docdb_delete.src_etcd <- function(src, key, ...){
+docdb_delete.src_etcd <- function(src, key, ...) {
   etseed::delete(key, dir = TRUE, recursive = TRUE)
 }
 
 #' @export
-docdb_delete.src_elasticsearch <- function(src, key, ...){
+docdb_delete.src_elasticsearch <- function(src, key, ...) {
   elastic::index_delete(key, verbose = FALSE)
 }
 
 #' @export
-docdb_delete.src_mongo <- function(src, key, ...){
+docdb_delete.src_mongo <- function(src, key, ...) {
   stopifnot(is(src, "src_mongo"))
   collection <- mongolite:::mongo_collection_new(src$con, src$db, key)
   mongolite:::mongo_collection_drop(collection)

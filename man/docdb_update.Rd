@@ -25,11 +25,11 @@ Note that with etcd, you have to prefix a key with a forward slash.
 \dontrun{
 # CouchDB
 src <- src_couchdb()
-docdb_create(src, "mtcars3", mtcars)
-docdb_get(src, "mtcars3")
+docdb_create(src, "mtcars2", mtcars)
+docdb_get(src, "mtcars2")
 
 mtcars$letter <- sample(letters, NROW(mtcars), replace = TRUE)
-docdb_update(src, "mtcars3", mtcars)
-docdb_get(src, "mtcars3")
+docdb_update(src, "mtcars2", mtcars)
+docdb_get(src, "mtcars2")
 }
 }

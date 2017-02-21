@@ -25,7 +25,7 @@ Note that with etcd, you have to prefix a key with a forward slash.
 \dontrun{
 # CouchDB
 src <- src_couchdb()
-docdb_create(src, "mtcars2", mtcars)
+docdb_create(src, key="mtcars2", value=mtcars)
 docdb_get(src, "mtcars2")
 
 # Etcd

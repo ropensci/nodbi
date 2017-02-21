@@ -9,7 +9,7 @@
 #' @examples \dontrun{
 #' # CouchDB
 #' src <- src_couchdb()
-#' docdb_create(src, "mtcars2", mtcars)
+#' docdb_create(src, key="mtcars2", value=mtcars)
 #' docdb_get(src, "mtcars2")
 #'
 #' # Etcd
@@ -33,10 +33,9 @@ docdb_create <- function(src, key, value, ...){
 }
 
 #' @export
-docdb_create.src_couchdb <- function(src, key, value, ...){
-  dbinfo <- sofa::db_info(dbname = key)
-  if(!is.null(dbinfo$error)) sofa::db_create(dbname=key)
-  sofa::bulk_create(doc = value, cushion = src$type, dbname = key)
+docdb_create.src_couchdb <- function(src, key, value, ...) {
+  if (!key %in% attr(src, "dbs")) sofa::db_create(src[[1]], dbname = key)
+  invisible(sofa::db_bulk_create(src[[1]], dbname = key, doc = value, ...))
 }
 
 #' @export
@@ -85,8 +84,8 @@ docdb_create.src_mongo <- function(src, key, value, ...){
 # make_bulk("diamonds", diamonds, "~/diamonds.json")
 make_bulk <- function(key, value, filename = "~/docdbi_bulk.json") {
   unlink(filename)
-  for(i in 1:NROW(value)){
-    dat <- list(index = list(`_index` = key, `_type` = key, `_id` = i-1))
+  for (i in 1:NROW(value)) {
+    dat <- list(index = list(`_index` = key, `_type` = key, `_id` = i - 1))
     cat(proc_doc(dat), sep = "\n", file = filename, append = TRUE)
     cat(proc_doc(value[i,]), sep = "\n", file = filename, append = TRUE)
   }
