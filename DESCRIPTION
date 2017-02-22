@@ -18,7 +18,8 @@ Imports:
 Suggests:
     sofa (>= 0.2.0),
     RedisAPI (>= 0.1.4),
-    rrlite  (>= 0.2.0),
+    rrlite (>= 0.2.0),
+    RcppRedis,
     etseed (>= 0.1.0),
     elastic (>= 0.7.8),
     mongolite (>= 0.9.1),
