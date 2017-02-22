@@ -1,6 +1,6 @@
 skip_if_no_redis <- function() {
   testthat::skip_if_not_installed("RedisAPI")
-  if (RedisAPI::redis_available()) {
+  if (RedisAPI::rcppredis_available()) {
     return()
   }
   skip("Redis or RcppRedis are not available")
@@ -12,7 +12,7 @@ skip_if_no_rrlite <- function() {
 
 skip_if_no_couchdb <- function() {
   testthat::skip_if_not_installed("sofa")
-  if (inherits(try(src_couchdb(), silent=TRUE), "try-error")) {
+  if (inherits(try(src_couchdb(), silent = TRUE), "try-error")) {
     skip("couchdb is not available")
   }
 }

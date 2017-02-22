@@ -7,7 +7,8 @@ test_that("Source", {
   expect_is(src, "docdb_src")
   expect_is(src, "src_couchdb")
   expect_is(unclass(src), "list")
-  expect_equal(src$couchdb, "Welcome")
+  expect_equal(attr(src, "type"), "couchdb")
+  expect_equal(attr(src, "info")$couchdb, "Welcome")
 })
 
 df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
@@ -29,9 +30,9 @@ test_that("delete in couchdb works", {
   src <- src_couchdb()
 
   # delete if exists
-  invisible(tryCatch(docdb_delete(src, "df"), error = function(e) e))
+  invisible(tryCatch(docdb_delete(src, "foobar"), error = function(e) e))
 
-  invisible(docdb_create(src, "df", df))
-  del <- docdb_delete(src, "df")
+  invisible(docdb_create(src, "foobar", df))
+  del <- docdb_delete(src, "foobar")
   expect_true(del$ok)
 })

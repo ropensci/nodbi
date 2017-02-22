@@ -5,7 +5,7 @@ test_that("Source", {
   src <- src_mongo()
   expect_is(src, "docdb_src")
   expect_is(src, "src_mongo")
-  expect_that(src$con, is_a("mongo_client"))
+  expect_is(src$con, "mongo")
   expect_equal(src$db, "test")
 })
 

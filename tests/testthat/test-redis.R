@@ -7,7 +7,7 @@ test_that("Source (Redis)", {
   expect_that(src, is_a("src_redis"))
   expect_that(src$con, is_a("redis_api"))
   expect_that(src$type, equals("redis"))
-  expect_that(src$con$type, equals("RcppRedis"))
+  expect_equal(src$con$type(), "RcppRedis")
 })
 
 test_that("Source (rlite)", {
@@ -18,7 +18,7 @@ test_that("Source (rlite)", {
   expect_that(src, is_a("src_redis"))
   expect_that(src$con, is_a("redis_api"))
   expect_that(src$type, equals("redis"))
-  expect_that(src$con$type, equals("rrlite"))
+  expect_equal(src$con$type(), "rrlite")
 })
 
 test_that("db into Redis", {

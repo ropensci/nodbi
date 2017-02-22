@@ -6,8 +6,8 @@ test_that("Source", {
   src <- src_etcd()
   expect_is(src, "docdb_src")
   expect_is(src, "src_etcd")
-  expect_is(unclass(src), "list")
-  expect_is(src$etcdserver, "character")
+  expect_is(attr(src, "version"), "list")
+  expect_is(attr(src, "version")$etcdserver, "character")
 })
 
 df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
@@ -17,10 +17,10 @@ test_that("db into etcd", {
   src <- src_etcd()
 
   # delete if exists
-  invisible(tryCatch(suppressWarnings(docdb_delete(src, "/df")), error = function(e) e))
+  invisible(tryCatch(suppressWarnings(docdb_delete(src, "/ddd")), error = function(e) e))
 
-  docdb_create(src, "/df", df)
-  d2 <- docdb_get(src, "/df")
+  docdb_create(src, "/ddd", df)
+  d2 <- docdb_get(src, "/ddd")
   expect_equal(data.frame(d2), df)
 })
 

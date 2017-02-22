@@ -5,6 +5,7 @@ cache: packages
 services:
   - couchdb
   - redis
+  - mongodb
 
 addons:
   apt:
