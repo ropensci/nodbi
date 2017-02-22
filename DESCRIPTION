@@ -23,7 +23,6 @@ Suggests:
     etseed (>= 0.1.0),
     elastic (>= 0.7.8),
     mongolite (>= 0.9.1),
-    jsonlite (>= 1.2),
-    testthat
+    jsonlite (>= 1.2)
 Remotes: richfitz/redux, ropensci/RedisAPI, ropensci/rrlite
 RoxygenNote: 6.0.1

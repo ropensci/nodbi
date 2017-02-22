@@ -1,11 +1,15 @@
 #' Setup a CouchDB database connection
 #'
 #' @export
-#' @param type One of localhost, cloudant, or iriscouch. This is what's
-#' used to determine how to structure the URL to make the request.
-#' @param port Port number
-#' @param user Username, if any
-#' @param pwd Password, if any
+#' @param host (character) host value, default: 127.0.0.1
+#' @param port (integer/numeric) Port. Remember that if you don't want a port
+#' set, set this parameter to NULL. Default: 5984
+#' @param path (character) context path that is appended to the end of the url. e.g.,
+#' bar in http://foo.com/bar. Default: NULL, ignored
+#' @param transport (character) http or https. Default: http
+#' @param user (character) Username, if any
+#' @param pwd (character) Password, if any
+#' @param headers (list) list of named headers
 #' @examples \dontrun{
 #' src_couchdb()
 #' }

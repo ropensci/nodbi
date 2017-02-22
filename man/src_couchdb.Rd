@@ -8,14 +8,21 @@ src_couchdb(host = "127.0.0.1", port = 5984, path = NULL,
   transport = "http", user = NULL, pwd = NULL, headers = NULL)
 }
 \arguments{
-\item{port}{Port number}
+\item{host}{(character) host value, default: 127.0.0.1}
 
-\item{user}{Username, if any}
+\item{port}{(integer/numeric) Port. Remember that if you don't want a port
+set, set this parameter to NULL. Default: 5984}
 
-\item{pwd}{Password, if any}
+\item{path}{(character) context path that is appended to the end of the url. e.g.,
+bar in http://foo.com/bar. Default: NULL, ignored}
 
-\item{type}{One of localhost, cloudant, or iriscouch. This is what's
-used to determine how to structure the URL to make the request.}
+\item{transport}{(character) http or https. Default: http}
+
+\item{user}{(character) Username, if any}
+
+\item{pwd}{(character) Password, if any}
+
+\item{headers}{(list) list of named headers}
 }
 \description{
 Setup a CouchDB database connection

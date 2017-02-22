@@ -7,6 +7,17 @@
 src_etcd(host = "127.0.0.1", port = 2379, api_version = "v2",
   allow_redirect = TRUE, scheme = "http")
 }
+\arguments{
+\item{host}{(character) Host url. Deafault: 127.0.0.1}
+
+\item{port}{(integer/numeric) Port. Default: 2379}
+
+\item{api_version}{(character) etcd API version. Default: 'v2'}
+
+\item{allow_redirect}{(logical) Allow redirects? Default: \code{TRUE}}
+
+\item{scheme}{(character) http scheme, one of http or https. Default: http}
+}
 \description{
 Setup an Etcd database connection
 }

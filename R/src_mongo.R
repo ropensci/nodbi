@@ -5,8 +5,8 @@
 #' @param db (character) name of database
 #' @param url	(character) address of the mongodb server in mongo connection
 #' string URI format.
-#' @param verbose	(logical) emit some more output. default: \code{TRUE}
-#' @param options	(list) additional connection options such as SSL keys/certs
+#' @param ... additional named params passed on to
+#' \code{\link[mongolite]{mongo}}
 #' @examples \dontrun{
 #' (con <- src_mongo())
 #' print(con)

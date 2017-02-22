@@ -15,9 +15,8 @@ src_mongo(collection = "test", db = "test", url = "mongodb://localhost",
 \item{url}{(character) address of the mongodb server in mongo connection
 string URI format.}
 
-\item{verbose}{(logical) emit some more output. default: \code{TRUE}}
-
-\item{options}{(list) additional connection options such as SSL keys/certs}
+\item{...}{additional named params passed on to
+\code{\link[mongolite]{mongo}}}
 }
 \description{
 Setup a mongoDB database connection

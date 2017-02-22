@@ -9,7 +9,7 @@
 src_redis <- function(host="127.0.0.1", port=6379) {
   con <- RedisAPI::rcppredis_hiredis(host = host, port = port)
   ret <- list(type = "redis",
-              version = packageVersion("RedisAPI"),
+              version = utils::packageVersion("RedisAPI"),
               con = con)
   class(ret) <- c("src_redis", "docdb_src")
   ret
@@ -32,7 +32,7 @@ print.docdb_src_redis <- function(x, ...) {
 src_rlite <- function(...) {
   con <- rrlite::hirlite(...)
   ret <- list(type = "redis",
-              version = packageVersion("rrlite"),
+              version = utils::packageVersion("rrlite"),
               con = con)
   class(ret) <- c("src_rlite", "src_redis", "docdb_src")
   ret
