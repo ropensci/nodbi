@@ -53,14 +53,9 @@ Currently we have support for data.frame's for the following operations
 * Delete - all DBs
 * Update - just CouchDB (others coming)
 
-## Dependencies not on CRAN
-
-You don't need to install these, only the ones that you want to use in `nodbi`.
-We put all database drivers in `Suggests`, so this package doesn't require
-any one database drive package unless you invoke the function that uses that 
-thing. 
-
 `sofa`, `mongolite`, `elastic`, and `etseed` are on CRAN
+
+`RedisAPI` and `rrlite` are not on CRAN
 
 ## Install
 
@@ -164,16 +159,19 @@ head( docdb_get(src, "iris") )
 
 ```{r output.lines=1:10}
 library("ggplot2")
-src <- src_mongo()
-ff <- docdb_create(src, "diamonds_small", diamonds)
-docdb_get(src, "diamonds_small")
+src <- src_mongo(verbose = FALSE)
+ff <- docdb_create(src, "diamonds", diamonds)
+docdb_get(src, "diamonds")
 ```
 
 ## Redis
 
-```{r output.lines=1:10}
+```{r}
 src <- src_rlite()
 docdb_create(src, "mtcars", mtcars)
+```
+
+```{r output.lines=1:10}
 docdb_get(src, "mtcars")
 ```
 
@@ -181,11 +179,12 @@ docdb_get(src, "mtcars")
 
 ```{r}
 library("dplyr")
-src <- src_elasticsearch()
+src <- src_mongo(verbose = FALSE)
+
 ```
 
 ```{r}
-docdb_get(src, "diamonds_small") %>%
+docdb_get(src, "diamonds") %>%
   group_by(cut) %>%
   summarise(mean_depth = mean(depth), mean_price = mean(price))
 ```

@@ -13,7 +13,7 @@
 #'
 #' # Etcd
 #' src <- src_etcd()
-#' docdb_create(src, "/hello", "world")
+#' docdb_create(src, "/hello", mtcars)
 #' docdb_get(src, "/hello")
 #'
 #' # Elasticsearch
@@ -37,16 +37,15 @@ docdb_get <- function(src, docid, ...){
 
 #' @export
 docdb_get.src_couchdb <- function(src, docid, ...) {
-  dropmeta(
-    data.table::setDF(data.table::rbindlist(
+  dropmeta(makedf(
     pluck(sofa::db_alldocs(src[[1]], dbname = docid,
-                           include_docs = TRUE, ...)$rows, "doc"))))
+                           include_docs = TRUE, ...)$rows, "doc")))
 }
 
 #' @export
-docdb_get.src_etcd <- function(src, docid, ...){
-  tmp <- etseed::key(docid, recursive = TRUE, sorted = TRUE)
-  rbindlist(
+docdb_get.src_etcd <- function(src, docid, ...) {
+  tmp <- src$key(docid, recursive = TRUE, sorted = TRUE, ...)
+  makedf(
     lapply(pluck(tmp$node$nodes, "value"), jsonlite::fromJSON)
   )
 }
@@ -57,19 +56,22 @@ docdb_get.src_elasticsearch <- function(src, docid, ...){
                                size = 1000)$hits$hits, "_id", "")
   tmp <- elastic::docs_mget(index = docid, type = docid, ids = ids,
                             verbose = FALSE)
-  rbindlist(pluck(tmp$docs, "_source"))
+  makedf(pluck(tmp$docs, "_source"))
 }
 
 #' @export
 docdb_get.src_redis <- function(src, docid, ...) {
-  RedisAPI::redis_object_get(docid, src$con, ...)
+  res <- src$con$GET(docid)
+  if (is.null(res)) stop("no matching result found")
+  RedisAPI::string_to_object(res)
 }
 
 #' @export
 docdb_get.src_mongo <- function(src, docid, ...) {
-  collection <- mongolite:::mongo_collection_new(src$con, src$db, docid)
-  cursor <- mongolite:::mongo_collection_find(collection, ...)
-  mongolite:::mongo_stream_in(cursor, verbose = FALSE)
+  dump <- tempfile()
+  src$con$export(file(dump))
+  # remove first column, a mongodb identifier
+  jsonlite::stream_in(file(dump), verbose = FALSE)[,-1]
 }
 
 dropmeta <- function(x) {

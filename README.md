@@ -1,5 +1,5 @@
 nodbi
-======
+=====
 
 
 
@@ -21,23 +21,9 @@ Currently we have support for data.frame's for the following operations
 * Delete - all DBs
 * Update - just CouchDB (others coming)
 
-## Dependencies not on CRAN
+`sofa`, `mongolite`, `elastic`, and `etseed` are on CRAN
 
-You don't need to install these, only the ones that you want to use in `nodbi`.
-We put all database drivers in `Suggests`, so this package doesn't require
-any one database drive package unless you invoke the function that uses that 
-thing. 
-
-
-```r
-install.packages("devtools")
-devtools::install_github("ropensci/sofa")
-devtools::install_github("ropensci/etseed")
-devtools::install_github("ropensci/rrlite")
-devtools::install_github("ropensci/RedisAPI")
-```
-
-`mongolite` and `elastic` are on CRAN
+`RedisAPI` and `rrlite` are not on CRAN
 
 ## Install
 
@@ -59,12 +45,9 @@ Start CouchDB in your shell of choice by, e.g.: `couchdb`
 
 ```r
 src_couchdb()
-#> src: couchdb 1.6.1 [localhost/5984]
-#> databases: _replicator, _users, adsfa, adsfdsf, bulkfromchr, bulkfromlist,
-#>      bulktest, bulktest2, bulktest3, bulktest4, bulktest5, cachecall, diamonds,
-#>      docdbi, hello_earth, iris, iriscolumns, irisrows, leothelion, leothelion2,
-#>      mapuris, mran, mtcars2, mtcars3, mtcarsdb, mydb, newdb, newdbs, newnew,
-#>      sofadb, stuff, stuff2, test, testiris, xiris
+#> src: couchdb 2.0.0 [127.0.0.1/5984]
+#> databases: cab859b90-020a-418b-80fc-b7492378e92, mtcars, mtcars2, omdb,
+#>      testing123, z85a07642-9f49-408c-a16f-f71135d9450f
 ```
 
 Start Elaticsearch in your shell of choice by, e.g.:
@@ -76,14 +59,8 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 
 ```r
 src_elasticsearch()
-#> src: elasticsearch 1.7.2 [http://127.0.0.1:9200]
-#> databases: flowers, shite, animals, asdfdf, things2, twitter, testrgdal, -----,
-#>      arrests, flights, testlist, diam, logstash-2018.02.28, stuff, bbbbbbb,
-#>      gbif, afjaljfalsfjalksdfadf, stuff_m, testes, gbifnewgeo, geoshape,
-#>      stuff_x, afjaljfalsfjalksdf, diamfromlist, diamonds, stuff_i, pos,
-#>      shakespeare2, stuff_e, iris_data, stuff_g, geonames, gbifgeo, yep,
-#>      diamonds_small, foobar, stuff_k, things, shakespeare, stuff_j,
-#>      gbifgeopoint, stuff_w, hello
+#> src: elasticsearch 5.1.2 [127.0.0.1:9200]
+#> databases: gbifgeo, shakespeare, plos, geoshape, gbif, gbifgeopoint
 ```
 
 Start etcd in your shell of choice after installing etcd (https://github.com/coreos/etcd/releases/tag/v2.2.0) by, e.g.: `etcd`
@@ -92,8 +69,8 @@ Start etcd in your shell of choice after installing etcd (https://github.com/cor
 ```r
 src_etcd()
 #> src:
-#>   etcd server: 2.2.0
-#>   etcd cluster: 2.2.0
+#>   etcd server: 3.1.1
+#>   etcd cluster: 3.1.0
 ```
 
 Start MongoDB in your shell of choice by: `mongod`
@@ -101,8 +78,8 @@ Start MongoDB in your shell of choice by: `mongod`
 
 ```r
 src_mongo()
-#> MongoDB 3.0.5 (uptime: 141s)
-#> URL: Scotts-MBP/test
+#> MongoDB 3.4.2 (uptime: 3488s)
+#> URL: MacBook-Pro-10.local/test
 ```
 
 If you want to use classic Redis server, we do that through the [RedisAPi][redisapi] 
@@ -115,11 +92,11 @@ src_redis()
 #> [1] "redis"
 #> 
 #> $version
-#> [1] '0.1.4'
+#> [1] '0.4.0'
 #> 
 #> $con
 #> <redis_api>
-#>   Public:
+#>   Redis commands:
 #>     APPEND: function
 ...
 ```
@@ -134,11 +111,11 @@ src_rlite()
 #> [1] "redis"
 #> 
 #> $version
-#> [1] '0.2.0'
+#> [1] '0.4.0'
 #> 
 #> $con
 #> <redis_api>
-#>   Public:
+#>   Redis commands:
 #>     APPEND: function
 ...
 ```
@@ -150,13 +127,13 @@ src_rlite()
 src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars", value = mtcars)
 head( docdb_get(src, "mtcars") )
-#>     mpg cyl disp  hp drat    wt  qsec vs am gear carb letter
-#> 1: 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4      n
-#> 2: 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4      o
-#> 3: 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1      y
-#> 4: 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1      d
-#> 5: 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2      q
-#> 6: 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1      u
+#>    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+#> 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+#> 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+#> 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+#> 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+#> 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+#> 6 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
 ```
 
 ## etcd
@@ -168,13 +145,13 @@ head( docdb_get(src, "mtcars") )
 src <- src_etcd()
 ff <- docdb_create(src, "/mtcars", mtcars)
 head( docdb_get(src, "/mtcars") )
-#>     mpg cyl disp  hp drat    wt  qsec vs am gear carb letter
-#> 1: 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4      n
-#> 2: 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4      o
-#> 3: 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1      y
-#> 4: 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1      d
-#> 5: 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2      q
-#> 6: 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1      u
+#>    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+#> 1 21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+#> 2 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+#> 3 22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+#> 4 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+#> 5 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+#> 6 18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
 ```
 
 ## Elasticsearch
@@ -202,9 +179,9 @@ head( docdb_get(src, "iris") )
 
 ```r
 library("ggplot2")
-src <- src_mongo()
-ff <- docdb_create(src, "diamonds_small", diamonds)
-docdb_get(src, "diamonds_small")
+src <- src_mongo(verbose = FALSE)
+ff <- docdb_create(src, "diamonds", diamonds)
+docdb_get(src, "diamonds")
 #>        carat       cut color clarity depth table price     x     y     z
 #> 1       0.23     Ideal     E     SI2  61.5  55.0   326  3.95  3.98  2.43
 #> 2       0.21   Premium     E     SI1  59.8  61.0   326  3.89  3.84  2.31
@@ -224,6 +201,11 @@ docdb_get(src, "diamonds_small")
 ```r
 src <- src_rlite()
 docdb_create(src, "mtcars", mtcars)
+#> [Redis: OK]
+```
+
+
+```r
 docdb_get(src, "mtcars")
 #>                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
 #> Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
@@ -243,7 +225,7 @@ docdb_get(src, "mtcars")
 
 ```r
 library("dplyr")
-src <- src_elasticsearch()
+src <- src_mongo(verbose = FALSE)
 ```
 
 
@@ -251,25 +233,24 @@ src <- src_elasticsearch()
 docdb_get(src, "diamonds_small") %>%
   group_by(cut) %>%
   summarise(mean_depth = mean(depth), mean_price = mean(price))
-#> Source: local data table [5 x 3]
-#> 
+#> # A tibble: 5 × 3
 #>         cut mean_depth mean_price
-#>       (chr)      (dbl)      (dbl)
-#> 1      Good   62.38090   2185.303
-#> 2 Very Good   61.74602   2365.310
-#> 3     Ideal   61.67477   2503.051
-#> 4   Premium   61.21793   2554.372
-#> 5      Fair   63.31290   2793.613
+#>       <chr>      <dbl>      <dbl>
+#> 1      Fair   64.04168   4358.758
+#> 2      Good   62.36588   3928.864
+#> 3     Ideal   61.70940   3457.542
+#> 4   Premium   61.26467   4584.258
+#> 5 Very Good   61.81828   3981.760
 ```
 
 ## Meta
 
-* [Please report any issues or bugs](https://github.com/ropensci/nodbi/issues).
+* Please [report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 * License: MIT
 * Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
 * Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-[![rofooter](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+[![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
 
 [rlite]: https://github.com/seppo0010/rlite
 [redisapi]: https://github.com/ropensci/RedisAPI

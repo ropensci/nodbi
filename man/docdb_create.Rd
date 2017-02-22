@@ -40,8 +40,21 @@ docdb_create(src, key = "iris", value = iris)
 docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
 
 # Redis
-src <- src_redis()
-docdb_create(src, "mtcars", mtcars)
+### server
+src1 <- src_redis()
+docdb_create(src1, key = "mtcars", value = mtcars)
+docdb_get(src1, "mtcars")
+docdb_delete(src1, "mtcars")
+
+### serverless
+src2 <- src_rlite()
+docdb_create(src2, key = "mtcars", value = mtcars)
+docdb_get(src2, "mtcars")
+docdb_delete(src2, "mtcars")
+
+# MongoDB
+src <- src_mongo()
+docdb_create(src, key = "mtcars", value = mtcars)
 docdb_get(src, "mtcars")
 }
 }

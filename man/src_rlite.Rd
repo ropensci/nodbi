@@ -4,10 +4,11 @@
 \alias{src_rlite}
 \title{Setup an rlite database connection}
 \usage{
-src_rlite(filename = ":memory:")
+src_rlite(...)
 }
 \arguments{
-\item{filename}{Name of the database to use}
+\item{...}{named config options passed on to
+\code{\link[redux]{redis_config}}}
 }
 \description{
 Setup an rlite database connection

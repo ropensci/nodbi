@@ -11,3 +11,8 @@ doc_wrap <- function (..., indent = 0, width = getOption("width")){
   wrapped <- strwrap(x, indent = indent, exdent = indent + 5, width = width)
   paste0(wrapped, collapse = "\n")
 }
+
+makedf <- function(x) {
+  (xyz <-
+     data.table::setDF(data.table::rbindlist(x, use.names = TRUE, fill = TRUE)))
+}

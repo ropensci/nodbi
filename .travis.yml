@@ -11,6 +11,9 @@ addons:
     packages:
       - libhiredis-dev
 
+r_binary_packages:
+  - RcppRedis
+
 r_github_packages:
   - richfitz/redux
   - ropensci/RedisAPI

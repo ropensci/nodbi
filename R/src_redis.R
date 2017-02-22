@@ -4,13 +4,13 @@
 ##' @param port Port number
 ##' @export
 ##' @examples
-##' con <- src_redis()
+##' (con <- src_redis())
 ##' class(con)
 src_redis <- function(host="127.0.0.1", port=6379) {
-  con <- RedisAPI::hiredis(host, port)
-  ret <- list(type="redis",
-              version=packageVersion("RedisAPI"),
-              con=con)
+  con <- RedisAPI::rcppredis_hiredis(host = host, port = port)
+  ret <- list(type = "redis",
+              version = packageVersion("RedisAPI"),
+              con = con)
   class(ret) <- c("src_redis", "docdb_src")
   ret
 }
@@ -23,16 +23,17 @@ print.docdb_src_redis <- function(x, ...) {
 
 ##' Setup an rlite database connection
 ##' @title Setup an rlite database connection
-##' @param filename Name of the database to use
+##' @param ... named config options passed on to
+##' \code{\link[redux]{redis_config}}
 ##' @export
 ##' @examples
 ##' con <- src_rlite()
 ##' class(con)
-src_rlite <- function(filename = ":memory:") {
-  con <- rrlite::hirlite(filename)
-  ret <- list(type="redis",
-              version=packageVersion("rrlite"),
-              con=con)
+src_rlite <- function(...) {
+  con <- rrlite::hirlite(...)
+  ret <- list(type = "redis",
+              version = packageVersion("rrlite"),
+              con = con)
   class(ret) <- c("src_rlite", "src_redis", "docdb_src")
   ret
 }

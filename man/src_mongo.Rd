@@ -4,17 +4,27 @@
 \alias{src_mongo}
 \title{Setup a mongoDB database connection}
 \usage{
-src_mongo(url = "mongodb://localhost", db = "test")
+src_mongo(collection = "test", db = "test", url = "mongodb://localhost",
+  ...)
 }
 \arguments{
-\item{url}{Server host url}
+\item{collection}{(character) name of collection}
 
-\item{db}{Name of the database to use}
+\item{db}{(character) name of database}
+
+\item{url}{(character) address of the mongodb server in mongo connection
+string URI format.}
+
+\item{verbose}{(logical) emit some more output. default: \code{TRUE}}
+
+\item{options}{(list) additional connection options such as SSL keys/certs}
 }
 \description{
 Setup a mongoDB database connection
 }
 \examples{
-con <- src_mongo()
+\dontrun{
+(con <- src_mongo())
 print(con)
+}
 }

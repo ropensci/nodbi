@@ -1,20 +1,28 @@
 #' Setup a mongoDB database connection
-#' 
-#' @param db Name of the database to use
-#' @param url Server host url
+#'
 #' @export
-#' @examples
-#' con <- src_mongo()
+#' @param collection (character) name of collection
+#' @param db (character) name of database
+#' @param url	(character) address of the mongodb server in mongo connection
+#' string URI format.
+#' @param verbose	(logical) emit some more output. default: \code{TRUE}
+#' @param options	(list) additional connection options such as SSL keys/certs
+#' @examples \dontrun{
+#' (con <- src_mongo())
 #' print(con)
-src_mongo <- function(url = "mongodb://localhost", db = "test") {
-  con <- mongolite:::mongo_client_new(url)
+#' }
+src_mongo <- function(collection = "test", db = "test",
+                      url = "mongodb://localhost", ...) {
+
+  con <- mongolite::mongo(collection, db, url, ...)
   structure(list(con = con, db = db), class = c("src_mongo", "docdb_src"))
 }
 
-##' @export
+#' @export
 print.src_mongo <- function(x, ...) {
   con <- x$con
   db <- x$db
-  srv <- mongolite:::mongo_client_server_status(con)
-  cat(sprintf("MongoDB %s (uptime: %ss)\nURL: %s/%s", srv$version, srv$uptime, srv$host, db))
+  srv <- con$info()
+  cat(sprintf("MongoDB %s (uptime: %ss)\nURL: %s/%s",
+              srv$server$version, srv$server$uptime, srv$server$host, db))
 }

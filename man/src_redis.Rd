@@ -15,6 +15,6 @@ src_redis(host = "127.0.0.1", port = 6379)
 Setup an Redis database connection
 }
 \examples{
-con <- src_redis()
+(con <- src_redis())
 class(con)
 }

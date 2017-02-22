@@ -4,7 +4,8 @@
 \alias{src_etcd}
 \title{Setup an Etcd database connection}
 \usage{
-src_etcd()
+src_etcd(host = "127.0.0.1", port = 2379, api_version = "v2",
+  allow_redirect = TRUE, scheme = "http")
 }
 \description{
 Setup an Etcd database connection

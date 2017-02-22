@@ -4,23 +4,30 @@
 \alias{src_elasticsearch}
 \title{Setup an Elasticsearch database connection}
 \usage{
-src_elasticsearch(base = "http://127.0.0.1", port = 9200, user = NULL,
-  pwd = NULL, key = NULL, force = FALSE, ...)
+src_elasticsearch(host = "127.0.0.1", port = 9200, path = NULL,
+  transport_schema = "http", user = NULL, pwd = NULL, force = FALSE,
+  ...)
 }
 \arguments{
-\item{base}{the base url, defaults to localhost (http://127.0.0.1)}
+\item{host}{(character) the base url, defaults to localhost
+(http://127.0.0.1)}
 
-\item{port}{port to connect to, defaults to 9200 (optional)}
+\item{port}{(character) port to connect to, defaults to 9200 (optional)}
 
-\item{user}{User name, if required for the connection. You can specify, but ignored for now.}
+\item{path}{(character) context path that is appended to the end of the
+url. Default: NULL, ignored}
 
-\item{pwd}{Password, if required for the connection. You can specify, but ignored for now.}
+\item{transport_schema}{(character) http or https. Default: http}
 
-\item{key}{An API key, ignored for now}
+\item{user}{(character) User name, if required for the connection. You
+can specify, but ignored for now.}
 
-\item{force}{Force re-load of connection details}
+\item{pwd}{(character) Password, if required for the connection. You can
+specify, but ignored for now.}
 
-\item{...}{Further args passed on to print for the es_conn class.}
+\item{force}{(logical) Force re-load of connection details}
+
+\item{...}{Further args passed on to \code{\link[elastic]{connect}}}
 }
 \description{
 Setup an Elasticsearch database connection

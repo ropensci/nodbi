@@ -1,7 +1,7 @@
 Package: nodbi
 Title: NoSQL Database Connector
 Description: Simplified document database manipulation and analysis.
-Version: 0.0.3.9100
+Version: 0.0.4.9100
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com"),
     person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"),
@@ -22,6 +22,7 @@ Suggests:
     etseed (>= 0.1.0),
     elastic (>= 0.7.8),
     mongolite (>= 0.9.1),
+    jsonlite (>= 1.2),
     testthat
 Remotes: richfitz/redux, ropensci/RedisAPI, ropensci/rrlite
 RoxygenNote: 6.0.1

@@ -23,11 +23,24 @@
 #' docdb_get(src, "iris")
 #' docdb_delete(src, "iris")
 #'
+#' # Redis
+#' ### server
+#' src1 <- src_redis()
+#' docdb_create(src1, key = "mtcars", value = mtcars)
+#' docdb_get(src1, "mtcars")
+#' docdb_delete(src1, "mtcars")
+#'
+#' ### serverless
+#' src2 <- src_rlite()
+#' docdb_create(src2, key = "mtcars", value = mtcars)
+#' docdb_get(src2, "mtcars")
+#' docdb_delete(src2, "mtcars")
+#'
 #' # mongo
-#' src <- src_mongo()
+#' src <- src_mongo("stuff")
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
-#' docdb_delete(src, "iris")
+#' docdb_delete(src)
 #' }
 docdb_delete <- function(src, key, ...){
   UseMethod("docdb_delete")
@@ -40,7 +53,7 @@ docdb_delete.src_couchdb <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_etcd <- function(src, key, ...) {
-  etseed::delete(key, dir = TRUE, recursive = TRUE)
+  src$delete(key, dir = TRUE, recursive = TRUE, ...)
 }
 
 #' @export
@@ -50,12 +63,10 @@ docdb_delete.src_elasticsearch <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_mongo <- function(src, key, ...) {
-  stopifnot(is(src, "src_mongo"))
-  collection <- mongolite:::mongo_collection_new(src$con, src$db, key)
-  mongolite:::mongo_collection_drop(collection)
+  src$con$drop()
 }
 
 #' @export
 docdb_delete.src_redis <- function(src, key, ...) {
-  RedisAPI::redis_object_del(key, src$con, ...)
+  src$con$DEL(key)
 }

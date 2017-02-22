@@ -5,14 +5,15 @@
 #' (src <- src_etcd())
 #' class(src)
 #' }
-src_etcd <- function() {
-  ver <- etseed::version()
-  structure(c(ver, type = "etcd"), class = c("src_etcd", "docdb_src"))
+src_etcd <- function(host = "127.0.0.1", port = 2379, api_version = "v2",
+                     allow_redirect = TRUE, scheme = "http") {
+  x <- etseed::etcd(host, port, api_version, allow_redirect, scheme)
+  structure(x, class = c("src_etcd", "docdb_src"), version = x$version())
 }
 
 #' @export
 print.src_etcd <- function(x, ...) {
   cat("src:\n")
-  cat(sprintf("  etcd server: %s\n", x$etcdserver))
-  cat(sprintf("  etcd cluster: %s\n", x$etcdcluster))
+  cat(sprintf("  etcd server: %s\n", attr(x, "version")$etcdserver))
+  cat(sprintf("  etcd cluster: %s\n", attr(x, "version")$etcdcluster))
 }

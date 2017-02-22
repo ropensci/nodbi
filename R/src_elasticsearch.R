@@ -1,29 +1,41 @@
 #' Setup an Elasticsearch database connection
 #'
 #' @export
-#' @param base the base url, defaults to localhost (http://127.0.0.1)
-#' @param port	port to connect to, defaults to 9200 (optional)
-#' @param user	User name, if required for the connection. You can specify, but ignored for now.
-#' @param pwd	Password, if required for the connection. You can specify, but ignored for now.
-#' @param key	An API key, ignored for now
-#' @param force	Force re-load of connection details
-#' @param ...	Further args passed on to print for the es_conn class.
+#' @param host (character) the base url, defaults to localhost
+#' (http://127.0.0.1)
+#' @param port (character) port to connect to, defaults to 9200 (optional)
+#' @param path (character) context path that is appended to the end of the
+#' url. Default: NULL, ignored
+#' @param transport_schema (character) http or https. Default: http
+#' @param user (character) User name, if required for the connection. You
+#' can specify, but ignored for now.
+#' @param pwd	(character) Password, if required for the connection. You can
+#' specify, but ignored for now.
+#' @param force	(logical) Force re-load of connection details
+#' @param ...	Further args passed on to \code{\link[elastic]{connect}}
 #' @examples \dontrun{
 #' src_elasticsearch()
 #' }
-src_elasticsearch <- function(base = "http://127.0.0.1", port = 9200, user = NULL,
-                              pwd = NULL, key = NULL, force = FALSE, ...) {
+src_elasticsearch <- function(host = "127.0.0.1", port = 9200, path = NULL,
+                              transport_schema = "http", user = NULL,
+                              pwd = NULL, force = FALSE, ...) {
 
-  elastic::connect(es_base = base, es_port = port, es_user = user,
-                   es_pwd = pwd, es_key = key, force = force, ...)
+  elastic::connect(es_host = host, es_port = port, es_path = path,
+                   es_transport_schema = transport_schema, es_user = user,
+                   es_pwd = pwd, force = force, ...)
   conninfo <- elastic::connection()
   info <- elastic::ping()
   dbs <- names(elastic::aliases_get())
-  structure(list(es_info=info, es_conn=conninfo, dbs=dbs), class=c("src_elasticsearch","docdb_src"), type="elasticsearch")
+  structure(list(es_info = info, es_conn = conninfo, dbs = dbs),
+            class = c("src_elasticsearch","docdb_src"),
+            type = "elasticsearch")
 }
 
 #' @export
-print.src_elasticsearch <- function(x, ...){
-  cat(sprintf("src: elasticsearch %s [%s:%s]", x$es_info$version$number, x$es_conn$base, x$es_conn$port), sep = "\n")
-  cat(doc_wrap("databases: ", paste0(x$dbs, collapse = ", "), width=80), "\n", sep = "")
+print.src_elasticsearch <- function(x, ...) {
+  cat(sprintf("src: elasticsearch %s [%s:%s]",
+              x$es_info$version$number,
+              x$es_conn$host, x$es_conn$port), sep = "\n")
+  cat(doc_wrap("databases: ", paste0(x$dbs, collapse = ", "),
+               width = 80), "\n", sep = "")
 }

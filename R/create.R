@@ -24,8 +24,21 @@
 #' docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
 #'
 #' # Redis
-#' src <- src_redis()
-#' docdb_create(src, "mtcars", mtcars)
+#' ### server
+#' src1 <- src_redis()
+#' docdb_create(src1, key = "mtcars", value = mtcars)
+#' docdb_get(src1, "mtcars")
+#' docdb_delete(src1, "mtcars")
+#'
+#' ### serverless
+#' src2 <- src_rlite()
+#' docdb_create(src2, key = "mtcars", value = mtcars)
+#' docdb_get(src2, "mtcars")
+#' docdb_delete(src2, "mtcars")
+#'
+#' # MongoDB
+#' src <- src_mongo()
+#' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_get(src, "mtcars")
 #' }
 docdb_create <- function(src, key, value, ...){
@@ -40,12 +53,12 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
 #' @export
 docdb_create.src_etcd <- function(src, key, value, ...){
-  invisible(etseed::create(key = key, dir = TRUE))
+  invisible(src$create(key = key, dir = TRUE, ...))
   cl <- class(value)
   switch(cl,
          data.frame = {
-           for (i in 1:NROW(value)) {
-             etseed::create_inorder(key, jsonlite::toJSON(value[i, ]))
+           for (i in seq_along(value)) {
+             src$create_inorder(key, jsonlite::toJSON(value[i, ]), ...)
              # etseed::create(paste0(key, "/", i), jsonlite::toJSON(value[i, ]))
            }
          }
@@ -55,28 +68,24 @@ docdb_create.src_etcd <- function(src, key, value, ...){
 #' @export
 docdb_create.src_elasticsearch <- function(src, key, value, ...){
   elastic::index_create(index = key, verbose = FALSE)
-  cl <- class(value)
-  switch(cl,
-         data.frame = {
-           ff <- paste0(key, ".json")
-           make_bulk(key, value, ff)
-           invisible(elastic::docs_bulk(ff))
-         }
+  switch(
+    class(value),
+    data.frame = {
+      invisible(elastic::docs_bulk(value, index = key))
+    },
+    stop("only objects of class 'data.frame' supported")
   )
 }
 
 #' @export
 docdb_create.src_redis <- function(src, key, value, ...) {
-  RedisAPI::redis_object_set(key, value, src$con, ...)
+  src$con$SET(key, RedisAPI::object_to_string(value), ...)
 }
 
 #' @export
 docdb_create.src_mongo <- function(src, key, value, ...){
-  stopifnot(is(src, "src_mongo"))
   stopifnot(is.data.frame(value))
-  collection <- mongolite:::mongo_collection_new(src$con, src$db, key)
-  mongolite:::mongo_stream_out(value, collection, verbose = FALSE, ...)
-  invisible(collection)
+  src$con$insert(value, ...)
 }
 
 # make_bulk("mtcars", mtcars, "~/mtcars.json")
