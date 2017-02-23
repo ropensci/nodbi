@@ -28,6 +28,8 @@ r_github_packages:
 after_failure:
   - ./travis-tool.sh dump_logs
 
+r_check_args: "--as-cran --run-dontrun"
+
 notifications:
   email:
     on_success: change
