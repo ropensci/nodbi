@@ -6,6 +6,10 @@ services:
   - couchdb
   - redis
   - mongodb
+  - elasticsearch
+
+before_script:
+  - sleep 10
 
 addons:
   apt:
