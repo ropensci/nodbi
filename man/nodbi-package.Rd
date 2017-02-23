@@ -6,7 +6,8 @@
 \alias{nodbi}
 \title{Document database connector}
 \description{
-Document database connector
+Supports  NoSQL databases (Elasticsearch, CouchDB, MongoDB),
+key-value databases (Redis, Riak), and other NoSQL types (etcd).
 }
 \author{
 Scott Chamberlain \email{myrmecocystus@gmail.com}

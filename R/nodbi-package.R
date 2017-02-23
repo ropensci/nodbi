@@ -1,5 +1,8 @@
 #' Document database connector
 #'
+#' Supports  NoSQL databases (Elasticsearch, CouchDB, MongoDB),
+#' key-value databases (Redis, Riak), and other NoSQL types (etcd).
+#'
 #' @name nodbi-package
 #' @aliases nodbi
 #' @docType package

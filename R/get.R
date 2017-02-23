@@ -30,6 +30,11 @@
 #' src <- src_mongo()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
+#'
+#' # Riak
+#' src <- src_riak()
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_get(src, docid="mtcars")
 #' }
 docdb_get <- function(src, docid, ...){
   UseMethod("docdb_get")
@@ -72,6 +77,11 @@ docdb_get.src_mongo <- function(src, docid, ...) {
   src$con$export(file(dump))
   # remove first column, a mongodb identifier
   jsonlite::stream_in(file(dump), verbose = FALSE)[,-1]
+}
+
+#' @export
+docdb_get.src_riak <- function(src, docid, ...) {
+  reeack::riak_unserialize(src[[1]]$fetch(key = docid))
 }
 
 dropmeta <- function(x) {

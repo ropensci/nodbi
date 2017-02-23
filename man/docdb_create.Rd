@@ -56,5 +56,11 @@ docdb_delete(src2, "mtcars")
 src <- src_mongo()
 docdb_create(src, key = "mtcars", value = mtcars)
 docdb_get(src, "mtcars")
+
+# Riak
+src <- src_riak()
+docdb_create(src, key = "mtcars2", value = mtcars)
+docdb_get(src, "mtcars2")
+identical(mtcars, docdb_get(src, "mtcars2"))
 }
 }

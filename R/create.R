@@ -40,6 +40,12 @@
 #' src <- src_mongo()
 #' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_get(src, "mtcars")
+#'
+#' # Riak
+#' src <- src_riak()
+#' docdb_create(src, key = "mtcars2", value = mtcars)
+#' docdb_get(src, "mtcars2")
+#' identical(mtcars, docdb_get(src, "mtcars2"))
 #' }
 docdb_create <- function(src, key, value, ...){
   UseMethod("docdb_create")
@@ -87,6 +93,17 @@ docdb_create.src_mongo <- function(src, key, value, ...){
   stopifnot(is.data.frame(value))
   src$con$insert(value, ...)
 }
+
+#' @export
+docdb_create.src_riak <- function(src, key, value, ...){
+  stopifnot(is.data.frame(value))
+  stopifnot(length(attr(src, "dbs")) == 1)
+  src[[1]]$create(bucket = attr(src, "dbs"), key = key,
+                  body = reeack::riak_serialize(value),
+                  content_type = "text/plain", ...)
+}
+
+## helpers --------------------------------------
 
 # make_bulk("mtcars", mtcars, "~/mtcars.json")
 # make_bulk("iris", iris, "~/iris.json")

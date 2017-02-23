@@ -42,5 +42,10 @@ docdb_get(src, "mtcars")
 src <- src_mongo()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
+
+# Riak
+src <- src_riak()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, docid="mtcars")
 }
 }
