@@ -81,7 +81,7 @@ docdb_get.src_mongo <- function(src, docid, ...) {
 
 #' @export
 docdb_get.src_riak <- function(src, docid, ...) {
-  reeack::riak_unserialize(src[[1]]$fetch(key = docid))
+  reeack::riak_unserialize(src$con$fetch(key = docid))
 }
 
 dropmeta <- function(x) {

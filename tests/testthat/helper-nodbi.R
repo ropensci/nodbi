@@ -30,3 +30,10 @@ skip_if_no_etcd <- function() {
     skip("etcd is not available")
   }
 }
+
+skip_if_no_riak <- function() {
+  testthat::skip_if_not_installed("reeack")
+  if (inherits(try(src_riak(), silent=TRUE), "try-error")) {
+    skip("reeack is not available")
+  }
+}

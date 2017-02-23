@@ -23,7 +23,7 @@ src_riak <- function(host = "127.0.0.1", port = 8098, path = NULL,
   info <- x$stats()
   buckets <- x$buckets()$buckets
 
-  structure(list(x),
+  structure(list(con = x),
             class = c("src_riak", "docdb_src"),
             type = "riak", host = host, port = port,
             info = info, dbs = buckets)
