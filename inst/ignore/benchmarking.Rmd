@@ -1,0 +1,114 @@
+```{r}
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+# Benchmarking nodbi
+
+```{r}
+library(nodbi)
+library(microbenchmark)
+```
+
+make connections for use below
+
+```{r}
+src_m <- src_mongo()
+src_red <- src_redis()
+src_rl <- src_rlite()
+src_c <- src_couchdb()
+src_e <- src_elasticsearch()
+src_ri <- src_riak()
+#src_et <- src_etcd()
+```
+
+delete any datasets to be used below
+
+to do ...
+
+
+## initialize connection
+
+```{r}
+microbenchmark(
+  mongo = src_mongo(),
+  redis = src_redis(),
+  rlite = src_rlite(),
+  couch = src_couchdb(),
+  elasticsearch = src_elasticsearch(),
+  riak = src_riak(),
+  etcd = src_etcd(),
+  times = 100
+)
+```
+
+## create
+
+```{r}
+microbenchmark(
+  mongo = docdb_create(src_m, paste0("iris", sample(1:1000, 1)), iris),
+  redis = docdb_create(src_red, paste0("iris", sample(1:1000, 1)), iris),
+  rlite = docdb_create(src_rl, paste0("iris", sample(1:1000, 1)), iris),
+  couch = docdb_create(src_c, paste0("iris", sample(1:1000, 1)), iris),
+  elasticsearch = docdb_create(src_e, paste0("iris", sample(1:1000, 1)), iris),
+  riak = docdb_create(src_ri, paste0("iris", sample(1:1000, 1)), iris),
+  #etcd = docdb_create(src_et, paste0("/iris", sample(1:1000, 1)), iris),
+  times = 10
+)
+```
+
+## get
+
+create some data that won't be affected by above
+
+```{r}
+try_del_create <- function(src, key) {
+  invisible(tryCatch(docdb_delete(src, key), error = function(e) e))
+  invisible(docdb_create(src, key, iris))
+}
+```
+
+```{r}
+try_del_create(src_m, "iris_get")
+try_del_create(src_red, "iris_get")
+try_del_create(src_rl, "iris_get")
+try_del_create(src_c, "iris_get")
+try_del_create(src_e, "iris_get")
+try_del_create(src_ri, "iris_get")
+#try_del_create(src_et, "/iris_get")
+```
+
+benchmark
+
+```{r}
+microbenchmark(
+  mongo = docdb_get(src_m, "iris_get"),
+  redis = docdb_get(src_red, "iris_get"),
+  rlite = docdb_get(src_rl, "iris_get"),
+  couch = docdb_get(src_c, "iris_get"),
+  elasticsearch = docdb_get(src_e, "iris_get"),
+  riak = docdb_get(src_ri, "iris_get"),
+  #etcd = docdb_get(src_et, "/iris_get"),
+  times = 100
+)
+```
+
+## delete
+
+to do ...
+
+## cleanup
+
+```{r}
+docdb_delete(src_m, "iris_get")
+docdb_delete(src_red, "iris_get")
+docdb_delete(src_rl, "iris_get")
+docdb_delete(src_c, "iris_get")
+docdb_delete(src_e, "iris_get")
+docdb_delete(src_ri, "iris_get")
+#docdb_delete(src_et, "/iris_get")
+```
