@@ -54,7 +54,7 @@ docdb_delete <- function(src, key, ...){
 
 #' @export
 docdb_delete.src_couchdb <- function(src, key, ...) {
-  sofa::db_delete(src[[1]], dbname = key, ...)
+  sofa::db_delete(src$con, dbname = key, ...)
 }
 
 #' @export

@@ -4,7 +4,7 @@
 \alias{src_riak}
 \title{Setup a Riak database connection}
 \usage{
-src_riak(host = "127.0.0.1", port = 8098, path = NULL,
+src_riak(bucket = "test", host = "127.0.0.1", port = 8098, path = NULL,
   transport = "http", user = NULL, pwd = NULL, headers = NULL)
 }
 \arguments{
@@ -26,6 +26,14 @@ bar in http://foo.com/bar. Default: NULL, ignored}
 }
 \description{
 Setup a Riak database connection
+}
+\details{
+Riak's "databases" are called buckets - and a bucket holds
+keys. If there is no bucket named "test" the default bucket name,
+we'll create it for you in this function call by inserting a key
+with value of \code{""} into a bucket called "test". There's no way to
+create a bucket other than inserting a key, so there you have it. You can
+of course do this yourself.
 }
 \examples{
 \dontrun{

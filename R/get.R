@@ -43,7 +43,7 @@ docdb_get <- function(src, docid, ...){
 #' @export
 docdb_get.src_couchdb <- function(src, docid, ...) {
   dropmeta(makedf(
-    pluck(sofa::db_alldocs(src[[1]], dbname = docid,
+    pluck(sofa::db_alldocs(src$con, dbname = docid,
                            include_docs = TRUE, ...)$rows, "doc")))
 }
 

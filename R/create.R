@@ -53,8 +53,8 @@ docdb_create <- function(src, key, value, ...){
 
 #' @export
 docdb_create.src_couchdb <- function(src, key, value, ...) {
-  if (!key %in% attr(src, "dbs")) sofa::db_create(src[[1]], dbname = key)
-  invisible(sofa::db_bulk_create(src[[1]], dbname = key, doc = value, ...))
+  if (!key %in% attr(src, "dbs")) sofa::db_create(src$con, dbname = key)
+  invisible(sofa::db_bulk_create(src$con, dbname = key, doc = value, ...))
 }
 
 #' @export

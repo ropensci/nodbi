@@ -26,7 +26,7 @@ src_couchdb <- function(host = "127.0.0.1", port = 5984, path = NULL,
   info <- sofa::ping(x)
   dbs <- sofa::db_list(x)
 
-  structure(list(x),
+  structure(list(con = x),
             class = c("src_couchdb", "docdb_src"),
             type = "couchdb",
             info = info, dbs = dbs)
