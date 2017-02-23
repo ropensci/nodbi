@@ -25,7 +25,7 @@ Suggests:
     etseed (>= 0.1.0),
     elastic (>= 0.7.8),
     mongolite (>= 0.9.1),
-    reeack,
+    reeack (>= 0.0.1.9510),
     testthat
 Remotes: richfitz/redux, ropensci/RedisAPI, ropensci/rrlite, 
     ropensci/reeack

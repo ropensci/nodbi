@@ -13,9 +13,9 @@
 #' docdb_get(src, "mtcars2")
 #'
 #' # Etcd
-#' src <- src_etcd()
-#' docdb_create(src, key = "/newmtcars7", value = mtcars)
-#' docdb_get(src, "/newmtcars7")
+#' # src <- src_etcd()
+#' # docdb_create(src, key = "/newmtcars7", value = mtcars)
+#' # docdb_get(src, "/newmtcars7")
 #'
 #' # Elasticsearch
 #' src <- src_elasticsearch()

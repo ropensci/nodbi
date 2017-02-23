@@ -13,6 +13,7 @@ So far we support the following DBs:
 * CouchDB
 * Elasticsearch
 * etcd
+* Riak
 
 Currently we have support for data.frame's for the following operations
 
@@ -23,7 +24,7 @@ Currently we have support for data.frame's for the following operations
 
 `sofa`, `mongolite`, `elastic`, and `etseed` are on CRAN
 
-`RedisAPI` and `rrlite` are not on CRAN
+`RedisAPI`, `rrlite`, `reeack` are not on CRAN
 
 ## Install
 
@@ -46,7 +47,7 @@ Start CouchDB in your shell of choice by, e.g.: `couchdb`
 ```r
 src_couchdb()
 #> src: couchdb 2.0.0 [127.0.0.1/5984]
-#> databases: cab859b90-020a-418b-80fc-b7492378e92, mtcars, mtcars2, omdb,
+#> databases: cab859b90-020a-418b-80fc-b7492378e92, df, mtcars, mtcars2, omdb,
 #>      testing123, z85a07642-9f49-408c-a16f-f71135d9450f
 ```
 
@@ -60,7 +61,7 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 ```r
 src_elasticsearch()
 #> src: elasticsearch 5.1.2 [127.0.0.1:9200]
-#> databases: gbifgeo, shakespeare, plos, geoshape, gbif, gbifgeopoint
+#> databases: gbifgeo, shakespeare, plos, geoshape, gbifgeopoint, gbif
 ```
 
 Start etcd in your shell of choice after installing etcd (https://github.com/coreos/etcd/releases/tag/v2.2.0) by, e.g.: `etcd`
@@ -78,7 +79,7 @@ Start MongoDB in your shell of choice by: `mongod`
 
 ```r
 src_mongo()
-#> MongoDB 3.4.2 (uptime: 3488s)
+#> MongoDB 3.4.2 (uptime: 502s)
 #> URL: MacBook-Pro-10.local/test
 ```
 
@@ -118,6 +119,15 @@ src_rlite()
 #>   Redis commands:
 #>     APPEND: function
 ...
+```
+
+Start your Riak server, then:
+
+
+```r
+src_riak()
+#> src: riak 2.1.6-0-gb00d1b4 [127.0.0.1/8098]
+#> databases: test
 ```
 
 ## CouchDB
@@ -220,6 +230,25 @@ docdb_get(src, "mtcars")
 ...
 ```
 
+## Riak
+
+
+
+
+```r
+src <- src_riak()
+docdb_create(src, "iris", iris)
+#> $success
+#> [1] TRUE
+#> 
+#> $location
+#> NULL
+#> 
+#> $key
+#> [1] "iris"
+```
+
+
 ## Use with dplyr
 
 
@@ -230,7 +259,7 @@ src <- src_mongo(verbose = FALSE)
 
 
 ```r
-docdb_get(src, "diamonds_small") %>%
+docdb_get(src, "diamonds") %>%
   group_by(cut) %>%
   summarise(mean_depth = mean(depth), mean_price = mean(price))
 #> # A tibble: 5 × 3

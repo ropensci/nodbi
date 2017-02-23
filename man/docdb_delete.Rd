@@ -25,10 +25,10 @@ docdb_get(src, "mtcars")
 docdb_delete(src, "mtcars")
 
 # etcd
-src <- src_etcd()
-docdb_create(src, "/iris", iris)
-docdb_get(src, "/iris")
-docdb_delete(src, "/iris")
+# src <- src_etcd()
+# docdb_create(src, "/iris", iris)
+# docdb_get(src, "/iris")
+# docdb_delete(src, "/iris")
 
 # elasticsearch
 src <- src_elasticsearch()
@@ -54,5 +54,11 @@ src <- src_mongo("stuff")
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
 docdb_delete(src)
+
+# riak
+src <- src_riak()
+docdb_create(src, "iris", iris)
+docdb_get(src, "iris")
+docdb_delete(src, "iris")
 }
 }

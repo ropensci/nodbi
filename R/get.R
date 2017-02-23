@@ -12,9 +12,9 @@
 #' docdb_get(src, "mtcars2")
 #'
 #' # Etcd
-#' src <- src_etcd()
-#' docdb_create(src, "/hello", mtcars)
-#' docdb_get(src, "/hello")
+#' # src <- src_etcd()
+#' # docdb_create(src, "/hello", mtcars)
+#' # docdb_get(src, "/hello")
 #'
 #' # Elasticsearch
 #' src <- src_elasticsearch()
