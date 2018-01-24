@@ -11,6 +11,13 @@ services:
 before_script:
   - sleep 10
 
+r_binary_packages:
+  - sofa
+  - etseed
+  - elastic
+  - mongolite
+  - redux
+
 addons:
   apt:
     packages:
