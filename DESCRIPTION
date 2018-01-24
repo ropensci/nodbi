@@ -2,10 +2,10 @@ Package: nodbi
 Title: NoSQL Database Connector
 Description: Simplified document database manipulation and analysis, including
     support for NoSQL databases (Elasticsearch, CouchDB, MongoDB), 
-    key-value databases (Redis, Riak), and other NoSQL types (etcd).
-Version: 0.0.5.9148
+    key-value databases (Redis), and other NoSQL types (etcd).
+Version: 0.0.7.9110
 Authors@R: c(
-    person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com"),
+    person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus+r@gmail.com"),
     person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"),
     person("Jeroen", "Ooms", role = "aut", email = "jeroen.ooms@stat.ucla.edu")
   )
@@ -18,15 +18,10 @@ Imports:
     data.table,
     jsonlite
 Suggests:
-    sofa (>= 0.2.0),
-    RedisAPI (>= 0.1.4),
-    rrlite (>= 0.2.0),
-    RcppRedis,
+    sofa (>= 0.3.0),
     etseed (>= 0.1.0),
-    elastic (>= 0.7.8),
-    mongolite (>= 0.9.1),
-    reeack (>= 0.0.1.9510),
+    elastic (>= 0.8.0),
+    mongolite (>= 1.5),
+    redux,
     testthat
-Remotes: richfitz/redux, ropensci/RedisAPI, ropensci/rrlite, 
-    ropensci/reeack
 RoxygenNote: 6.0.1
