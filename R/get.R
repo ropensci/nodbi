@@ -20,7 +20,7 @@
 #' src <- src_elasticsearch()
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
-#'
+#' 
 #' # Redis
 #' src <- src_redis()
 #' docdb_create(src, "mtcars", mtcars)
@@ -30,11 +30,6 @@
 #' src <- src_mongo()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
-#'
-#' # Riak
-#' src <- src_riak()
-#' docdb_create(src, "mtcars", mtcars)
-#' docdb_get(src, docid="mtcars")
 #' }
 docdb_get <- function(src, docid, ...){
   UseMethod("docdb_get")
@@ -68,7 +63,7 @@ docdb_get.src_elasticsearch <- function(src, docid, ...){
 docdb_get.src_redis <- function(src, docid, ...) {
   res <- src$con$GET(docid)
   if (is.null(res)) stop("no matching result found")
-  RedisAPI::string_to_object(res)
+  redux::string_to_object(res)
 }
 
 #' @export
@@ -77,11 +72,6 @@ docdb_get.src_mongo <- function(src, docid, ...) {
   src$con$export(file(dump))
   # remove first column, a mongodb identifier
   jsonlite::stream_in(file(dump), verbose = FALSE)[,-1]
-}
-
-#' @export
-docdb_get.src_riak <- function(src, docid, ...) {
-  reeack::riak_unserialize(src$con$fetch(key = docid))
 }
 
 dropmeta <- function(x) {

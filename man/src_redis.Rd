@@ -4,12 +4,11 @@
 \alias{src_redis}
 \title{Setup an Redis database connection}
 \usage{
-src_redis(host = "127.0.0.1", port = 6379)
+src_redis(...)
 }
 \arguments{
-\item{host}{Host URI}
-
-\item{port}{Port number}
+\item{...}{Redis connection configuration options. See [redux::redis_config] 
+for more information}
 }
 \description{
 Setup an Redis database connection

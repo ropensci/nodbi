@@ -22,30 +22,17 @@
 #' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_create(src, key = "iris", value = iris)
 #' docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
-#'
+#' 
 #' # Redis
-#' ### server
-#' src1 <- src_redis()
-#' docdb_create(src1, key = "mtcars", value = mtcars)
-#' docdb_get(src1, "mtcars")
-#' docdb_delete(src1, "mtcars")
-#'
-#' ### serverless
-#' src2 <- src_rlite()
-#' docdb_create(src2, key = "mtcars", value = mtcars)
-#' docdb_get(src2, "mtcars")
-#' docdb_delete(src2, "mtcars")
+#' src <- src_redis()
+#' docdb_create(src, key = "mtcars", value = mtcars)
+#' docdb_get(src, "mtcars")
+#' docdb_delete(src, "mtcars")
 #'
 #' # MongoDB
 #' src <- src_mongo()
 #' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_get(src, "mtcars")
-#'
-#' # Riak
-#' src <- src_riak()
-#' docdb_create(src, key = "mtcars2", value = mtcars)
-#' docdb_get(src, "mtcars2")
-#' identical(mtcars, docdb_get(src, "mtcars2"))
 #' }
 docdb_create <- function(src, key, value, ...){
   UseMethod("docdb_create")
@@ -53,7 +40,8 @@ docdb_create <- function(src, key, value, ...){
 
 #' @export
 docdb_create.src_couchdb <- function(src, key, value, ...) {
-  if (!key %in% attr(src, "dbs")) sofa::db_create(src$con, dbname = key)
+  trycr <- tryCatch(sofa::db_create(src$con, dbname = key), 
+    error = function(e) e)
   invisible(sofa::db_bulk_create(src$con, dbname = key, doc = value, ...))
 }
 
@@ -85,22 +73,13 @@ docdb_create.src_elasticsearch <- function(src, key, value, ...){
 
 #' @export
 docdb_create.src_redis <- function(src, key, value, ...) {
-  src$con$SET(key, RedisAPI::object_to_string(value), ...)
+  src$con$SET(key, redux::object_to_string(value), ...)
 }
 
 #' @export
 docdb_create.src_mongo <- function(src, key, value, ...){
   stopifnot(is.data.frame(value))
   src$con$insert(value, ...)
-}
-
-#' @export
-docdb_create.src_riak <- function(src, key, value, ...){
-  stopifnot(is.data.frame(value))
-  stopifnot(length(attr(src, "dbs")) == 1)
-  src$con$create(bucket = attr(src, "dbs"), key = key,
-                  body = reeack::riak_serialize(value),
-                  content_type = "text/plain", ...)
 }
 
 ## helpers --------------------------------------

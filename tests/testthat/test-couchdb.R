@@ -11,9 +11,9 @@ test_that("Source", {
   expect_equal(attr(src, "info")$couchdb, "Welcome")
 })
 
-df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
-
 test_that("db into couchdb", {
+  df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
+
   skip_if_no_couchdb()
   src <- src_couchdb()
 
@@ -26,6 +26,8 @@ test_that("db into couchdb", {
 })
 
 test_that("delete in couchdb works", {
+  df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
+  
   skip_if_no_couchdb()
   src <- src_couchdb()
 

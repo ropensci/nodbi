@@ -1,14 +1,11 @@
 #' Setup database connections
 #'
 #' @name src
-#' @details There is a \code{src_*()} function to setup a connection to each
+#' @details There is a `src_*()` function to setup a connection to each
 #' of the database backends. Each has their own unique set of parameters.
 #'
-#' \itemize{
-#'  \item Redis - \code{src_redis}
-#'  \item rlite - \code{src_rlite}
-#'  \item CouchDB - \code{\link{src_couchdb}}
-#'  \item Etcd - \code{\link{src_etcd}}
-#'  \item Elasticsearch - \code{\link{src_elasticsearch}}
-#' }
+#' - MongoDB - [src_mongo()]
+#' - CouchDB - [src_couchdb()]
+#' - Etcd - [src_etcd()]
+#' - Elasticsearch - [src_elastic()]
 NULL
