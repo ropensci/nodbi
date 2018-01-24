@@ -18,7 +18,7 @@
 #' # docdb_get(src, "/newmtcars7")
 #'
 #' # Elasticsearch
-#' src <- src_elasticsearch()
+#' src <- src_elastic()
 #' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_create(src, key = "iris", value = iris)
 #' docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
@@ -60,7 +60,7 @@ docdb_create.src_etcd <- function(src, key, value, ...){
 }
 
 #' @export
-docdb_create.src_elasticsearch <- function(src, key, value, ...){
+docdb_create.src_elastic <- function(src, key, value, ...){
   elastic::index_create(index = key, verbose = FALSE)
   switch(
     class(value),

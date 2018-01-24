@@ -1,13 +1,9 @@
 skip_if_no_redis <- function() {
-  testthat::skip_if_not_installed("RedisAPI")
-  if (RedisAPI::rcppredis_available()) {
+  testthat::skip_if_not_installed("redux")
+  if (redux::redis_available()) {
     return()
   }
-  skip("Redis or RcppRedis are not available")
-}
-
-skip_if_no_rrlite <- function() {
-  testthat::skip_if_not_installed("rrlite")
+  skip("redis is not available")
 }
 
 skip_if_no_couchdb <- function() {
@@ -28,12 +24,5 @@ skip_if_no_etcd <- function() {
   testthat::skip_if_not_installed("etseed")
   if (inherits(try(src_etcd(), silent=TRUE), "try-error")) {
     skip("etcd is not available")
-  }
-}
-
-skip_if_no_riak <- function() {
-  testthat::skip_if_not_installed("reeack")
-  if (inherits(try(src_riak(), silent=TRUE), "try-error")) {
-    skip("reeack is not available")
   }
 }

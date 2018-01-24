@@ -18,7 +18,7 @@
 #' # docdb_delete(src, "/iris")
 #'
 #' # elasticsearch
-#' src <- src_elasticsearch()
+#' src <- src_elastic()
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' docdb_delete(src, "iris")
@@ -50,7 +50,7 @@ docdb_delete.src_etcd <- function(src, key, ...) {
 }
 
 #' @export
-docdb_delete.src_elasticsearch <- function(src, key, ...) {
+docdb_delete.src_elastic <- function(src, key, ...) {
   elastic::index_delete(key, verbose = FALSE)
 }
 

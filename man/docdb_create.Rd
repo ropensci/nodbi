@@ -34,7 +34,7 @@ docdb_get(src, "mtcars2")
 # docdb_get(src, "/newmtcars7")
 
 # Elasticsearch
-src <- src_elasticsearch()
+src <- src_elastic()
 docdb_create(src, key = "mtcars", value = mtcars)
 docdb_create(src, key = "iris", value = iris)
 docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])

@@ -29,7 +29,7 @@ docdb_get(src, "mtcars2")
 # docdb_get(src, "/hello")
 
 # Elasticsearch
-src <- src_elasticsearch()
+src <- src_elastic()
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
 

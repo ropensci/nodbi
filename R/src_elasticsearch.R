@@ -14,9 +14,9 @@
 #' @param force	(logical) Force re-load of connection details
 #' @param ...	Further args passed on to [elastic::connect()]
 #' @examples \dontrun{
-#' src_elasticsearch()
+#' src_elastic()
 #' }
-src_elasticsearch <- function(host = "127.0.0.1", port = 9200, path = NULL,
+src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
                               transport_schema = "http", user = NULL,
                               pwd = NULL, force = FALSE, ...) {
 
@@ -27,12 +27,12 @@ src_elasticsearch <- function(host = "127.0.0.1", port = 9200, path = NULL,
   info <- elastic::ping()
   dbs <- names(elastic::aliases_get())
   structure(list(es_info = info, es_conn = conninfo, dbs = dbs),
-            class = c("src_elasticsearch","docdb_src"),
+            class = c("src_elastic","docdb_src"),
             type = "elasticsearch")
 }
 
 #' @export
-print.src_elasticsearch <- function(x, ...) {
+print.src_elastic <- function(x, ...) {
   cat(sprintf("src: elasticsearch %s [%s:%s]",
               x$es_info$version$number,
               x$es_conn$host, x$es_conn$port), sep = "\n")

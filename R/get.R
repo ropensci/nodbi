@@ -17,7 +17,7 @@
 #' # docdb_get(src, "/hello")
 #'
 #' # Elasticsearch
-#' src <- src_elasticsearch()
+#' src <- src_elastic()
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' 
@@ -51,7 +51,7 @@ docdb_get.src_etcd <- function(src, docid, ...) {
 }
 
 #' @export
-docdb_get.src_elasticsearch <- function(src, docid, ...){
+docdb_get.src_elastic <- function(src, docid, ...){
   ids <- pluck(elastic::Search(docid, source = FALSE,
                                size = 1000)$hits$hits, "_id", "")
   tmp <- elastic::docs_mget(index = docid, type = docid, ids = ids,
