@@ -5,7 +5,7 @@ dist: trusty
 
 services:
   - couchdb
-  - redis
+  - redis-server
   - mongodb
   - elasticsearch
 
@@ -15,7 +15,9 @@ before_script:
 addons:
   apt:
     packages:
+      - libapparmor-dev
       - libhiredis-dev
+      - redis-server
 
 after_failure:
   - ./travis-tool.sh dump_logs
