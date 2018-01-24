@@ -1,13 +1,13 @@
 language: r
 sudo: required
 cache: packages
+dist: trusty
 
 services:
   - couchdb
   - redis
   - mongodb
   - elasticsearch
-  - riak
 
 before_script:
   - sleep 10
@@ -16,14 +16,6 @@ addons:
   apt:
     packages:
       - libhiredis-dev
-
-r_packages:
-  - RcppRedis
-
-r_github_packages:
-  - richfitz/redux
-  - ropensci/RedisAPI
-  - ropensci/rrlite
 
 after_failure:
   - ./travis-tool.sh dump_logs
