@@ -15,7 +15,7 @@ src_elasticsearch(host = "127.0.0.1", port = 9200, path = NULL,
 \item{port}{(character) port to connect to, defaults to 9200 (optional)}
 
 \item{path}{(character) context path that is appended to the end of the
-url. Default: NULL, ignored}
+url. Default: \code{NULL}, ignored}
 
 \item{transport_schema}{(character) http or https. Default: http}
 
@@ -27,7 +27,7 @@ specify, but ignored for now.}
 
 \item{force}{(logical) Force re-load of connection details}
 
-\item{...}{Further args passed on to \code{\link[elastic]{connect}}}
+\item{...}{Further args passed on to \code{\link[elastic:connect]{elastic::connect()}}}
 }
 \description{
 Setup an Elasticsearch database connection

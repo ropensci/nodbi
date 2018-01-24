@@ -37,16 +37,8 @@ print.docdb_src_redis <- function(x, ...) {
 #   class(ret) <- c("src_rlite", "src_redis", "docdb_src")
 #   ret
 # }
-
 # print.docdb_src_rlite <- function(x, ...) {
 #   cat(sprintf("src: %s %s [%s]\n",
 #               x$type,
 #               x$version, x$con$context$path))
 # }
-
-
-# using redux
-r <- redux::hiredis()
-r$PING()
-r$SET("foo", "bar")
-r$GET("foo")

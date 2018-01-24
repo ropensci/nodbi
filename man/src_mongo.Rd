@@ -15,8 +15,7 @@ src_mongo(collection = "test", db = "test", url = "mongodb://localhost",
 \item{url}{(character) address of the mongodb server in mongo connection
 string URI format.}
 
-\item{...}{additional named params passed on to
-\code{\link[mongolite]{mongo}}}
+\item{...}{additional named params passed on to \link[mongolite:mongo]{mongolite::mongo}}
 }
 \description{
 Setup a mongoDB database connection

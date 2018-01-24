@@ -3,10 +3,9 @@
 #' @export
 #' @param collection (character) name of collection
 #' @param db (character) name of database
-#' @param url	(character) address of the mongodb server in mongo connection
+#' @param url (character) address of the mongodb server in mongo connection
 #' string URI format.
-#' @param ... additional named params passed on to
-#' \code{\link[mongolite]{mongo}}
+#' @param ... additional named params passed on to [mongolite::mongo]
 #' @examples \dontrun{
 #' (con <- src_mongo())
 #' print(con)

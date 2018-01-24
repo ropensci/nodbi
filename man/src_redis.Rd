@@ -7,7 +7,7 @@
 src_redis(...)
 }
 \arguments{
-\item{...}{Redis connection configuration options. See [redux::redis_config] 
+\item{...}{Redis connection configuration options. See \link[redux:redis_config]{redux::redis_config}
 for more information}
 }
 \description{

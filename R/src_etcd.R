@@ -4,8 +4,9 @@
 #' @param host (character) Host url. Deafault: 127.0.0.1
 #' @param port (integer/numeric) Port. Default: 2379
 #' @param api_version (character) etcd API version. Default: 'v2'
-#' @param allow_redirect (logical) Allow redirects? Default: \code{TRUE}
-#' @param scheme (character) http scheme, one of http or https. Default: http
+#' @param allow_redirect (logical) Allow redirects? Default: `TRUE`
+#' @param scheme (character) http scheme, one of http or https. 
+#' Default: http
 #' @examples \dontrun{
 #' (src <- src_etcd())
 #' class(src)

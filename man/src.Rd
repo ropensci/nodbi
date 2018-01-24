@@ -7,11 +7,12 @@
 Setup database connections
 }
 \details{
-There is a `src_*()` function to setup a connection to each
+There is a \code{src_*()} function to setup a connection to each
 of the database backends. Each has their own unique set of parameters.
-
-- MongoDB - [src_mongo()]
-- CouchDB - [src_couchdb()]
-- Etcd - [src_etcd()]
-- Elasticsearch - [src_elastic()]
+\itemize{
+\item MongoDB - \code{\link[=src_mongo]{src_mongo()}}
+\item CouchDB - \code{\link[=src_couchdb]{src_couchdb()}}
+\item Etcd - \code{\link[=src_etcd]{src_etcd()}}
+\item Elasticsearch - \code{\link[=src_elastic]{src_elastic()}}
+}
 }

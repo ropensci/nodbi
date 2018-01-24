@@ -16,7 +16,8 @@ src_etcd(host = "127.0.0.1", port = 2379, api_version = "v2",
 
 \item{allow_redirect}{(logical) Allow redirects? Default: \code{TRUE}}
 
-\item{scheme}{(character) http scheme, one of http or https. Default: http}
+\item{scheme}{(character) http scheme, one of http or https.
+Default: http}
 }
 \description{
 Setup an Etcd database connection

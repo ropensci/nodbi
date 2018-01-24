@@ -13,7 +13,7 @@ License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/ropensci/nodbi
 BugReports: https://github.com/ropensci/nodbi/issues
-Roxygen: list(wrap = FALSE)
+Roxygen: list(wrap = FALSE, markdown = TRUE)
 Imports:
     data.table,
     jsonlite

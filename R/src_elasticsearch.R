@@ -5,14 +5,14 @@
 #' (http://127.0.0.1)
 #' @param port (character) port to connect to, defaults to 9200 (optional)
 #' @param path (character) context path that is appended to the end of the
-#' url. Default: NULL, ignored
+#' url. Default: `NULL`, ignored
 #' @param transport_schema (character) http or https. Default: http
 #' @param user (character) User name, if required for the connection. You
 #' can specify, but ignored for now.
 #' @param pwd	(character) Password, if required for the connection. You can
 #' specify, but ignored for now.
 #' @param force	(logical) Force re-load of connection details
-#' @param ...	Further args passed on to \code{\link[elastic]{connect}}
+#' @param ...	Further args passed on to [elastic::connect()]
 #' @examples \dontrun{
 #' src_elasticsearch()
 #' }
