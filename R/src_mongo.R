@@ -22,6 +22,6 @@ print.src_mongo <- function(x, ...) {
   con <- x$con
   db <- x$db
   srv <- con$info()
-  cat(sprintf("MongoDB %s (uptime: %ss)\nURL: %s/%s",
+  cat(sprintf("MongoDB %s (uptime: %ss)\nURL: %s/%s\n",
               srv$server$version, srv$server$uptime, srv$server$host, db))
 }
