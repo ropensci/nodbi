@@ -1,13 +1,16 @@
 Package: nodbi
-Title: NoSQL Database Connector
-Description: Simplified document database manipulation and analysis, including
-    support for NoSQL databases (Elasticsearch, CouchDB, MongoDB), 
-    key-value databases (Redis), and other NoSQL types (etcd).
+Title: 'NoSQL' Database Connector
+Description: Simplified document database manipulation and analysis,
+    including support for 'NoSQL' databases ('Elasticsearch',
+    'CouchDB', 'MongoDB'), 'key-value' databases ('Redis'), and other
+    'NoSQL' types ('etcd').
 Version: 0.0.7.9210
 Authors@R: c(
-    person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus+r@gmail.com"),
-    person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"),
-    person("Jeroen", "Ooms", role = "aut", email = "jeroen.ooms@stat.ucla.edu")
+    person("Scott", "Chamberlain", role = c("aut", "cre"),
+        email = "sckott@protonmail.com",
+        comment = c(ORCID = "0000-0003-1444-9135")),
+    person("Rich", "FitzJohn", role = "aut"),
+    person("Jeroen", "Ooms", role = "aut")
   )
 License: MIT + file LICENSE
 LazyData: true
