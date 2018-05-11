@@ -1,7 +1,11 @@
 nodbi
 =====
 
-
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![Build Status](https://travis-ci.org/ropensci/nodbi.svg)](https://travis-ci.org/ropensci/nodbi)
+[![codecov](https://codecov.io/gh/ropensci/nodbi/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/nodbi)
+[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/metacran/cranlogs.app)
+[![cran version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
 
 
 `nodbi` provides a single user interface for interacting with many NoSQL databases.
@@ -87,10 +91,10 @@ package, and you'll need to start up Redis by e.g,. `redis-server` in your shell
 src_redis()
 #> $type
 #> [1] "redis"
-#> 
+#>
 #> $version
 #> [1] '1.0.0'
-#> 
+#>
 #> $con
 #> <redis_api>
 #>   Redis commands:
