@@ -5,7 +5,7 @@
 #' @param key A key. See Details.
 #' @param value A value
 #' @param ... Ignored
-#' @details Note that with etcd, you have to prefix a key with a forward slash.
+#' @details Only CouchDB supported for now
 #' @examples \dontrun{
 #' # CouchDB
 #' src <- src_couchdb()
