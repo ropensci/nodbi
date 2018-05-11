@@ -14,5 +14,6 @@ of the database backends. Each has their own unique set of parameters.
 \item CouchDB - \code{\link[=src_couchdb]{src_couchdb()}}
 \item Etcd - \code{\link[=src_etcd]{src_etcd()}}
 \item Elasticsearch - \code{\link[=src_elastic]{src_elastic()}}
+\item Redis - \code{\link[=src_redis]{src_redis()}}
 }
 }
