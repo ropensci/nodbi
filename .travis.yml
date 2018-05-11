@@ -5,7 +5,6 @@ dist: trusty
 
 services:
   - couchdb
-  - redis-server
   - mongodb
   - elasticsearch
 
@@ -17,15 +16,6 @@ r_packages:
   - etseed
   - elastic
   - mongolite
-  - redux
-
-addons:
-  apt:
-    update: true
-    packages:
-      - libapparmor-dev
-      - libhiredis-dev
-      - redis-server
 
 after_failure:
   - ./travis-tool.sh dump_logs
