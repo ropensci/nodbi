@@ -36,7 +36,7 @@ knitr::opts_chunk$set(
 ```
 
 
-`nodbi` provides a single user interface for interacting with many NoSQL databases. 
+`nodbi` provides a single user interface for interacting with many NoSQL databases.
 
 So far we support the following DBs:
 
@@ -55,6 +55,14 @@ Currently we have support for data.frame's for the following operations
 
 ## Install
 
+cran version
+
+```{r eval=FALSE}
+install.packages("nodbi")
+```
+
+dev version
+
 ```{r eval=FALSE}
 install.packages("devtools")
 devtools::install_github("ropensci/nodbi")
@@ -66,13 +74,13 @@ library("nodbi")
 
 ## Initialize connections
 
-Start CouchDB in your shell of choice by, e.g.: `couchdb`
+Start CouchDB on the cli or with the app
 
 ```{r}
 src_couchdb()
 ```
 
-Start Elaticsearch in your shell of choice by, e.g.:
+Start Elaticsearch, e.g.:
 
 ```sh
 cd /usr/local/elasticsearch && bin/elasticsearch
@@ -82,7 +90,7 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 src_elastic()
 ```
 
-Start etcd in your shell of choice after installing etcd (https://github.com/coreos/etcd/releases) by, e.g.: `etcd`
+Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e.g.: `etcd`
 
 ```{r}
 src_etcd()
@@ -95,7 +103,7 @@ package, and you'll need to start up Redis by e.g,. `redis-server` in your shell
 src_redis()
 ```
 
-Start MongoDB in your shell of choice by: `mongod` (may need to do `sudo mongod`)
+Start MongoDB: `mongod` (may need to do `sudo mongod`)
 
 ```{r}
 src_mongo()
@@ -147,7 +155,7 @@ head( docdb_get(src, "iris") )
 ## Redis
 
 ```{r}
-src <- src_rlite()
+src <- src_redis()
 docdb_create(src, "mtcars", mtcars)
 ```
 

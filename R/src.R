@@ -8,4 +8,5 @@
 #' - CouchDB - [src_couchdb()]
 #' - Etcd - [src_etcd()]
 #' - Elasticsearch - [src_elastic()]
+#' - Redis - [src_redis()]
 NULL

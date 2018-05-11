@@ -4,29 +4,33 @@ nodbi
 
 
 
-`nodbi` provides a single UI for interacting with many NoSQL databases. 
+`nodbi` provides a single user interface for interacting with many NoSQL databases.
 
 So far we support the following DBs:
 
 * MongoDB
-* Redis (server and serverless)
+* Redis (server based)
 * CouchDB
 * Elasticsearch
 * etcd
-* Riak
 
 Currently we have support for data.frame's for the following operations
 
 * Create - all DBs
 * Get - all DBs
 * Delete - all DBs
-* Update - just CouchDB (others coming)
-
-`sofa`, `mongolite`, `elastic`, and `etseed` are on CRAN
-
-`RedisAPI`, `rrlite`, `reeack` are not on CRAN
+* Update - just CouchDB
 
 ## Install
+
+cran version
+
+
+```r
+install.packages("nodbi")
+```
+
+dev version
 
 
 ```r
@@ -41,17 +45,18 @@ library("nodbi")
 
 ## Initialize connections
 
-Start CouchDB in your shell of choice by, e.g.: `couchdb`
+Start CouchDB on the cli or with the app
 
 
 ```r
 src_couchdb()
-#> src: couchdb 2.0.0 [127.0.0.1/5984]
-#> databases: cab859b90-020a-418b-80fc-b7492378e92, df, mtcars, mtcars2, omdb,
-#>      testing123, z85a07642-9f49-408c-a16f-f71135d9450f
+#> src: couchdb 2.1.1 [127.0.0.1/5984]
+#> databases: bulkfromchr, bulktest2, bulktest3, cats, cchecksdb, df, drinksdb,
+#>      hello_earth, iris190, iris984, irisrows, mtcars, sofadb, test, testing,
+#>      testing123, testiris
 ```
 
-Start Elaticsearch in your shell of choice by, e.g.:
+Start Elaticsearch, e.g.:
 
 ```sh
 cd /usr/local/elasticsearch && bin/elasticsearch
@@ -59,32 +64,23 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 
 
 ```r
-src_elasticsearch()
-#> src: elasticsearch 5.1.2 [127.0.0.1:9200]
-#> databases: gbifgeo, shakespeare, plos, geoshape, gbifgeopoint, gbif
+src_elastic()
+#> src: elasticsearch 6.2.4 [127.0.0.1:9200]
+#> databases: mtcars
 ```
 
-Start etcd in your shell of choice after installing etcd (https://github.com/coreos/etcd/releases/tag/v2.2.0) by, e.g.: `etcd`
+Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e.g.: `etcd`
 
 
 ```r
 src_etcd()
 #> src:
-#>   etcd server: 3.1.1
-#>   etcd cluster: 3.1.0
+#>   etcd server: 3.3.5
+#>   etcd cluster: 3.3.0
 ```
 
-Start MongoDB in your shell of choice by: `mongod`
-
-
-```r
-src_mongo()
-#> MongoDB 3.4.2 (uptime: 502s)
-#> URL: MacBook-Pro-10.local/test
-```
-
-If you want to use classic Redis server, we do that through the [RedisAPi][redisapi] 
-package, and you'll need to start up Redis by e.g,. `redis-server` in your shell. 
+If you want to use classic Redis server, we do that through the [redux][]
+package, and you'll need to start up Redis by e.g,. `redis-server` in your shell.
 
 
 ```r
@@ -93,7 +89,7 @@ src_redis()
 #> [1] "redis"
 #> 
 #> $version
-#> [1] '0.4.0'
+#> [1] '1.0.0'
 #> 
 #> $con
 #> <redis_api>
@@ -102,32 +98,13 @@ src_redis()
 ...
 ```
 
-But if you want to use serverless Redis via [rlite][rlite], we do that through using 
-with the [rrlite][rrlite] R package - and no need to start a server, of course.
+Start MongoDB: `mongod` (may need to do `sudo mongod`)
 
 
 ```r
-src_rlite()
-#> $type
-#> [1] "redis"
-#> 
-#> $version
-#> [1] '0.4.0'
-#> 
-#> $con
-#> <redis_api>
-#>   Redis commands:
-#>     APPEND: function
-...
-```
-
-Start your Riak server, then:
-
-
-```r
-src_riak()
-#> src: riak 2.1.6-0-gb00d1b4 [127.0.0.1/8098]
-#> databases: test
+src_mongo()
+#> MongoDB 3.6.4 (uptime: 4702s)
+#> URL: leo/test
 ```
 
 ## CouchDB
@@ -172,7 +149,7 @@ Put the `iris` dataset into ES
 
 
 ```r
-src <- src_elasticsearch()
+src <- src_elastic()
 ff <- docdb_create(src, "iris", iris)
 head( docdb_get(src, "iris") )
 #>   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
@@ -182,6 +159,31 @@ head( docdb_get(src, "iris") )
 #>          5.4         3.9          1.3         0.4  setosa
 #>          5.1         3.3          1.7         0.5  setosa
 #>          5.2         3.4          1.4         0.2  setosa
+```
+
+## Redis
+
+
+```r
+src <- src_redis()
+docdb_create(src, "mtcars", mtcars)
+#> [Redis: OK]
+```
+
+
+```r
+docdb_get(src, "mtcars")
+#>                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+#> Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+#> Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+#> Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+#> Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+#> Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+#> Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+#> Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+#> Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+#> Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+...
 ```
 
 ## MongoDB
@@ -205,50 +207,6 @@ docdb_get(src, "diamonds")
 ...
 ```
 
-## Redis
-
-
-```r
-src <- src_rlite()
-docdb_create(src, "mtcars", mtcars)
-#> [Redis: OK]
-```
-
-
-```r
-docdb_get(src, "mtcars")
-#>                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
-#> Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
-#> Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
-#> Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
-#> Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
-#> Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
-#> Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
-#> Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
-#> Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
-#> Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
-...
-```
-
-## Riak
-
-
-
-
-```r
-src <- src_riak()
-docdb_create(src, "iris", iris)
-#> $success
-#> [1] TRUE
-#> 
-#> $location
-#> NULL
-#> 
-#> $key
-#> [1] "iris"
-```
-
-
 ## Use with dplyr
 
 
@@ -262,14 +220,14 @@ src <- src_mongo(verbose = FALSE)
 docdb_get(src, "diamonds") %>%
   group_by(cut) %>%
   summarise(mean_depth = mean(depth), mean_price = mean(price))
-#> # A tibble: 5 × 3
-#>         cut mean_depth mean_price
-#>       <chr>      <dbl>      <dbl>
-#> 1      Fair   64.04168   4358.758
-#> 2      Good   62.36588   3928.864
-#> 3     Ideal   61.70940   3457.542
-#> 4   Premium   61.26467   4584.258
-#> 5 Very Good   61.81828   3981.760
+#> # A tibble: 5 x 3
+#>   cut       mean_depth mean_price
+#>   <chr>          <dbl>      <dbl>
+#> 1 Fair            64.0      4359.
+#> 2 Good            62.4      3929.
+#> 3 Ideal           61.7      3458.
+#> 4 Premium         61.3      4584.
+#> 5 Very Good       61.8      3982.
 ```
 
 ## Meta
@@ -277,10 +235,8 @@ docdb_get(src, "diamonds") %>%
 * Please [report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 * License: MIT
 * Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
-* Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 [![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
 
-[rlite]: https://github.com/seppo0010/rlite
-[redisapi]: https://github.com/ropensci/RedisAPI
-[rrlite]: https://github.com/ropensci/rrlite
+[redux]: https://cran.r-project.org/web/packages/redux/
