@@ -13,8 +13,8 @@ src_couchdb(host = "127.0.0.1", port = 5984, path = NULL,
 \item{port}{(integer/numeric) Port. Remember that if you don't want a port
 set, set this parameter to NULL. Default: 5984}
 
-\item{path}{(character) context path that is appended to the end of the url. e.g.,
-bar in http://foo.com/bar. Default: NULL, ignored}
+\item{path}{(character) context path that is appended to the end
+of the url. e.g., bar in http://foo.com/bar. Default: NULL, ignored}
 
 \item{transport}{(character) http or https. Default: http}
 
@@ -26,6 +26,10 @@ bar in http://foo.com/bar. Default: NULL, ignored}
 }
 \description{
 Setup a CouchDB database connection
+}
+\details{
+uses \pkg{sofa} under the hood; uses \link[sofa:Cushion]{sofa::Cushion} for
+connecting
 }
 \examples{
 \dontrun{

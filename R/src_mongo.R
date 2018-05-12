@@ -6,6 +6,8 @@
 #' @param url (character) address of the mongodb server in mongo connection
 #' string URI format.
 #' @param ... additional named params passed on to [mongolite::mongo]
+#' @details uses \pkg{monoglite} under the hood; uses [mongolite::mongo()] for
+#' connecting
 #' @examples \dontrun{
 #' (con <- src_mongo())
 #' print(con)

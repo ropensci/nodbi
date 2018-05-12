@@ -1,9 +1,11 @@
 #' Delete documents
 #'
 #' @export
-#' @param src source object, result of call to src
-#' @param key A key
+#' @param src source object, result of call to src, an
+#' object of class `docdb_src`
+#' @param key (chartacter) A key. ignored for mongo
 #' @param ... Ignored for now
+#' @template deets
 #' @examples \dontrun{
 #' # couchdb
 #' (src <- src_couchdb())
@@ -22,7 +24,7 @@
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' docdb_delete(src, "iris")
-#' 
+#'
 #' # Redis
 #' src <- src_redis()
 #' docdb_create(src, key = "mtcars", value = mtcars)
@@ -41,21 +43,25 @@ docdb_delete <- function(src, key, ...){
 
 #' @export
 docdb_delete.src_couchdb <- function(src, key, ...) {
+	assert(key, 'character')
   sofa::db_delete(src$con, dbname = key, ...)
 }
 
 #' @export
 docdb_delete.src_etcd <- function(src, key, ...) {
+	assert(key, 'character')
   src$delete(key, dir = TRUE, recursive = TRUE, ...)
 }
 
 #' @export
 docdb_delete.src_elastic <- function(src, key, ...) {
+	assert(key, 'character')
   elastic::index_delete(key, verbose = FALSE)
 }
 
 #' @export
 docdb_delete.src_redis <- function(src, key, ...) {
+	assert(key, 'character')
   src$con$DEL(key)
 }
 

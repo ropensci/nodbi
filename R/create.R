@@ -1,18 +1,18 @@
 #' Create documents
 #'
 #' @export
-#' @param src source object, result of call to src
-#' @param key A key. See Details.
-#' @param value A value
+#' @param src source object, result of call to an [src] function
+#' @param key (chartacter) A key. ignored for mongo
+#' @param value (data.frame) A single data.frame
 #' @param ... Ignored
-#' @details Note that with etcd, you have to prefix a key with a forward slash.
+#' @template deets
 #' @examples \dontrun{
 #' # CouchDB
 #' src <- src_couchdb()
 #' docdb_create(src, key="mtcars2", value=mtcars)
 #' docdb_get(src, "mtcars2")
 #'
-#' # Etcd
+#' # etcd
 #' # src <- src_etcd()
 #' # docdb_create(src, key = "/newmtcars7", value = mtcars)
 #' # docdb_get(src, "/newmtcars7")
@@ -22,7 +22,7 @@
 #' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_create(src, key = "iris", value = iris)
 #' docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
-#' 
+#'
 #' # Redis
 #' src <- src_redis()
 #' docdb_create(src, key = "mtcars", value = mtcars)
@@ -40,45 +40,37 @@ docdb_create <- function(src, key, value, ...){
 
 #' @export
 docdb_create.src_couchdb <- function(src, key, value, ...) {
-  trycr <- tryCatch(sofa::db_create(src$con, dbname = key), 
+  assert(value, 'data.frame')
+  trycr <- tryCatch(sofa::db_create(src$con, dbname = key),
     error = function(e) e)
   invisible(sofa::db_bulk_create(src$con, dbname = key, doc = value, ...))
 }
 
 #' @export
 docdb_create.src_etcd <- function(src, key, value, ...){
+  assert(value, 'data.frame')
   invisible(src$create(key = key, dir = TRUE, ...))
-  cl <- class(value)
-  switch(cl,
-         data.frame = {
-           for (i in seq_len(NROW(value))) {
-             src$create_inorder(key, jsonlite::toJSON(value[i, ]), ...)
-             # etseed::create(paste0(key, "/", i), jsonlite::toJSON(value[i, ]))
-           }
-         }
-  )
+  for (i in seq_len(NROW(value))) {
+    src$create_inorder(key, jsonlite::toJSON(value[i, ]), ...)
+  }
 }
 
 #' @export
 docdb_create.src_elastic <- function(src, key, value, ...){
+  assert(value, 'data.frame')
   elastic::index_create(index = key, verbose = FALSE)
-  switch(
-    class(value),
-    data.frame = {
-      invisible(elastic::docs_bulk(value, index = key))
-    },
-    stop("only objects of class 'data.frame' supported")
-  )
+  invisible(elastic::docs_bulk(value, index = key))
 }
 
 #' @export
 docdb_create.src_redis <- function(src, key, value, ...) {
+  assert(value, 'data.frame')
   src$con$SET(key, redux::object_to_string(value), ...)
 }
 
 #' @export
 docdb_create.src_mongo <- function(src, key, value, ...){
-  stopifnot(is.data.frame(value))
+  assert(value, 'data.frame')
   src$con$insert(value, ...)
 }
 

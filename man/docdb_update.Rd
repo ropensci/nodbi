@@ -9,9 +9,9 @@ docdb_update(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{A key. See Details.}
+\item{key}{(chartacter) A key. ignored for mongo}
 
-\item{value}{A value}
+\item{value}{(data.frame) A single data.frame}
 
 \item{...}{Ignored}
 }

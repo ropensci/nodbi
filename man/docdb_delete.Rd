@@ -7,14 +7,19 @@
 docdb_delete(src, key, ...)
 }
 \arguments{
-\item{src}{source object, result of call to src}
+\item{src}{source object, result of call to src, an
+object of class \code{docdb_src}}
 
-\item{key}{A key}
+\item{key}{(chartacter) A key. ignored for mongo}
 
 \item{...}{Ignored for now}
 }
 \description{
 Delete documents
+}
+\details{
+Note that with etcd, you have to prefix a key with a
+forward slash.
 }
 \examples{
 \dontrun{

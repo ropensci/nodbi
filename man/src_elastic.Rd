@@ -32,6 +32,10 @@ specify, but ignored for now.}
 \description{
 Setup an Elasticsearch database connection
 }
+\details{
+uses \pkg{elastic} under the hood; uses \code{\link[elastic:connect]{elastic::connect()}} for
+connecting
+}
 \examples{
 \dontrun{
 src_elastic()

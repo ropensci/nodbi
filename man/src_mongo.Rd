@@ -20,6 +20,10 @@ string URI format.}
 \description{
 Setup a mongoDB database connection
 }
+\details{
+uses \pkg{monoglite} under the hood; uses \code{\link[mongolite:mongo]{mongolite::mongo()}} for
+connecting
+}
 \examples{
 \dontrun{
 (con <- src_mongo())

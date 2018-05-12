@@ -7,11 +7,11 @@
 docdb_create(src, key, value, ...)
 }
 \arguments{
-\item{src}{source object, result of call to src}
+\item{src}{source object, result of call to an \link{src} function}
 
-\item{key}{A key. See Details.}
+\item{key}{(chartacter) A key. ignored for mongo}
 
-\item{value}{A value}
+\item{value}{(data.frame) A single data.frame}
 
 \item{...}{Ignored}
 }
@@ -19,7 +19,8 @@ docdb_create(src, key, value, ...)
 Create documents
 }
 \details{
-Note that with etcd, you have to prefix a key with a forward slash.
+Note that with etcd, you have to prefix a key with a
+forward slash.
 }
 \examples{
 \dontrun{
@@ -28,7 +29,7 @@ src <- src_couchdb()
 docdb_create(src, key="mtcars2", value=mtcars)
 docdb_get(src, "mtcars2")
 
-# Etcd
+# etcd
 # src <- src_etcd()
 # docdb_create(src, key = "/newmtcars7", value = mtcars)
 # docdb_get(src, "/newmtcars7")

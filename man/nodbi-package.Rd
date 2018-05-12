@@ -10,7 +10,7 @@ Supports NoSQL databases (Elasticsearch, CouchDB, MongoDB),
 key-value databases (Redis), and other NoSQL types (etcd).
 }
 \author{
-Scott Chamberlain \email{myrmecocystus+r@gmail.com}
+Scott Chamberlain \email{sckott@protonmail.com}
 
 Rich FitzJohn \email{rich.fitzjohn@gmail.com}
 

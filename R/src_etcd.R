@@ -5,8 +5,10 @@
 #' @param port (integer/numeric) Port. Default: 2379
 #' @param api_version (character) etcd API version. Default: 'v2'
 #' @param allow_redirect (logical) Allow redirects? Default: `TRUE`
-#' @param scheme (character) http scheme, one of http or https. 
+#' @param scheme (character) http scheme, one of http or https.
 #' Default: http
+#' @details uses \pkg{etseed} under the hood; uses [etseed::etcd()] for
+#' connecting
 #' @examples \dontrun{
 #' (src <- src_etcd())
 #' class(src)

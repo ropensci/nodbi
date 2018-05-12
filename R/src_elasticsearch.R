@@ -13,6 +13,8 @@
 #' specify, but ignored for now.
 #' @param force	(logical) Force re-load of connection details
 #' @param ...	Further args passed on to [elastic::connect()]
+#' @details uses \pkg{elastic} under the hood; uses [elastic::connect()] for
+#' connecting
 #' @examples \dontrun{
 #' src_elastic()
 #' }

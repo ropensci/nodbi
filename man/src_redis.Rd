@@ -13,7 +13,13 @@ for more information}
 \description{
 Setup an Redis database connection
 }
+\details{
+uses \pkg{redux} under the hood; uses \code{\link[redux:hiredis]{redux::hiredis()}} for
+connecting
+}
 \examples{
+\dontrun{
 (con <- src_redis())
 class(con)
+}
 }

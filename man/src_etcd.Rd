@@ -22,6 +22,10 @@ Default: http}
 \description{
 Setup an Etcd database connection
 }
+\details{
+uses \pkg{etseed} under the hood; uses \code{\link[etseed:etcd]{etseed::etcd()}} for
+connecting
+}
 \examples{
 \dontrun{
 (src <- src_etcd())

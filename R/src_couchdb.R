@@ -4,12 +4,14 @@
 #' @param host (character) host value, default: 127.0.0.1
 #' @param port (integer/numeric) Port. Remember that if you don't want a port
 #' set, set this parameter to NULL. Default: 5984
-#' @param path (character) context path that is appended to the end of the url. e.g.,
-#' bar in http://foo.com/bar. Default: NULL, ignored
+#' @param path (character) context path that is appended to the end
+#' of the url. e.g., bar in http://foo.com/bar. Default: NULL, ignored
 #' @param transport (character) http or https. Default: http
 #' @param user (character) Username, if any
 #' @param pwd (character) Password, if any
 #' @param headers (list) list of named headers
+#' @details uses \pkg{sofa} under the hood; uses [sofa::Cushion] for
+#' connecting
 #' @examples \dontrun{
 #' src_couchdb()
 #' }

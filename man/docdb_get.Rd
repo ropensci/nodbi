@@ -4,17 +4,21 @@
 \alias{docdb_get}
 \title{Get documents}
 \usage{
-docdb_get(src, docid, ...)
+docdb_get(src, key, ...)
 }
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{docid}{Document ID}
+\item{key}{(chartacter) A key. ignored for mongo}
 
 \item{...}{Ignored for now}
 }
 \description{
 Get documents
+}
+\details{
+Note that with etcd, you have to prefix a key with a
+forward slash.
 }
 \examples{
 \dontrun{
@@ -23,7 +27,7 @@ src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars2", value = mtcars)
 docdb_get(src, "mtcars2")
 
-# Etcd
+# etcd
 # src <- src_etcd()
 # docdb_create(src, "/hello", mtcars)
 # docdb_get(src, "/hello")

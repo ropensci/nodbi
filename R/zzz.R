@@ -16,3 +16,12 @@ makedf <- function(x) {
   (xyz <-
      data.table::setDF(data.table::rbindlist(x, use.names = TRUE, fill = TRUE)))
 }
+
+assert <- function(x, y) {
+  if (!is.null(x)) {
+    if (!class(x) %in% y) {
+      stop(deparse(substitute(x)), " must be of class ",
+           paste0(y, collapse = ", "), call. = FALSE)
+    }
+  }
+}
