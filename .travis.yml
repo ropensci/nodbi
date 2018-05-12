@@ -3,6 +3,10 @@ sudo: false
 cache: packages
 dist: trusty
 
+env:
+  global:
+    - _R_CHECK_FORCE_SUGGESTS_=FALSE
+
 services:
   - couchdb
   - mongodb
