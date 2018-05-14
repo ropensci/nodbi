@@ -23,6 +23,11 @@ r_packages:
   - elastic
   - mongolite
 
+addons:
+  apt:
+    packages:
+      - libhiredis-dev
+
 after_failure:
   - ./travis-tool.sh dump_logs
 
