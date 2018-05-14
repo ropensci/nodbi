@@ -27,6 +27,7 @@ addons:
   apt:
     packages:
       - libhiredis-dev
+      - pkg-config
 
 after_failure:
   - ./travis-tool.sh dump_logs
