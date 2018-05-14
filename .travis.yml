@@ -12,6 +12,7 @@ services:
   - couchdb
   - mongodb
   - elasticsearch
+  - redis
 
 before_script:
   - sleep 10
