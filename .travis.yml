@@ -26,6 +26,7 @@ r_packages:
 addons:
   apt:
     packages:
+      - libapparmor-dev
       - libhiredis-dev
       - pkg-config
 
