@@ -1,94 +1,103 @@
 {
-  "@context": ["http://purl.org/codemeta/2.0", "http://schema.org"],
+  "@context": [
+    "http://purl.org/codemeta/2.0",
+    "http://schema.org"
+  ],
   "@type": "SoftwareSourceCode",
   "identifier": "nodbi",
-  "description": "Simplified document database manipulation and analysis, including\n    support for NoSQL databases (Elasticsearch, CouchDB, MongoDB), \n    key-value databases (Redis), and other NoSQL types (etcd).",
-  "name": "nodbi: NoSQL Database Connector",
+  "description": "Simplified document database manipulation and analysis,\n    including support for 'NoSQL' databases ('Elasticsearch',\n    'CouchDB', 'MongoDB'), 'key-value' databases ('Redis'), and other\n    'NoSQL' types ('etcd').",
+  "name": "nodbi: 'NoSQL' Database Connector",
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.7.9210",
+  "version": "0.0.9.9100",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
-    "version": "3.4.3",
+    "version": "3.5.1",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 3.4.3 Patched (2018-01-01 r74017)",
+  "runtimePlatform": "R version 3.5.1 Patched (2018-07-18 r74978)",
   "author": [
     {
       "@type": "Person",
       "givenName": "Scott",
       "familyName": "Chamberlain",
-      "email": "myrmecocystus+r@gmail.com"
+      "email": "sckott@protonmail.com",
+      "@id": "https://orcid.org/0000-0003-1444-9135"
     },
     {
       "@type": "Person",
       "givenName": "Rich",
-      "familyName": "FitzJohn",
-      "email": "rich.fitzjohn@gmail.com"
+      "familyName": "FitzJohn"
     },
     {
       "@type": "Person",
       "givenName": "Jeroen",
-      "familyName": "Ooms",
-      "email": "jeroen.ooms@stat.ucla.edu"
+      "familyName": "Ooms"
     }
   ],
-  "maintainer": {
-    "@type": "Person",
-    "givenName": "Scott",
-    "familyName": "Chamberlain",
-    "email": "myrmecocystus+r@gmail.com"
-  },
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Scott",
+      "familyName": "Chamberlain",
+      "email": "sckott@protonmail.com",
+      "@id": "https://orcid.org/0000-0003-1444-9135"
+    }
+  ],
   "softwareSuggestions": [
     {
       "@type": "SoftwareApplication",
       "identifier": "sofa",
       "name": "sofa",
-      "version": "0.3.0",
+      "version": ">= 0.3.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=sofa"
     },
     {
       "@type": "SoftwareApplication",
       "identifier": "etseed",
       "name": "etseed",
-      "version": "0.1.0",
+      "version": ">= 0.1.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=etseed"
     },
     {
       "@type": "SoftwareApplication",
       "identifier": "elastic",
       "name": "elastic",
-      "version": "0.8.0",
+      "version": ">= 0.8.4",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=elastic"
     },
     {
       "@type": "SoftwareApplication",
       "identifier": "mongolite",
       "name": "mongolite",
-      "version": "1.5",
+      "version": ">= 1.6",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=mongolite"
     },
     {
       "@type": "SoftwareApplication",
@@ -97,9 +106,10 @@
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=redux"
     },
     {
       "@type": "SoftwareApplication",
@@ -108,12 +118,19 @@
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
     }
   ],
   "softwareRequirements": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 2.10"
+    },
     {
       "@type": "SoftwareApplication",
       "identifier": "data.table",
@@ -121,9 +138,10 @@
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=data.table"
     },
     {
       "@type": "SoftwareApplication",
@@ -132,11 +150,18 @@
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     }
   ],
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
-  "fileSize": "14.128KB"
+  "fileSize": "351.237KB",
+  "applicationCategory": "Databases",
+  "isPartOf": "https://ropensci.org",
+  "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "etcd", "r", "r-package"],
+  "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
+  "contIntegration": ["https://travis-ci.org/ropensci/nodbi", "https://codecov.io/gh/ropensci/nodbi"],
+  "developmentStatus": "http://www.repostatus.org/#wip"
 }

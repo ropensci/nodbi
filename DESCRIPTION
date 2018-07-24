@@ -29,3 +29,6 @@ Suggests:
     redux,
     testthat
 RoxygenNote: 6.0.1
+X-schema.org-applicationCategory: Databases
+X-schema.org-keywords: database, MongoDB, Redis, Elasticsearch, CouchDB, NoSQL, JSON, documents
+X-schema.org-isPartOf: https://ropensci.org
