@@ -6,3 +6,4 @@ README.Rmd
 ^CODE_OF_CONDUCT\.md$
 ^codemeta\.json$
 man-roxygen
+^cran-comments\.md$
