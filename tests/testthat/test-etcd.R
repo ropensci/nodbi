@@ -2,6 +2,8 @@ context("etcd")
 
 
 test_that("Source", {
+  skip_on_cran()
+
   skip_if_no_etcd()
   src <- src_etcd()
   expect_is(src, "docdb_src")
@@ -13,6 +15,8 @@ test_that("Source", {
 df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
 
 test_that("db into etcd", {
+  skip_on_cran()
+
   skip_if_no_etcd()
   src <- src_etcd()
 
@@ -25,6 +29,8 @@ test_that("db into etcd", {
 })
 
 test_that("delete in etcd works", {
+  skip_on_cran()
+  
   skip_if_no_etcd()
   src <- src_etcd()
 

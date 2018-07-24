@@ -1,6 +1,8 @@
 context("redis")
 
 test_that("Source (Redis)", {
+  skip_on_cran()
+
   skip_if_no_redis()
   src <- src_redis()
   expect_that(src, is_a("docdb_src"))
@@ -11,6 +13,8 @@ test_that("Source (Redis)", {
 })
 
 test_that("db into Redis", {
+  skip_on_cran()
+  
   skip_if_no_redis()
   d <- mtcars
   key <- "mtcars"

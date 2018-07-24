@@ -4,7 +4,7 @@ Description: Simplified document database manipulation and analysis,
     including support for 'NoSQL' databases ('Elasticsearch',
     'CouchDB', 'MongoDB'), 'key-value' databases ('Redis'), and other
     'NoSQL' types ('etcd').
-Version: 0.0.7.9411
+Version: 0.0.9.9100
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
@@ -24,8 +24,8 @@ Imports:
 Suggests:
     sofa (>= 0.3.0),
     etseed (>= 0.1.0),
-    elastic (>= 0.8.0),
-    mongolite (>= 1.5),
+    elastic (>= 0.8.4),
+    mongolite (>= 1.6),
     redux,
     testthat
 RoxygenNote: 6.0.1

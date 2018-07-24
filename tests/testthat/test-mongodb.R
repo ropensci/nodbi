@@ -1,6 +1,8 @@
 context("mongodb")
 
 test_that("Source", {
+  skip_on_cran()
+
   skip_if_no_mongo()
   src <- src_mongo()
   expect_is(src, "docdb_src")
@@ -10,6 +12,8 @@ test_that("Source", {
 })
 
 test_that("db into mongo", {
+  skip_on_cran()
+
   skip_if_no_mongo()
   con <- src_mongo()
   # delete if exists
@@ -23,6 +27,8 @@ test_that("db into mongo", {
 })
 
 test_that("delete in mongo works", {
+  skip_on_cran()
+  
   skip_if_no_mongo()
   cnn <- src_mongo()
   # delete if exists
