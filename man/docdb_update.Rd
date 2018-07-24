@@ -29,7 +29,7 @@ docdb_create(src, "mtcars2", mtcars)
 docdb_get(src, "mtcars2")
 
 mtcars$letter <- sample(letters, NROW(mtcars), replace = TRUE)
-docdb_update(src, "mtcars2", mtcars)
+invisible(docdb_update(src, "mtcars2", mtcars))
 docdb_get(src, "mtcars2")
 }
 }
