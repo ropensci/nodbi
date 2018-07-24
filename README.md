@@ -243,4 +243,4 @@ docdb_get(src, "diamonds") %>%
 
 [![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
 
-[redux]: https://cran.r-project.org/web/packages/redux/
+[redux]: https://cran.r-project.org/package=redux

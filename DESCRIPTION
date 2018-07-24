@@ -1,10 +1,10 @@
 Package: nodbi
 Title: 'NoSQL' Database Connector
 Description: Simplified document database manipulation and analysis,
-    including support for 'NoSQL' databases ('Elasticsearch',
-    'CouchDB', 'MongoDB'), 'key-value' databases ('Redis'), and other
-    'NoSQL' types ('etcd').
-Version: 0.0.9.9100
+    including support for many 'NoSQL' databases, including document 
+    databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
+    'key-value' databases ('Redis'), and other 'NoSQL' types ('etcd').
+Version: 0.1.0
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
