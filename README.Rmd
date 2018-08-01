@@ -36,6 +36,7 @@ knitr::opts_chunk$set(
 ```
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![cran checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi)
 [![Build Status](https://travis-ci.org/ropensci/nodbi.svg)](https://travis-ci.org/ropensci/nodbi)
 [![codecov](https://codecov.io/gh/ropensci/nodbi/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/nodbi)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/metacran/cranlogs.app)
