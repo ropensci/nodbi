@@ -4,7 +4,7 @@ Description: Simplified document database manipulation and analysis,
     including support for many 'NoSQL' databases, including document 
     databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
     'key-value' databases ('Redis'), and other 'NoSQL' types ('etcd').
-Version: 0.1.0
+Version: 0.1.0.9100
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
