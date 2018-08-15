@@ -4,12 +4,16 @@
 \alias{docdb_get}
 \title{Get documents}
 \usage{
-docdb_get(src, key, ...)
+docdb_get(src, key, limit = NULL, ...)
 }
 \arguments{
 \item{src}{source object, result of call to src}
 
 \item{key}{(chartacter) A key. ignored for mongo}
+
+\item{limit}{(integer) number of records/rows to return. by default
+not passed, so you get all results. Only works for CouchDB,
+Elasticsearch and MongoDB; ignored for others}
 
 \item{...}{Ignored for now}
 }
@@ -26,6 +30,7 @@ forward slash.
 src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars2", value = mtcars)
 docdb_get(src, "mtcars2")
+docdb_get(src, "mtcars2", limit = 5)
 
 # etcd
 # src <- src_etcd()
@@ -36,6 +41,8 @@ docdb_get(src, "mtcars2")
 src <- src_elastic()
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
+docdb_create(src, "d2", diamonds)
+docdb_get(src, "d2", limit = 1010)
 
 # Redis
 src <- src_redis()
@@ -46,5 +53,6 @@ docdb_get(src, "mtcars")
 src <- src_mongo()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
+docdb_get(src, "mtcars", limit = 4)
 }
 }
