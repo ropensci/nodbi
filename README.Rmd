@@ -143,7 +143,7 @@ Put the `iris` dataset into ES
 
 ```{r echo=FALSE}
 src <- src_elastic()
-if (elastic::index_exists("iris")) invisible(docdb_delete(src, "iris"))
+if (elastic::index_exists(src$con, "iris")) invisible(docdb_delete(src, "iris"))
 ```
 
 ```{r eval=FALSE}

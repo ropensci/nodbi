@@ -4,7 +4,7 @@ Description: Simplified document database manipulation and analysis,
     including support for many 'NoSQL' databases, including document 
     databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
     'key-value' databases ('Redis'), and other 'NoSQL' types ('etcd').
-Version: 0.1.0.9100
+Version: 0.1.1.9110
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
@@ -24,11 +24,12 @@ Imports:
 Suggests:
     sofa (>= 0.3.0),
     etseed (>= 0.1.0),
-    elastic (>= 0.8.4),
+    elastic (>= 1.0.0),
     mongolite (>= 1.6),
     redux,
     testthat
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
+Remotes: ropensci/elastic
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Redis, Elasticsearch, CouchDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org

@@ -19,16 +19,13 @@
 #' src_elastic()
 #' }
 src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
-                              transport_schema = "http", user = NULL,
-                              pwd = NULL, force = FALSE, ...) {
+  transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...) {
 
-  elastic::connect(es_host = host, es_port = port, es_path = path,
-                   es_transport_schema = transport_schema, es_user = user,
-                   es_pwd = pwd, force = force, ...)
-  conninfo <- elastic::connection()
-  info <- elastic::ping()
-  dbs <- names(elastic::aliases_get())
-  structure(list(es_info = info, es_conn = conninfo, dbs = dbs),
+  x <- elastic::connect(host = host, port = port, path = path,
+    transport_schema = transport_schema, user = user,
+    pwd = pwd, force = force, ...)
+  dbs <- names(elastic::aliases_get(x))
+  structure(list(con = x, info = x$ping(), dbs = dbs),
             class = c("src_elastic","docdb_src"),
             type = "elasticsearch")
 }
@@ -36,8 +33,8 @@ src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
 #' @export
 print.src_elastic <- function(x, ...) {
   cat(sprintf("src: elasticsearch %s [%s:%s]",
-              x$es_info$version$number,
-              x$es_conn$host, x$es_conn$port), sep = "\n")
+              x$info$version$number,
+              x$con$host, x$con$port), sep = "\n")
   cat(doc_wrap("databases: ", paste0(x$dbs, collapse = ", "),
                width = 80), "\n", sep = "")
 }
