@@ -13,7 +13,12 @@ docdb_query(src, key, query, ...)
 
 \item{query}{various. see Query section below.}
 
-\item{...}{Ignored for now}
+\item{...}{Additional named parameters passed on to each package:
+\itemize{
+\item CouchDB: passed on to \code{\link[sofa:db_query]{sofa::db_query()}}
+\item Elasticsearch: passed on to \code{\link[elastic:Search]{elastic::Search()}}
+\item MongoDB: passed on to the \code{$find} method of \pkg{mongolite}
+}}
 }
 \description{
 Get documents with a filtering query
@@ -26,7 +31,12 @@ forward slash.
 
 \itemize{
 \item CouchDB: a list, see docs for \code{\link[sofa:db_query]{sofa::db_query()}}
-\item Elasticsearch: query parameters, see \code{\link[elastic:Search]{elastic::Search()}}
+\item Elasticsearch: query parameters, see \code{\link[elastic:Search]{elastic::Search()}}; passed to
+the \code{query} parameter of \code{elastic::Search}, thus performs a URI
+based search where the query is passed in the URI instead of the body.
+In theory you can instead pass in a JSON or list to the \code{body}
+parameter, but if you want to do complicated Elasticsearch queries
+you may be better of using \pkg{elastic} package directly
 \item MongoDB: query parameters, see \pkg{mongolite} docs for
 help with searches
 }

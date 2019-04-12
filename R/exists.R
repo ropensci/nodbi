@@ -5,9 +5,7 @@
 #' @param key (chartacter) A key. ignored for mongo
 #' @param ... Ignored for now
 #' @template deets
-#' @note for MongoDB we just return `TRUE` because one has to 
-#' instantiate a database and collection when running [src_mongo()], 
-#' whereas that's not true with other data sources
+#' @note no docdb_exists method for MongoDB at this time
 #' @return logical, `TRUE` or `FALSE`
 #' @examples \dontrun{
 #' # CouchDB
@@ -34,12 +32,6 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_exists(src, "mtcars")
 #' docdb_exists(src, "asdfasf")
-#'
-#' # Mongo
-#' (src <- src_mongo())
-#' docdb_create(src, "mtcars", mtcars)
-#' docdb_exists(src, "mtcars")
-#' docdb_exists(src, "asdfasdfsdfasdf")
 #' }
 docdb_exists <- function(src, key, ...){
   UseMethod("docdb_exists")
@@ -63,7 +55,7 @@ docdb_exists.src_etcd <- function(src, key, ...) {
 #' @export
 docdb_exists.src_elastic <- function(src, key, ...) {
   assert(key, 'character')
-  elastic::index_exists(key, ...)
+  elastic::index_exists(src$con, key, ...)
 }
 
 #' @export
@@ -72,5 +64,4 @@ docdb_exists.src_redis <- function(src, key, ...) {
   switch(as.character(src$con$EXISTS(key)), "1" = TRUE, "0" = FALSE)
 }
 
-#' @export
-docdb_exists.src_mongo <- function(src, key, ...) return(TRUE)
+# docdb_exists.src_mongo <- function(src, key, ...) return(TRUE)

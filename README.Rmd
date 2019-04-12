@@ -56,7 +56,9 @@ So far we support the following DBs:
 Currently we have support for data.frame's for the following operations
 
 * Create - all DBs
+* Exists - except MongoDB
 * Get - all DBs
+* Query - except Redis, etcd
 * Delete - all DBs
 * Update - just CouchDB
 
@@ -106,7 +108,7 @@ src_etcd()
 If you want to use classic Redis server, we do that through the [redux][]
 package, and you'll need to start up Redis by e.g,. `redis-server` in your shell.
 
-```{r output.lines=1:10}
+```{r}
 src_redis()
 ```
 

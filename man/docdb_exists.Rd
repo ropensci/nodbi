@@ -24,9 +24,7 @@ Note that with etcd, you have to prefix a key with a
 forward slash.
 }
 \note{
-for MongoDB we just return \code{TRUE} because one has to
-instantiate a database and collection when running \code{\link[=src_mongo]{src_mongo()}},
-whereas that's not true with other data sources
+no docdb_exists method for MongoDB at this time
 }
 \examples{
 \dontrun{
@@ -54,11 +52,5 @@ docdb_exists(src, "adfadf")
 docdb_create(src, "mtcars", mtcars)
 docdb_exists(src, "mtcars")
 docdb_exists(src, "asdfasf")
-
-# Mongo
-(src <- src_mongo())
-docdb_create(src, "mtcars", mtcars)
-docdb_exists(src, "mtcars")
-docdb_exists(src, "asdfasdfsdfasdf")
 }
 }

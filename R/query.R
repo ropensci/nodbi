@@ -4,12 +4,22 @@
 #' @param src source object, result of call to src
 #' @param key (chartacter) A key. ignored for mongo
 #' @param query various. see Query section below.
-#' @param ... Ignored for now
+#' @param ... Additional named parameters passed on to each package:
+#' 
+#' - CouchDB: passed on to [sofa::db_query()]
+#' - Elasticsearch: passed on to [elastic::Search()]
+#' - MongoDB: passed on to the `$find` method of \pkg{mongolite}
+#' 
 #' @template deets
 #' @section What is expected for each source:
 #' 
 #' - CouchDB: a list, see docs for [sofa::db_query()]
-#' - Elasticsearch: query parameters, see [elastic::Search()]
+#' - Elasticsearch: query parameters, see [elastic::Search()]; passed to 
+#' the `query` parameter of `elastic::Search`, thus performs a URI 
+#' based search where the query is passed in the URI instead of the body.
+#' In theory you can instead pass in a JSON or list to the `body`
+#' parameter, but if you want to do complicated Elasticsearch queries
+#' you may be better of using \pkg{elastic} package directly
 #' - MongoDB: query parameters, see \pkg{mongolite} docs for 
 #' help with searches
 #' 
@@ -63,10 +73,10 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 #' @export
 docdb_query.src_elastic <- function(src, key, query, ...) {
   assert(key, 'character')
-  ids <- pluck(elastic::Search(key, q = query, source = FALSE,
-                               size = 10)$hits$hits, "_id", "")
+  ids <- pluck(elastic::Search(src$con, key, q = query, source = FALSE,
+                               size = 10, ...)$hits$hits, "_id", "")
   if (length(ids) == 0) return(data.frame(NULL))
-  tmp <- elastic::docs_mget(index = key, type = key, ids = ids,
+  tmp <- elastic::docs_mget(src$con, index = key, type = key, ids = ids,
                             verbose = FALSE)
   makedf(pluck(tmp$docs, "_source"))
 }
@@ -74,8 +84,4 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 #' @export
 docdb_query.src_mongo <- function(src, key, query, ...) {
   src$con$find(query = query, ...)
-  # dump <- tempfile()
-  # src$con$export(file(dump))
-  # # remove first column, a mongodb identifier
-  # jsonlite::stream_in(file(dump), verbose = FALSE)[,-1]
 }
