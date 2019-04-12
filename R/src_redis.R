@@ -20,7 +20,12 @@ src_redis <- function(...) {
 }
 
 #' @export
-print.docdb_src_redis <- function(x, ...) {
+print.src_redis <- function(x, ...) {
+  config <- x$con$config()
+  keys <- grep("feature:", unlist(x$con$KEYS("*")), 
+    value = TRUE, invert = TRUE)
   cat(sprintf("src: %s %s [%s:%d]\n",
-              x$type, x$version, x$con$host, x$con$port))
+              x$type, x$version, config$host, config$port))
+  cat(doc_wrap("keys: ", paste0(keys, collapse = ", "),
+               width = 80), "\n", sep = "")
 }

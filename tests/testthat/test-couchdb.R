@@ -1,6 +1,4 @@
-context("couchdb")
-
-
+context("couchdb: src")
 test_that("Source", {
   skip_on_cran()
 
@@ -13,6 +11,7 @@ test_that("Source", {
   expect_equal(attr(src, "info")$couchdb, "Welcome")
 })
 
+context("couchdb: create")
 test_that("db into couchdb", {
   skip_on_cran()
 
@@ -29,6 +28,7 @@ test_that("db into couchdb", {
   expect_equal(data.frame(d2), df)
 })
 
+context("couchdb: delete")
 test_that("delete in couchdb works", {
   skip_on_cran()
   
@@ -44,3 +44,41 @@ test_that("delete in couchdb works", {
   del <- docdb_delete(src, "foobar")
   expect_true(del$ok)
 })
+
+
+context("couchdb: exists")
+test_that("exists in couchdb works", {
+  skip_on_cran()
+  
+  df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
+  
+  skip_if_no_couchdb()
+  src <- src_couchdb()
+
+  # delete if exists
+  invisible(tryCatch(docdb_delete(src, "foobar"), error = function(e) e))
+
+  expect_false(docdb_exists(src, "foobar"))
+
+  invisible(docdb_create(src, "foobar", df))
+  
+  expect_true(docdb_exists(src, "foobar"))
+})
+
+
+context("couchdb: query")
+test_that("query in couchdb works", {
+  skip_on_cran()
+  skip_if_no_couchdb()
+  src <- src_couchdb()
+
+  if (docdb_exists(src, "mtcars2")) docdb_delete(src, "mtcars2")
+  invisible(docdb_create(src, key = "mtcars2", value = mtcars))
+  expect_true(docdb_exists(src, "mtcars2"))
+  query <- list(cyl = list("$gt" = 6))
+  res <- docdb_query(src, "mtcars2", query = query)
+  expect_is(res, "data.frame")
+  expect_equal(NROW(res), 10)
+})
+
+
