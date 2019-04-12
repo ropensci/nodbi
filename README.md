@@ -1,6 +1,8 @@
 nodbi
 =====
 
+
+
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 [![cran checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi)
 [![Build Status](https://travis-ci.org/ropensci/nodbi.svg)](https://travis-ci.org/ropensci/nodbi)
@@ -55,13 +57,12 @@ Start CouchDB on the cli or with the app
 
 ```r
 src_couchdb()
-#> src: couchdb 2.1.1 [127.0.0.1/5984]
-#> databases: bulkfromchr, bulktest2, bulktest3, cats, cchecksdb, df, drinksdb,
-#>      hello_earth, iris190, iris984, irisrows, mtcars, sofadb, test, testing,
-#>      testing123, testiris
+#> src: couchdb 2.3.0 [127.0.0.1/5984]
+#> databases: cats, df, flights, foobar, geotest, mtcars, mtcars2, sofadb, test,
+#>      testing123
 ```
 
-Start Elaticsearch, e.g.:
+Start Elasticsearch, e.g.:
 
 ```sh
 cd /usr/local/elasticsearch && bin/elasticsearch
@@ -70,8 +71,8 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 
 ```r
 src_elastic()
-#> src: elasticsearch 6.2.4 [127.0.0.1:9200]
-#> databases: mtcars
+#> src: elasticsearch 7.0.0 [127.0.0.1:9200]
+#> databases: gbifgeo, gbif, plos
 ```
 
 Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e.g.: `etcd`
@@ -80,7 +81,7 @@ Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e
 ```r
 src_etcd()
 #> src:
-#>   etcd server: 3.3.5
+#>   etcd server: 3.3.11
 #>   etcd cluster: 3.3.0
 ```
 
@@ -92,10 +93,10 @@ package, and you'll need to start up Redis by e.g,. `redis-server` in your shell
 src_redis()
 #> $type
 #> [1] "redis"
-#>
+#> 
 #> $version
-#> [1] '1.0.0'
-#>
+#> [1] '1.1.0'
+#> 
 #> $con
 #> <redis_api>
 #>   Redis commands:
@@ -108,8 +109,8 @@ Start MongoDB: `mongod` (may need to do `sudo mongod`)
 
 ```r
 src_mongo()
-#> MongoDB 3.6.4 (uptime: 4702s)
-#> URL: leo/test
+#> MongoDB 4.0.5 (uptime: 30s)
+#> URL: leothelion.local/test
 ```
 
 ## CouchDB
@@ -199,16 +200,16 @@ library("ggplot2")
 src <- src_mongo(verbose = FALSE)
 ff <- docdb_create(src, "diamonds", diamonds)
 docdb_get(src, "diamonds")
-#>        carat       cut color clarity depth table price     x     y     z
-#> 1       0.23     Ideal     E     SI2  61.5  55.0   326  3.95  3.98  2.43
-#> 2       0.21   Premium     E     SI1  59.8  61.0   326  3.89  3.84  2.31
-#> 3       0.23      Good     E     VS1  56.9  65.0   327  4.05  4.07  2.31
-#> 4       0.29   Premium     I     VS2  62.4  58.0   334  4.20  4.23  2.63
-#> 5       0.31      Good     J     SI2  63.3  58.0   335  4.34  4.35  2.75
-#> 6       0.24 Very Good     J    VVS2  62.8  57.0   336  3.94  3.96  2.48
-#> 7       0.24 Very Good     I    VVS1  62.3  57.0   336  3.95  3.98  2.47
-#> 8       0.26 Very Good     H     SI1  61.9  55.0   337  4.07  4.11  2.53
-#> 9       0.22      Fair     E     VS2  65.1  61.0   337  3.87  3.78  2.49
+#>      carat       cut color clarity depth table price    x    y    z
+#> 1     0.23     Ideal     E     SI2  61.5  55.0   326 3.95 3.98 2.43
+#> 2     0.21   Premium     E     SI1  59.8  61.0   326 3.89 3.84 2.31
+#> 3     0.23      Good     E     VS1  56.9  65.0   327 4.05 4.07 2.31
+#> 4     0.29   Premium     I     VS2  62.4  58.0   334 4.20 4.23 2.63
+#> 5     0.31      Good     J     SI2  63.3  58.0   335 4.34 4.35 2.75
+#> 6     0.24 Very Good     J    VVS2  62.8  57.0   336 3.94 3.96 2.48
+#> 7     0.24 Very Good     I    VVS1  62.3  57.0   336 3.95 3.98 2.47
+#> 8     0.26 Very Good     H     SI1  61.9  55.0   337 4.07 4.11 2.53
+#> 9     0.22      Fair     E     VS2  65.1  61.0   337 3.87 3.78 2.49
 ...
 ```
 

@@ -56,7 +56,7 @@ docdb_delete.src_etcd <- function(src, key, ...) {
 #' @export
 docdb_delete.src_elastic <- function(src, key, ...) {
 	assert(key, 'character')
-  elastic::index_delete(key, verbose = FALSE)
+  elastic::index_delete(src$con, key, verbose = FALSE)
 }
 
 #' @export
