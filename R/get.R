@@ -7,7 +7,14 @@
 #' @param limit (integer) number of records/rows to return. by default
 #' not passed, so you get all results. Only works for CouchDB, 
 #' Elasticsearch and MongoDB; ignored for others
-#' @param ... Ignored for now
+#' @param ... passed on to functions:
+#' 
+#' - CouchDB: passed to [sofa::db_alldocs()]
+#' - etcd: passed to the `$key()` method
+#' - Elasticsearch: passed to [elastic::Search()]
+#' - Redis: ignored
+#' - MongoDB: ignored
+#' 
 #' @template deets
 #' @examples \dontrun{
 #' # CouchDB
@@ -64,7 +71,7 @@ docdb_get.src_etcd <- function(src, key, limit = NULL, ...) {
 docdb_get.src_elastic <- function(src, key, limit = NULL, ...){
   assert(key, 'character')
   ids <- pluck(elastic::Search(src$con, key, source = FALSE,
-                               size = 1000)$hits$hits, "_id", "")
+                               size = limit, ...)$hits$hits, "_id", "")
   tmp <- elastic::docs_mget(src$con, index = key, type = key, ids = ids,
                             verbose = FALSE)
   makedf(pluck(tmp$docs, "_source"))

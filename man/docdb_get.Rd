@@ -15,7 +15,14 @@ docdb_get(src, key, limit = NULL, ...)
 not passed, so you get all results. Only works for CouchDB,
 Elasticsearch and MongoDB; ignored for others}
 
-\item{...}{Ignored for now}
+\item{...}{passed on to functions:
+\itemize{
+\item CouchDB: passed to \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
+\item etcd: passed to the \code{$key()} method
+\item Elasticsearch: passed to \code{\link[elastic:Search]{elastic::Search()}}
+\item Redis: ignored
+\item MongoDB: ignored
+}}
 }
 \description{
 Get documents
