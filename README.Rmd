@@ -87,7 +87,7 @@ Start CouchDB on the cli or with the app
 src_couchdb()
 ```
 
-Start Elaticsearch, e.g.:
+Start Elasticsearch, e.g.:
 
 ```sh
 cd /usr/local/elasticsearch && bin/elasticsearch

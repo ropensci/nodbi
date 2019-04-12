@@ -58,11 +58,11 @@ Start CouchDB on the cli or with the app
 ```r
 src_couchdb()
 #> src: couchdb 2.3.0 [127.0.0.1/5984]
-#> databases: cats, df, flights, foobar, geotest, mtcars2, sofadb, test,
+#> databases: cats, df, flights, foobar, geotest, mtcars, mtcars2, sofadb, test,
 #>      testing123
 ```
 
-Start Elaticsearch, e.g.:
+Start Elasticsearch, e.g.:
 
 ```sh
 cd /usr/local/elasticsearch && bin/elasticsearch
@@ -72,7 +72,7 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 ```r
 src_elastic()
 #> src: elasticsearch 7.0.0 [127.0.0.1:9200]
-#> databases: gbifgeo, mtcars, diamonds_small, iris, plos, gbif
+#> databases: gbifgeo, gbif, plos
 ```
 
 Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e.g.: `etcd`
@@ -109,7 +109,7 @@ Start MongoDB: `mongod` (may need to do `sudo mongod`)
 
 ```r
 src_mongo()
-#> MongoDB 4.0.5 (uptime: 23s)
+#> MongoDB 4.0.5 (uptime: 30s)
 #> URL: leothelion.local/test
 ```
 
