@@ -1,5 +1,4 @@
-context("redis")
-
+context("redis: src")
 test_that("Source (Redis)", {
   skip_on_cran()
 
@@ -12,6 +11,7 @@ test_that("Source (Redis)", {
   expect_equal(src$con$type(), "redux")
 })
 
+context("redis: create")
 test_that("db into Redis", {
   skip_on_cran()
   

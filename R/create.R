@@ -58,8 +58,8 @@ docdb_create.src_etcd <- function(src, key, value, ...){
 #' @export
 docdb_create.src_elastic <- function(src, key, value, ...){
   assert(value, 'data.frame')
-  elastic::index_create(index = key, verbose = FALSE)
-  invisible(elastic::docs_bulk(value, index = key))
+  elastic::index_create(src$con, index = key, verbose = FALSE)
+  invisible(elastic::docs_bulk(src$con, value, index = key))
 }
 
 #' @export

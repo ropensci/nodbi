@@ -4,8 +4,8 @@
 \alias{src_mongo}
 \title{Setup a mongoDB database connection}
 \usage{
-src_mongo(collection = "test", db = "test", url = "mongodb://localhost",
-  ...)
+src_mongo(collection = "test", db = "test",
+  url = "mongodb://localhost", ...)
 }
 \arguments{
 \item{collection}{(character) name of collection}

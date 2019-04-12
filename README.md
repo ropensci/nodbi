@@ -1,6 +1,8 @@
 nodbi
 =====
 
+
+
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 [![cran checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi)
 [![Build Status](https://travis-ci.org/ropensci/nodbi.svg)](https://travis-ci.org/ropensci/nodbi)
@@ -22,7 +24,9 @@ So far we support the following DBs:
 Currently we have support for data.frame's for the following operations
 
 * Create - all DBs
+* Exists - except MongoDB
 * Get - all DBs
+* Query - except Redis, etcd
 * Delete - all DBs
 * Update - just CouchDB
 
@@ -55,13 +59,12 @@ Start CouchDB on the cli or with the app
 
 ```r
 src_couchdb()
-#> src: couchdb 2.1.1 [127.0.0.1/5984]
-#> databases: bulkfromchr, bulktest2, bulktest3, cats, cchecksdb, df, drinksdb,
-#>      hello_earth, iris190, iris984, irisrows, mtcars, sofadb, test, testing,
-#>      testing123, testiris
+#> src: couchdb 2.3.0 [127.0.0.1/5984]
+#> databases: cats, df, flights, foobar, geotest, mtcars, mtcars2, sofadb, test,
+#>      testing123
 ```
 
-Start Elaticsearch, e.g.:
+Start Elasticsearch, e.g.:
 
 ```sh
 cd /usr/local/elasticsearch && bin/elasticsearch
@@ -70,8 +73,8 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 
 ```r
 src_elastic()
-#> src: elasticsearch 6.2.4 [127.0.0.1:9200]
-#> databases: mtcars
+#> src: elasticsearch 7.0.0 [127.0.0.1:9200]
+#> databases: gbifgeo, mtcars, gbif, plos, diamonds_small
 ```
 
 Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e.g.: `etcd`
@@ -80,7 +83,7 @@ Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e
 ```r
 src_etcd()
 #> src:
-#>   etcd server: 3.3.5
+#>   etcd server: 3.3.11
 #>   etcd cluster: 3.3.0
 ```
 
@@ -90,17 +93,8 @@ package, and you'll need to start up Redis by e.g,. `redis-server` in your shell
 
 ```r
 src_redis()
-#> $type
-#> [1] "redis"
-#>
-#> $version
-#> [1] '1.0.0'
-#>
-#> $con
-#> <redis_api>
-#>   Redis commands:
-#>     APPEND: function
-...
+#> src: redis 1.1.0 [127.0.0.1:6379]
+#> keys: diamonds, mtcars, foo
 ```
 
 Start MongoDB: `mongod` (may need to do `sudo mongod`)
@@ -108,8 +102,8 @@ Start MongoDB: `mongod` (may need to do `sudo mongod`)
 
 ```r
 src_mongo()
-#> MongoDB 3.6.4 (uptime: 4702s)
-#> URL: leo/test
+#> MongoDB 4.0.5 (uptime: 2300s)
+#> URL: leothelion.local/test
 ```
 
 ## CouchDB
@@ -199,16 +193,16 @@ library("ggplot2")
 src <- src_mongo(verbose = FALSE)
 ff <- docdb_create(src, "diamonds", diamonds)
 docdb_get(src, "diamonds")
-#>        carat       cut color clarity depth table price     x     y     z
-#> 1       0.23     Ideal     E     SI2  61.5  55.0   326  3.95  3.98  2.43
-#> 2       0.21   Premium     E     SI1  59.8  61.0   326  3.89  3.84  2.31
-#> 3       0.23      Good     E     VS1  56.9  65.0   327  4.05  4.07  2.31
-#> 4       0.29   Premium     I     VS2  62.4  58.0   334  4.20  4.23  2.63
-#> 5       0.31      Good     J     SI2  63.3  58.0   335  4.34  4.35  2.75
-#> 6       0.24 Very Good     J    VVS2  62.8  57.0   336  3.94  3.96  2.48
-#> 7       0.24 Very Good     I    VVS1  62.3  57.0   336  3.95  3.98  2.47
-#> 8       0.26 Very Good     H     SI1  61.9  55.0   337  4.07  4.11  2.53
-#> 9       0.22      Fair     E     VS2  65.1  61.0   337  3.87  3.78  2.49
+#>                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+#> Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+#> Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+#> Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+#> Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+#> Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+#> Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+#> Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+#> Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+#> Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
 ...
 ```
 
@@ -225,14 +219,15 @@ src <- src_mongo(verbose = FALSE)
 docdb_get(src, "diamonds") %>%
   group_by(cut) %>%
   summarise(mean_depth = mean(depth), mean_price = mean(price))
-#> # A tibble: 5 x 3
+#> # A tibble: 6 x 3
 #>   cut       mean_depth mean_price
 #>   <chr>          <dbl>      <dbl>
-#> 1 Fair            64.0      4359.
-#> 2 Good            62.4      3929.
-#> 3 Ideal           61.7      3458.
-#> 4 Premium         61.3      4584.
-#> 5 Very Good       61.8      3982.
+#> 1 <NA>            NA          NA 
+#> 2 Fair            64.0      4359.
+#> 3 Good            62.4      3929.
+#> 4 Ideal           61.7      3458.
+#> 5 Premium         61.3      4584.
+#> 6 Very Good       61.8      3982.
 ```
 
 ## Meta
