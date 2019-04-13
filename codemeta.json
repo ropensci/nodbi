@@ -5,19 +5,19 @@
   ],
   "@type": "SoftwareSourceCode",
   "identifier": "nodbi",
-  "description": "Simplified document database manipulation and analysis,\n    including support for 'NoSQL' databases ('Elasticsearch',\n    'CouchDB', 'MongoDB'), 'key-value' databases ('Redis'), and other\n    'NoSQL' types ('etcd').",
+  "description": "Simplified document database manipulation and analysis,\n    including support for many 'NoSQL' databases, including document \n    databases ('Elasticsearch', 'CouchDB', 'MongoDB'), \n    'key-value' databases ('Redis'), and other 'NoSQL' types ('etcd').",
   "name": "nodbi: 'NoSQL' Database Connector",
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.9.9100",
+  "version": "0.1.9.9100",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
-    "version": "3.5.1",
+    "version": "3.5.3",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 3.5.1 Patched (2018-07-18 r74978)",
+  "runtimePlatform": "R version 3.5.3 (2019-03-11)",
   "author": [
     {
       "@type": "Person",
@@ -77,7 +77,7 @@
       "@type": "SoftwareApplication",
       "identifier": "elastic",
       "name": "elastic",
-      "version": ">= 0.8.4",
+      "version": ">= 1.0.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -157,11 +157,23 @@
     }
   ],
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
-  "fileSize": "351.237KB",
+  "fileSize": "354.193KB",
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "etcd", "r", "r-package"],
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
-  "contIntegration": ["https://travis-ci.org/ropensci/nodbi", "https://codecov.io/gh/ropensci/nodbi"],
-  "developmentStatus": "http://www.repostatus.org/#wip"
+  "contIntegration": [
+    "https://travis-ci.org/ropensci/nodbi",
+    "https://codecov.io/gh/ropensci/nodbi"
+  ],
+  "developmentStatus": "http://www.repostatus.org/#wip",
+  "provider": {
+    "@id": "https://cran.r-project.org",
+    "@type": "Organization",
+    "name": "Comprehensive R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
+  "contributor": {},
+  "copyrightHolder": {},
+  "funder": {}
 }
