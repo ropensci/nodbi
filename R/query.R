@@ -162,7 +162,7 @@ docdb_query.src_sqlite <- function(src, key, query = NULL, fields = NULL, ...) {
     
     # change from long to wide
     return(
-      data.table::dcast(data = tmp, 
+      data.table::dcast(data = data.table::data.table(tmp), 
                         formula = `_id` + path ~ key, 
                         value.var = "value"))
     
