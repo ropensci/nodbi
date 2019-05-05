@@ -9,9 +9,9 @@ docdb_query(src, key, query, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key, ignored for mongo}
 
-\item{query}{various. see Query section below.}
+\item{query}{various, see Query section below.}
 
 \item{...}{Additional named parameters passed on to each package:
 \itemize{
@@ -39,6 +39,9 @@ parameter, but if you want to do complicated Elasticsearch queries
 you may be better of using \pkg{elastic} package directly
 \item MongoDB: query parameters, see \pkg{mongolite} docs for
 help with searches
+\item SQLite: \code{fields}, an optional character vector of fields to be
+selected from anywhere in the tree.
+Parameter \code{query} is not yet supported; all entries are returned.
 }
 }
 
@@ -69,11 +72,18 @@ docdb_query(src, "iris", query = "setosa")
 docdb_query(src, "iris", query = "1.5")
 docdb_query(src, "iris", query = "Petal.Width:1.5")
 
-# Mongo
+# MongoDB
 src <- src_mongo()
 if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 docdb_create(src, "mtcars", mtcars)
 docdb_query(src, query = '{"mpg":21}')
 docdb_query(src, query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+
+# SQLite
+src <- src_sqlite()
+if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
+docdb_create(src, "mtcars", mtcars)
+docdb_query(src, fields = c("mpg", "cyl"))
+docdb_query(con, fields = '{"disp": 1, "gear": 0, "drat": 1}')
 }
 }

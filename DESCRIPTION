@@ -4,13 +4,17 @@ Description: Simplified document database manipulation and analysis,
     including support for many 'NoSQL' databases, including document 
     databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
     'key-value' databases ('Redis'), and other 'NoSQL' types ('etcd').
-Version: 0.2.0.9100
+Version: 0.2.0.9101
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
         comment = c(ORCID = "0000-0003-1444-9135")),
     person("Rich", "FitzJohn", role = "aut"),
-    person("Jeroen", "Ooms", role = "aut")
+    person("Jeroen", "Ooms", role = "aut"),
+    person(given = "Ralf",
+           family = "Herold",
+           role = "aut",
+           comment = c(ORCID = "0000-0002-8148-6748"))
   )
 License: MIT + file LICENSE
 LazyData: true
@@ -28,9 +32,11 @@ Suggests:
     etseed (>= 0.1.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
+    RSQLite (>= 1.1),
+    DBI,
     redux,
     testthat
 RoxygenNote: 6.1.1
 X-schema.org-applicationCategory: Databases
-X-schema.org-keywords: database, MongoDB, Redis, Elasticsearch, CouchDB, NoSQL, JSON, documents
+X-schema.org-keywords: database, MongoDB, Redis, Elasticsearch, CouchDB, NoSQL, JSON, documents, sqlite/json1
 X-schema.org-isPartOf: https://ropensci.org

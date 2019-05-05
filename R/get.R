@@ -3,7 +3,7 @@
 #' @export
 #' @import data.table jsonlite
 #' @param src source object, result of call to src
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key, ignored for mongo
 #' @param limit (integer) number of records/rows to return. by default
 #' not passed, so you get all results. Only works for CouchDB, 
 #' Elasticsearch and MongoDB; ignored for others
@@ -14,6 +14,7 @@
 #' - Elasticsearch: passed to [elastic::Search()]
 #' - Redis: ignored
 #' - MongoDB: ignored
+#' - SQLite: ignored
 #' 
 #' @template deets
 #' @examples \dontrun{
@@ -42,6 +43,12 @@
 #'
 #' # Mongo
 #' src <- src_mongo()
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_get(src, "mtcars")
+#' docdb_get(src, "mtcars", limit = 4)
+#' 
+#' # SQLite
+#' src <- src_sqlite()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
 #' docdb_get(src, "mtcars", limit = 4)
@@ -94,6 +101,40 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
   # remove first column, a mongodb identifier
   jsonlite::stream_in(file(dump), verbose = FALSE)[,-1]
 }
+
+#' @export
+docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
+
+  assert(key, "character")
+  assert(limit, "integer")
+  
+  # temporary file
+  dump <- tempfile()
+  
+  # get all and limit
+  if (is.null(limit)) {
+    
+    # TODO _id could be retained, may be useful?
+    cat(DBI::dbReadTable(conn = src$con,
+                         name = key)[, -1],
+        fill = TRUE, file = dump) 
+    
+  } else {
+    
+    # TODO _id could be retained, may be useful?
+    cat(DBI::dbReadTable(conn = src$con,
+                         name = key)[1:limit, -1],
+        fill = TRUE, file = dump) 
+    
+  }
+  
+  # Because parsing huge JSON strings is difficult and inefficient, 
+  # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
+  jsonlite::stream_in(file(dump), verbose = FALSE)
+  
+}
+
+## helpers --------------------------------------
 
 dropmeta <- function(x) {
   x$`_id` <- NULL

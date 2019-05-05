@@ -9,7 +9,7 @@ docdb_exists(src, key, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key, ignored for mongo}
 
 \item{...}{Ignored for now}
 }
@@ -22,35 +22,4 @@ Check if a database exists
 \details{
 Note that with etcd, you have to prefix a key with a
 forward slash.
-}
-\note{
-no docdb_exists method for MongoDB at this time
-}
-\examples{
-\dontrun{
-# CouchDB
-(src <- src_couchdb())
-docout <- docdb_create(src, key = "mtcars2", value = mtcars)
-docdb_exists(src, "mtcars2")
-docdb_exists(src, "asdfadf")
-
-# etcd
-# src <- src_etcd()
-# docdb_exists(src, "/hello")
-# docdb_exists(src, "/asdfadsf")
-
-# Elasticsearch
-(src <- src_elastic())
-if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
-docdb_exists(src, "iris")
-docdb_create(src, "iris", iris)
-docdb_exists(src, "iris")
-docdb_exists(src, "adfadf")
-
-# Redis
-(src <- src_redis())
-docdb_create(src, "mtcars", mtcars)
-docdb_exists(src, "mtcars")
-docdb_exists(src, "asdfasf")
-}
 }

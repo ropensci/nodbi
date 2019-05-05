@@ -7,9 +7,9 @@
 docdb_create(src, key, value, ...)
 }
 \arguments{
-\item{src}{source object, result of call to an \link{src} function}
+\item{src}{source object, result of call to an \link{src_*} function}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key, ignored for mongo}
 
 \item{value}{(data.frame) A single data.frame}
 
@@ -48,6 +48,11 @@ docdb_delete(src, "mtcars")
 
 # MongoDB
 src <- src_mongo()
+docdb_create(src, key = "mtcars", value = mtcars)
+docdb_get(src, "mtcars")
+
+# SQLite
+src <- src_sqlite()
 docdb_create(src, key = "mtcars", value = mtcars)
 docdb_get(src, "mtcars")
 }

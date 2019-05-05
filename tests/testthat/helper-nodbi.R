@@ -26,3 +26,10 @@ skip_if_no_etcd <- function() {
     skip("etcd is not available")
   }
 }
+
+skip_if_no_sqlite <- function() {
+  testthat::skip_if_not_installed("RSQLite")
+  if (inherits(try(src_sqlite(), silent = TRUE), "try-error")) {
+    skip("sqlite is not available")
+  }
+}

@@ -2,8 +2,8 @@
 #'
 #' @export
 #' @param src source object, result of call to src
-#' @param key (chartacter) A key. ignored for mongo
-#' @param query various. see Query section below.
+#' @param key (character) A key, ignored for mongo
+#' @param query various, see Query section below.
 #' @param ... Additional named parameters passed on to each package:
 #' 
 #' - CouchDB: passed on to [sofa::db_query()]
@@ -22,6 +22,9 @@
 #' you may be better of using \pkg{elastic} package directly
 #' - MongoDB: query parameters, see \pkg{mongolite} docs for 
 #' help with searches
+#' - SQLite: `fields`, an optional character vector of fields to be 
+#' selected from anywhere in the tree. 
+#' Parameter `query` is not yet supported; all entries are returned.
 #' 
 #' @section Not supported yet:
 #' 
@@ -46,12 +49,19 @@
 #' docdb_query(src, "iris", query = "1.5")
 #' docdb_query(src, "iris", query = "Petal.Width:1.5")
 #'
-#' # Mongo
+#' # MongoDB
 #' src <- src_mongo()
 #' if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_query(src, query = '{"mpg":21}')
 #' docdb_query(src, query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+#' 
+#' # SQLite
+#' src <- src_sqlite()
+#' if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_query(src, fields = c("mpg", "cyl"))
+#' docdb_query(con, fields = '{"disp": 1, "gear": 0, "drat": 1}')
 #' }
 docdb_query <- function(src, key, query, ...){
   UseMethod("docdb_query")
@@ -85,3 +95,87 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 docdb_query.src_mongo <- function(src, key, query, ...) {
   src$con$find(query = query, ...)
 }
+
+#' @export
+docdb_query.src_sqlite <- function(src, key, query = NULL, fields = NULL, ...) {
+  
+  assert(key, "character")
+  assert(fields, "character")
+  assert(query, "character")
+  
+  ## attempt at implementing examples from
+  ## https://www.sqlite.org/json1.html#jins
+  
+  ## - full table
+  if (is.null(fields) & 
+      is.null(query)) {
+    
+    # These warnings are expected, hence suppressed:
+    #
+    # Warning messages:
+    #   1: In result_fetch(res@ptr, n = n) :
+    #   Column `value`: mixed type, first seen values of type string, 
+    #   coercing other values of type integer, real
+    # 2: In result_fetch(res@ptr, n = n) :
+    #   Column `atom`: mixed type, first seen values of type real, 
+    #   coercing other values of type string  
+    return(
+      suppressWarnings(
+        DBI::dbGetQuery(conn = src$con, 
+                        statement = sprintf(
+                          "SELECT DISTINCT * FROM %s;",
+                          key)
+        )))
+  }
+  
+  ## - extract fields from anywhere in the tree
+  if (!is.null(fields) & 
+      is.null(query)) {
+    
+    # transform fields if in json format
+    if (jsonlite::validate(fields)) {
+      
+      p <- '["](.+?)["]:[ ]*["]?[01]["]?'
+      m <- gregexpr(pattern = p, 
+                    text = fields)
+      r <- regmatches(x = fields, 
+                      m = m, 
+                      invert = FALSE)
+      r <- unlist(r)
+      r <- r[grepl("1$", r)]
+      
+      fields <- gsub('.*["](.+?)["].*', "\\1", r)
+      
+    }
+
+    # now get all rows
+    tmp <- suppressWarnings(
+      DBI::dbGetQuery(conn = src$con, 
+                      statement = sprintf(
+                        "SELECT DISTINCT * 
+                         FROM %s, json_tree (%s.json);",
+                        key, key)))
+    
+    # select columns of interest
+    tmp <- tmp[ tmp$key %in% fields, 
+                c("_id", "path", "key", "value")]
+    
+    # change from long to wide
+    return(
+      data.table::dcast(data = tmp, 
+                        formula = `_id` + path ~ key, 
+                        value.var = "value"))
+    
+  }
+
+  # TODO handle queries - review this: 
+  # Node.js library for mapping mongo-style query objects to SQL queries
+  # https://www.npmjs.com/package/json-sql
+  if (!is.null(query)) {
+    
+    stop("parameter query not yet implemented for src_sqlite.")
+    
+  }
+
+}
+

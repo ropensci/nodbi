@@ -1,12 +1,15 @@
 #' Check if a database exists
 #'
 #' @export
+#' 
 #' @param src source object, result of call to src
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key, ignored for mongo
 #' @param ... Ignored for now
+#' 
 #' @template deets
-#' @note no docdb_exists method for MongoDB at this time
+#' 
 #' @return logical, `TRUE` or `FALSE`
+#' 
 #' @examples \dontrun{
 #' # CouchDB
 #' (src <- src_couchdb())
@@ -33,6 +36,20 @@
 #' docdb_exists(src, "mtcars")
 #' docdb_exists(src, "asdfasf")
 #' }
+#' 
+#' # MongoDB
+#' (src <- src_mongo())
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_exists(src, "mtcars")
+#' docdb_exists(src, "asdfasf")
+#' }
+#' 
+#' # SQLite
+#' (src <- src_sqlite())
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_exists(src, "mtcars")
+#' }
+#' 
 docdb_exists <- function(src, key, ...){
   UseMethod("docdb_exists")
 }
@@ -64,4 +81,14 @@ docdb_exists.src_redis <- function(src, key, ...) {
   switch(as.character(src$con$EXISTS(key)), "1" = TRUE, "0" = FALSE)
 }
 
-# docdb_exists.src_mongo <- function(src, key, ...) return(TRUE)
+#' @export
+docdb_exists.src_mongo <- function(src, key, ...) {
+  # key (collection) is part of src
+  as.logical(src$con$count())
+}
+
+#' @export
+docdb_exists.src_sqlite <- function(src, key, ...) {
+  assert(key, 'character')
+  key %in% DBI::dbListTables(src$con)
+}

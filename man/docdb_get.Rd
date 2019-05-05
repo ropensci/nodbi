@@ -9,7 +9,7 @@ docdb_get(src, key, limit = NULL, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key, ignored for mongo}
 
 \item{limit}{(integer) number of records/rows to return. by default
 not passed, so you get all results. Only works for CouchDB,
@@ -22,6 +22,7 @@ Elasticsearch and MongoDB; ignored for others}
 \item Elasticsearch: passed to \code{\link[elastic:Search]{elastic::Search()}}
 \item Redis: ignored
 \item MongoDB: ignored
+\item SQLite: ignored
 }}
 }
 \description{
@@ -58,6 +59,12 @@ docdb_get(src, "mtcars")
 
 # Mongo
 src <- src_mongo()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
+docdb_get(src, "mtcars", limit = 4)
+
+# SQLite
+src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 docdb_get(src, "mtcars", limit = 4)

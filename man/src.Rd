@@ -15,6 +15,7 @@ of the database backends. Each has their own unique set of parameters.
 \item etcd - \code{\link[=src_etcd]{src_etcd()}}
 \item Elasticsearch - \code{\link[=src_elastic]{src_elastic()}}
 \item Redis - \code{\link[=src_redis]{src_redis()}}
+\item SQLite - \code{\link[=src_sqlite]{src_sqlite()}}
 }
 
 Documentation details for each database:
@@ -24,5 +25,6 @@ Documentation details for each database:
 \item etcd - \url{https://coreos.com/etcd/docs/latest/getting-started-with-etcd.html}
 \item Elasticsearch - \url{https://www.elastic.co/guide/en/elasticsearch/reference/current}
 \item Redis - \url{https://redis.io/documentation}
+\item SQLite - \url{https://www.sqlite.org/json1.html}
 }
 }

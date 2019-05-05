@@ -31,7 +31,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   collapse = TRUE,
   warning = FALSE,
-  message = FALSE
+  message = FALSE,
+  eval = FALSE
 )
 ```
 
@@ -52,6 +53,7 @@ So far we support the following DBs:
 * CouchDB
 * Elasticsearch
 * etcd
+* SQLite
 
 Currently we have support for data.frame's for the following operations
 
@@ -179,6 +181,16 @@ library("ggplot2")
 src <- src_mongo(verbose = FALSE)
 ff <- docdb_create(src, "diamonds", diamonds)
 docdb_get(src, "diamonds")
+```
+
+## SQLite
+
+At this time, `docdb_query()` only processes parameter `fields`, not `query`, so that fields from all records returned. 
+
+```{r output.lines=1:10}
+src <- src_sqlite()
+ff <- docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
 ```
 
 ## Use with dplyr
