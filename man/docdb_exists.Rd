@@ -52,5 +52,11 @@ docdb_exists(src, "adfadf")
 docdb_create(src, "mtcars", mtcars)
 docdb_exists(src, "mtcars")
 docdb_exists(src, "asdfasf")
+
+# SQLite
+(src <- src_sqlite())
+docdb_create(src, "mtcars", mtcars)
+docdb_exists(src, "mtcars")
 }
+
 }
