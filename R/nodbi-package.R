@@ -1,7 +1,8 @@
 #' Document database connector
 #'
 #' Supports NoSQL databases (Elasticsearch, CouchDB, MongoDB),
-#' key-value databases (Redis), and other NoSQL types (etcd).
+#' key-value databases (Redis), other NoSQL types (etcd), 
+#' and SQLite with json1 extension as in R package RSQLite.
 #'
 #' @name nodbi-package
 #' @aliases nodbi
@@ -9,6 +10,7 @@
 #' @author Scott Chamberlain \email{sckott@@protonmail.com}
 #' @author Rich FitzJohn \email{rich.fitzjohn@@gmail.com}
 #' @author Jeroen Ooms \email{jeroen.ooms@@stat.ucla.edu}
+#' @author Ralf Herold \email{ralf.herold@@mailbox.org}
 #' @keywords package
 NULL
 
@@ -34,3 +36,175 @@ NULL
 #' @docType data
 #' @keywords data
 NULL
+
+
+#' contacts
+#'
+#' @format A json string with ragged, nested contact details
+#' @name contacts
+#' @docType data
+#' @keywords data
+#' @export
+#' 
+contacts <- '
+[
+  {
+    "_id": "5cd67853f841025e65ce0ce2",
+    "isActive": false,
+    "balance": "$3,808.45",
+    "age": 23,
+    "eyeColor": "green",
+    "name": "Lacy Chen",
+    "email": "lacychen@conjurica.com",
+    "about": "Sunt consequat ad dolore irure mollit aliquip labore aute. Exercitation nisi nisi reprehenderit.",
+    "registered": "2014-08-03T12:11:54 -02:00",
+    "tags": [
+      "nulla",
+      "nisi",
+      "adipisicing",
+      "do",
+      "ad",
+      "ullamco",
+      "irure"
+    ],
+    "friends": [
+      {
+        "id": 0,
+        "name": "Wooten Goodwin"
+      },
+      {
+        "id": 1,
+        "name": "Brandie Woodward"
+      },
+      {
+        "id": 2,
+        "name": "Angelique Britt"
+      }
+    ]
+  },
+  {
+    "_id": "5cd678531b423d5f04cfb0a1",
+    "isActive": false,
+    "balance": "$3,400.50",
+    "age": 20,
+    "eyeColor": "brown",
+    "name": "Rae Colon",
+    "email": "raecolon@conjurica.com",
+    "about": "Nisi excepteur duis duis aliquip qui occaecat exercitation id consequat consequat.",
+    "registered": "2018-12-19T06:23:35 -01:00",
+    "tags": [
+      "nostrud",
+      "eu",
+      "consectetur",
+      "adipisicing",
+      "labore",
+      "ut",
+      "voluptate"
+    ],
+    "friends": [
+      {
+        "id": 0,
+        "name": "Yang Yates"
+      },
+      {
+        "id": 1,
+        "name": "Lacy Chen"
+      }
+    ]
+  },
+  {
+    "_id": "5cd6785335b63cb19dfa8347",
+    "isActive": false,
+    "balance": "$2,579.09",
+    "age": 30,
+    "eyeColor": "brown",
+    "name": "Williamson French",
+    "email": "williamsonfrench@conjurica.com",
+    "about": "Nulla do sunt magna consectetur officia. Laboris pariatur minim exercitation incididunt.",
+    "registered": "2018-02-14T10:59:57 -01:00",
+    "tags": [
+      "exercitation",
+      "do",
+      "magna",
+      "ut",
+      "consectetur",
+      "ex",
+      "incididunt"
+    ],
+    "friends": [
+      {
+        "id": 0,
+        "name": "Coleen Dunn"
+      },
+      {
+        "id": 1,
+        "name": "Doris Phillips"
+      },
+      {
+        "id": 2,
+        "name": "Concetta Turner"
+      }
+    ]
+  },
+  {
+    "_id": "5cd6785325ce3a94dfc54096",
+    "isActive": true,
+    "balance": "$1,161.52",
+    "age": 22,
+    "eyeColor": "brown",
+    "name": "Pace Bell",
+    "email": "pacebell@conjurica.com",
+    "about": "Eiusmod sunt Lorem voluptate laborum ipsum do cupidatat qui id dolore do.",
+    "registered": "2018-08-17T12:23:42 -02:00",
+    "tags": [
+      "aliqua",
+      "consectetur",
+      "commodo",
+      "velit",
+      "cupidatat",
+      "duis",
+      "dolore"
+    ],
+    "friends": [
+      {
+        "id": 0,
+        "name": "Baird Keller"
+      },
+      {
+        "id": 1,
+        "name": "Francesca Reese"
+      },
+      {
+        "id": 2,
+        "name": "Dona Bartlett"
+      }
+    ]
+  },
+  {
+    "_id": "5cd678530df22d3625ed8375",
+    "isActive": true,
+    "balance": "$2,412.67",
+    "age": 20,
+    "eyeColor": "blue",
+    "name": "Krista Baxter",
+    "email": "kristabaxter@conjurica.com",
+    "about": "Sint quis nulla ea fugiat nisi velit eu reprehenderit nulla esse. Commodo nisi qui elit laborum eu sit.",
+    "registered": "2017-07-19T05:03:47 -02:00",
+    "tags": [
+      "sit",
+      "cillum",
+      "commodo",
+      "labore",
+      "sint",
+      "in",
+      "exercitation"
+    ],
+    "friends": [
+      {
+        "id": 0,
+        "name": "Pace Bell"
+      }
+    ]
+  }
+]
+'

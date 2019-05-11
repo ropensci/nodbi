@@ -50,5 +50,11 @@ docdb_delete(src, "mtcars")
 src <- src_mongo()
 docdb_create(src, key = "mtcars", value = mtcars)
 docdb_get(src, "mtcars")
+
+# SQLite
+src <- src_sqlite()
+docdb_create(src, key = "mtcars", value = mtcars)
+docdb_create(src, key = "mtcars", value = contacts)
+docdb_get(src, "mtcars")
 }
 }

@@ -19,7 +19,7 @@ docdb_update(src, key, value, ...)
 Update documents
 }
 \details{
-Only CouchDB supported for now
+Only CouchDB and sqlite supported for now
 }
 \examples{
 \dontrun{

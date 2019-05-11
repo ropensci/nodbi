@@ -32,7 +32,13 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_exists(src, "mtcars")
 #' docdb_exists(src, "asdfasf")
+#' 
+#' # SQLite
+#' (src <- src_sqlite())
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_exists(src, "mtcars")
 #' }
+#' 
 docdb_exists <- function(src, key, ...){
   UseMethod("docdb_exists")
 }
@@ -65,3 +71,9 @@ docdb_exists.src_redis <- function(src, key, ...) {
 }
 
 # docdb_exists.src_mongo <- function(src, key, ...) return(TRUE)
+
+#' @export
+docdb_exists.src_sqlite <- function(src, key, ...) {
+  assert(key, 'character')
+  key %in% DBI::dbListTables(src$con)
+}

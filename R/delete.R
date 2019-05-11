@@ -36,6 +36,12 @@
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' docdb_delete(src)
+#' 
+#' # SQLite
+#' src <- src_sqlite()
+#' docdb_create(src, "iris", iris)
+#' docdb_get(src)
+#' docdb_delete(src)
 #' }
 docdb_delete <- function(src, key, ...){
   UseMethod("docdb_delete")
@@ -68,4 +74,11 @@ docdb_delete.src_redis <- function(src, key, ...) {
 #' @export
 docdb_delete.src_mongo <- function(src, key, ...) {
   src$con$drop()
+}
+
+#' @export
+docdb_delete.src_sqlite <- function(src, key, ...) {
+  assert(key, 'character')
+  DBI::dbRemoveTable(conn = src$con, 
+                     name = key, ...)
 }
