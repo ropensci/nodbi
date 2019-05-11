@@ -86,6 +86,18 @@ test_that("query in sqlite works", {
                 query = '{"name": "Lacy Chen", "age": {"$lt": 22}}')[["_id"]],
     "5cd678531b423d5f04cfb0a1")
   
+  expect_equal(nrow(
+    docdb_query(con, "mtcars", 
+                fields = '{"age": 1, "name": 1}', 
+                query = '{"$or": {"_id": "5cd6785335b63cb19dfa8347", "age": {"$lt": 25}}}')),
+    5L)
+  
+  expect_equal(
+    docdb_query(con, "mtcars", 
+                fields = '{"age": 1, "name": 1}', 
+                query = '{"_id": "5cd6785335b63cb19dfa8347"}')[["name"]],
+    "Williamson French")
+  
 })
 
 context("sqlitedb: update")

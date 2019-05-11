@@ -64,6 +64,7 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_query(src, "mtcars", query = "{}", fields = '{"mpg":1, "cyl":1}')
 #' docdb_query(src, "mtcars", query = '{"gear": {"$lte": 4}}', fields = '{"gear": 1}')
+#' docdb_query(src, "mtcars", query = '{"_id": {"$regex": "0%"}}', fields = '{"gear": 1}')
 #' }
 docdb_query <- function(src, key, query, ...){
   UseMethod("docdb_query")
@@ -176,8 +177,12 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
                          sapply(
                            tmpquery, 
                            function(x) 
-                             sprintf("( tt.key = %s AND tt.value %s) ",  
-                                     x[1], x[2])
+                             # extra handling of _id, which is not in json
+                             ifelse(x[1] == "\"_id\"", 
+                                    # check _id column
+                                    paste0(" _id ", x[2], " "),
+                                    # check json column
+                                    paste0(" (tt.key = ", x[1], " AND tt.value ", x[2], ") "))
                          ))), 
                      collapse = "OR \n")), 
             "") # ifelse empty query
@@ -206,9 +211,17 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
                          sapply(
                            tmpquery, 
                            function(x) 
-                             sprintf("SELECT _id FROM %s, json_tree (%s.json) AS tt WHERE( tt.key = %s AND tt.value %s) ",  
-                                     key, key, x[1], x[2])
-                         ))), 
+                             paste0("SELECT _id FROM ", key, 
+                                    # extra handling of _id, which is not in json
+                                    ifelse(x[1] == "\"_id\"", 
+                                           # check _id column
+                                           paste0(" AS tt WHERE tt._id ", x[2], " "),
+                                           # check json column
+                                           paste0(", json_tree (", key, ".json) AS tt ", 
+                                                  "WHERE (tt.key = ", x[1], " AND 
+                                                   tt.value ", x[2], ") "))
+                             ))
+                         )), 
                      collapse = "INTERSECT \n"),
                     ")"), 
             "") # ifelse empty query
