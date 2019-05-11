@@ -56,7 +56,7 @@ docdb_delete(src)
 # SQLite
 src <- src_sqlite()
 docdb_create(src, "iris", iris)
-docdb_get(src)
-docdb_delete(src)
+docdb_get(src, "iris")
+docdb_delete(src, "iris")
 }
 }
