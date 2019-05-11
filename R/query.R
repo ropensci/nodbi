@@ -61,10 +61,9 @@
 #' 
 #' # SQLite
 #' src <- src_sqlite()
-#' if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 #' docdb_create(src, "mtcars", mtcars)
-#' docdb_query(src, fields = c("mpg", "cyl"))
-#' docdb_query(con, fields = '{"disp": 1, "gear": 0, "drat": 1}')
+#' docdb_query(src, "mtcars", query = "{}", fields = '{"mpg":1, "cyl":1}')
+#' docdb_query(src, "mtcars", query = '{"gear": {"$lte": 4}}', fields = '{"gear": 1}')
 #' }
 docdb_query <- function(src, key, query, ...){
   UseMethod("docdb_query")

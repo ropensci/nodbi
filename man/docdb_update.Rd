@@ -31,5 +31,20 @@ docdb_get(src, "mtcars2")
 mtcars$letter <- sample(letters, NROW(mtcars), replace = TRUE)
 invisible(docdb_update(src, "mtcars2", mtcars))
 docdb_get(src, "mtcars2")
+
+# SQLite
+src <- src_sqlite()
+docdb_create(src, "mtcars",
+             data.frame("_id" = seq_len(nrow(mtcars)),
+                        mtcars,
+                        stringsAsFactors = FALSE,
+                        check.names = FALSE))
+dfupd <- data.frame("cyl" = 4, "gear" = 99,
+                    stringsAsFactors = FALSE,
+                    check.names = FALSE)
+docdb_update(src, "mtcars", dfupd)
+docdb_query(src, "mtcars",
+            query = '{"gear": {"$gt": 10}}',
+            fields = '{"gear": 1, "cyl": 1}')
 }
 }

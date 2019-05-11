@@ -40,8 +40,8 @@
 #' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, "iris", iris)
-#' docdb_get(src)
-#' docdb_delete(src)
+#' docdb_get(src, "iris")
+#' docdb_delete(src, "iris")
 #' }
 docdb_delete <- function(src, key, ...){
   UseMethod("docdb_delete")
