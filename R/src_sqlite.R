@@ -38,7 +38,8 @@ src_sqlite <- function(dbname = ":memory:",
   
   # return standard nodbi structure
   structure(list(con = con, 
-                 dbname = dbname), 
+                 dbname = dbname, 
+                 ...), 
             class = c("src_sqlite", "docdb_src"))
 
 }
