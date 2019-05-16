@@ -123,8 +123,8 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
     # obtain or to generate _id's
     tmpdf <- jsonlite::fromJSON(value)
     ids <- tmpdf[["_id"]]
-    if (is.null(ids) || 
-        length(unique(ids)) != nrow(tmpdf)) {
+    if (is.null(ids) || (is.data.frame(tmpdf) &&
+        (length(unique(ids)) != nrow(tmpdf)))) {
       ids <- sapply(seq_len(nrow(tmpdf)), 
                     function(x) rand_id())}
     rm("tmpdf")
