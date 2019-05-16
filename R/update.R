@@ -107,7 +107,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
         "UPDATE %s
          SET json = 
           (SELECT json_set( 
-                  json( %s.json ), '$.%s', json ( %s ))
+                  json( %s.json ), '$.%s', json ( '%s' ))
            FROM %s 
            WHERE _id = '%s')
          WHERE _id = '%s';", 
