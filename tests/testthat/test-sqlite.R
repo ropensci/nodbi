@@ -131,9 +131,9 @@ test_that("update in sqlite works", {
                       # to have _id as column name
                       check.names = FALSE) 
   
-  expect_equal(docdb_update(con, "mtcars", value), 1L)
+  expect_equal((docdb_update(con, "mtcars", value)), 1L)
   tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1}')
-  expect_equal(tmp[["gear"]][tmp[["_id"]] == "2"], 9)
+  expect_equal(tmp[["gear"]][tmp[["_id"]] == "2"], "9")
   
   # upsert - add key and value not previously present
   value <- data.frame("_id" = "4", 
@@ -143,7 +143,7 @@ test_that("update in sqlite works", {
                       check.names = FALSE) 
   
   expect_equal(docdb_update(con, "mtcars", value), 1L)
-  expect_equal(docdb_query(con, "mtcars", query = "{}", fields = '{"a": 1}')[["a"]], 123)
+  expect_equal(docdb_query(con, "mtcars", query = "{}", fields = '{"a": 1}')[["a"]], "123")
 
   # multiple - upsert
   value <- data.frame("_id" = c("3", "5"), 
@@ -154,7 +154,7 @@ test_that("update in sqlite works", {
   
   expect_equal(docdb_update(con, "mtcars", value), 2L)
   tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1}')
-  expect_equal(tmp[["gear"]][tmp[["_id"]] == "3"], 8)
+  expect_equal(tmp[["gear"]][tmp[["_id"]] == "3"], "8")
   
   ## test other paths than _id
   value <- data.frame("gear" = c("4", "5"),
@@ -163,6 +163,6 @@ test_that("update in sqlite works", {
   
   expect_equal(docdb_update(con, "mtcars", value), 15L)
   tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1, "a": 1}')
-  expect_true(all(tmp[["a"]][tmp[["gear"]] == 4] == 8))
+  expect_true(all(tmp[["a"]][tmp[["gear"]] == 4] == "8"))
   
 })
