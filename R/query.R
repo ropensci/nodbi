@@ -108,12 +108,13 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # make dotted parameters accessible
   tmpdots <- list(...)
   
+  # https://www.sqlite.org/json1.html#jeach
   # need to obtain the types of fields
   tmpstr <- suppressWarnings(
     DBI::dbGetQuery(
       conn = src$con, 
       statement = paste0(
-        "SELECT DISTINCT key, type
+        "SELECT DISTINCT fullkey, type
          FROM ", key, ", json_tree (", key, ".json) AS tt
          WHERE tt.type <> 'object';"
       )))
@@ -123,11 +124,15 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   if (!is.null(tmpdots$fields)) fields <- tmpdots$fields
   tmpfields <- json2fieldsSql(fields)
   
-  # if no fields specified, get names
-  if (all(tmpfields == "")) tmpfields <- tmpstr$key
+  # if no fields specified, get names without $. prefix
+  if (all(tmpfields == ""))
+    tmpfields <- unique(gsub("\\$[.]|\\[[0-9]+\\]", "", tmpstr$fullkey))
   
   # exclude _id from fields
   tmpfields <- tmpfields[tmpfields != "_id"]
+  
+  # TODO: special case: return all fields if fields = NULL
+  if (!is.null(tmpdots$listfields)) return(tmpfields)
   
   ## convert parameter query
   if (is.null(query)) query <- "{}"
