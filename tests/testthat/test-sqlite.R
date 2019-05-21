@@ -78,8 +78,8 @@ test_that("query in sqlite works", {
                   fields = '{"mpg":1, "cyl": 1, "_row": 1}')[["_id"]],
     6L)
 
-  invisible(docdb_create(con, "mtcars", contacts))
-  
+  invisible(docdb_create(con, "mtcars", value = data.frame(contacts, stringsAsFactors = FALSE)))
+
   expect_equal(
     docdb_query(con, "mtcars", 
                 fields = '{"age": 1, "name": 1}', 
