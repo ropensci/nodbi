@@ -83,7 +83,7 @@ docdb_create.src_mongo <- function(src, key, value, ...){
 #' @export
 docdb_create.src_sqlite <- function(src, key, value, ...){
   
-  assert(value,  c("character", "data.frame"))
+  assert(value,  "data.frame")
   assert(key, "character")
   
   ### if table does not exist, create one
@@ -106,102 +106,86 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
                          key, " ( _id );"))
   }
   
-  ### return if no value provided
+  ### return if no value provided, 
+  # such as to create empty table
   if (is.null(value)) return(invisible(0L))
-
-  ### only if value is a json string:
-  # extract _id if any and turn
-  # into data.frame with columns
-  # _id and json, as created above
-  if ("character" %in% class(value) && 
-      jsonlite::validate(value)) {
+  
+  # add _id column if not yet in data.frame 'value'
+  # and fill column _id with random identifiers
+  idcol <- grep("_id", names(value))
+  if (!length(idcol)) {
     
-    # remove line breaks etc
-    value <- jsonlite::minify(value)
-    
-    # create temporary data.frame to 
-    # obtain or to generate _id's
-    tmpdf <- jsonlite::fromJSON(value)
-    ids <- tmpdf[["_id"]]
-    if (is.null(ids) || (is.data.frame(tmpdf) &&
-        (length(unique(ids)) != nrow(tmpdf)))) {
-      ids <- sapply(seq_len(nrow(tmpdf)), 
-                    function(x) rand_id())}
-    rm("tmpdf")
-    
-    # remove any _id's from json
-    value <- gsub(pattern = '"_id":(.*?)",', "", value)
-    
-    # create list from json
-    tmplist <- jsonlite::fromJSON(value, simplifyVector = FALSE)
-    
-    # turn list into character vector
-    tmplist <- sapply(tmplist, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
-    
-    # replave value with data.frame 
-    # created for subsequent step
     value <- data.frame(
-      "_id" = ids,
-      "json" = tmplist, 
+      "_id" = sapply(seq_len(nrow(value)), 
+                     function(x) rand_id()),
+      value, 
       stringsAsFactors = FALSE,
       check.names = FALSE)
-    rm("tmplist")
-    rm("ids")
     
-    # add one document(s) for each row in data.frame 'value'
-    nrowaffected <- sapply(seq_len(nrow(value)), function(i) {
-      
-      DBI::dbExecute(
-        conn = src$con, 
-        statement = paste0("INSERT INTO ", key, " (_id, json) ", 
-                           "values ('", value[i,  1],  "', '", 
-                                        value[i, -1], "');"
-        ))
-    })
-    
-    # return number of created rows in table
-    return(invisible(sum(nrowaffected, na.rm = TRUE)))
-    
+    idcol <- 1
   }
   
-  ### only if a data.frame is in value with 1+ rows
-  if ("data.frame" %in% class(value) && 
-      nrow(value)) {
+  # add one document(s) for each row in data.frame 'value'
+  nrowaffected <- sapply(seq_len(nrow(value)), function(i) {
     
-    # add _id column if not yet in data.frame 'value'
-    # and fill column _id with random identifiers
-    idcol <- grep("_id", names(value))
-    if (!length(idcol)) {
+    if ("try-error" %in% 
+        class(try(jsonlite::validate(value[i, -idcol]), 
+                  silent = TRUE))) {
       
-      value <- data.frame(
-        "_id" = sapply(seq_len(nrow(value)), 
-                       function(x) rand_id()),
-        value, 
-        stringsAsFactors = FALSE,
-        check.names = FALSE)
-      
-      idcol <- 1
-    }
-    
-    # add one document(s) for each row in data.frame 'value'
-    # assumes that value only has valid json as its elements
-    nrowaffected <- sapply(seq_len(nrow(value)), function(i) {
-      
+      # for regular data frame
       DBI::dbExecute(
         conn = src$con, 
         statement = paste0("INSERT INTO ", key, " (_id, json) ", 
                            "values ('", value[i,  idcol], "', '", 
-                               proc_doc(value[i, -idcol]), "');"
+                           proc_doc(value[i, -idcol]), "');"
         ))
-    })
-    
-    # return number of created rows in table
-    return(invisible(sum(nrowaffected, na.rm = TRUE)))
-  }
+      
+    } else {
+      
+      # when dataframe is already json
+      
+      # minify
+      value[i, -idcol] <- jsonlite::minify(value[i, -idcol])
+      
+      # check if _id's in json and get them
+      subids <- gregexpr('"_id":".*?"', value[i, -idcol])
+      subids <- regmatches(value[i, -idcol], subids)
+      subids <- sub(".*:\"(.*)\".*", "\\1", unlist(subids))
+      
+      if (length(subids)) {
+        
+        # if not in square brackets, add them 
+        if (!grepl("^\\[.*\\]$", value[i, -idcol]))
+          value[i, -idcol] <- paste0('[', value[i, -idcol], ']')
+        
+        # splice value element into json elements
+        subvalue <- jsonlite::fromJSON(value[i, -idcol], simplifyVector = FALSE)
+        subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
+        
+        sapply(seq_along(subvalue), function(ii)
+          DBI::dbExecute(
+            conn = src$con, 
+            statement = paste0("INSERT INTO ", key, " (_id, json) ", 
+                               "values ('", subids[ii], "', '", 
+                                          subvalue[ii], "');"
+            )))
 
-  ### return
-  return(invisible(0L))
-  
+      } else {
+
+        DBI::dbExecute(
+          conn = src$con, 
+          statement = paste0("INSERT INTO ", key, " (_id, json) ", 
+                             "values ('", value[i,  idcol], "', '", 
+                                          value[i, -idcol], "');"
+          ))
+      }
+    }
+  }
+  )
+
+  # return number of created rows in table
+  return(invisible(sum(nrowaffected, na.rm = TRUE)))
+
 }
 
 ## helpers --------------------------------------

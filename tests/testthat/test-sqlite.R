@@ -47,7 +47,7 @@ test_that("exists in sqlite works", {
   skip_on_cran()
   
   skip_if_no_sqlite()
-  con <- src_sqlite(collection = "iris")
+  con <- src_sqlite()
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
   
