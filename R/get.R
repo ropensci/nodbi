@@ -98,8 +98,7 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
   if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
   dump <- tempfile()
   src$con$export(file(dump))
-  # remove first column, a mongodb identifier
-  jsonlite::stream_in(file(dump), verbose = FALSE)[,-1]
+  jsonlite::stream_in(file(dump), verbose = FALSE)
 }
 
 #' @export
