@@ -49,10 +49,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
   assert(value, 'data.frame') 
   
   # Two columns for path, value ("key" is name of value column)
-  if (dim(value)[2] != 2) 
-    stop("value must have exactly 2 columns (path, value), ",
-         "with names corresponding to the respective fields")
-  
+
   # If table does not exist, create empty table
   if (!docdb_exists(src = src, key = key)) {
     docdb_create(src = src, key = key, value = NULL)
@@ -104,31 +101,36 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
     
   }
   
-  # identifier is table index
-  nrowaffected <- 
-    sapply(seq_len(nrow(value)), function(i) {
-      
-      DBI::dbExecute(
-        conn = src$con, 
-        statement = sprintf(
-          "UPDATE %s
+  # iterate over columns
+  ncoliterated <- sapply(seq(2, ncol(value)), function(i) {
+    
+    # identifier _id is table index
+    nrowaffected <- 
+      sapply(seq_len(nrow(value)), function(ii) {
+        
+        DBI::dbExecute(
+          conn = src$con, 
+          statement = sprintf(
+            "UPDATE %s
          SET json = 
           (SELECT json_set( 
                   json( %s.json ), '$.%s', json ( '%s' ))
            FROM %s 
            WHERE _id = '%s')
          WHERE _id = '%s';", 
-          key, 
-          key, vn[2], value[i, 2, drop = TRUE], 
-          key,
-          value[i, 1],
-          value[i, 1]
-        ))
-    })
+            key, 
+            key, vn[i], value[ii, i, drop = TRUE], 
+            key,
+            value[ii, 1],
+            value[ii, 1]
+          ))
+      }) # nrowaffected
+    nrowaffected
+  })
   
   # TODO: remove
   # gsub("[ \n]+", " ", statement)
   
-  invisible(sum(nrowaffected, na.rm = TRUE))
+  invisible(sum(ncoliterated, na.rm = TRUE))
   
 }
