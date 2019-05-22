@@ -252,14 +252,12 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # the return value
   dump <- tempfile()
   
-  # TODO remove
-  # message(dump)
-  
   # get data, write to file in ndjson format
   cat(stats::na.omit(unlist(
     DBI::dbGetQuery(conn = src$con,
                     statement = statement, 
-                    n = n))
+                    n = n)
+  )
   ),
   sep = "\n", # ndjson
   file = dump)
@@ -268,7 +266,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # Because parsing huge JSON strings is difficult and inefficient, 
   # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
   jsonlite::stream_in(file(dump), verbose = FALSE)
-  
+
 }
 
 
@@ -280,30 +278,27 @@ jsonEscape <- function(x, y) {
   
   # parameters:
   # - x is a data frame created in docdb_query.src_sqlite
-  #     with columns key and type as per json_tree()
+  #     with columns fullkey and type as per json_tree()
   # - y is the name of a variable / column of x that is of interest
 
+  # default
+  o <- ""
+  
+  # format like fullkey
+  y <- paste0("$.", y)
+  
   # no escaping for:
   # - lists, which correspond to arrays
   # - numerics
-  # ...
-  o <- ""
   
-  # escaping for:
+  # do escaping for:
   # - strings
-  if (all(x$type[x$key == y] == "text")) o <- "\""
+  if (all(x$type[x$fullkey == y] == "text")) o <- "\""
   # - special case, row names
-  if (y == "_row") o <- "\""
+  if (y == "$._row") o <- "\""
   
-  # TODO: remove
-  # message(y)
-
   return(o)
 }
-# jsonEscape(x = tmpstr, y = "_row")
-# jsonEscape(x = tmpstr, y = "tags")
-# jsonEscape(x = tmpstr, y = "name")
-# jsonEscape(x = tmpstr, y = "mpg")
 
 
 # converst json string into
