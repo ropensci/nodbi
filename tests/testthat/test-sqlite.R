@@ -147,14 +147,15 @@ test_that("update in sqlite works", {
 
   # multiple - upsert
   value <- data.frame("_id" = c("3", "5"), 
-                      "gear" = c(8, 7), 
+                      "gear" = c(99, 66), 
+                      "cyl" = c(88, 77),
                       stringsAsFactors = FALSE,
                       # to have _id as column name
                       check.names = FALSE) 
   
-  expect_equal(docdb_update(con, "mtcars", value), 2L)
-  tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1}')
-  expect_equal(tmp[["gear"]][tmp[["_id"]] == "3"], "8")
+  expect_equal(docdb_update(con, "mtcars", value), 4L)
+  tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1, "cyl": 1}')
+  expect_equal(tmp[["cyl"]][tmp[["_id"]] == "5"], "77")
   
   ## test other paths than _id
   value <- data.frame("gear" = c("4", "5"),
