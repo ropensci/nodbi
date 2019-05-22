@@ -86,11 +86,11 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
     value <- lapply(seq_len(nrow(value)), function(i) {
       
       tmp <- data.frame(idsaffected[i], 
-                        value[i, 2], 
+                        value[i, -1], 
                         stringsAsFactors = FALSE,
                         check.rows = FALSE)
       
-      names(tmp) <- c("_id", vn[2])
+      names(tmp) <- c("_id", vn[-1])
       
       tmp
       
@@ -108,22 +108,25 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
     nrowaffected <- 
       sapply(seq_len(nrow(value)), function(ii) {
         
-        DBI::dbExecute(
-          conn = src$con, 
-          statement = sprintf(
-            "UPDATE %s
+        statement <- sprintf(
+          "UPDATE %s
          SET json = 
           (SELECT json_set( 
-                  json( %s.json ), '$.%s', json ( '%s' ))
+                  json( %s.json ), '$.%s', json ( %s ))
            FROM %s 
            WHERE _id = '%s')
          WHERE _id = '%s';", 
-            key, 
-            key, vn[i], value[ii, i, drop = TRUE], 
-            key,
-            value[ii, 1],
-            value[ii, 1]
-          ))
+          key, 
+          key, vn[i], valueEscape(value[ii, i, drop = TRUE]), 
+          key,
+          value[ii, 1],
+          value[ii, 1]
+        )
+        
+        DBI::dbExecute(
+          conn = src$con, 
+          statement = statement)
+        
       }) # nrowaffected
     nrowaffected
   })
@@ -134,3 +137,28 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
   invisible(sum(ncoliterated, na.rm = TRUE))
   
 }
+
+
+## helpers --------------------------------------
+
+valueEscape <- function(x) {
+
+  # cf. https://www.sqlite.org/json1.html#jset  
+  switch(class(x),
+         
+         # - character: '"stringvalue"'
+         "character" = paste0('\'\"', x, '\"\''),
+         # - list e.g.: '{"a": "something", "b": 2}'
+         "list" = paste0('\'', jsonlite::toJSON(x), '\''),
+         # - no quotation for integers, real
+         "numeric" = paste0(x),
+         # - default, all others: 'value'
+         paste0('\'', x, '\'')
+  )
+  
+}
+
+
+
+
+
