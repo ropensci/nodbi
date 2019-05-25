@@ -123,6 +123,9 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
           value[ii, 1]
         )
         
+        # TODO remove
+        if (getOption("verbose")) message(statement)
+        
         DBI::dbExecute(
           conn = src$con, 
           statement = statement)
