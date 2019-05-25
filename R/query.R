@@ -336,8 +336,8 @@ json2fieldsSql <- function(x) {
   x
   
 }
-# json2fieldsSql(x = '{"cut" : "1", "price": 1 }') # "cut" not returned because specified as string
-# json2fieldsSql(x = '{"_id": 1, "annotation": 0, "other": 1}') # correctly specified as numbers
+# json2fieldsSql(x = '{"cut" : "1", "price": 1 }') # "cut" not returned because 1 is string
+# json2fieldsSql(x = '{"_id": 1, "annotation": 0, "other": 1}') # correctly specified numbers
 # json2fieldsSql('{}')
 
 

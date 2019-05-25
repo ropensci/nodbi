@@ -117,9 +117,8 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   n <- -1L
   if (!is.null(limit)) n <- limit
   
-  # temporary file; note this cannot be 
-  # because it is needed to stream 
-  # the return value
+  # temporary file; note this cannot be deleted
+  # because it is streamed into the return value
   dump <- tempfile()
   
   # get data, write to file in ndjson format
