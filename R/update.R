@@ -150,7 +150,9 @@ valueEscape <- function(x) {
   switch(class(x),
          
          # - character: '"stringvalue"'
-         "character" = paste0('\'\"', x, '\"\''),
+         "character" = ifelse(test = grepl("^[{].*[}]$", x), 
+                              yes = paste0('\'', x, '\''), 
+                              no = paste0('\'\"', x, '\"\'')),
          # - list e.g.: '{"a": "something", "b": 2}'
          "list" = paste0('\'', jsonlite::toJSON(x), '\''),
          # - no quotation for integers, real
