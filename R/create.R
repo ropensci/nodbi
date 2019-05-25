@@ -162,30 +162,42 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
         subvalue <- jsonlite::fromJSON(value[i, -idcol], simplifyVector = FALSE)
         subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
         
-        sapply(seq_along(subvalue), function(ii)
+        sapply(seq_along(subvalue), function(ii){
+          
+          statement <- paste0("INSERT INTO ", key, " (_id, json) ", 
+                              "values ('", subids[ii], "', '", 
+                              subvalue[ii], "');")
+          
+          # TODO remove
+          if (getOption("verbose")) message(statement)
+          
           DBI::dbExecute(
             conn = src$con, 
-            statement = paste0("INSERT INTO ", key, " (_id, json) ", 
-                               "values ('", subids[ii], "', '", 
-                                          subvalue[ii], "');"
-            )))
-
+            statement = statement)
+          
+        })
+        
       } else {
+        
+        statement = paste0("INSERT INTO ", key, " (_id, json) ", 
+                           "values ('", value[i,  idcol], "', '", 
+                           value[i, -idcol], "');")
+        
+        # TODO remove
+        if (getOption("verbose")) message(statement)
 
         DBI::dbExecute(
           conn = src$con, 
-          statement = paste0("INSERT INTO ", key, " (_id, json) ", 
-                             "values ('", value[i,  idcol], "', '", 
-                                          value[i, -idcol], "');"
-          ))
+          statement = statement)
+        
       }
     }
   }
   )
-
+  
   # return number of created rows in table
   return(invisible(sum(nrowaffected, na.rm = TRUE)))
-
+  
 }
 
 ## helpers --------------------------------------
