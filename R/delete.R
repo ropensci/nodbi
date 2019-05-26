@@ -79,6 +79,36 @@ docdb_delete.src_mongo <- function(src, key, ...) {
 #' @export
 docdb_delete.src_sqlite <- function(src, key, ...) {
   assert(key, 'character')
-  DBI::dbRemoveTable(conn = src$con, 
-                     name = key, ...)
+  
+  # make dotted parameters accessible
+  tmpdots <- list(...)
+  
+  # if valid query, delete document(s), not table
+  if (!is.null(tmpdots$query) && 
+      jsonlite::validate(tmpdots$query)) {
+    
+    # get _id's of document to be deleted
+    tmpids <- docdb_query(src = src, 
+                          key = key, 
+                          query = tmpdots$query, 
+                          fields = '{"_id": 1}')[["_id"]]
+    
+    # create delete
+    statement <- paste0("DELETE FROM ", key, " WHERE _id IN (", 
+                        paste0('"', tmpids, '"', collapse = ','), ");")
+
+    # TODO remove
+    if (getOption("verbose")) message(statement)
+    
+    # do delete
+    DBI::dbExecute(conn = src$con,
+                   statement = statement)
+    
+  } else {
+    
+    # remove table
+    DBI::dbRemoveTable(conn = src$con, 
+                       name = key)
+    
+  }
 }
