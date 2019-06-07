@@ -89,16 +89,14 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
   ### if table does not exist, create one
   if (!docdb_exists(src, key)) {
     
-    # defining the standard for a nodbi json table in sqlite:
+    ### defining the standard for a nodbi json table in sqlite:
     # CREATE TABLE mtcars ( _id TEXT PRIMARY_KEY NOT NULL, json JSON );
     # CREATE UNIQUE INDEX mtcars_index ON mtcars ( _id );
-    
     DBI::dbExecute(
       conn = src$con, 
       statement = paste0("CREATE TABLE ", key, 
                          " ( _id TEXT PRIMARY_KEY NOT NULL,", 
                          "  json JSON);"))
-    
     DBI::dbExecute(
       conn = src$con, 
       statement = paste0("CREATE UNIQUE INDEX ", 
@@ -110,93 +108,95 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
   # such as to create empty table
   if (is.null(value)) return(invisible(0L))
   
-  # add _id column if not yet in data.frame 'value'
-  # and fill column _id with random identifiers
-  idcol <- grep("_id", names(value))
-  if (!length(idcol)) {
+  ### convert dataframe rows into json
+  # respect any pre-existing json
+  if (all(sapply(value, is.character)) &&
+      all(sapply(value, jsonlite::validate))) {
     
+    # process json row by row
+    value2 <- sapply(X = seq_len(nrow(value)), 
+                     FUN = function(x) {
+                       
+                       # get row from data frame
+                       tmp <- value[x, ]
+                       
+                       # minify for regexp
+                       tmp <- jsonlite::minify(tmp)
+                       
+                       # check if _id's in json and get them
+                       subids <- gregexpr('"_id":".*?"', tmp)
+                       subids <- regmatches(tmp, subids)
+                       subids <- sub(".*:\"(.*)\".*", "\\1", unlist(subids))
+                       #
+                       if (length(subids)) {
+                         
+                         # if not in square brackets, add them 
+                         if (!grepl("^\\[.*\\]$", tmp)) {
+                           tmp <- paste0('[', tmp, ']')
+                         }
+                         
+                         # remove _ids
+                         tmp <- gsub('"_id":".*?",', "", tmp)
+                         
+                         # splice tmp element into json elements and merge again
+                         subvalue <- jsonlite::fromJSON(tmp, simplifyVector = FALSE)
+                         subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
+                         
+                         # output
+                         data.frame("_id" = subids, 
+                                    "json" = subvalue, 
+                                    stringsAsFactors = FALSE,
+                                    check.names = FALSE)
+                         
+                       } else {
+                         
+                         # use json as-is
+                         tmp
+                       }
+                     })
+    
+    # value included json subelements
     value <- data.frame(
-      "_id" = sapply(seq_len(nrow(value)), 
-                     function(x) rand_id()),
-      value, 
+      "_id" = value2[[1]],  
+      "json" = value2[[2]],
       stringsAsFactors = FALSE,
       check.names = FALSE)
     
-    idcol <- 1
-  }
-  
-  # add one document(s) for each row in data.frame 'value'
-  nrowaffected <- sapply(seq_len(nrow(value)), function(i) {
+  } else { 
     
-    if ("try-error" %in% 
-        class(try(jsonlite::validate(value[i, -idcol]), 
-                  silent = TRUE))) {
-      
-      # for regular data frame
-      DBI::dbExecute(
-        conn = src$con, 
-        statement = paste0("INSERT INTO ", key, " (_id, json) ", 
-                           "values ('", value[i,  idcol], "', '", 
-                           proc_doc(value[i, -idcol]), "');"
-        ))
-      
-    } else {
-      
-      # when dataframe is already json
-      
-      # minify
-      value[i, -idcol] <- jsonlite::minify(value[i, -idcol])
-      
-      # check if _id's in json and get them
-      subids <- gregexpr('"_id":".*?"', value[i, -idcol])
-      subids <- regmatches(value[i, -idcol], subids)
-      subids <- sub(".*:\"(.*)\".*", "\\1", unlist(subids))
-      
-      if (length(subids)) {
-        
-        # if not in square brackets, add them 
-        if (!grepl("^\\[.*\\]$", value[i, -idcol]))
-          value[i, -idcol] <- paste0('[', value[i, -idcol], ']')
-        
-        # splice value element into json elements
-        subvalue <- jsonlite::fromJSON(value[i, -idcol], simplifyVector = FALSE)
-        subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
-        
-        sapply(seq_along(subvalue), function(ii){
-          
-          statement <- paste0("INSERT INTO ", key, " (_id, json) ", 
-                              "values ('", subids[ii], "', '", 
-                              subvalue[ii], "');")
-          
-          # TODO remove
-          if (getOption("verbose")) message(statement)
-          
-          DBI::dbExecute(
-            conn = src$con, 
-            statement = statement)
-          
-        })
-        
-      } else {
-        
-        statement = paste0("INSERT INTO ", key, " (_id, json) ", 
-                           "values ('", value[i,  idcol], "', '", 
-                           value[i, -idcol], "');")
-        
-        # TODO remove
-        if (getOption("verbose")) message(statement)
+    # no json in dataframe, 
+    # transform row into json
+    dump <- tempfile()
+    dumpcon <- file(dump)
+    
+    # this is fasted using ndjson
+    jsonlite::stream_out(
+      x = value, 
+      con = dumpcon, 
+      verbose = FALSE)
 
-        DBI::dbExecute(
-          conn = src$con, 
-          statement = statement)
-        
-      }
-    }
+    value <- data.frame(
+      "_id" = ifelse(
+        test = rep(any(grepl("_id", names(value))), nrow(value)),
+        yes = value[["_id"]], 
+        no = row.names(value)),
+      "json" = readLines(dump),
+      stringsAsFactors = FALSE,
+      check.names = FALSE)
+    
+    # cleanup
+    unlink(dump)
   }
-  )
   
-  # return number of created rows in table
-  return(invisible(sum(nrowaffected, na.rm = TRUE)))
+  ### load into database
+  nrowaffected <- 
+    DBI::dbAppendTable(
+      conn = src$con, 
+      name = key, 
+      value = value,
+      ...)
+  
+  return(invisible(nrowaffected))
   
 }
 

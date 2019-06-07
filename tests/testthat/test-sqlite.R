@@ -21,11 +21,16 @@ test_that("db into sqlite", {
   iris$Species <- as.character(iris$Species)
   invisible(docdb_create(con, "iris", iris))
   
+  invisible(tryCatch(docdb_delete(con, "diamonds"), error = function(e) e))
   d2 <- docdb_get(con, "iris")
   # remove _id column
   d2 <- d2[, -1]
   
   expect_equal(d2, iris)
+
+  # check if timing acceptable  
+  docdb_create(con, "diamonds", diamonds)
+
 })
 
 context("sqlitedb: delete")
