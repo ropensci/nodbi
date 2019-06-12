@@ -97,9 +97,6 @@ docdb_delete.src_sqlite <- function(src, key, ...) {
     statement <- paste0("DELETE FROM ", key, " WHERE _id IN (", 
                         paste0('"', tmpids, '"', collapse = ','), ");")
 
-    # TODO remove
-    if (getOption("verbose")) message(statement)
-    
     # do delete
     DBI::dbExecute(conn = src$con,
                    statement = statement)

@@ -123,9 +123,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
           value[ii, 1]
         )
         
-        # TODO remove
-        if (getOption("verbose")) message(statement)
-        
+        # execute
         DBI::dbExecute(
           conn = src$con, 
           statement = statement)
@@ -133,9 +131,6 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
       }) # nrowaffected
     nrowaffected
   })
-  
-  # TODO: remove
-  # gsub("[ \n]+", " ", statement)
   
   invisible(sum(ncoliterated, na.rm = TRUE))
   

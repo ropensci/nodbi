@@ -131,7 +131,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # exclude _id from fields
   tmpfields <- tmpfields[tmpfields != "_id"]
   
-  # TODO: special case: return all fields if listfields != NULL
+  # special case: return all fields if listfields != NULL
   if (!is.null(tmpdots$listfields)) return(tmpfields)
   
   ## convert parameter query
@@ -237,9 +237,6 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   
   # minify statement
   statement <- gsub("[\n ]+", " ", statement)
-  
-  # TODO remove
-  if (getOption("verbose")) message(statement)
   
   # add limit if not in ...
   n <- -1L
