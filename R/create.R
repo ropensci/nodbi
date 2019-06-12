@@ -37,7 +37,7 @@
 #' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, key = "mtcars", value = mtcars)
-#' docdb_create(src, key = "mtcars", value = contacts)
+#' docdb_create(src, key = "mtcars", value = data.frame(contacts, stringsAsFactors = FALSE))
 #' docdb_get(src, "mtcars")
 #' }
 docdb_create <- function(src, key, value, ...){
