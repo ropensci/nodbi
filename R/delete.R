@@ -67,5 +67,32 @@ docdb_delete.src_redis <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_mongo <- function(src, key, ...) {
-  src$con$drop()
+  
+  # check expectations
+  if (exists("key", inherits = FALSE) && 
+      src$collection != key) 
+    message("Parameter 'key' is different from parameter 'collection', ",
+            "was given as ", src$collection, " in src_mongo().")
+  
+  # https://docs.mongodb.com/manual/tutorial/remove-documents/
+  # https://jeroen.github.io/mongolite/manipulate-data.html#remove
+  
+  # make dotted parameters accessible
+  tmpdots <- list(...)
+  
+  # if valid json, try to delete 
+  # document(s) instead of collection
+  if (!is.null(tmpdots$query) && 
+      jsonlite::validate(tmpdots$query)) {
+    
+    # delete document
+    src$con$remove(query = tmpdots$query, 
+                   just_one = FALSE)
+    
+  } else {
+    
+    # delete collection
+    src$con$drop()
+
+  }
 }

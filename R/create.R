@@ -70,8 +70,103 @@ docdb_create.src_redis <- function(src, key, value, ...) {
 
 #' @export
 docdb_create.src_mongo <- function(src, key, value, ...){
+  
   assert(value, 'data.frame')
-  src$con$insert(value, ...)
+  
+  # check expectations
+  if (exists("key", inherits = FALSE) && 
+      src$collection != key) 
+    message("Parameter 'key' is different from parameter 'collection', ",
+            "was given as ", src$collection, " in src_mongo().")
+  
+  # Document identifier is created by mongolite
+  # from _id column or row.names of dataframe "value". 
+  # If dataframe has _id column, ensure it is character
+  # to emulate how row.names is used by mongolite.
+  
+  if (any(grepl("_id", names(value)))) {
+    value[["_id"]] <- as.character(value[["_id"]])
+  }
+  
+  # mongolite: 
+  # insert(data, pagesize = 1000, stop_on_error = TRUE, ...)
+  # 
+  # Insert rows into the collection. 
+  # Argument 'data' must be a 
+  # - data-frame, 
+  # - named list (for single record) or 
+  # - character vector with json strings (one string for each row). 
+  # 
+  # For lists and data frames, arguments 
+  # in ... get passed to jsonlite::toJSON
+  
+  # check if _id in data.frame
+  idcol <- grep("_id", names(value))
+  valcol <- 1L + ifelse(length(idcol), 1L, 0L)
+  
+  # Check if data.frame has one or two 
+  # columns where the non-_id column is
+  # already filled with json strings: 
+  if (ncol(value) == (1L + ifelse(length(idcol) != 0L, 1L, 0L)) &&
+      all(sapply(value[, valcol], is.character)) &&
+      all(sapply(value[, valcol], jsonlite::validate))) {
+    
+    # True, thus now add json strings as documents.
+    # Iterate over rows if any in data.frame value
+    nrowaffected <- sapply(seq_len(nrow(value)), function(i) {
+      
+      # minify
+      value[i, valcol] <- as.character(jsonlite::minify(value[i, valcol]))
+      
+      # check if subids (_id's) in json strings, extract them
+      subids <- gregexpr('"_id":".*?"', value[i, valcol])
+      subids <- regmatches(value[i, valcol], subids)
+      subids <- sub(".*:\"(.*)\".*", "\\1", unlist(subids))
+      
+      if (length(subids)) {
+        
+        # if not in square brackets, add them 
+        if (!grepl("^\\[.*\\]$", value[i, valcol]))
+          value[i, -idcol] <- paste0('[', value[i, valcol], ']')
+        
+        # splice value element into json elements
+        subvalue <- jsonlite::fromJSON(value[i, valcol], simplifyVector = FALSE)
+        subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
+        
+        # iterate over elements and each has an _id
+        sapply(seq_along(subvalue), function(ii){
+          
+          # insert
+          src$con$insert(subvalue[ii], ...)$nInserted
+          
+        })
+        
+      } else {# no subids
+        
+        # add _id into beginning of json string, 
+        # if the json string does not yet have it.
+        tmpvalue <- value[i, valcol, drop = TRUE]
+        if (length(idcol) && !grepl('"_id"', tmpvalue)) 
+          tmpvalue <- jsonlite::toJSON(c(list("_id" = value[i, idcol, drop = TRUE]), 
+                                         jsonlite::fromJSON(tmpvalue)), auto_unbox = TRUE)
+        
+        # insert
+        src$con$insert(data = tmpvalue, ...)$nInserted
+        
+      }
+      
+    })
+    
+  } else {# no character vecto with json strings in data.frame
+    
+    # standard method to add data.frame
+    nrowaffected <- src$con$insert(data = value, ...)$nInserted
+    
+  }
+  
+  # return number of created rows in table
+  return(invisible(sum(nrowaffected, na.rm = TRUE)))
+  
 }
 
 ## helpers --------------------------------------

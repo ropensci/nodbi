@@ -87,12 +87,19 @@ docdb_get.src_redis <- function(src, key, limit = NULL, ...) {
 
 #' @export
 docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
+  
+  # check expectations
+  if (exists("key", inherits = FALSE) && 
+      src$collection != key) 
+    message("Parameter 'key' is different from parameter 'collection', ",
+            "was given as ", src$collection, " in src_mongo().")
+  
   # FIXME: or use $find() here? not if doing a separate query method
   if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
   dump <- tempfile()
   src$con$export(file(dump))
   # remove first column, a mongodb identifier
-  jsonlite::stream_in(file(dump), verbose = FALSE)[,-1]
+  jsonlite::stream_in(file(dump), verbose = FALSE) # [,-1]
 }
 
 dropmeta <- function(x) {

@@ -64,4 +64,29 @@ docdb_exists.src_redis <- function(src, key, ...) {
   switch(as.character(src$con$EXISTS(key)), "1" = TRUE, "0" = FALSE)
 }
 
-# docdb_exists.src_mongo <- function(src, key, ...) return(TRUE)
+#' @export
+docdb_exists.src_mongo <- function(src, key, ...) {
+  assert(key, 'character')
+  
+  # need to connect to check collection key
+  test <- src_mongo(collection = key, 
+                    db = src$db, 
+                    url = src$url)
+
+  # check collection
+
+  # rights may be insufficient to call info(),
+  # hence try() blocks and consecutive tries 
+  tmp <- try(!is.null(test$con$info()$stats) &&
+               test$con$info()$stats$count != 0L,
+             silent = TRUE) 
+  if (!("try-error" %in% class(tmp))) return(tmp)
+  
+  tmp <- try(docdb_query(src = test, 
+                         key = key, 
+                         query = '{"_id": {"$ne": ""}}', 
+                         limit = 1L),
+             silent = TRUE)
+  if (!("try-error" %in% class(tmp))) return(nrow(tmp) > 0L)
+  
+}
