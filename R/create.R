@@ -48,7 +48,7 @@ docdb_create <- function(src, key, value, ...){
 docdb_create.src_couchdb <- function(src, key, value, ...) {
   assert(value, 'data.frame')
   trycr <- tryCatch(sofa::db_create(src$con, dbname = key),
-    error = function(e) e)
+                    error = function(e) e)
   invisible(sofa::db_bulk_create(src$con, dbname = key, doc = value, ...))
 }
 
@@ -108,20 +108,31 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
   # such as to create empty table
   if (is.null(value)) return(invisible(0L))
   
-  ### convert dataframe rows into json
-  # respect any pre-existing json
-  if (all(sapply(value, is.character)) &&
-      all(sapply(value, jsonlite::validate))) {
+  # check if _id in data.frame
+  idcol <- grep("_id", names(value))
+  valcol <- 1L + ifelse(length(idcol), 1L, 0L)
+  
+  # Check if data.frame has one or two 
+  # columns where the non-_id column is
+  # already filled with json strings: 
+  if (ncol(value) == (1L + ifelse(length(idcol) != 0L, 1L, 0L)) &&
+      all(sapply(value[, valcol], is.character)) &&
+      all(sapply(value[, valcol], jsonlite::validate))) {
+    
+    # # convert dataframe rows into json
+    # # respect any pre-existing json
+    # if (all(sapply(value, is.character)) &&
+    #     all(sapply(value, jsonlite::validate))) {
     
     # process json row by row
     value2 <- sapply(X = seq_len(nrow(value)), 
                      FUN = function(x) {
                        
                        # get row from data frame
-                       tmp <- value[x, ]
+                       tmp <- value[x, valcol]
                        
                        # minify for regexp
-                       tmp <- jsonlite::minify(tmp)
+                       tmp <- as.character(jsonlite::minify(tmp))
                        
                        # check if _id's in json and get them
                        subids <- gregexpr('"_id":".*?"', tmp)
@@ -150,14 +161,18 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
                          
                        } else {
                          
-                         # use json as-is
-                         tmp
+                         # output
+                         data.frame("_id" = value[x, idcol], 
+                                    "json" = tmp, 
+                                    stringsAsFactors = FALSE,
+                                    check.names = FALSE)
+                         
                        }
                      })
     
     # value included json subelements
     value <- data.frame(
-      "_id" = value2[[1]],  
+      "_id" = value2[[1]],
       "json" = value2[[2]],
       stringsAsFactors = FALSE,
       check.names = FALSE)
@@ -169,16 +184,26 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
     dump <- tempfile()
     dumpcon <- file(dump)
     
-    # this is fasted using ndjson
-    jsonlite::stream_out(
-      x = value, 
-      con = dumpcon, 
-      verbose = FALSE)
-
+    # this is fastest using ndjson
+    if (length(idcol) == 0L) {
+      # no idcol
+      jsonlite::stream_out(
+        x = value,
+        con = dumpcon, 
+        verbose = FALSE)
+    } else {
+      # has idcol
+      jsonlite::stream_out(
+        x = value[ -idcol ], 
+        con = dumpcon, 
+        verbose = FALSE)
+    }
+    
+    # read back in as json    
     value <- data.frame(
       "_id" = ifelse(
-        test = rep(any(grepl("_id", names(value))), nrow(value)),
-        yes = value[["_id"]], 
+        test = rep(length(idcol), nrow(value)),
+        yes = as.character(value[["_id"]]), 
         no = row.names(value)),
       "json" = readLines(dump),
       stringsAsFactors = FALSE,

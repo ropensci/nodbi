@@ -53,4 +53,14 @@ print.src_sqlite <- function(x, ...) {
   srv <- rev(RSQLite::rsqliteVersion())[1]
   cat(sprintf("SQLite library version: %s\n size: %s kBytes\n dbname: %s\n",
               srv, dbsize / 2^10, dbname))
+  
+  if (grepl(":memory:", dbname)) {
+    warning("Database is only in memory, will not persist after R ends! Consider to copy it with \n", 
+            "RSQLite::sqliteCopyDatabase(\n", 
+            "  from = <your nodbi::src_sqlite() object>$con, \n", 
+            "  to = <e.g. RSQLite::SQLite(dbname = 'local_file.db')>\n", 
+            "  )", 
+            call. = FALSE)
+  }
+  
 }
