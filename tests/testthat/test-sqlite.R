@@ -1,4 +1,4 @@
-context("sqlite: src")
+context("sqlitedb: src")
 test_that("Source", {
   skip_on_cran()
   
