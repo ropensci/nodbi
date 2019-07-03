@@ -14,6 +14,7 @@
 #' - Elasticsearch: passed to [elastic::Search()]
 #' - Redis: ignored
 #' - MongoDB: ignored
+#' - SQLite: ignored
 #' 
 #' @template deets
 #' @examples \dontrun{
@@ -45,6 +46,12 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
 #' docdb_get(src, "mtcars", limit = 4)
+#' 
+#' # SQLite
+#' src <- src_sqlite()
+#' docdb_create(src, "mtcars", mtcars)
+#' docdb_get(src, "mtcars")
+#' docdb_get(src, "mtcars", limit = 4L)
 #' }
 docdb_get <- function(src, key, limit = NULL, ...){
   UseMethod("docdb_get")
@@ -55,7 +62,7 @@ docdb_get.src_couchdb <- function(src, key, limit = NULL, ...) {
   assert(key, 'character')
   dropmeta(makedf(
     pluck(sofa::db_alldocs(src$con, dbname = key,
-        include_docs = TRUE, limit = limit, ...)$rows, "doc")))
+                           include_docs = TRUE, limit = limit, ...)$rows, "doc")))
 }
 
 #' @export
@@ -101,6 +108,44 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
   # remove first column, a mongodb identifier
   jsonlite::stream_in(file(dump), verbose = FALSE) # [,-1]
 }
+
+#' @export
+docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
+  
+  assert(key, "character")
+  assert(limit, "integer")
+  
+  # arguments for call
+  statement <- paste0(
+    # _id is included into json for use with jsonlite::stream_in
+    "SELECT '{\"_id\": \"' || _id || '\", ' || substr(json, 2) ", 
+    "FROM ", key, " ;")
+  
+  # set limit if not null
+  n <- -1L
+  if (!is.null(limit)) n <- limit
+  
+  # temporary file; note this cannot be deleted
+  # because it is streamed into the return value
+  dump <- tempfile()
+  
+  # get data, write to file in ndjson format
+  cat(stats::na.omit(unlist(
+    DBI::dbGetQuery(conn = src$con,
+                    statement = statement, 
+                    n = n))
+  ),
+  sep = "\n", # ndjson
+  file = dump)
+  
+  # from jsonlite:
+  # Because parsing huge JSON strings is difficult and inefficient, 
+  # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
+  jsonlite::stream_in(file(dump), verbose = FALSE)
+
+}
+
+## helpers --------------------------------------
 
 dropmeta <- function(x) {
   x$`_id` <- NULL

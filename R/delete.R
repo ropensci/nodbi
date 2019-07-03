@@ -36,6 +36,12 @@
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' docdb_delete(src)
+#' 
+#' # SQLite
+#' src <- src_sqlite()
+#' docdb_create(src, "iris", iris)
+#' docdb_get(src, "iris")
+#' docdb_delete(src, "iris")
 #' }
 docdb_delete <- function(src, key, ...){
   UseMethod("docdb_delete")
@@ -94,5 +100,39 @@ docdb_delete.src_mongo <- function(src, key, ...) {
     # delete collection
     src$con$drop()
 
+  }
+}
+
+#' @export
+docdb_delete.src_sqlite <- function(src, key, ...) {
+  assert(key, 'character')
+  
+  # make dotted parameters accessible
+  tmpdots <- list(...)
+  
+  # if valid query, delete document(s), not table
+  if (!is.null(tmpdots$query) && 
+      jsonlite::validate(tmpdots$query)) {
+    
+    # get _id's of document to be deleted
+    tmpids <- docdb_query(src = src, 
+                          key = key, 
+                          query = tmpdots$query, 
+                          fields = '{"_id": 1}')[["_id"]]
+    
+    # create delete
+    statement <- paste0("DELETE FROM ", key, " WHERE _id IN (", 
+                        paste0('"', tmpids, '"', collapse = ','), ");")
+
+    # do delete
+    DBI::dbExecute(conn = src$con,
+                   statement = statement)
+    
+  } else {
+    
+    # remove table
+    DBI::dbRemoveTable(conn = src$con, 
+                       name = key)
+    
   }
 }

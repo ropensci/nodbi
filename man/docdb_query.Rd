@@ -39,6 +39,12 @@ parameter, but if you want to do complicated Elasticsearch queries
 you may be better of using \pkg{elastic} package directly
 \item MongoDB: query parameters, see \pkg{mongolite} docs for
 help with searches
+\item SQLite: \code{fields}, an optional json string of fields to be
+returned from anywhere in the tree.
+Parameter \code{query}, a json string In analogy to MongoDB,
+a comma separated list of expressions provides an implicit
+AND operation. Nested or otherwise complex queries are not
+yet supported.
 }
 }
 
@@ -75,5 +81,12 @@ if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 docdb_create(src, "mtcars", mtcars)
 docdb_query(src, query = '{"mpg":21}')
 docdb_query(src, query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+
+# SQLite
+src <- src_sqlite()
+docdb_create(src, "mtcars", mtcars)
+docdb_query(src, "mtcars", query = "{}", fields = '{"mpg":1, "cyl":1}')
+docdb_query(src, "mtcars", query = '{"gear": {"$lte": 4}}', fields = '{"gear": 1}')
+docdb_query(src, "mtcars", query = '{"_id": {"$regex": "0\%"}}', fields = '{"gear": 1}')
 }
 }

@@ -22,6 +22,7 @@ Elasticsearch and MongoDB; ignored for others}
 \item Elasticsearch: passed to \code{\link[elastic:Search]{elastic::Search()}}
 \item Redis: ignored
 \item MongoDB: ignored
+\item SQLite: ignored
 }}
 }
 \description{
@@ -61,5 +62,11 @@ src <- src_mongo()
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 docdb_get(src, "mtcars", limit = 4)
+
+# SQLite
+src <- src_sqlite()
+docdb_create(src, "mtcars", mtcars)
+docdb_get(src, "mtcars")
+docdb_get(src, "mtcars", limit = 4L)
 }
 }

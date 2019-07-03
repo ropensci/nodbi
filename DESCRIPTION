@@ -3,14 +3,19 @@ Title: 'NoSQL' Database Connector
 Description: Simplified document database manipulation and analysis,
     including support for many 'NoSQL' databases, including document 
     databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
-    'key-value' databases ('Redis'), and other 'NoSQL' types ('etcd').
-Version: 0.2.0.9100
+    'key-value' databases ('Redis'), other 'NoSQL' types ('etcd'), 
+    and, with limitations, also SQLite/json1.
+Version: 0.2.0.9102
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
         comment = c(ORCID = "0000-0003-1444-9135")),
     person("Rich", "FitzJohn", role = "aut"),
-    person("Jeroen", "Ooms", role = "aut")
+    person("Jeroen", "Ooms", role = "aut"),
+    person(given = "Ralf",
+           family = "Herold",
+           role = "aut",
+           comment = c(ORCID = "0000-0002-8148-6748"))
   )
 License: MIT + file LICENSE
 LazyData: true
@@ -29,6 +34,8 @@ Suggests:
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
     redux,
+    RSQLite (>= 1.1),
+    DBI,
     testthat
 RoxygenNote: 6.1.1
 X-schema.org-applicationCategory: Databases
