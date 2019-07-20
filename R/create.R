@@ -30,7 +30,7 @@
 #' docdb_delete(src, "mtcars")
 #'
 #' # MongoDB
-#' src <- src_mongo()
+#' src <- src_mongo(collection = "mtcars")
 #' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_get(src, "mtcars")
 #' 
