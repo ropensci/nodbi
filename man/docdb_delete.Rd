@@ -10,7 +10,7 @@ docdb_delete(src, key, ...)
 \item{src}{source object, result of call to src, an
 object of class \code{docdb_src}}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key (collection for mongo)}
 
 \item{...}{Ignored for now}
 }
@@ -48,7 +48,7 @@ docdb_get(src, "mtcars")
 docdb_delete(src, "mtcars")
 
 # mongo
-src <- src_mongo("stuff")
+src <- src_mongo(collection = "iris")
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
 docdb_delete(src)

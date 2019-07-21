@@ -9,7 +9,7 @@ docdb_update(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key (collection for mongo)}
 
 \item{value}{(data.frame) A single data.frame}
 

@@ -9,7 +9,7 @@ docdb_create(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to an \link{src} function}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key (collection for mongo)}
 
 \item{value}{(data.frame) A single data.frame}
 
@@ -47,7 +47,7 @@ docdb_get(src, "mtcars")
 docdb_delete(src, "mtcars")
 
 # MongoDB
-src <- src_mongo()
+src <- src_mongo(collection = "mtcars")
 docdb_create(src, key = "mtcars", value = mtcars)
 docdb_get(src, "mtcars")
 
