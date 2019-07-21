@@ -15,7 +15,7 @@ test_that("db into mongo", {
   skip_on_cran()
 
   skip_if_no_mongo()
-  con <- src_mongo()
+  con <- src_mongo(collection = "iris")
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
@@ -42,7 +42,7 @@ test_that("delete in mongo works", {
   skip_on_cran()
 
   skip_if_no_mongo()
-  cnn <- src_mongo()
+  cnn <- src_mongo(collection = "iris")
   # delete if exists
   invisible(tryCatch(docdb_delete(cnn, "iris"), error = function(e) e))
 
@@ -64,7 +64,7 @@ test_that("exists in mongo works", {
   skip_on_cran()
 
   skip_if_no_mongo()
-  cnn <- src_mongo()
+  cnn <- src_mongo(collection = "thisnameshouldnotexistatallever")
   expect_false(docdb_exists(cnn, "thisnameshouldnotexistatallever"))
 
   docdb_create(cnn, "flowers", iris)
@@ -78,7 +78,7 @@ test_that("query in mongo works", {
   skip_on_cran()
   
   skip_if_no_mongo()
-  cnn <- src_mongo()
+  cnn <- src_mongo(collection = "mtcars")
   
   invisible(docdb_create(cnn, "mtcars", mtcars))
   expect_is(suppressWarnings(docdb_query(cnn, "mtcars", query = '{"mpg":21}')),
@@ -96,11 +96,13 @@ test_that("update in mongo works", {
   skip_on_cran()
   
   skip_if_no_mongo()
-  con <- src_mongo()
+  con <- src_mongo(collection = "iris")
   
   # clean up
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
+  con <- src_mongo(collection = "mtcars")
+  
   # add data frame into table,
   # with user-provided _id
   # for subsequent reference

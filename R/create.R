@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param src source object, result of call to an [src] function
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key (collection for mongo)
 #' @param value (data.frame) A single data.frame
 #' @param ... Ignored
 #' @template deets

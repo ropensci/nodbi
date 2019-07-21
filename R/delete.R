@@ -3,7 +3,7 @@
 #' @export
 #' @param src source object, result of call to src, an
 #' object of class `docdb_src`
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key (collection for mongo)
 #' @param ... Ignored for now
 #' @template deets
 #' @examples \dontrun{
@@ -32,7 +32,7 @@
 #' docdb_delete(src, "mtcars")
 #'
 #' # mongo
-#' src <- src_mongo("stuff")
+#' src <- src_mongo(collection = "iris")
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' docdb_delete(src)

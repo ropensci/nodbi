@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param src source object, result of call to src
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key (collection for mongo)
 #' @param query various. see Query section below.
 #' @param ... Additional named parameters passed on to each package:
 #' 
@@ -53,7 +53,7 @@
 #' docdb_query(src, "iris", query = "Petal.Width:1.5")
 #'
 #' # Mongo
-#' src <- src_mongo()
+#' src <- src_mongo(collection = "mtcars")
 #' if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_query(src, query = '{"mpg":21}')
