@@ -42,20 +42,20 @@ test_that("delete in mongo works", {
   skip_on_cran()
 
   skip_if_no_mongo()
-  cnn <- src_mongo(collection = "iris")
+  con <- src_mongo(collection = "iris")
   # delete if exists
-  invisible(tryCatch(docdb_delete(cnn, "iris"), error = function(e) e))
+  invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
-  docdb_create(cnn, "flowers", iris)
-  del <- docdb_delete(cnn, "flowers", query = '{"Species": "setosa"}')
+  docdb_create(con, "iris", iris)
+  del <- docdb_delete(con, "iris", query = '{"Species": "setosa"}')
   expect_true(del)
-  d2 <- docdb_get(cnn, "iris")
+  d2 <- docdb_get(con, "iris")
   expect_equal(nrow(d2), 100L)
   # clean up
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
   
-  docdb_create(cnn, "flowers", iris)
-  del <- docdb_delete(cnn, "flowers")
+  docdb_create(con, "iris", iris)
+  del <- docdb_delete(con, "iris")
   expect_true(del)
 })
 
@@ -64,13 +64,13 @@ test_that("exists in mongo works", {
   skip_on_cran()
 
   skip_if_no_mongo()
-  cnn <- src_mongo(collection = "thisnameshouldnotexistatallever")
-  expect_false(docdb_exists(cnn, "thisnameshouldnotexistatallever"))
+  con <- src_mongo(collection = "thisnameshouldnotexistatallever")
+  expect_false(docdb_exists(con, "thisnameshouldnotexistatallever2"))
 
-  docdb_create(cnn, "flowers", iris)
-  expect_true(docdb_exists(cnn, key = "test"))
+  docdb_create(con, "thisnameshouldnotexistatallever", iris)
+  expect_true(docdb_exists(con, key = "thisnameshouldnotexistatallever"))
   # clean up
-  invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
+  invisible(tryCatch(docdb_delete(con, "thisnameshouldnotexistatallever"), error = function(e) e))
 })
 
 context("mongodb: query")
@@ -78,17 +78,17 @@ test_that("query in mongo works", {
   skip_on_cran()
   
   skip_if_no_mongo()
-  cnn <- src_mongo(collection = "mtcars")
+  con <- src_mongo(collection = "mtcars")
   
-  invisible(docdb_create(cnn, "mtcars", mtcars))
-  expect_is(suppressWarnings(docdb_query(cnn, "mtcars", query = '{"mpg":21}')),
+  invisible(docdb_create(con, "mtcars", mtcars))
+  expect_is(suppressWarnings(docdb_query(con, "mtcars", query = '{"mpg":21}')),
             "data.frame")
   expect_is(suppressWarnings(
-    docdb_query(cnn, query = '{"mpg":21}', "mtcars", fields = '{"mpg":1, "cyl":1}')),
+    docdb_query(con, query = '{"mpg":21}', "mtcars", fields = '{"mpg":1, "cyl":1}')),
     "data.frame"
   )
   # clean up
-  invisible(tryCatch(docdb_delete(cnn, "iris"), error = function(e) e))
+  invisible(tryCatch(docdb_delete(con, "mtcars"), error = function(e) e))
 })
 
 context("mongodb: update")
@@ -96,10 +96,10 @@ test_that("update in mongo works", {
   skip_on_cran()
   
   skip_if_no_mongo()
-  con <- src_mongo(collection = "iris")
+  con <- src_mongo(collection = "mtcars")
   
   # clean up
-  invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
+  invisible(tryCatch(docdb_delete(con, "mtcars"), error = function(e) e))
 
   con <- src_mongo(collection = "mtcars")
   
@@ -161,5 +161,5 @@ test_that("update in mongo works", {
   expect_true(all(tmp[["carb"]][tmp[["gear"]] == 4L] == 8.1))
   
   # clean up
-  invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
+  invisible(tryCatch(docdb_delete(con, "mtcars"), error = function(e) e))
 })
