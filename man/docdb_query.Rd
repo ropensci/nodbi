@@ -79,8 +79,9 @@ docdb_query(src, "iris", query = "Petal.Width:1.5")
 src <- src_mongo(collection = "mtcars")
 if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 docdb_create(src, "mtcars", mtcars)
-docdb_query(src, query = '{"mpg":21}')
-docdb_query(src, query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+docdb_query(src, "mtcars", query = '{"mpg":21}')
+docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+docdb_get(src, "mtcars")
 
 # SQLite
 src <- src_sqlite()

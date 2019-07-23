@@ -53,6 +53,11 @@ docdb_create(src, "mtcars", mtcars)
 docdb_exists(src, "mtcars")
 docdb_exists(src, "asdfasf")
 
+# MongoDB
+src <- src_mongo(collection = "mtcars")
+docdb_create(src, key = "mtcars", value = mtcars)
+docdb_exists(src, "mtcars")
+
 # SQLite
 (src <- src_sqlite())
 docdb_create(src, "mtcars", mtcars)

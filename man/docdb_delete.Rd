@@ -51,7 +51,7 @@ docdb_delete(src, "mtcars")
 src <- src_mongo(collection = "iris")
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
-docdb_delete(src)
+docdb_delete(src, "iris")
 
 # SQLite
 src <- src_sqlite()
