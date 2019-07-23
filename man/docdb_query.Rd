@@ -9,7 +9,7 @@ docdb_query(src, key, query, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key (collection for mongo)}
 
 \item{query}{various. see Query section below.}
 
@@ -76,11 +76,12 @@ docdb_query(src, "iris", query = "1.5")
 docdb_query(src, "iris", query = "Petal.Width:1.5")
 
 # Mongo
-src <- src_mongo()
+src <- src_mongo(collection = "mtcars")
 if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 docdb_create(src, "mtcars", mtcars)
-docdb_query(src, query = '{"mpg":21}')
-docdb_query(src, query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+docdb_query(src, "mtcars", query = '{"mpg":21}')
+docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+docdb_get(src, "mtcars")
 
 # SQLite
 src <- src_sqlite()

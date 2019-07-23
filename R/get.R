@@ -3,7 +3,7 @@
 #' @export
 #' @import data.table jsonlite
 #' @param src source object, result of call to src
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key (collection for mongo)
 #' @param limit (integer) number of records/rows to return. by default
 #' not passed, so you get all results. Only works for CouchDB, 
 #' Elasticsearch and MongoDB; ignored for others
@@ -42,7 +42,7 @@
 #' docdb_get(src, "mtcars")
 #'
 #' # Mongo
-#' src <- src_mongo()
+#' src <- src_mongo(collection = "mtcars")
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
 #' docdb_get(src, "mtcars", limit = 4)
@@ -94,11 +94,19 @@ docdb_get.src_redis <- function(src, key, limit = NULL, ...) {
 
 #' @export
 docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
+  
+  # check expectations
+  if (exists("key", inherits = FALSE) && 
+      src$collection != key) 
+    message("Parameter 'key' is different from parameter 'collection', ",
+            "was given as ", src$collection, " in src_mongo().")
+  
   # FIXME: or use $find() here? not if doing a separate query method
   if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
   dump <- tempfile()
   src$con$export(file(dump))
-  jsonlite::stream_in(file(dump), verbose = FALSE)
+  # remove first column, a mongodb identifier
+  jsonlite::stream_in(file(dump), verbose = FALSE) # [,-1]
 }
 
 #' @export
@@ -134,7 +142,7 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   # Because parsing huge JSON strings is difficult and inefficient, 
   # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
   jsonlite::stream_in(file(dump), verbose = FALSE)
-  
+
 }
 
 ## helpers --------------------------------------

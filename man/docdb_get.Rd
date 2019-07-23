@@ -9,7 +9,7 @@ docdb_get(src, key, limit = NULL, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key (collection for mongo)}
 
 \item{limit}{(integer) number of records/rows to return. by default
 not passed, so you get all results. Only works for CouchDB,
@@ -58,7 +58,7 @@ docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 
 # Mongo
-src <- src_mongo()
+src <- src_mongo(collection = "mtcars")
 docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 docdb_get(src, "mtcars", limit = 4)

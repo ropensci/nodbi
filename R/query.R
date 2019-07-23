@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param src source object, result of call to src
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key (collection for mongo)
 #' @param query various. see Query section below.
 #' @param ... Additional named parameters passed on to each package:
 #' 
@@ -53,11 +53,12 @@
 #' docdb_query(src, "iris", query = "Petal.Width:1.5")
 #'
 #' # Mongo
-#' src <- src_mongo()
+#' src <- src_mongo(collection = "mtcars")
 #' if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 #' docdb_create(src, "mtcars", mtcars)
-#' docdb_query(src, query = '{"mpg":21}')
-#' docdb_query(src, query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+#' docdb_query(src, "mtcars", query = '{"mpg":21}')
+#' docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+#' docdb_get(src, "mtcars")
 #' 
 #' # SQLite
 #' src <- src_sqlite()
@@ -96,7 +97,19 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 
 #' @export
 docdb_query.src_mongo <- function(src, key, query, ...) {
-  src$con$find(query = query, ...)
+  
+  # check expectations
+  if (exists("key", inherits = FALSE) && 
+      src$collection != key) 
+    message("Parameter 'key' is different from parameter 'collection', ",
+            "was given as ", src$collection, " in src_mongo().")
+  
+  # get results
+  tmp <- src$con$find(query = query, ...)
+  
+  # ensure results are flattened
+  jsonlite::flatten(tmp)
+  
 }
 
 #' @export

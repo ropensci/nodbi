@@ -9,7 +9,7 @@ docdb_update(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key (collection for mongo)}
 
 \item{value}{(data.frame) A single data.frame}
 
@@ -31,6 +31,22 @@ docdb_get(src, "mtcars2")
 mtcars$letter <- sample(letters, NROW(mtcars), replace = TRUE)
 invisible(docdb_update(src, "mtcars2", mtcars))
 docdb_get(src, "mtcars2")
+
+# MongoDB
+src <- src_mongo(collection = "mtcars")
+docdb_create(src, key = "mtcars", value = mtcars)
+# - update of carb for each matching gear
+value <- data.frame("gear" = c(4, 5),
+                    "carb" = c(8.1, 7.9),
+                    stringsAsFactors = FALSE)
+docdb_update(src, "mtcars", value)
+# - update of gear where _id / oid is "2"
+value <- data.frame("_id" = "2",
+                    "gear" = 9,
+                    stringsAsFactors = FALSE,
+                    check.names = FALSE)
+docdb_update(src, "mtcars", value)
+docdb_get(src, "mtcars")
 
 # SQLite
 src <- src_sqlite()

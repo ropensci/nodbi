@@ -3,7 +3,7 @@
 #' @export
 #' @param src source object, result of call to src, an
 #' object of class `docdb_src`
-#' @param key (chartacter) A key. ignored for mongo
+#' @param key (character) A key (collection for mongo)
 #' @param ... Ignored for now
 #' @template deets
 #' @examples \dontrun{
@@ -32,10 +32,10 @@
 #' docdb_delete(src, "mtcars")
 #'
 #' # mongo
-#' src <- src_mongo("stuff")
+#' src <- src_mongo(collection = "iris")
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
-#' docdb_delete(src)
+#' docdb_delete(src, "iris")
 #' 
 #' # SQLite
 #' src <- src_sqlite()
@@ -73,7 +73,34 @@ docdb_delete.src_redis <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_mongo <- function(src, key, ...) {
-  src$con$drop()
+  
+  # check expectations
+  if (exists("key", inherits = FALSE) && 
+      src$collection != key) 
+    message("Parameter 'key' is different from parameter 'collection', ",
+            "was given as ", src$collection, " in src_mongo().")
+  
+  # https://docs.mongodb.com/manual/tutorial/remove-documents/
+  # https://jeroen.github.io/mongolite/manipulate-data.html#remove
+  
+  # make dotted parameters accessible
+  tmpdots <- list(...)
+  
+  # if valid json, try to delete 
+  # document(s) instead of collection
+  if (!is.null(tmpdots$query) && 
+      jsonlite::validate(tmpdots$query)) {
+    
+    # delete document
+    src$con$remove(query = tmpdots$query, 
+                   just_one = FALSE)
+    
+  } else {
+    
+    # delete collection
+    src$con$drop()
+
+  }
 }
 
 #' @export
