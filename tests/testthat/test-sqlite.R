@@ -84,17 +84,20 @@ test_that("query in sqlite works", {
   invisible(docdb_create(con, "mtcars", mtcars))
   
   expect_is(
-      docdb_query(con, "mtcars", query = "{}", fields = '{"mpg":1, "cyl": 1}'),
+    docdb_query(con, "mtcars", query = "{}", fields = '{"mpg":1, "cyl": 1}'),
     "data.frame")
-
+  
+  # depending on availability of regular expression operator
   expect_length(
-      docdb_query(con, "mtcars", 
-                  query = '{"gear" : 4, "cyl": {"$lte": 8}, "_row": {"$regex": "M%"} }', 
-                  fields = '{"mpg":1, "cyl": 1, "_row": 1}')[["_id"]],
+    docdb_query(con, "mtcars", 
+                query = paste0('{"gear" : 4, "cyl": {"$lte": 8}, "_row": {"$regex": "', 
+                               ifelse(attr(x = con$con, which = "regexp.extension"), 
+                                      '^M[a-z].*', 'M%'), '"} }'), 
+                fields = '{"mpg":1, "cyl": 1, "_row": 1}')[["_id"]],
     6L)
-
+  
   invisible(docdb_create(con, "mtcars", value = data.frame(contacts, stringsAsFactors = FALSE)))
-
+  
   expect_equal(
     docdb_query(con, "mtcars", 
                 fields = '{"age": 1, "name": 1}', 

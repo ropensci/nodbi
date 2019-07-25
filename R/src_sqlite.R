@@ -36,6 +36,20 @@ src_sqlite <- function(dbname = ":memory:",
          "install.packages('RSQLite') to install a current version.")
   }
   
+  # check if regular expressions are supported (RSQLite >= 2.1.2)
+  if ("try-error" %in% class(
+    try({
+      RSQLite::initRegExp(db = con)
+      DBI::dbExecute(
+        conn = con, 
+        statement = paste0('SELECT * FROM (VALUES ("Astring")) WHERE 1 REGEXP "[A-Z][a-z]+";'))
+      }, silent = TRUE)
+  )) {
+    attr(x = con, which = "regexp.extension") <- FALSE
+  } else {
+    attr(x = con, which = "regexp.extension") <- TRUE
+  }
+  
   # return standard nodbi structure
   structure(list(con = con, 
                  dbname = dbname, 
