@@ -3,10 +3,12 @@ test_that("Source", {
   skip_on_cran()
   
   skip_if_no_sqlite()
-  src <- src_sqlite()
-  expect_is(src, "docdb_src")
-  expect_is(src, "src_sqlite")
-  expect_is(src$con, "SQLiteConnection")
+  con <- src_sqlite()
+  on.exit(RSQLite::dbDisconnect(con$con), add = TRUE)  
+  
+  expect_is(con, "docdb_src")
+  expect_is(con, "src_sqlite")
+  expect_is(con$con, "SQLiteConnection")
 })
 
 context("sqlitedb: create")
@@ -15,6 +17,8 @@ test_that("db into sqlite", {
   
   skip_if_no_sqlite()
   con <- src_sqlite()
+  on.exit(RSQLite::dbDisconnect(con$con), add = TRUE)  
+  
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
   
@@ -27,10 +31,10 @@ test_that("db into sqlite", {
   d2 <- d2[, -1]
   
   expect_equal(d2, iris)
-
+  
   # check if timing acceptable  
   docdb_create(con, "diamonds", diamonds)
-
+  
 })
 
 context("sqlitedb: delete")
@@ -39,6 +43,8 @@ test_that("delete in sqlite works", {
   
   skip_if_no_sqlite()
   con <- src_sqlite()
+  on.exit(RSQLite::dbDisconnect(con$con), add = TRUE)  
+  
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
   
@@ -53,6 +59,8 @@ test_that("exists in sqlite works", {
   
   skip_if_no_sqlite()
   con <- src_sqlite()
+  on.exit(RSQLite::dbDisconnect(con$con), add = TRUE)  
+  
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
   
@@ -68,6 +76,8 @@ test_that("query in sqlite works", {
   
   skip_if_no_sqlite()
   con <- src_sqlite()
+  on.exit(RSQLite::dbDisconnect(con$con), add = TRUE)  
+  
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "mtcars"), error = function(e) e))
   
@@ -111,6 +121,8 @@ test_that("update in sqlite works", {
   
   skip_if_no_sqlite()
   con <- src_sqlite()
+  on.exit(RSQLite::dbDisconnect(con$con), add = TRUE)  
+  
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "mtcars"), error = function(e) e))
   
@@ -149,7 +161,7 @@ test_that("update in sqlite works", {
   
   expect_equal(docdb_update(con, "mtcars", value), 1L)
   expect_equal(docdb_query(con, "mtcars", query = "{}", fields = '{"a": 1}')[["a"]], 123)
-
+  
   # multiple - upsert
   value <- data.frame("_id" = c("3", "5"), 
                       "gear" = c(99, 66), 
