@@ -65,7 +65,8 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_query(src, "mtcars", query = "{}", fields = '{"mpg":1, "cyl":1}')
 #' docdb_query(src, "mtcars", query = '{"gear": {"$lte": 4}}', fields = '{"gear": 1}')
-#' docdb_query(src, "mtcars", query = '{"_id": {"$regex": "0%"}}', fields = '{"gear": 1}')
+#' # for RSQLite from 2.1.2 using PCRE regular expressions
+#' docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
 #' }
 docdb_query <- function(src, key, query, ...){
   UseMethod("docdb_query")
@@ -149,7 +150,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   
   ## convert parameter query
   if (is.null(query)) query <- "{}"
-  tmpquery <- json2querySql(query)
+  tmpquery <- json2querySql(query, src$con)
   
   ## compose statement
   statement <-
@@ -353,7 +354,7 @@ json2fieldsSql <- function(x) {
 
 # convert json query string to
 # string as part of sql WHERE
-json2querySql <- function(x) {
+json2querySql <- function(x, con) {
   
   if (!jsonlite::validate(x)) stop("No json: ", x)
   
@@ -415,8 +416,11 @@ json2querySql <- function(x) {
   
   # special case
   # https://docs.mongodb.com/manual/reference/operator/query/regex/#pcre-vs-javascript
-  x <- gsub(pattern = "[$]regex:", replacement = "LIKE ", x = x)
-  
+  x <- gsub(pattern = "[$]regex:", 
+            replacement = ifelse(attr(x = con, which = "regexp.extension"), 
+                                 "REGEXP ", "LIKE "), 
+            x = x)
+
   # make right hand side
   RHS <- x
   

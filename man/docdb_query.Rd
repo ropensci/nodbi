@@ -88,6 +88,7 @@ src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_query(src, "mtcars", query = "{}", fields = '{"mpg":1, "cyl":1}')
 docdb_query(src, "mtcars", query = '{"gear": {"$lte": 4}}', fields = '{"gear": 1}')
-docdb_query(src, "mtcars", query = '{"_id": {"$regex": "0\%"}}', fields = '{"gear": 1}')
+# for RSQLite from 2.1.2 using PCRE regular expressions
+docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
 }
 }
