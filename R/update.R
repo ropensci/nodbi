@@ -191,7 +191,11 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
                               WHERE key = '%s'
                                 AND value = %s;",
                         key, key,
-                        vn[1], value[i , 1]))
+                        vn[1], 
+                        ifelse(class(value[i, 1]) == "character", 
+                               paste0("'", value[i , 1], "'"),
+                               value[i , 1])
+                      ))
     })
     
     # replace first column with _id
@@ -200,7 +204,8 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
       tmp <- data.frame(idsaffected[i], 
                         value[i, -1], 
                         stringsAsFactors = FALSE,
-                        check.rows = FALSE)
+                        check.rows = FALSE,
+                        row.names = NULL)
       
       names(tmp) <- c("_id", vn[-1])
       
