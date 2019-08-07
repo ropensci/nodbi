@@ -220,30 +220,39 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
   
   # iterate over columns
   ncoliterated <- sapply(seq(2, ncol(value)), function(i) {
-    
+
     # identifier _id is table index
-    nrowaffected <- 
+    nrowaffected <-
       sapply(seq_len(nrow(value)), function(ii) {
-        
-        statement <- sprintf(
-          "UPDATE %s
-         SET json = 
-          (SELECT json_set( 
-                  json( %s.json ), '$.%s', json ( %s ))
-           FROM %s 
-           WHERE _id = '%s')
-         WHERE _id = '%s';", 
-          key, 
-          key, vn[i], valueEscape(value[ii, i, drop = TRUE]), 
-          key,
-          value[ii, 1],
-          value[ii, 1]
-        )
-        
-        # execute
-        DBI::dbExecute(
-          conn = src$con, 
-          statement = statement)
+
+        # check if current cell has a value
+        if (!is.na(value[ii, i, drop = TRUE])) {
+          
+          statement <- sprintf(
+            "UPDATE %s
+             SET json =
+              (SELECT json_set(
+                      json( %s.json ), '$.%s', json ( %s ))
+               FROM %s
+               WHERE _id = '%s')
+             WHERE _id = '%s';",
+            key,
+            key, vn[i], valueEscape(value[ii, i, drop = TRUE]),
+            key,
+            value[ii, 1],
+            value[ii, 1]
+          )
+          
+          # execute
+          DBI::dbExecute(
+            conn = src$con,
+            statement = statement)
+          
+        } else {
+          
+          # no record changed
+          0
+        }
         
       }) # nrowaffected
     nrowaffected

@@ -178,12 +178,18 @@ test_that("update in sqlite works", {
   expect_equal(tmp[["cyl"]][tmp[["_id"]] == "5"], 77)
   
   ## test other paths than _id
-  value <- data.frame("gear" = c("4", "5"),
-                      "a" = c(8, 7),
+  value <- data.frame("gear" = c(3, 4, 5),
+                      "a" =    c(8, 7, NA),
+                      "b" =    c("b1", NA, "b2"),
                       stringsAsFactors = FALSE)
   
-  expect_equal(docdb_update(con, "mtcars", value), 15L)
-  tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1, "a": 1}')
-  expect_true(all(tmp[["a"]][tmp[["gear"]] == 4] == 8))
+  # table(docdb_get(con, "mtcars")[["gear"]])
+  #  3  4  5  9 66 99 
+  # 14 10  5  1  1  1 
+  # -> 14 + 14 + 10 + 5 = 43
+  expect_equal(docdb_update(con, "mtcars", value), 43L)
+  tmp <- docdb_get(con, "mtcars")
+  expect_true(all(tmp[["a"]][tmp[["gear"]] == 3] == 8))
+  expect_true(all(is.na(tmp[["a"]][tmp[["gear"]] == 5])))
   
 })
