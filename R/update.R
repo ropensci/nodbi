@@ -192,7 +192,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
                                 AND value = %s;",
                         key, key,
                         vn[1], 
-                        ifelse(class(value[i, 1]) == "character", 
+                        ifelse(inherits(value[i, 1], "character"), 
                                paste0("'", value[i , 1], "'"),
                                value[i , 1])
                       ))
