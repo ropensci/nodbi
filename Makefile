@@ -14,7 +14,7 @@ roxygen:
 	${RSCRIPT} -e "library(methods); devtools::document()"
 
 install:
-	R CMD INSTALL .
+	R CMD INSTALL . && rm *.tar.gz
 
 build:
 	R CMD build .
