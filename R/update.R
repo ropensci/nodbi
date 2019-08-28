@@ -271,7 +271,7 @@ valueEscape <- function(x) {
   switch(class(x),
          
          # - character: '"stringvalue"'
-         "character" = ifelse(test = grepl("^[{].*[}]$", x), 
+         "character" = ifelse(test = grepl("^[{].*[}]$", trimws(x)), 
                               yes = paste0('\'', x, '\''), 
                               no = paste0('\'\"', x, '\"\'')),
          # - list e.g.: '{"a": "something", "b": 2}'
