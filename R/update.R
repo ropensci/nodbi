@@ -228,26 +228,46 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
         # check if current cell has a value
         if (!is.na(value[ii, i, drop = TRUE])) {
           
-          statement <- sprintf(
-            "UPDATE %s
+          tmpval <- value[ii, i, drop = TRUE]
+          
+          # if current cell value is a json string, 
+          # use this to replace all of existing json
+          if (is.character(tmpval) && 
+              jsonlite::validate(tmpval)) {
+            
+            statement <- sprintf(
+              "UPDATE %s
+             SET json = json ( %s )
+             WHERE _id = '%s';",
+              key,
+              valueEscape(tmpval),
+              value[ii, 1]
+            )
+            
+          } else {
+            
+            statement <- sprintf(
+              "UPDATE %s
              SET json =
               (SELECT json_set(
                       json( %s.json ), '$.%s', json ( %s ))
                FROM %s
                WHERE _id = '%s')
              WHERE _id = '%s';",
-            key,
-            key, vn[i], valueEscape(value[ii, i, drop = TRUE]),
-            key,
-            value[ii, 1],
-            value[ii, 1]
-          )
+              key,
+              key, vn[i], valueEscape(tmpval),
+              key,
+              value[ii, 1],
+              value[ii, 1]
+            )
+            
+          }
           
           # execute
-          DBI::dbExecute(
-            conn = src$con,
-            statement = statement)
-          
+            DBI::dbExecute(
+              conn = src$con,
+              statement = statement)
+            
         } else {
           
           # no record changed

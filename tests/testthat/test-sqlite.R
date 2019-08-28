@@ -198,4 +198,13 @@ test_that("update in sqlite works", {
   expect_true(all(tmp[["a"]][tmp[["gear"]] == 3] == 8))
   expect_true(all(is.na(tmp[["a"]][tmp[["gear"]] == 5])))
   
+  ## test updating with json string
+  value <- data.frame("carb" = 8L,
+                      "json" = '{"mpg": 123, "gear": 3}',
+                      stringsAsFactors = FALSE)
+  expect_equal((docdb_update(src = con, key = "mtcars", value = value)), 1L)
+  tmp <- docdb_get(con, "mtcars")
+  expect_true(all(tmp[["gear"]][tmp[["mpg"]] == 123L] == 3L))
+  expect_true(all(is.na(tmp[["carb"]][tmp[["mpg"]] == 123L])))
+  
 })
