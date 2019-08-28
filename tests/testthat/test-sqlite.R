@@ -157,7 +157,7 @@ test_that("update in sqlite works", {
                       # to have _id as column name
                       check.names = FALSE) 
   
-  expect_equal((docdb_update(con, "mtcars", value)), 1L)
+  expect_equal(docdb_update(con, "mtcars", value), 1L)
   tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1}')
   expect_equal(tmp[["gear"]][tmp[["_id"]] == "2"], 9)
   
