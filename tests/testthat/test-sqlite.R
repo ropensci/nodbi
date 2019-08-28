@@ -116,6 +116,12 @@ test_that("query in sqlite works", {
                 query = '{"_id": "5cd6785335b63cb19dfa8347"}')[["name"]],
     "Williamson French")
   
+  expect_equal(
+    docdb_query(con, "mtcars", 
+                fields = '{"age": 1, "friends[1].id": 1}', 
+                query = '{"_id": "5cd6785335b63cb19dfa8347"}')[["age"]],
+    30L)
+  
 })
 
 context("sqlitedb: update")
