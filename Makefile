@@ -9,11 +9,11 @@ test:
 test_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make test
 
-roxygen:
+doc:
 	@mkdir -p man
 	${RSCRIPT} -e "library(methods); devtools::document()"
 
-install:
+install: doc build
 	R CMD INSTALL . && rm *.tar.gz
 
 build:
@@ -28,4 +28,4 @@ check_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make check
 
 # No real targets!
-.PHONY: all test document install
+.PHONY: all test doc install
