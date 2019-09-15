@@ -179,7 +179,7 @@ test_that("update in sqlite works", {
                       # to have _id as column name
                       check.names = FALSE) 
   
-  expect_equal(docdb_update(con, "mtcars", value), 4L)
+  expect_equal(docdb_update(con, "mtcars", value), 2L)
   tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1, "cyl": 1}')
   expect_equal(tmp[["cyl"]][tmp[["_id"]] == "5"], 77)
   
@@ -189,22 +189,19 @@ test_that("update in sqlite works", {
                       "b" =    c("b1", NA, "b2"),
                       stringsAsFactors = FALSE)
   
-  # table(docdb_get(con, "mtcars")[["gear"]])
-  #  3  4  5  9 66 99 
-  # 14 10  5  1  1  1 
-  # -> 14 + 14 + 10 + 5 = 43
-  expect_equal(docdb_update(con, "mtcars", value), 43L)
+  expect_equal(docdb_update(con, "mtcars", value), 29L)
   tmp <- docdb_get(con, "mtcars")
   expect_true(all(tmp[["a"]][tmp[["gear"]] == 3] == 8))
   expect_true(all(is.na(tmp[["a"]][tmp[["gear"]] == 5])))
   
   ## test updating with json string
   value <- data.frame("carb" = 8L,
-                      "json" = '{"mpg": 123, "gear": 3}',
+                      "json1" = '{"mpg": 123, "gear": 3}',
+                      "json2" = '{"gear": 456}',
                       stringsAsFactors = FALSE)
-  expect_equal((docdb_update(src = con, key = "mtcars", value = value)), 1L)
+  expect_equal(docdb_update(src = con, key = "mtcars", value = value), 1L)
   tmp <- docdb_get(con, "mtcars")
-  expect_true(all(tmp[["gear"]][tmp[["mpg"]] == 123L] == 3L))
-  expect_true(all(is.na(tmp[["carb"]][tmp[["mpg"]] == 123L])))
+  expect_true(tmp[["carb"]][tmp[["mpg"]] == 123L] == 8L)
+  expect_true(tmp[["gear"]][tmp[["mpg"]] == 123L] == 456L)
   
 })

@@ -34,18 +34,22 @@
 #' 
 #' # SQLite
 #' src <- src_sqlite()
-#' docdb_create(src, "mtcars",
-#'              data.frame("_id" = seq_len(nrow(mtcars)),
-#'                         mtcars,
-#'                         stringsAsFactors = FALSE,
-#'                         check.names = FALSE))
-#' dfupd <- data.frame("cyl" = 4, "gear" = 99,
-#'                     stringsAsFactors = FALSE,
-#'                     check.names = FALSE)
+#' docdb_create(src, "mtcars", mtcars)
+#' dfupd <- data.frame("cyl" = c(4, 6),
+#'                     "gear" = c(88, 99),
+#'                     stringsAsFactors = FALSE)
 #' docdb_update(src, "mtcars", dfupd)
 #' docdb_query(src, "mtcars",
-#'             query = '{"gear": {"$gt": 10}}',
+#'             query = '{"gear": {"$gte": 88}}',
 #'             fields = '{"gear": 1, "cyl": 1}')
+#' dfupd <- data.frame("cyl" = c(8, 6),
+#'                     "somejson" = c('{"gear": 77, "carb": 55}',
+#'                                    '{"gear": 66, "newvar": 55}'),
+#'                     stringsAsFactors = FALSE)
+#' docdb_update(src, "mtcars", dfupd)
+#' docdb_query(src, "mtcars",
+#'             query = '{"gear": {"$eq": 66}}',
+#'             fields = '{"gear": 1, "cyl": 1, "carb": 1, "newvar": 1}')
 #' }
 docdb_update <- function(src, key, value, ...) {
   UseMethod("docdb_update")
@@ -76,9 +80,9 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   #   into a set of changes, where column names indicate what element
   #   in the document to update, and will be replaced with non-NA values 
   #   in the dataframe for the respective document)
-
+  
   assert(value, 'data.frame')
-
+  
   # Get ellipsis
   dotparams <- list(...)
   
@@ -116,7 +120,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   value <- sapply(X = seq_len(nrow(value)), 
                   FUN = function(i) 
                     ifelse(!is.character(value[i,]) || 
-                           !jsonlite::validate(value[i,]),
+                             !jsonlite::validate(value[i,]),
                            jsonlite::toJSON(x = value[i, , drop = FALSE], 
                                             dataframe = "rows",
                                             auto_unbox = TRUE), 
@@ -124,8 +128,8 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   
   # - Remove outer []
   value <- gsub(pattern = "^\\[|\\]$", 
-               replacement = "",
-               x = value)
+                replacement = "",
+                x = value)
   
   # - Turn into json set
   value <- paste0('{"$set":', value, '}')
@@ -160,42 +164,43 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
   assert(key, "character")
   assert(value, 'data.frame') 
   
-  # Two columns for path, value ("key" is name of value column)
-
   # If table does not exist, create empty table
   if (!docdb_exists(src = src, key = key)) {
     docdb_create(src = src, key = key, value = NULL)
   }
   
-  # https://www.sqlite.org/json1.html#jrepl
-  # json_set() 
-  #  - Overwrite if already exists?	Yes. 
-  #  - Create if does not exist? Yes.
-  # first argument: single JSON value
-  # second argument: zero or more pairs of path and value
-  # returns: new JSON string formed by updating the input JSON by path/value pairs
-  # emulate this:
-  # json_set('{"a":2,"c":4}', '$.c', json('[97,96]')) → '{"a":2,"c":[97,96]}'
-  
+  # value: data frame where first column has the name _id 
+  # or the name of a variable in the data-to-be-updated; 
+  # the rows of the data frame value then have values 
+  # that identify the records that are to be updated. 
+  # 
+  # When the data frame value has only two columns and the
+  # second column consists of json strings, these json 
+  # sets will be used to update (json_patch) the data-to-
+  # be-updated, https://www.sqlite.org/json1.html#jpatch 
+
+  # Check data frame value  
   vn <- names(value)
   
   if ("_id" != vn[1]) {
     
-    # get _id of records
+    # get _id of records to be updated
     idsaffected <- sapply(seq_len(nrow(value)), function(i) {
       
+      statement <- sprintf(
+        "SELECT _id
+         FROM %s, json_each( %s.json )
+         WHERE key = '%s'
+         AND value = %s;",
+        key, key,
+        vn[1], 
+        ifelse(inherits(value[i, 1], "character"), 
+               paste0("'", value[i , 1], "'"),
+               value[i , 1])
+      )
+      
       DBI::dbGetQuery(conn = src$con, 
-                      statement = sprintf(
-                        "SELECT _id
-                              FROM %s, json_each( %s.json )
-                              WHERE key = '%s'
-                                AND value = %s;",
-                        key, key,
-                        vn[1], 
-                        ifelse(inherits(value[i, 1], "character"), 
-                               paste0("'", value[i , 1], "'"),
-                               value[i , 1])
-                      ))
+                      statement = statement)
     })
     
     # replace first column with _id
@@ -217,68 +222,71 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
     value <- do.call(rbind, value)
     
   }
-  
-  # iterate over columns
-  ncoliterated <- sapply(seq(2, ncol(value)), function(i) {
 
-    # identifier _id is table index
-    nrowaffected <-
-      sapply(seq_len(nrow(value)), function(ii) {
+  # iterate over rows to handle any mixed data
+  nrowiterated <- sapply(seq_len(nrow(value)), function(i) {
+    
+    # get row except first column,
+    # which identifies the records
+    # that are to be updated
+    tmpval <- value[i, -1, drop = FALSE]
 
-        # check if current cell has a value
-        if (!is.na(value[ii, i, drop = TRUE])) {
-          
-          tmpval <- value[ii, i, drop = TRUE]
-          
-          # if current cell value is a json string, 
-          # use this to replace all of existing json
-          if (is.character(tmpval) && 
-              jsonlite::validate(tmpval)) {
-            
-            statement <- sprintf(
-              "UPDATE %s
-             SET json = json ( %s )
-             WHERE _id = '%s';",
-              key,
-              valueEscape(tmpval),
-              value[ii, 1]
-            )
-            
-          } else {
-            
-            statement <- sprintf(
-              "UPDATE %s
-             SET json =
-              (SELECT json_set(
-                      json( %s.json ), '$.%s', json ( %s ))
-               FROM %s
-               WHERE _id = '%s')
-             WHERE _id = '%s';",
-              key,
-              key, vn[i], valueEscape(tmpval),
-              key,
-              value[ii, 1],
-              value[ii, 1]
-            )
-            
-          }
-          
-          # execute
-            DBI::dbExecute(
-              conn = src$con,
-              statement = statement)
-            
-        } else {
-          
-          # no record changed
-          0
-        }
+    # all values in these columns json?
+    # if (all(is.character(tmpval)) && 
+    if (all(sapply(tmpval, 
+                   function(col) 
+                     is.character(col) && 
+                     jsonlite::validate(col)))) {
+      
+      # iterate over columns
+      ncoliterated <- sapply(tmpval, function(ii) {
         
-      }) # nrowaffected
-    nrowaffected
+        # construct sql statment
+        statement <- sprintf(
+          "UPDATE %s
+           SET json = json_patch ( %s.json, %s )
+           WHERE _id = '%s';",
+          key, 
+          key, valueEscape(ii),
+          value[i, 1]
+        )
+        
+        # execute sql statement
+        DBI::dbExecute(
+          conn = src$con,
+          statement = statement)
+        
+      }) # by column with json
+      
+      # return number of records modified
+      sum(ncoliterated, na.rm = TRUE) >= 1L
+      
+    } else {# no json
+      
+      # construct json from columns
+      tmpval <- jsonlite::toJSON(jsonlite::unbox(tmpval))
+
+      # construct sql statement
+      statement <- sprintf(
+        "UPDATE %s
+         SET json = json_patch ( %s.json, %s )
+         WHERE _id = '%s';",
+        key, 
+        key, valueEscape(tmpval),
+        value[i, 1]
+      )
+      
+      # execute sql statement
+      DBI::dbExecute(
+        conn = src$con,
+        statement = statement)
+      
+    } # no json
+      
   })
   
-  invisible(sum(ncoliterated, na.rm = TRUE))
+  # return value
+  invisible(sum(nrowiterated, na.rm = TRUE))
   
 }
 
@@ -286,7 +294,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
 ## helpers --------------------------------------
 
 valueEscape <- function(x) {
-
+  
   # cf. https://www.sqlite.org/json1.html#jset  
   switch(class(x),
          
