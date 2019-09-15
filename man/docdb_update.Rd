@@ -50,17 +50,21 @@ docdb_get(src, "mtcars")
 
 # SQLite
 src <- src_sqlite()
-docdb_create(src, "mtcars",
-             data.frame("_id" = seq_len(nrow(mtcars)),
-                        mtcars,
-                        stringsAsFactors = FALSE,
-                        check.names = FALSE))
-dfupd <- data.frame("cyl" = 4, "gear" = 99,
-                    stringsAsFactors = FALSE,
-                    check.names = FALSE)
+docdb_create(src, "mtcars", mtcars)
+dfupd <- data.frame("cyl" = c(4, 6),
+                    "gear" = c(88, 99),
+                    stringsAsFactors = FALSE)
 docdb_update(src, "mtcars", dfupd)
 docdb_query(src, "mtcars",
-            query = '{"gear": {"$gt": 10}}',
+            query = '{"gear": {"$gte": 88}}',
             fields = '{"gear": 1, "cyl": 1}')
+dfupd <- data.frame("cyl" = c(8, 6),
+                    "somejson" = c('{"gear": 77, "carb": 55}',
+                                   '{"gear": 66, "newvar": 55}'),
+                    stringsAsFactors = FALSE)
+docdb_update(src, "mtcars", dfupd)
+docdb_query(src, "mtcars",
+            query = '{"gear": {"$eq": 66}}',
+            fields = '{"gear": 1, "cyl": 1, "carb": 1, "newvar": 1}')
 }
 }
