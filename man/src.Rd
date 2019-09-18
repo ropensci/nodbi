@@ -21,7 +21,8 @@ Documentation details for each database:
 \itemize{
 \item MongoDB - \url{https://docs.mongodb.com/}
 \item CouchDB - \url{http://docs.couchdb.org/}
-\item Elasticsearch - \url{https://www.elastic.co/guide/en/elasticsearch/reference/current}
+\item Elasticsearch -
+\url{https://www.elastic.co/guide/en/elasticsearch/reference/current}
 \item Redis - \url{https://redis.io/documentation}
 \item SQLite/json1 - \url{https://www.sqlite.org/json1.html}
 }

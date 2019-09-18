@@ -37,6 +37,7 @@
 #' (src <- src_sqlite())
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_exists(src, "mtcars")
+#' docdb_exists(src, "yellowcheese")
 #' }
 #' 
 docdb_exists <- function(src, key, ...){

@@ -31,6 +31,7 @@ docdb_delete(src, "mtcars")
 
 # elasticsearch
 src <- src_elastic()
+if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
 docdb_create(src, "iris", iris)
 docdb_get(src, "iris")
 docdb_delete(src, "iris")

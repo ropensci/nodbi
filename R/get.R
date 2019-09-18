@@ -25,8 +25,10 @@
 #'
 #' # Elasticsearch
 #' src <- src_elastic()
+#' if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
+#' if (docdb_exists(src, "d2")) docdb_delete(src, "d2")
 #' docdb_create(src, "d2", diamonds)
 #' docdb_get(src, "d2", limit = 1010)
 #'
@@ -65,7 +67,7 @@ docdb_get.src_elastic <- function(src, key, limit = NULL, ...){
   ids <- pluck(elastic::Search(src$con, key, source = FALSE,
                                size = limit, ...)$hits$hits, "_id", "")
   tmp <- elastic::docs_mget(src$con, index = key, type = key, ids = ids,
-                            verbose = FALSE)
+    verbose = FALSE)
   makedf(pluck(tmp$docs, "_source"))
 }
 

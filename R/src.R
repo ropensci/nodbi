@@ -14,7 +14,8 @@
 #'
 #' - MongoDB - <https://docs.mongodb.com/>
 #' - CouchDB - <http://docs.couchdb.org/>
-#' - Elasticsearch - <https://www.elastic.co/guide/en/elasticsearch/reference/current>
+#' - Elasticsearch -
+#'  <https://www.elastic.co/guide/en/elasticsearch/reference/current>
 #' - Redis - <https://redis.io/documentation>
 #' - SQLite/json1 - <https://www.sqlite.org/json1.html>
 NULL

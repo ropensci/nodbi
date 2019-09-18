@@ -31,6 +31,9 @@ docdb_get(src, "mtcars2")
 
 # Elasticsearch
 src <- src_elastic()
+if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
+if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
+if (docdb_exists(src, "diamonds_small")) docdb_delete(src, "diamonds_small")
 docdb_create(src, key = "mtcars", value = mtcars)
 docdb_create(src, key = "iris", value = iris)
 docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
@@ -48,8 +51,13 @@ docdb_get(src, "mtcars")
 
 # SQLite
 src <- src_sqlite()
+if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
 docdb_create(src, key = "mtcars", value = mtcars)
-docdb_create(src, key = "mtcars", value = data.frame(contacts, stringsAsFactors = FALSE))
 docdb_get(src, "mtcars")
+if (docdb_exists(src, "contacts")) docdb_delete(src, "contacts")
+## contacts is a dataset included in this package
+contacts_df <- data.frame(contacts, stringsAsFactors = FALSE)
+docdb_create(src, key = "contacts", value = )
+docdb_get(src, "contacts")
 }
 }
