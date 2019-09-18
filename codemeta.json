@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.2.8.9610",
+  "version": "0.3.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -175,10 +175,10 @@
     }
   ],
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
-  "fileSize": "366.659KB",
+  "fileSize": "367.513KB",
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
-  "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "etcd", "r", "r-package"],
+  "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "SQLite", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "etcd", "r", "r-package"],
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
   "contIntegration": [
     "https://travis-ci.org/ropensci/nodbi",
