@@ -20,13 +20,6 @@ skip_if_no_mongo <- function() {
   }
 }
 
-skip_if_no_etcd <- function() {
-  testthat::skip_if_not_installed("etseed")
-  if (inherits(try(src_etcd(), silent=TRUE), "try-error")) {
-    skip("etcd is not available")
-  }
-}
-
 skip_if_no_sqlite <- function() {
   testthat::skip_if_not_installed("RSQLite")
   if (inherits(try(src_sqlite(), silent = TRUE), "try-error")) {

@@ -18,7 +18,6 @@ Elasticsearch and MongoDB; ignored for others}
 \item{...}{passed on to functions:
 \itemize{
 \item CouchDB: passed to \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
-\item etcd: passed to the \code{$key()} method
 \item Elasticsearch: passed to \code{\link[elastic:Search]{elastic::Search()}}
 \item Redis: ignored
 \item MongoDB: ignored
@@ -39,11 +38,6 @@ src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars2", value = mtcars)
 docdb_get(src, "mtcars2")
 docdb_get(src, "mtcars2", limit = 5)
-
-# etcd
-# src <- src_etcd()
-# docdb_create(src, "/hello", mtcars)
-# docdb_get(src, "/hello")
 
 # Elasticsearch
 src <- src_elastic()

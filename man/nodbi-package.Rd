@@ -7,8 +7,8 @@
 \title{Document database connector}
 \description{
 Supports NoSQL databases (Elasticsearch, CouchDB, MongoDB),
-key-value databases (Redis), other NoSQL types (etcd),
-and SQLite with json1 extension as in R package RSQLite.
+key-value databases (Redis), and SQLite with json1 extension
+as in R package RSQLite.
 }
 \author{
 Scott Chamberlain \email{sckott@protonmail.com}

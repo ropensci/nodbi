@@ -31,7 +31,6 @@
 #' 
 #' @section Not supported yet:
 #' 
-#' - Etcd
 #' - Redis
 #' 
 #' @examples \dontrun{

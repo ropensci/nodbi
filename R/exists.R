@@ -14,11 +14,6 @@
 #' docdb_exists(src, "mtcars2")
 #' docdb_exists(src, "asdfadf")
 #'
-#' # etcd
-#' # src <- src_etcd()
-#' # docdb_exists(src, "/hello")
-#' # docdb_exists(src, "/asdfadsf")
-#'
 #' # Elasticsearch
 #' (src <- src_elastic())
 #' if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
@@ -53,13 +48,6 @@ docdb_exists.src_couchdb <- function(src, key, ...) {
   assert(key, 'character')
   tmp <- tryCatch(sofa::db_info(src$con, dbname = key, ...), 
     error = function(e) e)
-  !inherits(tmp, "error")
-}
-
-#' @export
-docdb_exists.src_etcd <- function(src, key, ...) {
-  assert(key, 'character')
-  tmp <- tryCatch(src$key(key, ...), error = function(e) e)
   !inherits(tmp, "error")
 }
 

@@ -12,11 +12,6 @@
 #' docdb_create(src, key="mtcars2", value=mtcars)
 #' docdb_get(src, "mtcars2")
 #'
-#' # etcd
-#' # src <- src_etcd()
-#' # docdb_create(src, key = "/newmtcars7", value = mtcars)
-#' # docdb_get(src, "/newmtcars7")
-#'
 #' # Elasticsearch
 #' src <- src_elastic()
 #' docdb_create(src, key = "mtcars", value = mtcars)
@@ -50,15 +45,6 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   trycr <- tryCatch(sofa::db_create(src$con, dbname = key),
                     error = function(e) e)
   invisible(sofa::db_bulk_create(src$con, dbname = key, doc = value, ...))
-}
-
-#' @export
-docdb_create.src_etcd <- function(src, key, value, ...){
-  assert(value, 'data.frame')
-  invisible(src$create(key = key, dir = TRUE, ...))
-  for (i in seq_len(NROW(value))) {
-    src$create_inorder(key, jsonlite::toJSON(value[i, ]), ...)
-  }
 }
 
 #' @export

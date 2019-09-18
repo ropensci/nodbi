@@ -1,8 +1,8 @@
 #' Document database connector
 #'
 #' Supports NoSQL databases (Elasticsearch, CouchDB, MongoDB),
-#' key-value databases (Redis), other NoSQL types (etcd), 
-#' and SQLite with json1 extension as in R package RSQLite.
+#' key-value databases (Redis), and SQLite with json1 extension
+#' as in R package RSQLite.
 #'
 #' @name nodbi-package
 #' @aliases nodbi

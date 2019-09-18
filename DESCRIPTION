@@ -3,9 +3,9 @@ Title: 'NoSQL' Database Connector
 Description: Simplified document database manipulation and analysis,
     including support for many 'NoSQL' databases, including document 
     databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
-    'key-value' databases ('Redis'), other 'NoSQL' types ('etcd'), 
-    and, with limitations, also SQLite/json1.
-Version: 0.2.8.9411
+    'key-value' databases ('Redis'), and (with limitations)
+    SQLite/json1.
+Version: 0.2.8.9610
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
@@ -30,7 +30,6 @@ Imports:
     jsonlite
 Suggests:
     sofa (>= 0.3.0),
-    etseed (>= 0.1.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
     redux,

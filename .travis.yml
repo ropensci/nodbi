@@ -18,7 +18,6 @@ before_script:
 
 r_packages:
   - sofa
-  - etseed
   - elastic
   - mongolite
 

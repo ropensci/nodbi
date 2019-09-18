@@ -51,7 +51,6 @@ yet supported.
 \section{Not supported yet}{
 
 \itemize{
-\item Etcd
 \item Redis
 }
 }

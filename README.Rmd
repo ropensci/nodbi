@@ -52,7 +52,6 @@ So far we support the following DBs:
 * Redis (server based)
 * CouchDB
 * Elasticsearch
-* etcd
 * SQLite
 
 Currently we have support for data.frame's for the following operations
@@ -60,7 +59,7 @@ Currently we have support for data.frame's for the following operations
 * Create - all DBs
 * Exists - all DBs, except MongoDB
 * Get - all DBs
-* Query - all DBs, except Redis and etcd
+* Query - all DBs, except Redis
 * Delete - all DBs
 * Update - just CouchDB
 
@@ -101,12 +100,6 @@ cd /usr/local/elasticsearch && bin/elasticsearch
 src_elastic()
 ```
 
-Start etcd after installing etcd (https://github.com/coreos/etcd/releases) by, e.g.: `etcd`
-
-```{r}
-src_etcd()
-```
-
 If you want to use classic Redis server, we do that through the [redux][]
 package, and you'll need to start up Redis by e.g,. `redis-server` in your shell.
 
@@ -126,19 +119,6 @@ src_mongo()
 src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars", value = mtcars)
 head( docdb_get(src, "mtcars") )
-```
-
-## etcd
-
-```{r echo=FALSE}
-src <- src_etcd()
-invisible(docdb_delete(src, "/mtcars"))
-```
-
-```{r}
-src <- src_etcd()
-ff <- docdb_create(src, "/mtcars", mtcars)
-head( docdb_get(src, "/mtcars") )
 ```
 
 ## Elasticsearch

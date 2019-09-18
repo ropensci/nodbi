@@ -13,12 +13,6 @@
 #' docdb_get(src, "mtcars")
 #' docdb_delete(src, "mtcars")
 #'
-#' # etcd
-#' # src <- src_etcd()
-#' # docdb_create(src, "/iris", iris)
-#' # docdb_get(src, "/iris")
-#' # docdb_delete(src, "/iris")
-#'
 #' # elasticsearch
 #' src <- src_elastic()
 #' docdb_create(src, "iris", iris)
@@ -51,12 +45,6 @@ docdb_delete <- function(src, key, ...){
 docdb_delete.src_couchdb <- function(src, key, ...) {
 	assert(key, 'character')
   sofa::db_delete(src$con, dbname = key, ...)
-}
-
-#' @export
-docdb_delete.src_etcd <- function(src, key, ...) {
-	assert(key, 'character')
-  src$delete(key, dir = TRUE, recursive = TRUE, ...)
 }
 
 #' @export

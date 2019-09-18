@@ -10,7 +10,6 @@
 #' @param ... passed on to functions:
 #' 
 #' - CouchDB: passed to [sofa::db_alldocs()]
-#' - etcd: passed to the `$key()` method
 #' - Elasticsearch: passed to [elastic::Search()]
 #' - Redis: ignored
 #' - MongoDB: ignored
@@ -23,11 +22,6 @@
 #' docout <- docdb_create(src, key = "mtcars2", value = mtcars)
 #' docdb_get(src, "mtcars2")
 #' docdb_get(src, "mtcars2", limit = 5)
-#'
-#' # etcd
-#' # src <- src_etcd()
-#' # docdb_create(src, "/hello", mtcars)
-#' # docdb_get(src, "/hello")
 #'
 #' # Elasticsearch
 #' src <- src_elastic()
@@ -63,15 +57,6 @@ docdb_get.src_couchdb <- function(src, key, limit = NULL, ...) {
   dropmeta(makedf(
     pluck(sofa::db_alldocs(src$con, dbname = key,
                            include_docs = TRUE, limit = limit, ...)$rows, "doc")))
-}
-
-#' @export
-docdb_get.src_etcd <- function(src, key, limit = NULL, ...) {
-  assert(key, 'character')
-  tmp <- src$key(key, recursive = TRUE, sorted = TRUE, ...)
-  makedf(
-    lapply(pluck(tmp$node$nodes, "value"), jsonlite::fromJSON)
-  )
 }
 
 #' @export

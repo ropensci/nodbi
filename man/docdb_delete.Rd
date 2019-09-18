@@ -29,12 +29,6 @@ docdb_create(src, "mtcars", mtcars)
 docdb_get(src, "mtcars")
 docdb_delete(src, "mtcars")
 
-# etcd
-# src <- src_etcd()
-# docdb_create(src, "/iris", iris)
-# docdb_get(src, "/iris")
-# docdb_delete(src, "/iris")
-
 # elasticsearch
 src <- src_elastic()
 docdb_create(src, "iris", iris)
