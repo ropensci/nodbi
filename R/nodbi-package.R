@@ -14,6 +14,22 @@
 #' @keywords package
 NULL
 
+#' This function is defunct.
+#' @export
+#' @rdname src_etcd-defunct
+#' @keywords internal
+src_etcd <- function() {
+  .Defunct(msg = "This function is defunct; etcd removed")
+}
+
+#' Defunct functions in nodbi
+#'
+#' - [src_etcd]: etcd removed, as long as S3 methods for all `docdb_*`
+#' functions
+#'
+#' @name nodbi-defunct
+NULL
+
 #' diamonds
 #'
 #' @format A data frame with 53940 rows and 10 variables:

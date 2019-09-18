@@ -1,3 +1,21 @@
+nodbi 0.3.0
+===========
+
+### NEW FEATURES
+
+* new author Ralf Herold, with contribution of new functions for working with SQLite/json1. new functions: `src_sqlite`, `print.src_sqlite`, `docdb_create.src_sqlite`, `docdb_delete.src_sqlite`, `docdb_exists.src_sqlite`, `docdb_get.src_sqlite`, `docdb_query.src_sqlite`, and `docdb_update.src_sqlite`. includes new dataset `contacts` (#25) (#27) (#28) (#29) (#30) (#31)
+* `docdb_update` gains method for working with MongoDB, via (#27)
+
+### MINOR IMPROVEMENTS
+
+* added `.github` files in the source repository to facilitate contributions
+* `src_mongo` changes, improved behavior, via (#27)
+
+### DEFUNCT
+
+* `etcd` (via the `etseed` package) integration has been removed from this package as etcd doesn't really fit the main goal of the pkg. functions now defunct are: `src_etcd`, `docdb_create.src_etcd`, `docdb_delete.src_etcd`, `docdb_exists.src_etcd`, `docdb_get.src_etcd`, and `print.src_etcd` (#26)
+
+
 nodbi 0.2.0
 ===========
 
