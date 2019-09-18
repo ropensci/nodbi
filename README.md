@@ -235,8 +235,10 @@ docdb_get(src, "diamonds") %>%
 * Please [report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 * License: MIT
 * Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
-* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+* Please note that this project is released with a [Contributor Code of Conduct][coc].
+By participating in this project you agree to abide by its terms.
 
 [![rofooter](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
 
 [redux]: https://cran.r-project.org/package=redux
+[coc]: https://github.com/ropensci/nodbi/blob/master/CODE_OF_CONDUCT.md
