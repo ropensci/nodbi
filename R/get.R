@@ -117,6 +117,9 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   dump <- file(description = tfname,
                encoding = "UTF-8")
   
+  # register to remove file
+  # after used for streaming
+  on.exit(unlink(tfname))
   
   # get data, write to file in ndjson format
   cat(stats::na.omit(unlist(
@@ -127,7 +130,7 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   sep = "\n", # ndjson
   file = dump)
   
-  # from jsonlite:
+  # from jsonlite documentation:
   # Because parsing huge JSON strings is difficult and inefficient, 
   # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
   jsonlite::stream_in(dump, verbose = FALSE)
