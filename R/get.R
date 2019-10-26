@@ -112,9 +112,11 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   n <- -1L
   if (!is.null(limit)) n <- limit
   
-  # temporary file; note this cannot be deleted
-  # because it is streamed into the return value
-  dump <- tempfile()
+  # temporary file for streaming
+  tfname <- tempfile()
+  dump <- file(description = tfname,
+               encoding = "UTF-8")
+  
   
   # get data, write to file in ndjson format
   cat(stats::na.omit(unlist(
@@ -128,7 +130,7 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   # from jsonlite:
   # Because parsing huge JSON strings is difficult and inefficient, 
   # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
-  jsonlite::stream_in(file(dump), verbose = FALSE)
+  jsonlite::stream_in(dump, verbose = FALSE)
 
 }
 
