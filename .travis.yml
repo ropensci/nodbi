@@ -4,6 +4,13 @@ cache: packages
 dist: trusty
 warnings_are_errors: false
 
+addons:
+  apt:
+    packages:
+      - libapparmor-dev
+      - libhiredis-dev
+      - redis-server
+
 env:
   global:
     - _R_CHECK_FORCE_SUGGESTS_=FALSE
@@ -12,6 +19,7 @@ services:
   - couchdb
   - mongodb
   - elasticsearch
+  - redis-server
 
 before_script:
   - sleep 10
