@@ -70,6 +70,10 @@ context("couchdb: query")
 test_that("query in couchdb works", {
   skip_on_cran()
   skip_if_no_couchdb()
+  x <- sofa::Cushion$new()$ping()
+  couch_ver <- as.numeric(substring(gsub("\\.", "", x$version), 1, 1))
+  skip_if(couch_ver < 2)
+
   src <- src_couchdb()
 
   if (docdb_exists(src, "mtcars2")) docdb_delete(src, "mtcars2")
