@@ -27,9 +27,11 @@
 #' src <- src_elastic()
 #' if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
 #' docdb_create(src, "iris", iris)
+#' Sys.sleep(2)
 #' docdb_get(src, "iris")
 #' if (docdb_exists(src, "d2")) docdb_delete(src, "d2")
 #' docdb_create(src, "d2", diamonds)
+#' Sys.sleep(3)
 #' docdb_get(src, "d2", limit = 1010)
 #'
 #' # Redis

@@ -17,6 +17,7 @@
 #' src <- src_elastic()
 #' if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
 #' docdb_create(src, "iris", iris)
+#' Sys.sleep(2)
 #' docdb_get(src, "iris")
 #' docdb_delete(src, "iris")
 #'
