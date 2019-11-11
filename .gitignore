@@ -6,3 +6,8 @@ docdbi.Rcheck
 nodbi.Rproj
 nodbi.Rcheck
 *.tar.gz
+revdep/data.sqlite
+revdep/library.noindex
+revdep/checks.noindex
+revdep/checks
+revdep/library
