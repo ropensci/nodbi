@@ -1,3 +1,12 @@
+nodbi 0.4.0
+===========
+
+### MINOR IMPROVEMENTS
+
+* in `docdb_query()` and `docdb_get()`, for sqlite source, use a connection instead of a regular file path to avoid certain errors on Windows (#33) work by @rfhb
+* in `docdb_query()` and `docdb_create()` for sqlite source, fix to handle mixed values of different types (#34) work by @rfhb
+* some Sys.sleep's added to Elasticserch eg's to make sure data is available after creation, and before a data request
+
 nodbi 0.3.0
 ===========
 

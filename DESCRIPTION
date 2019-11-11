@@ -5,7 +5,7 @@ Description: Simplified document database manipulation and analysis,
     databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
     'key-value' databases ('Redis'), and (with limitations)
     SQLite/json1.
-Version: 0.3.2.9100
+Version: 0.4.0
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",

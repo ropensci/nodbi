@@ -10,11 +10,13 @@
 
 ## Reverse dependencies
 
-There are no reverse dependencies.
+* I have run R CMD check on the 1 downstream dependency
+(<https://github.com/ropensci/nodbi/blob/master/revdep/README.md>),
+no errors or warnings were found on reverse dependency check.
 
 --------
 
-This version includes removal of support for one of the database (etcd), and gains support for another database (SQLite).
+This version includes fixes for SQLite internals.
 
 Thanks!
 Scott Chamberlain

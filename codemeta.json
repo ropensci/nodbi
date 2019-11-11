@@ -10,14 +10,14 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "version": "3.6.1",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 3.6.1 Patched (2019-09-05 r77154)",
+  "runtimePlatform": "R version 3.6.1 Patched (2019-09-23 r77210)",
   "author": [
     {
       "@type": "Person",
@@ -178,7 +178,7 @@
   "fileSize": "367.513KB",
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
-  "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "SQLite", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "etcd", "r", "r-package"],
+  "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "SQLite", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "r", "r-package", "sqlite"],
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
   "contIntegration": [
     "https://travis-ci.org/ropensci/nodbi",
