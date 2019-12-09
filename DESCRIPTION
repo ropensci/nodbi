@@ -19,7 +19,7 @@ Authors@R: c(
   )
 License: MIT + file LICENSE
 LazyData: true
-URL: https://github.com/ropensci/nodbi
+URL: https://docs.ropensci.org/nodbi, https://github.com/ropensci/nodbi
 BugReports: https://github.com/ropensci/nodbi/issues
 Roxygen: list(wrap = FALSE, markdown = TRUE)
 Depends: R (>= 2.10)
