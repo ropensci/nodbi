@@ -5,7 +5,7 @@ Description: Simplified document database manipulation and analysis,
     databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
     'key-value' databases ('Redis'), and (with limitations)
     SQLite/json1.
-Version: 0.4.0
+Version: 0.4.1.91
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com",
@@ -36,7 +36,7 @@ Suggests:
     RSQLite (>= 1.1),
     DBI,
     testthat
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Redis, Elasticsearch, CouchDB, SQLite, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org

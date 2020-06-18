@@ -4,7 +4,8 @@
 \name{diamonds}
 \alias{diamonds}
 \title{diamonds}
-\format{A data frame with 53940 rows and 10 variables:
+\format{
+A data frame with 53940 rows and 10 variables:
 \itemize{
 \item price price in US dollars (\$326-\$18,823)
 \item carat weight of the diamond (0.2-5.01)
@@ -18,7 +19,8 @@ SI1, SI2, VS1, VS2, VVS1, VVS2, IF (best))
 \item depth total depth percentage = z / mean(x, y) = 2 * z / (x + y)
 (43-79)
 \item table width of top of diamond relative to widest point (43-95)
-}}
+}
+}
 \source{
 from \pkg{ggplot2}
 }

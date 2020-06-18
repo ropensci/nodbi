@@ -4,9 +4,16 @@
 \alias{src_elastic}
 \title{Setup an Elasticsearch database connection}
 \usage{
-src_elastic(host = "127.0.0.1", port = 9200, path = NULL,
-  transport_schema = "http", user = NULL, pwd = NULL,
-  force = FALSE, ...)
+src_elastic(
+  host = "127.0.0.1",
+  port = 9200,
+  path = NULL,
+  transport_schema = "http",
+  user = NULL,
+  pwd = NULL,
+  force = FALSE,
+  ...
+)
 }
 \arguments{
 \item{host}{(character) the base url, defaults to localhost

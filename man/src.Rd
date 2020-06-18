@@ -7,7 +7,7 @@
 Setup database connections
 }
 \details{
-There is a \code{src_*()} function to setup a connection to each
+There is a \verb{src_*()} function to setup a connection to each
 of the database backends. Each has their own unique set of parameters.
 \itemize{
 \item MongoDB - \code{\link[=src_mongo]{src_mongo()}}

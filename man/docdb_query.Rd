@@ -17,7 +17,7 @@ docdb_query(src, key, query, ...)
 \itemize{
 \item CouchDB: passed on to \code{\link[sofa:db_query]{sofa::db_query()}}
 \item Elasticsearch: passed on to \code{\link[elastic:Search]{elastic::Search()}}
-\item MongoDB: passed on to the \code{$find} method of \pkg{mongolite}
+\item MongoDB: passed on to the \verb{$find} method of \pkg{mongolite}
 }}
 }
 \description{

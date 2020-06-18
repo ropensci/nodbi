@@ -4,8 +4,15 @@
 \alias{src_couchdb}
 \title{Setup a CouchDB database connection}
 \usage{
-src_couchdb(host = "127.0.0.1", port = 5984, path = NULL,
-  transport = "http", user = NULL, pwd = NULL, headers = NULL)
+src_couchdb(
+  host = "127.0.0.1",
+  port = 5984,
+  path = NULL,
+  transport = "http",
+  user = NULL,
+  pwd = NULL,
+  headers = NULL
+)
 }
 \arguments{
 \item{host}{(character) host value, default: 127.0.0.1}

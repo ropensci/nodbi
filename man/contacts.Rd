@@ -4,7 +4,9 @@
 \name{contacts}
 \alias{contacts}
 \title{contacts}
-\format{A json string with ragged, nested contact details}
+\format{
+A json string with ragged, nested contact details
+}
 \usage{
 contacts
 }
