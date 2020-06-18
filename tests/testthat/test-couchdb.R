@@ -1,9 +1,12 @@
+COUCHDB_TEST_USER <- Sys.getenv("COUCHDB_TEST_USER")
+COUCHDB_TEST_PWD <- Sys.getenv("COUCHDB_TEST_PWD")
+
 context("couchdb: src")
 test_that("Source", {
   skip_on_cran()
 
   skip_if_no_couchdb()
-  src <- src_couchdb()
+  src <- src_couchdb(user=COUCHDB_TEST_USER, pwd=COUCHDB_TEST_PWD)
   expect_is(src, "docdb_src")
   expect_is(src, "src_couchdb")
   expect_is(unclass(src), "list")
@@ -18,7 +21,7 @@ test_that("db into couchdb", {
   df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
 
   skip_if_no_couchdb()
-  src <- src_couchdb()
+  src <- src_couchdb(user=COUCHDB_TEST_USER, pwd=COUCHDB_TEST_PWD)
 
   # delete if exists
   invisible(tryCatch(docdb_delete(src, "df"), error = function(e) e))
@@ -35,7 +38,7 @@ test_that("delete in couchdb works", {
   df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
   
   skip_if_no_couchdb()
-  src <- src_couchdb()
+  src <- src_couchdb(user=COUCHDB_TEST_USER, pwd=COUCHDB_TEST_PWD)
 
   # delete if exists
   invisible(tryCatch(docdb_delete(src, "foobar"), error = function(e) e))
@@ -53,7 +56,7 @@ test_that("exists in couchdb works", {
   df <- data.frame(a = letters[1:10], b = LETTERS[1:10], stringsAsFactors = FALSE)
   
   skip_if_no_couchdb()
-  src <- src_couchdb()
+  src <- src_couchdb(user=COUCHDB_TEST_USER, pwd=COUCHDB_TEST_PWD)
 
   # delete if exists
   invisible(tryCatch(docdb_delete(src, "foobar"), error = function(e) e))
@@ -74,7 +77,7 @@ test_that("query in couchdb works", {
   couch_ver <- as.numeric(substring(gsub("\\.", "", x$version), 1, 1))
   skip_if(couch_ver < 2)
 
-  src <- src_couchdb()
+  src <- src_couchdb(user=COUCHDB_TEST_USER, pwd=COUCHDB_TEST_PWD)
 
   if (docdb_exists(src, "mtcars2")) docdb_delete(src, "mtcars2")
   invisible(docdb_create(src, key = "mtcars2", value = mtcars))
