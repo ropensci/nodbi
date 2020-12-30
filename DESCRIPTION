@@ -19,9 +19,9 @@ Authors@R: c(
   )
 License: MIT + file LICENSE
 LazyData: true
-URL: https://docs.ropensci.org/nodbi, https://github.com/ropensci/nodbi
+URL: https://docs.ropensci.org/nodbi/, https://github.com/ropensci/nodbi
 BugReports: https://github.com/ropensci/nodbi/issues
-Roxygen: list(wrap = FALSE, markdown = TRUE)
+Roxygen: list(markdown = TRUE)
 Depends: R (>= 2.10)
 Encoding: UTF-8
 Language: en-US
@@ -36,7 +36,7 @@ Suggests:
     RSQLite (>= 1.1),
     DBI,
     testthat
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Redis, Elasticsearch, CouchDB, SQLite, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org

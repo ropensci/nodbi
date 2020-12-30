@@ -27,5 +27,8 @@ check: build
 check_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make check
 
+readme:
+	${RSCRIPT} -e "knitr::knit('README.Rmd')"
+		
 # No real targets!
 .PHONY: all test doc install
