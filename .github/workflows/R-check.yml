@@ -21,6 +21,8 @@ jobs:
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       CRAN: ${{ matrix.config.rspm }}
+      COUCHDB_TEST_USER: ${{ secrets.COUCHDB_TEST_USER }}
+      COUCHDB_TEST_PWD: ${{ secrets.COUCHDB_TEST_PWD }}
 
     steps:
       - uses: actions/checkout@v2
@@ -99,6 +101,11 @@ jobs:
 
       - name: Check
         run: Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')"
+
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
 
       - name: Upload check results
         if: failure()
