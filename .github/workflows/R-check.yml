@@ -54,7 +54,7 @@ jobs:
           discovery type: 'single-node'
 
       - name: Start CouchDB
-        uses: cobot/couchdb-action@v4
+        uses: sckott/couchdb-action@master
         with:
           couchdb version: '3.1.1'
 
