@@ -19,11 +19,11 @@ of the database backends. Each has their own unique set of parameters.
 
 Documentation details for each database:
 \itemize{
-\item MongoDB - \url{https://docs.mongodb.com/}
-\item CouchDB - \url{http://docs.couchdb.org/}
+\item MongoDB - https://docs.mongodb.com/
+\item CouchDB - http://docs.couchdb.org/
 \item Elasticsearch -
-\url{https://www.elastic.co/guide/en/elasticsearch/reference/current}
-\item Redis - \url{https://redis.io/documentation}
-\item SQLite/json1 - \url{https://www.sqlite.org/json1.html}
+https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+\item Redis - https://redis.io/documentation
+\item SQLite/json1 - https://www.sqlite.org/json1.html
 }
 }
