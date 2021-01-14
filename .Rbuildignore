@@ -3,6 +3,7 @@
 ^\.travis\.yml$
 ^Makefile$
 README.Rmd
+README.md
 ^CODE_OF_CONDUCT\.md$
 ^codemeta\.json$
 man-roxygen
