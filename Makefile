@@ -27,6 +27,9 @@ check: build
 check_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make check
 
+check_windows:
+	${RSCRIPT} -e "devtools::check_win_devel(quiet=TRUE); devtools::check_win_release(quiet=TRUE)"
+
 readme:
 	${RSCRIPT} -e "knitr::knit('README.Rmd')"
 		
