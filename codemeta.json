@@ -10,14 +10,13 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
-    "version": "3.6.1",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 3.6.1 Patched (2019-09-23 r77210)",
+  "runtimePlatform": "R version 4.0.3 Patched (2021-01-08 r79819)",
   "author": [
     {
       "@type": "Person",
@@ -175,16 +174,13 @@
     }
   ],
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
-  "fileSize": "367.513KB",
+  "fileSize": "446.838KB",
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "SQLite", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "r", "r-package", "sqlite"],
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
-  "contIntegration": [
-    "https://travis-ci.org/ropensci/nodbi",
-    "https://codecov.io/gh/ropensci/nodbi"
-  ],
-  "developmentStatus": "http://www.repostatus.org/#wip",
+  "contIntegration": "https://codecov.io/gh/ropensci/nodbi",
+  "developmentStatus": "https://www.repostatus.org/#active",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -193,5 +189,6 @@
   },
   "contributor": {},
   "copyrightHolder": {},
-  "funder": {}
+  "funder": {},
+  "relatedLink": "https://docs.ropensci.org/nodbi/"
 }

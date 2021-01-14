@@ -1,3 +1,10 @@
+nodbi 0.4.2
+===========
+
+### BUG FIXES
+
+* fix for `src_couchdb()`: we were not setting user and password correctly internally, was causing issues in CouchDB v3 (#35) thanks to @drtagkim for the pull request
+
 nodbi 0.4.0
 ===========
 

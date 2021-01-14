@@ -1,7 +1,7 @@
 ## Test environments
 
-* local OS X install, R 3.6.1 patched
-* ubuntu 14.04 (on travis-ci), R 3.6.1
+* local OS X install, R 4.0.3 patched
+* ubuntu 16.04 (on GitHub Actions), R 4.0.3
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -10,13 +10,13 @@
 
 ## Reverse dependencies
 
-* I have run R CMD check on the 1 downstream dependency
+* I have run R CMD check on the 2 downstream dependencies
 (<https://github.com/ropensci/nodbi/blob/master/revdep/README.md>),
 no errors or warnings were found on reverse dependency check.
 
 --------
 
-This version includes fixes for SQLite internals.
+This version fixes a bug in the CouchDB connector.
 
 Thanks!
 Scott Chamberlain
