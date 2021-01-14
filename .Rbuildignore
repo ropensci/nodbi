@@ -10,3 +10,4 @@ man-roxygen
 ^codemeta\.json$
 ^\.github$
 ^revdep$
+^LICENSE\.md$
