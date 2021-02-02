@@ -74,7 +74,7 @@ docdb_query <- function(src, key, query, ...){
 
 #' @export
 docdb_query.default <- function(src, key, query, ...) {
-  stop("docdb_query supported for CouchDB, Elasticsearch & MongoDB")
+  stop("docdb_query supported for CouchDB, Elasticsearch, MongoDB & SQLite")
 }
 
 #' @export
