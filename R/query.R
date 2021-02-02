@@ -129,8 +129,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       conn = src$con, 
       statement = paste0(
         "SELECT DISTINCT fullkey, type
-         FROM ", key, ", json_tree (", key, ".json) AS tt
-         WHERE tt.type <> 'object';"
+         FROM ", key, ", json_tree (", key, ".json) AS tt;"
       )))
   
   ## convert parameter fields
