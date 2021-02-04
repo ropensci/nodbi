@@ -22,10 +22,10 @@
 #' you may be better of using \pkg{elastic} package directly
 #' - MongoDB: query parameters, see \pkg{mongolite} docs for 
 #' help with searches
-#' - SQLite: `fields`, an optional json string of fields to be 
-#' returned from anywhere in the tree. 
-#' Parameter `query`, a json string In analogy to MongoDB, 
-#' a comma separated list of expressions provides an implicit 
+#' - SQLite: `fields`, an optional json string of fields to be
+#' returned from anywhere in the tree.
+#' Parameter `query`, a json string. In analogy to MongoDB,
+#' a comma separated list of expressions provides an implicit
 #' AND operation. Nested or otherwise complex queries are not
 #' yet supported. 
 #' 
@@ -122,8 +122,16 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # make dotted parameters accessible
   tmpdots <- list(...)
   
+
+  ## convert parameter fields
+  fields <- "{}"
+  if (!is.null(tmpdots$fields)) fields <- tmpdots$fields
+  fields <- json2fieldsSql(fields)
+  fields <- unique(fields[fields != ""])
+
+  # get types of all fields in dataset first,
+  # process fields subsequently (below SQL)
   # https://www.sqlite.org/json1.html#jeach
-  # need to obtain the types of fields
   tmpstr <- suppressWarnings(
     DBI::dbGetQuery(
       conn = src$con, 
@@ -131,22 +139,25 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
         "SELECT DISTINCT fullkey, type
          FROM ", key, ", json_tree (", key, ".json) AS tt;"
       )))
-  
-  ## convert parameter fields
-  fields <- "{}"
-  if (!is.null(tmpdots$fields)) fields <- tmpdots$fields
-  tmpfields <- json2fieldsSql(fields)
-  
-  # if no fields specified, get names without $. prefix
-  if (all(tmpfields == ""))
-    tmpfields <- unique(gsub("\\$[.]|\\[[0-9]+\\]", "", tmpstr$fullkey))
-  
-  # exclude _id from fields
-  tmpfields <- tmpfields[tmpfields != "_id"]
-  
+
+  # from field names, remove "$." and array elements "$.item[0]"
+  tmpfields <- unique(gsub("\\$[.]?|\\[[0-9]+\\]", "", tmpstr$fullkey))
+
+  # exclude _id and empty string from fields
+  tmpfields <- tmpfields[!(tmpfields %in% c("_id", ""))]
+
   # special case: return all fields if listfields != NULL
   if (!is.null(tmpdots$listfields)) return(tmpfields)
-  
+
+  # cannot handle "item.subitem" fields, see
+  # https://www.sqlite.org/json1.html#jeach
+  # thus keep top-level item field only
+  tmpfields <- unique(gsub("^(.+?)[.].*$", "\\1", tmpfields))
+  fields <- unique(gsub("^(.+?)[.].*$", "\\1", fields))
+
+  # if specified in parameter, keep only these fields
+  if (length(fields)) tmpfields <- tmpfields[tmpfields %in% fields]
+
   ## convert parameter query
   if (is.null(query)) query <- "{}"
   tmpquery <- json2querySql(query, src$con)
@@ -294,6 +305,9 @@ jsonEscape <- function(x, y) {
   # - x is a data frame created in docdb_query.src_sqlite
   #     with columns fullkey and type as per json_tree()
   # - y is the name of a variable / column of x that is of interest
+
+  # json.org: A value can be a string in double quotes,
+  # or a number, or true or false or null, or an object or an array.
 
   # format field like fullkeys
   y <- paste0("$.", y)
