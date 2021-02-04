@@ -41,7 +41,7 @@ you may be better of using \pkg{elastic} package directly
 help with searches
 \item SQLite: \code{fields}, an optional json string of fields to be
 returned from anywhere in the tree.
-Parameter \code{query}, a json string In analogy to MongoDB,
+Parameter \code{query}, a json string. In analogy to MongoDB,
 a comma separated list of expressions provides an implicit
 AND operation. Nested or otherwise complex queries are not
 yet supported.
