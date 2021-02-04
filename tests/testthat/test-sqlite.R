@@ -97,10 +97,46 @@ test_that("query in sqlite works", {
     6L)
   
   invisible(docdb_create(con, "mtcars", value = data.frame(contacts, stringsAsFactors = FALSE)))
-  
+
+  # tests with names of all fields,
+  # including item.subitem.subsubitem
   expect_equal(
-    docdb_query(con, "mtcars", 
-                fields = '{"age": 1, "name": 1}', 
+    length(allfields <-
+             docdb_query(con, "mtcars",
+                         listfields = TRUE,
+                         query = "{}")),
+    24L)
+  expect_true(
+    all(c("friends.name") %in% allfields))
+
+  expect_equal(
+    dim(
+      docdb_query(
+        con, "mtcars",
+        fields = paste0(
+          '{',
+          paste0(
+            '"',
+            # remove field names from mtcars data set
+            # and also the _row field = [-1] which resulted
+            # from importing mtcars
+            allfields[!allfields %in% names(mtcars)][-1],
+            collapse = '": 1, '),
+          '": 1}',
+          collapse = ''
+        ),
+        query = "{}")), c(5L, 11L))
+
+  expect_equal(
+    dimnames(
+      docdb_query(
+        con, "mtcars",
+        fields = '{"friends.name": 1}',
+        query = "{}")), list(as.character(1:5), c("friends", "_id")))
+
+  expect_equal(
+    docdb_query(con, "mtcars",
+                fields = '{"age": 1, "name": 1}',
                 query = '{"name": "Lacy Chen", "age": {"$lt": 22}}')[["_id"]],
     "5cd678531b423d5f04cfb0a1")
   
@@ -117,10 +153,45 @@ test_that("query in sqlite works", {
     "Williamson French")
   
   expect_equal(
-    docdb_query(con, "mtcars", 
-                fields = '{"age": 1, "friends[1].id": 1}', 
-                query = '{"_id": "5cd6785335b63cb19dfa8347"}')[["age"]],
-    30L)
+    docdb_query(con, "mtcars",
+                fields = '{"age": 1, "friends[1].id": 1}',
+                query = '{"_id": "5cd6785335b63cb19dfa8347"}'),
+    data.frame("age" = 30,
+               "_id" = "5cd6785335b63cb19dfa8347",
+               stringsAsFactors = FALSE,
+               check.names = FALSE))
+
+  expect_true(
+    is.data.frame(
+      docdb_query(
+        con, "mtcars",
+        fields = '{"age": 1, "friends": 1}',
+        query = '{"_id": "5cd6785335b63cb19dfa8347"}')
+    ))
+
+  expect_equal(
+    ncol(
+      docdb_query(
+        con, "mtcars",
+        fields = '{"age": 1, "friends": 1, "tags": 1}',
+        query = '{"_id": "5cd6785335b63cb19dfa8347"}')
+    ), 4L)
+
+  expect_true(
+    is.list(
+      docdb_query(
+        con, "mtcars",
+        fields = '{"age": 1, "friends": 1}',
+        query = '{"_id": "5cd6785335b63cb19dfa8347"}')[["friends"]]
+    ))
+
+  expect_true(
+    is.data.frame(
+      docdb_query(
+        con, "mtcars",
+        fields = '{"age": 1, "friends": 1}',
+        query = '{"_id": "5cd6785335b63cb19dfa8347"}')[["friends"]][[1]]
+    ))
 
   expect_equal(
     length(
