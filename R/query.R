@@ -5,34 +5,34 @@
 #' @param key (character) A key (collection for mongo)
 #' @param query various. see Query section below.
 #' @param ... Additional named parameters passed on to each package:
-#' 
+#'
 #' - CouchDB: passed on to [sofa::db_query()]
 #' - Elasticsearch: passed on to [elastic::Search()]
 #' - MongoDB: passed on to the `$find` method of \pkg{mongolite}
-#' 
+#'
 #' @template deets
 #' @section What is expected for each source:
-#' 
+#'
 #' - CouchDB: a list, see docs for [sofa::db_query()]
-#' - Elasticsearch: query parameters, see [elastic::Search()]; passed to 
-#' the `query` parameter of `elastic::Search`, thus performs a URI 
+#' - Elasticsearch: query parameters, see [elastic::Search()]; passed to
+#' the `query` parameter of `elastic::Search`, thus performs a URI
 #' based search where the query is passed in the URI instead of the body.
 #' In theory you can instead pass in a JSON or list to the `body`
 #' parameter, but if you want to do complicated Elasticsearch queries
 #' you may be better of using \pkg{elastic} package directly
-#' - MongoDB: query parameters, see \pkg{mongolite} docs for 
+#' - MongoDB: query parameters, see \pkg{mongolite} docs for
 #' help with searches
-#' - SQLite: `fields`, an optional json string of fields to be 
-#' returned from anywhere in the tree. 
-#' Parameter `query`, a json string In analogy to MongoDB, 
-#' a comma separated list of expressions provides an implicit 
+#' - SQLite: `fields`, an optional json string of fields to be
+#' returned from anywhere in the tree.
+#' Parameter `query`, a json string In analogy to MongoDB,
+#' a comma separated list of expressions provides an implicit
 #' AND operation. Nested or otherwise complex queries are not
-#' yet supported. 
-#' 
+#' yet supported.
+#'
 #' @section Not supported yet:
-#' 
+#'
 #' - Redis
-#' 
+#'
 #' @examples \dontrun{
 #' # CouchDB
 #' (src <- src_couchdb())
@@ -59,7 +59,7 @@
 #' docdb_query(src, "mtcars", query = '{"mpg":21}')
 #' docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
 #' docdb_get(src, "mtcars")
-#' 
+#'
 #' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, "mtcars", mtcars)
@@ -98,65 +98,65 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 
 #' @export
 docdb_query.src_mongo <- function(src, key, query, ...) {
-  
+
   # check expectations
-  if (exists("key", inherits = FALSE) && 
-      src$collection != key) 
+  if (exists("key", inherits = FALSE) &&
+      src$collection != key)
     message("Parameter 'key' is different from parameter 'collection', ",
             "was given as ", src$collection, " in src_mongo().")
-  
+
   # get results
   tmp <- src$con$find(query = query, ...)
-  
+
   # ensure results are flattened
   jsonlite::flatten(tmp)
-  
+
 }
 
 #' @export
 docdb_query.src_sqlite <- function(src, key, query, ...) {
-  
+
   assert(key, "character")
   assert(query, "character")
-  
+
   # make dotted parameters accessible
   tmpdots <- list(...)
-  
+
   # https://www.sqlite.org/json1.html#jeach
   # need to obtain the types of fields
   tmpstr <- suppressWarnings(
     DBI::dbGetQuery(
-      conn = src$con, 
+      conn = src$con,
       statement = paste0(
         "SELECT DISTINCT fullkey, type
-         FROM ", key, ", json_tree (", key, ".json) AS tt
+         FROM \"", key, "\", json_tree(\"", key, "\".json) AS tt
          WHERE tt.type <> 'object';"
       )))
-  
+
   ## convert parameter fields
   fields <- "{}"
   if (!is.null(tmpdots$fields)) fields <- tmpdots$fields
   tmpfields <- json2fieldsSql(fields)
-  
+
   # if no fields specified, get names without $. prefix
   if (all(tmpfields == ""))
     tmpfields <- unique(gsub("\\$[.]|\\[[0-9]+\\]", "", tmpstr$fullkey))
-  
+
   # exclude _id from fields
   tmpfields <- tmpfields[tmpfields != "_id"]
-  
+
   # special case: return all fields if listfields != NULL
   if (!is.null(tmpdots$listfields)) return(tmpfields)
-  
+
   ## convert parameter query
   if (is.null(query)) query <- "{}"
   tmpquery <- json2querySql(query, src$con)
-  
+
   ## compose statement
   statement <-
     paste0(
-      # SELECT '{' || 
-      #        ' "gear":  ' || json_extract(mtcars.json, '$.gear') || ',  ' || 
+      # SELECT '{' ||
+      #        ' "gear":  ' || json_extract(mtcars.json, '$.gear') || ',  ' ||
       #        ' "text": "' || json_extract(mtcars.json, '$.text') || '", ' ||
       #        ' "array": ' || json_array(json_extract(mtcars.json, '$.array')) || ', ' ||
       #        ' "_id": "' || _id || '"}'
@@ -165,121 +165,121 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       paste0(
         unname(
           sapply(
-            tmpfields, 
+            tmpfields,
             function(x){
               tmp <- jsonEscape(tmpstr, x)
-              sprintf("' \"%s\": %sjson_extract(%s.json, '$.%s')%s, ' ||",  
-                            x,  tmp[1],         key,       x, tmp[2])
-            })), 
+              sprintf("' \"%s\": %sjson_extract(\"%s\".json, '$.%s')%s, ' ||",
+                            x,    tmp[1],          key,          x,  tmp[2])
+            })),
         collapse = "\n")
       , " ' \"_id\": \"' || _id || '\"}'
         AS json ",
-      
+
       # select logical operation
       ifelse(
-        attr(x = tmpquery, which = "op") == "OR", 
-        
+        attr(x = tmpquery, which = "op") == "OR",
+
         # "OR" operation
         paste0(
-          # FROM mtcars, 
+          # FROM mtcars,
           #      json_tree (mtcars.json) AS tt
           # WHERE
-          #    (tt.key = 'cyl'  AND tt.value = 8) 
-          # OR (tt.key = 'gear' AND tt.value = 4) 
-          "FROM ", key, 
+          #    (tt.key = 'cyl'  AND tt.value = 8)
+          # OR (tt.key = 'gear' AND tt.value = 4)
+          "FROM \"", key, "\"",
           ifelse( # check if query specified
             tmpquery != "",
-            paste0(", json_tree (", key, ".json) AS tt
-                    WHERE ", 
+            paste0(", json_tree (\"", key, "\".json) AS tt
+                    WHERE ",
                    paste0(
                      paste0(
                        unname(
                          sapply(
-                           tmpquery, 
-                           function(x) 
+                           tmpquery,
+                           function(x)
                              # extra handling of _id, which is not in json
-                             ifelse(x[1] == "\"_id\"", 
+                             ifelse(x[1] == "\"_id\"",
                                     # check _id column
                                     paste0(" _id ", x[2], " "),
                                     # check json column
                                     paste0(" (tt.key = ", x[1], " AND tt.value ", x[2], ") "))
-                         ))), 
-                     collapse = "OR \n")), 
+                         ))),
+                     collapse = "OR \n")),
             "") # ifelse empty query
         ), # paste0 OR operation
-        
+
         # "AND" operation
         paste0(
-          "FROM ", key, " \n",
+          "FROM \"", key, "\" \n",
           # FROM mtcars
           # WHERE _id IN
           # (
-          # SELECT _id 
+          # SELECT _id
           #   FROM  mtcars, json_tree (mtcars.json) AS tt
           #   WHERE (tt.key = 'cyl' AND tt.value = 4)
           # INTERSECT
-          #  SELECT _id 
+          #  SELECT _id
           #   FROM  mtcars, json_tree (mtcars.json) AS tt
           #   WHERE (tt.key = 'gear' AND tt.value >= 3)
-          # )      
+          # )
           ifelse( # check if query specified
             tmpquery != "",
-            paste0("WHERE _id IN (", 
+            paste0("WHERE _id IN (",
                    paste0(
                      paste0(
                        unname(
                          sapply(
-                           tmpquery, 
-                           function(x) 
-                             paste0("SELECT _id FROM ", key, 
+                           tmpquery,
+                           function(x)
+                             paste0("SELECT _id FROM \"", key, "\"",
                                     # extra handling of _id, which is not in json
-                                    ifelse(x[1] == "\"_id\"", 
+                                    ifelse(x[1] == "\"_id\"",
                                            # check _id column
                                            paste0(" AS tt WHERE tt._id ", x[2], " "),
                                            # check json column
-                                           paste0(", json_tree (", key, ".json) AS tt ", 
-                                                  "WHERE (tt.key = ", x[1], " AND 
+                                           paste0(", json_tree (\"", key, "\".json) AS tt ",
+                                                  "WHERE (tt.key = ", x[1], " AND
                                                    tt.value ", x[2], ") "))
                              ))
-                         )), 
+                         )),
                      collapse = "INTERSECT \n"),
-                    ")"), 
+                    ")"),
             "") # ifelse empty query
         )
       ), # ifelse OR or AND operation
       # close sql
       ";")
-  
+
   # minify statement
   statement <- gsub("[\n ]+", " ", statement)
-  
+
   # add limit if not in ...
   n <- -1L
   if (!is.null(tmpdots$limit)) n <- tmpdots$limit
-  
+
   ## do query
-  
+
   # temporary file for streaming
   tfname <- tempfile()
   dump <- file(description = tfname,
                encoding = "UTF-8")
-  
+
   # register to remove file
   # after used for streaming
   on.exit(unlink(tfname))
-  
+
   # get data, write to file in ndjson format
   cat(stats::na.omit(unlist(
     DBI::dbGetQuery(conn = src$con,
-                    statement = statement, 
+                    statement = statement,
                     n = n))
   ),
   sep = "\n", # ndjson
   file = dump)
-  
+
   # from jsonlite documentation:
-  # Because parsing huge JSON strings is difficult and inefficient, 
-  # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
+  # Because parsing huge JSON strings is difficult and inefficient,
+  # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson.
   jsonlite::stream_in(dump, verbose = FALSE)
 
 }
@@ -290,7 +290,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
 # column type escaping
 jsonEscape <- function(x, y) {
-  
+
   # parameters:
   # - x is a data frame created in docdb_query.src_sqlite
   #     with columns fullkey and type as per json_tree()
@@ -299,7 +299,7 @@ jsonEscape <- function(x, y) {
   # format field like fullkeys
   y <- paste0("$.", y)
   tmp <- unique(x$type[x$fullkey == y])
-  
+
   # sprintf("' \"%s\": %sjson_extract(%s.json, '$.%s')%s , ' ||",
   #              o[1]---|                     o[2] ---|
 
@@ -308,20 +308,20 @@ jsonEscape <- function(x, y) {
   # - numerics
   # - default
   o <- c("' || ", " || '")
-  
+
   # do escaping for:
   # - row names
   # - strings
-  if (y == "$._row" || 
+  if (y == "$._row" ||
       all(tmp == "text")) {
     o <- c("\"' || ", " || '\"")
   }
   # - arrays if mixed with other types in same key
-  if (length(tmp) >= 2 && 
+  if (length(tmp) >= 2 &&
       "array" %in% tmp) {
     o <- c("' || json_array(", ") || '")
   }
-  
+
   return(o)
 }
 
@@ -329,37 +329,37 @@ jsonEscape <- function(x, y) {
 # converst json string into
 # string with sql fields
 json2fieldsSql <- function(x) {
-  
+
   if (!jsonlite::validate(x)) stop("No json: ", x)
-  
+
   # empty query
   if (x == "{}") return("")
-  
+
   # minify to simplify
   x <- jsonlite::minify(x)
-  
+
   # find numeric 0's and 1's on right hand side
   p <- '["](.+?)["][ ]*:[ ]*["]?[01]["]?'
-  
+
   # construct regular expression
-  m <- gregexpr(pattern = p, 
+  m <- gregexpr(pattern = p,
                 text = x)
-  
+
   # produce matches
-  r <- regmatches(x = x, 
-                  m = m, 
+  r <- regmatches(x = x,
+                  m = m,
                   invert = FALSE)
-  
+
   # keep only 1's
   r <- unlist(r)
   r <- r[grepl("1$", r)]
-  
+
   # replace quotation marks
   x <- gsub('.*["](.+?)["].*', "\\1", r)
-  
+
   # return
   x
-  
+
 }
 # json2fieldsSql(x = '{"cut" : "1", "price": 1 }') # "cut" not returned because 1 is string
 # json2fieldsSql(x = '{"_id": 1, "annotation": 0, "other": 1}') # correctly specified numbers
@@ -369,27 +369,27 @@ json2fieldsSql <- function(x) {
 # convert json query string to
 # string as part of sql WHERE
 json2querySql <- function(x, con) {
-  
+
   if (!jsonlite::validate(x)) stop("No json: ", x)
-  
-  # replaces 
+
+  # replaces
   # - atomic expression { A : { $op :B } }
-  # - simple expressions 
+  # - simple expressions
 
   # standard operation
   op <- "AND"
-  
+
   # empty query
   if (x == "{}") {
     out <- ""
     attr(out, "op") <- op
     return(out)
   }
-  
+
   # minify to simplify
   x <- jsonlite::minify(x)
-  
-  # main logical operation for concatenated criteria: 
+
+  # main logical operation for concatenated criteria:
   # - implicit AND, when specifying a comma separated list of expressions
   # - check if "OR" operation is specified
   if (grepl(pattern = '^[{]"[$]or":', x = x)) {
@@ -398,26 +398,26 @@ json2querySql <- function(x, con) {
     x <- gsub(pattern = "][}]$", replacement = "", x = x)
     op <- "OR"
   }
-  
+
   # separate by commata, will later be concatenated using AND
   x <- unlist(strsplit(x = x, split = ","))
-  
+
   # get left hand side and remove special characters
   LHS <- sapply(strsplit(x = x, split = ":"), "[[", 1)
   LHS <- trimws(gsub("[{} ]", "", LHS))
-  
+
   # get right hand side, that is, operator and value
   x <- gsub(pattern = ".*?:(.*)", replacement = "\\1", x = x)
-  
+
   # remote brackets, blanks and quotation marks around operator
   x <- gsub(pattern = "[{}]", replacement = "", x = x)
   x <- gsub(pattern = "[ ]+:[ ]+", replacement = ":", x = x)
   x <- gsub(pattern = "\"([$][a-z]+)\"[ ]*:", replacement = "\\1:", x = x)
   x <- trimws(x)
-  
+
   # special case where no operator, only term
   x <- ifelse(grepl("[:$]", x), x, paste0(" = ", x))
-  
+
   # replace json operators with sql operators
   # https://docs.mongodb.com/manual/reference/operator/query/
   # https://sqlite.org/lang_expr.html#booleanexpr
@@ -427,26 +427,26 @@ json2querySql <- function(x, con) {
   x <- gsub(pattern = "[$]lt:", replacement = "< ", x = x)
   x <- gsub(pattern = "[$]lte:", replacement = "<= ", x = x)
   x <- gsub(pattern = "[$]ne:", replacement = "!= ", x = x)
-  
+
   # special case
   # https://docs.mongodb.com/manual/reference/operator/query/regex/#pcre-vs-javascript
-  x <- gsub(pattern = "[$]regex:", 
-            replacement = ifelse(attr(x = con, which = "regexp.extension"), 
-                                 "REGEXP ", "LIKE "), 
+  x <- gsub(pattern = "[$]regex:",
+            replacement = ifelse(attr(x = con, which = "regexp.extension"),
+                                 "REGEXP ", "LIKE "),
             x = x)
 
   # make right hand side
   RHS <- x
-  
+
   # concatenate for return
   out <- lapply(seq_along(LHS), function(x) c(LHS[x], RHS[x]))
-  
+
   # add logical operation
   attr(out, "op") <- op
-  
+
   # return
   return(out)
-  
+
 }
 # json2querySql(x = '{"cut" : "Premium", "price" : { "$lt" : 1000 }, "_id": {"$ne": 4}, "_row": {"$regex": "Merc"} }')
 # json2querySql(x = '{ "$or": [ { "gear": { "$lt": 5 } }, { "cyl": 6 } ] }')
