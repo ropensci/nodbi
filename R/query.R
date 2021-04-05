@@ -24,10 +24,10 @@
 #' help with searches
 #' - SQLite: `fields`, an optional json string of fields to be
 #' returned from anywhere in the tree.
-#' Parameter `query`, a json string In analogy to MongoDB,
-#' a comma separated list of expressions provides an implicit
-#' AND operation. Nested or otherwise complex queries are not
-#' yet supported.
+#' Parameter `query`, a JSON string; supported at the moment:
+#' one level of $or or $and operators with
+#' $eq, $gt, $gte, $lt, $lte, $ne and $regex as tests.
+#'
 #'
 #' @section Not supported yet:
 #'
@@ -74,7 +74,7 @@ docdb_query <- function(src, key, query, ...){
 
 #' @export
 docdb_query.default <- function(src, key, query, ...) {
-  stop("docdb_query supported for CouchDB, Elasticsearch & MongoDB")
+  stop("docdb_query supported for CouchDB, Elasticsearch, MongoDB & SQLite (partially)")
 }
 
 #' @export
