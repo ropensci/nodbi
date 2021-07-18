@@ -39,10 +39,10 @@ parameter, but if you want to do complicated Elasticsearch queries
 you may be better of using \pkg{elastic} package directly
 \item MongoDB: query parameters, see \pkg{mongolite} docs for
 help with searches
-\item SQLite: \code{fields}, an optional json string of fields to be
-returned from anywhere in the tree.
-Parameter \code{query}, a JSON string; supported at the moment:
-one level of $or or $and operators with
+\item SQLite: \code{fields}, an optional JSON string of fields to be
+returned from anywhere in the tree (in dot paths notation).
+Parameter \code{query}, a JSON string; supported at the moment
+is only one level of $or or $and operators with
 $eq, $gt, $gte, $lt, $lte, $ne and $regex as tests.
 }
 }
