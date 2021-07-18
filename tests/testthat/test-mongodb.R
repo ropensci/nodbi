@@ -21,7 +21,7 @@ test_that("db into mongo", {
 
   iris$Species <- as.character(iris$Species)
   docdb_create(con, "iris", iris)
-  d2 <- docdb_get(con, "iris")[, -1]
+  d2 <- docdb_get(con, "iris")#[, -1]
   # FIXME: skipping for now, for some reason this is now failing, not sure why
   ## seems like just data.frame names are different, where mongo
   ## replaces dots with underscores

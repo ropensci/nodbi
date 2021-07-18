@@ -91,12 +91,25 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
     message("Parameter 'key' is different from parameter 'collection', ",
             "was given as ", src$collection, " in src_mongo().")
 
-  # FIXME: or use $find() here? not if doing a separate query method
-  if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
-  dump <- tempfile()
-  src$con$export(file(dump))
-  # remove first column, a mongodb identifier
-  jsonlite::stream_in(file(dump), verbose = FALSE) # [,-1]
+  # set limit if null
+  if (is.null(limit)) limit <- 0L
+
+  # get data. note: find() does not include _id
+  src$con$find(limit = limit, ...)
+
+  # # note: not using find() since this does not include _id
+  # # FIXME: or use $find() here? not if doing a separate query method
+  # # if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
+  # dump <- tempfile()
+  #
+  # # register to remove file
+  # # after used for streaming
+  # on.exit(unlink(dump))
+  #
+  # # save data
+  # src$con$export(file(dump))
+  # # remove first column, a MongoDB identifier
+  # jsonlite::stream_in(file(dump), verbose = FALSE) # [,-1]
 }
 
 #' @export
@@ -108,8 +121,8 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   # arguments for call
   statement <- paste0(
     # _id is included into json for use with jsonlite::stream_in
-    "SELECT '{\"_id\": \"' || _id || '\", ' || substr(json, 2) ",
-    "FROM \"", key, "\" ;")
+    # "SELECT '{\"_id\": \"' || _id || '\", ' || substr(json, 2) ",
+    "SELECT '{' || substr(json, 2) FROM \"", key, "\" ;")
 
   # set limit if not null
   n <- -1L
