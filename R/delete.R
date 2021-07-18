@@ -1,10 +1,13 @@
-#' Delete documents
+#' Delete documents or collections
 #'
 #' @export
 #' @param src source object, result of call to src, an
 #' object of class `docdb_src`
-#' @param key (character) A key (collection for mongo)
-#' @param ... Ignored for now
+#' @param key (character) A key (collection for MongoDB
+#' and RSQLite)
+#' @param ... For MongoDB and RSQLite: Can include
+#' a query for documents to delete, without query
+#' deletes collection
 #' @template deets
 #' @examples \dontrun{
 #' # couchdb
