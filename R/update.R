@@ -62,7 +62,7 @@ docdb_update <- function(src, key, value, ...) {
 
 #' @export
 docdb_update.src_couchdb <- function(src, key, value, ...) {
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
   if (!key %in% attr(src, "dbs")) sofa::db_create(src[[1]], dbname = key)
   sofa::db_bulk_update(src[[1]], dbname = key, doc = value, ...)
 }
@@ -86,7 +86,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   #   in the document to update, and will be replaced with non-NA values
   #   in the dataframe for the respective document)
 
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
 
   # Get ellipsis
   dotparams <- list(...)
@@ -113,8 +113,8 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
     # use FIRST for query and remove it
     if (ncol(value) >= 2L) {
       quoting <- ifelse(class(value[, 1]) == "character", "\"", "")
-      query <- paste0('{"', names(value)[1], '":{"$eq":', quoting, value[, 1, drop = TRUE], quoting, '}}')
-      query <- paste0('{"', names(value)[1], '":', quoting, value[, 1, drop = TRUE], quoting, '}')
+      query <- paste0('{"', names(value)[1], '":{"$eq":', quoting, value[, 1, drop = TRUE], quoting, "}}")
+      query <- paste0('{"', names(value)[1], '":', quoting, value[, 1, drop = TRUE], quoting, "}")
       value <- value[, -1, drop = FALSE]
     }
   }
@@ -138,7 +138,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
                 x = value)
 
   # - Turn into json set
-  value <- paste0('{"$set":', value, '}')
+  value <- paste0('{"$set":', value, "}")
 
   # - To update, iterate over json set vector
   nrowaffected <-
@@ -168,7 +168,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
 docdb_update.src_sqlite <- function(src, key, value, ...) {
 
   assert(key, "character")
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
 
   # If table does not exist, create empty table
   if (!docdb_exists(src = src, key = key)) {
@@ -314,17 +314,17 @@ valueEscape <- function(x) {
 
          # - character: '"stringvalue"'
          "character" = ifelse(test = grepl("^[{].*[}]$", trimws(x)),
-                              yes = paste0('\'', x, '\''),
-                              no = paste0('\'\"', x, '\"\'')),
+                              yes = paste0("\'", x, "\'"),
+                              no = paste0("\'\"", x, "\"\'")),
 
          # - list e.g.: '{"a": "something", "b": 2}'
-         "list" = paste0('\'', jsonlite::toJSON(x), '\''),
+         "list" = paste0("\'", jsonlite::toJSON(x), "\'"),
 
          # - no quotation for integers, real
          "numeric" = paste0(x),
 
          # - default, all others: 'value'
-         paste0('\'', x, '\'')
+         paste0("\'", x, "\'")
   )
 
 }

@@ -63,4 +63,5 @@ dbWithTransaction <- function(conn, statement) {
   error = rollback,
   interrupt = rollback
   )
+
 }

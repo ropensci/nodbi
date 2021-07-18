@@ -22,7 +22,7 @@ src_redis <- function(...) {
 #' @export
 print.src_redis <- function(x, ...) {
   config <- x$con$config()
-  keys <- grep("feature:", unlist(x$con$KEYS("*")), 
+  keys <- grep("feature:", unlist(x$con$KEYS("*")),
     value = TRUE, invert = TRUE)
   cat(sprintf("src: %s %s [%s:%d]\n",
               x$type, x$version, config$host, config$port))

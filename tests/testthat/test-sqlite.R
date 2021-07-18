@@ -102,7 +102,7 @@ test_that("query in sqlite works", {
   # test if _id only works
   expect_equal(nrow(docdb_query(
     src = con, key = "mt-cars",
-    query = '{}',
+    query = "{}",
     fields = '{"_id": 1}')), 32L)
 
   # test if _id only works
@@ -150,13 +150,13 @@ test_that("query in sqlite works", {
       docdb_query(
         con, "mt-cars",
         fields = paste0(
-          '{',
+          "{",
           paste0(
             '"',
             tmpfs,
             collapse = '": 1, '),
           '": 1}',
-          collapse = ''
+          collapse = ""
         ),
         query = "{}")), c(5L, length(tmpfs) + 1L)) # + 1L for _id column
 
@@ -195,9 +195,10 @@ test_that("query in sqlite works", {
 
   # test content of a single cell
   expect_equal(
-    docdb_query(con, "mt-cars",
-                fields = '{"age": 1, "friends.name": 1}',
-                query = '{"$and": {"eyeColor": "green", "age": {"$lt": 25}}}')[["friends.name"]],
+    docdb_query(
+      con, "mt-cars",
+      fields = '{"age": 1, "friends.name": 1}',
+      query = '{"$and": {"eyeColor": "green", "age": {"$lt": 25}}}')[["friends.name"]],
     list(c("Wooten Goodwin", "Brandie Woodward", "Angelique Britt")))
 
   # test atomic content of cell

@@ -72,18 +72,19 @@
 #' docdb_query(src, "mapdata", fields = '{"rows.elements.\\\\S+.text": 1}', query = '{}')
 #' docdb_query(src, "mapdata", fields = '{"rows.elements.*somevalue": 1}', query = '{}')
 #' }
-docdb_query <- function(src, key, query, ...){
+docdb_query <- function(src, key, query, ...) {
   UseMethod("docdb_query")
 }
 
 #' @export
 docdb_query.default <- function(src, key, query, ...) {
-  stop("docdb_query supported for CouchDB, Elasticsearch, MongoDB & SQLite (partially)")
+  stop("docdb_query supported for CouchDB, Elasticsearch, ",
+       "MongoDB & SQLite (partially)")
 }
 
 #' @export
 docdb_query.src_couchdb <- function(src, key, query, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   dropmeta(makedf(
     sofa::db_query(src$con, dbname = key,
                    selector = query, limit = 10, ...)$docs))
@@ -91,7 +92,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 
 #' @export
 docdb_query.src_elastic <- function(src, key, query, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   ids <- pluck(elastic::Search(src$con, key, q = query, source = FALSE,
                                size = 10, ...)$hits$hits, "_id", "")
   if (length(ids) == 0) return(data.frame(NULL))
@@ -160,7 +161,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   fields <- fields[fields != ""]
 
   ## special case: early return
-  if (!length(fields) && query == '{}') {
+  if (!length(fields) && query == "{}") {
     statement <- paste0(
       "  SELECT DISTINCT _id",
       "  FROM \"", key, "\"")
@@ -282,7 +283,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   out$fullkey <- gsub("[.][0-9]+[.]", ".", out$fullkey)
 
   # store type and fullkey
-  typing <- stats::na.omit(unique(out[ , c("fullkey", "type")]))
+  typing <- stats::na.omit(unique(out[, c("fullkey", "type")]))
 
   # handle situation when for same mangled fullkey,
   # there is more than one type, e.g. array and object:
@@ -582,4 +583,3 @@ trans2df <- function(clmn) {
       }
     }, USE.NAMES = TRUE, simplify = TRUE)
 }
-

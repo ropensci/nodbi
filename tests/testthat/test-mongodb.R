@@ -21,7 +21,7 @@ test_that("db into mongo", {
 
   iris$Species <- as.character(iris$Species)
   docdb_create(con, "iris", iris)
-  d2 <- docdb_get(con, "iris")[,-1]
+  d2 <- docdb_get(con, "iris")[, -1]
   # FIXME: skipping for now, for some reason this is now failing, not sure why
   ## seems like just data.frame names are different, where mongo
   ## replaces dots with underscores
@@ -31,7 +31,6 @@ test_that("db into mongo", {
 
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
-  # docdb_create(con, "iris", value = data.frame(contacts, stringsAsFactors = FALSE))
 
   # clean up
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
@@ -64,13 +63,13 @@ test_that("exists in mongo works", {
   skip_on_cran()
 
   skip_if_no_mongo()
-  con <- src_mongo(collection = "thisnameshouldnotexistatallever")
-  expect_false(docdb_exists(con, "thisnameshouldnotexistatallever2"))
+  con <- src_mongo(collection = "doesnotexist")
+  expect_false(docdb_exists(con, "doesnotexist2"))
 
-  docdb_create(con, "thisnameshouldnotexistatallever", iris)
-  expect_true(docdb_exists(con, key = "thisnameshouldnotexistatallever"))
+  docdb_create(con, "doesnotexist", iris)
+  expect_true(docdb_exists(con, key = "doesnotexist"))
   # clean up
-  invisible(tryCatch(docdb_delete(con, "thisnameshouldnotexistatallever"), error = function(e) e))
+  invisible(tryCatch(docdb_delete(con, "doesnotexist"), error = function(e) e))
 })
 
 context("mongodb: query")

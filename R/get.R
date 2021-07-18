@@ -51,21 +51,22 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars", limit = 4L)
 #' }
-docdb_get <- function(src, key, limit = NULL, ...){
+docdb_get <- function(src, key, limit = NULL, ...) {
   UseMethod("docdb_get")
 }
 
 #' @export
 docdb_get.src_couchdb <- function(src, key, limit = NULL, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   dropmeta(makedf(
-    pluck(sofa::db_alldocs(src$con, dbname = key,
-                           include_docs = TRUE, limit = limit, ...)$rows, "doc")))
+    pluck(sofa::db_alldocs(
+      src$con, dbname = key,
+      include_docs = TRUE, limit = limit, ...)$rows, "doc")))
 }
 
 #' @export
-docdb_get.src_elastic <- function(src, key, limit = NULL, ...){
-  assert(key, 'character')
+docdb_get.src_elastic <- function(src, key, limit = NULL, ...) {
+  assert(key, "character")
   ids <- pluck(elastic::Search(src$con, key, source = FALSE,
                                size = limit, ...)$hits$hits, "_id", "")
   tmp <- elastic::docs_mget(src$con, index = key, type = key, ids = ids,
@@ -75,7 +76,7 @@ docdb_get.src_elastic <- function(src, key, limit = NULL, ...){
 
 #' @export
 docdb_get.src_redis <- function(src, key, limit = NULL, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   res <- src$con$GET(key)
   if (is.null(res)) stop("no matching result found")
   redux::string_to_object(res)

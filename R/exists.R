@@ -46,7 +46,7 @@ docdb_exists <- function(src, key, ...) {
 
 #' @export
 docdb_exists.src_couchdb <- function(src, key, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   tmp <- tryCatch(sofa::db_info(src$con, dbname = key, ...),
     error = function(e) e)
   !inherits(tmp, "error")
@@ -54,19 +54,19 @@ docdb_exists.src_couchdb <- function(src, key, ...) {
 
 #' @export
 docdb_exists.src_elastic <- function(src, key, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   elastic::index_exists(src$con, key, ...)
 }
 
 #' @export
 docdb_exists.src_redis <- function(src, key, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   switch(as.character(src$con$EXISTS(key)), "1" = TRUE, "0" = FALSE)
 }
 
 #' @export
 docdb_exists.src_mongo <- function(src, key, ...) {
-  assert(key, 'character')
+  assert(key, "character")
 
   # need to connect to check collection key
   test <- src_mongo(collection = key,
@@ -92,6 +92,6 @@ docdb_exists.src_mongo <- function(src, key, ...) {
 
 #' @export
 docdb_exists.src_sqlite <- function(src, key, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   any(key == DBI::dbListTables(src$con))
 }

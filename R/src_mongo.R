@@ -16,7 +16,10 @@ src_mongo <- function(collection = "test", db = "test",
                       url = "mongodb://localhost", ...) {
 
   con <- mongolite::mongo(collection, db, url, ...)
-  structure(list(con = con, collection = collection, db = db, url = url), class = c("src_mongo", "docdb_src"))
+  structure(list(con = con,
+                 collection = collection,
+                 db = db, url = url),
+            class = c("src_mongo", "docdb_src"))
 }
 
 #' @export

@@ -49,7 +49,7 @@ docdb_create <- function(src, key, value, ...) {
 
 #' @export
 docdb_create.src_couchdb <- function(src, key, value, ...) {
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
   trycr <- tryCatch(sofa::db_create(src$con, dbname = key),
                     error = function(e) e)
   invisible(sofa::db_bulk_create(src$con, dbname = key, doc = value, ...))
@@ -57,21 +57,21 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
 #' @export
 docdb_create.src_elastic <- function(src, key, value, ...) {
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
   elastic::index_create(src$con, index = key, verbose = FALSE)
   invisible(elastic::docs_bulk(src$con, value, index = key))
 }
 
 #' @export
 docdb_create.src_redis <- function(src, key, value, ...) {
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
   src$con$SET(key, redux::object_to_string(value), ...)
 }
 
 #' @export
 docdb_create.src_mongo <- function(src, key, value, ...) {
 
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
 
   # check expectations
   if (exists("key", inherits = FALSE) &&
@@ -127,7 +127,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
 
         # if not in square brackets, add them
         if (!grepl("^\\[.*\\]$", value[i, valcol]))
-          value[i, -idcol] <- paste0('[', value[i, valcol], ']')
+          value[i, -idcol] <- paste0("[", value[i, valcol], "]")
 
         # splice value element into json elements
         subvalue <- jsonlite::fromJSON(value[i, valcol], simplifyVector = FALSE)
@@ -231,7 +231,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
           # if not in square brackets, add them
           if (!grepl("^\\[.*\\]$", tmp)) {
-            tmp <- paste0('[', tmp, ']')
+            tmp <- paste0("[", tmp, "]")
           }
 
           # remove _ids
