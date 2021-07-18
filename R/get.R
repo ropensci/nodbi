@@ -5,16 +5,16 @@
 #' @param src source object, result of call to src
 #' @param key (character) A key (collection for mongo)
 #' @param limit (integer) number of records/rows to return. by default
-#' not passed, so you get all results. Only works for CouchDB, 
+#' not passed, so you get all results. Only works for CouchDB,
 #' Elasticsearch and MongoDB; ignored for others
 #' @param ... passed on to functions:
-#' 
+#'
 #' - CouchDB: passed to [sofa::db_alldocs()]
 #' - Elasticsearch: passed to [elastic::Search()]
 #' - Redis: ignored
 #' - MongoDB: ignored
 #' - SQLite: ignored
-#' 
+#'
 #' @template deets
 #' @examples \dontrun{
 #' # CouchDB
@@ -44,7 +44,7 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars")
 #' docdb_get(src, "mtcars", limit = 4)
-#' 
+#'
 #' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, "mtcars", mtcars)
@@ -83,13 +83,13 @@ docdb_get.src_redis <- function(src, key, limit = NULL, ...) {
 
 #' @export
 docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
-  
+
   # check expectations
-  if (exists("key", inherits = FALSE) && 
-      src$collection != key) 
+  if (exists("key", inherits = FALSE) &&
+      src$collection != key)
     message("Parameter 'key' is different from parameter 'collection', ",
             "was given as ", src$collection, " in src_mongo().")
-  
+
   # FIXME: or use $find() here? not if doing a separate query method
   if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
   dump <- tempfile()
@@ -100,41 +100,41 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
 
 #' @export
 docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
-  
+
   assert(key, "character")
   assert(limit, "integer")
-  
+
   # arguments for call
   statement <- paste0(
     # _id is included into json for use with jsonlite::stream_in
-    "SELECT '{\"_id\": \"' || _id || '\", ' || substr(json, 2) ", 
-    "FROM ", key, " ;")
-  
+    "SELECT '{\"_id\": \"' || _id || '\", ' || substr(json, 2) ",
+    "FROM \"", key, "\" ;")
+
   # set limit if not null
   n <- -1L
   if (!is.null(limit)) n <- limit
-  
+
   # temporary file for streaming
   tfname <- tempfile()
   dump <- file(description = tfname,
                encoding = "UTF-8")
-  
+
   # register to remove file
   # after used for streaming
   on.exit(unlink(tfname))
-  
+
   # get data, write to file in ndjson format
   cat(stats::na.omit(unlist(
     DBI::dbGetQuery(conn = src$con,
-                    statement = statement, 
+                    statement = statement,
                     n = n))
   ),
   sep = "\n", # ndjson
   file = dump)
-  
+
   # from jsonlite documentation:
-  # Because parsing huge JSON strings is difficult and inefficient, 
-  # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson. 
+  # Because parsing huge JSON strings is difficult and inefficient,
+  # JSON streaming is done using lines of minified JSON records, a.k.a. ndjson.
   jsonlite::stream_in(dump, verbose = FALSE)
 
 }

@@ -32,7 +32,7 @@
 #' docdb_create(src, "iris", iris)
 #' docdb_get(src, "iris")
 #' docdb_delete(src, "iris")
-#' 
+#'
 #' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, "iris", iris)
@@ -63,30 +63,30 @@ docdb_delete.src_redis <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_mongo <- function(src, key, ...) {
-  
+
   # check expectations
-  if (exists("key", inherits = FALSE) && 
-      src$collection != key) 
+  if (exists("key", inherits = FALSE) &&
+      src$collection != key)
     message("Parameter 'key' is different from parameter 'collection', ",
             "was given as ", src$collection, " in src_mongo().")
-  
+
   # https://docs.mongodb.com/manual/tutorial/remove-documents/
   # https://jeroen.github.io/mongolite/manipulate-data.html#remove
-  
+
   # make dotted parameters accessible
   tmpdots <- list(...)
-  
-  # if valid json, try to delete 
+
+  # if valid json, try to delete
   # document(s) instead of collection
-  if (!is.null(tmpdots$query) && 
+  if (!is.null(tmpdots$query) &&
       jsonlite::validate(tmpdots$query)) {
-    
+
     # delete document
-    src$con$remove(query = tmpdots$query, 
+    src$con$remove(query = tmpdots$query,
                    just_one = FALSE)
-    
+
   } else {
-    
+
     # delete collection
     src$con$drop()
 
@@ -96,33 +96,33 @@ docdb_delete.src_mongo <- function(src, key, ...) {
 #' @export
 docdb_delete.src_sqlite <- function(src, key, ...) {
   assert(key, 'character')
-  
+
   # make dotted parameters accessible
   tmpdots <- list(...)
-  
+
   # if valid query, delete document(s), not table
-  if (!is.null(tmpdots$query) && 
+  if (!is.null(tmpdots$query) &&
       jsonlite::validate(tmpdots$query)) {
-    
+
     # get _id's of document to be deleted
-    tmpids <- docdb_query(src = src, 
-                          key = key, 
-                          query = tmpdots$query, 
+    tmpids <- docdb_query(src = src,
+                          key = key,
+                          query = tmpdots$query,
                           fields = '{"_id": 1}')[["_id"]]
-    
+
     # create delete
-    statement <- paste0("DELETE FROM ", key, " WHERE _id IN (", 
+    statement <- paste0("DELETE FROM \"", key, "\" WHERE _id IN (",
                         paste0('"', tmpids, '"', collapse = ','), ");")
 
     # do delete
     DBI::dbExecute(conn = src$con,
                    statement = statement)
-    
+
   } else {
-    
+
     # remove table
-    DBI::dbRemoveTable(conn = src$con, 
+    DBI::dbRemoveTable(conn = src$con,
                        name = key)
-    
+
   }
 }
