@@ -9,9 +9,14 @@ docdb_update(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(character) A key (collection for mongo)}
+\item{key}{(character) A key (collection for MongoDB and
+RSQLite)}
 
-\item{value}{(data.frame) A single data.frame}
+\item{value}{(data.frame) A single data.frame. For
+MongoDB and RSQLite, its first column identifies the
+documents to be updated by means of the name of the
+column and the value(s) in the respective row(s),
+see examples.}
 
 \item{...}{Ignored}
 }
@@ -54,7 +59,7 @@ docdb_create(src, "mtcars", mtcars)
 dfupd <- data.frame("cyl" = c(4, 6),
                     "gear" = c(88, 99),
                     stringsAsFactors = FALSE)
-docdb_update(src, "mtcars", dfupd)
+(docdb_update(src, "mtcars", dfupd))
 docdb_query(src, "mtcars",
             query = '{"gear": {"$gte": 88}}',
             fields = '{"gear": 1, "cyl": 1}')
@@ -62,7 +67,7 @@ dfupd <- data.frame("cyl" = c(8, 6),
                     "somejson" = c('{"gear": 77, "carb": 55}',
                                    '{"gear": 66, "newvar": 55}'),
                     stringsAsFactors = FALSE)
-docdb_update(src, "mtcars", dfupd)
+(docdb_update(src, "mtcars", dfupd))
 docdb_query(src, "mtcars",
             query = '{"gear": {"$eq": 66}}',
             fields = '{"gear": 1, "cyl": 1, "carb": 1, "newvar": 1}')

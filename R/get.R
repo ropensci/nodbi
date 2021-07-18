@@ -4,9 +4,10 @@
 #' @import data.table jsonlite
 #' @param src source object, result of call to src
 #' @param key (character) A key (collection for mongo)
-#' @param limit (integer) number of records/rows to return. by default
-#' not passed, so you get all results. Only works for CouchDB,
-#' Elasticsearch and MongoDB; ignored for others
+#' @param limit (integer) number of records/rows to return.
+#' By default not passed, so you get all results.
+#' Only works for CouchDB, Elasticsearch, MongoDB and
+#' RSQLite; ignored for others
 #' @param ... passed on to functions:
 #'
 #' - CouchDB: passed to [sofa::db_alldocs()]
@@ -48,7 +49,6 @@
 #' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, "mtcars", mtcars)
-#' docdb_get(src, "mtcars")
 #' docdb_get(src, "mtcars", limit = 4L)
 #' }
 docdb_get <- function(src, key, limit = NULL, ...){

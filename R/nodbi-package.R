@@ -224,3 +224,143 @@ contacts <- '
   }
 ]
 '
+
+
+#' mapdata
+#'
+#' @format A json string with ragged, nested map
+#' @name mapdata
+#' @docType data
+#' @keywords data
+#' @export
+#'
+mapdata <- '
+  [{"_id": "first_id",
+  "destination_addresses": [
+    "Miami, FL, USA",
+    "Austin, TX, USA",
+    "Napa County, CA, USA"
+  ],
+  "origin_addresses": [
+    "Santa Barbara, CA, USA",
+    "New York, NY, USA"
+  ],
+  "rows": [{
+    "elements": [{
+        "distance": {
+          "text": "227 mi",
+          "somevalue": 365468
+        },
+        "duration": {
+          "text": "3 hours 54 mins",
+          "somevalue": 14064
+        },
+        "status": "OK"
+      },
+      {
+        "distance": {
+          "text": "2,878 mi",
+          "somevalue": 4632197
+        },
+        "duration": {
+          "text": "1 day 18 hours",
+          "somevalue": 151772
+        },
+        "status": "OK"
+      },
+      {
+        "distance": {
+          "text": "1,286 mi",
+          "somevalue": 2069031
+        },
+        "duration": {
+          "text": "18 hours 43 mins",
+          "somevalue": 67405
+        },
+        "status": "OK"
+      },
+      {
+        "distance": {
+          "text": "2,871 mi",
+          "somevalue": 4620514
+        },
+        "duration": {
+          "text": "1 day 18 hours",
+          "somevalue": 152913
+        },
+        "status": "OK"
+      }
+    ]
+  }],
+  "status": "OK"},
+
+  {"_id": "second_id",
+  "destination_addresses": [
+    "Washington, DC, USA",
+    "Philadelphia, PA, USA",
+    "Napa County, CA, USA"
+  ],
+  "origin_addresses": [
+    "New York, NY, USA"
+  ],
+  "rows": [{
+    "elements": [{
+        "distance": {
+          "text": "227 mi",
+          "somevalue": 365468
+        },
+        "duration": {
+          "text": "3 hours 54 mins",
+          "somevalue": 14064
+        },
+        "status": "OK"
+      },
+      {
+        "distance": {
+          "text": "2,878 mi",
+          "somevalue": 4632197
+        },
+        "duration": {
+          "text": "1 day 18 hours",
+          "somevalue": 151772
+        },
+        "status": "OK"
+      },
+      {
+        "distance": {
+          "text": "1,286 mi",
+          "somevalue": 2069031
+        },
+        "duration": {
+          "text": "18 hours 43 mins",
+          "somevalue": 67405
+        },
+        "status": "OK"
+      },
+      {
+        "distance": {
+          "text": "1,742 mi",
+          "somevalue": 2802972
+        },
+        "duration": {
+          "text": "1 day 2 hours",
+          "somevalue": 93070
+        },
+        "status": "OK"
+      },
+      {
+        "duration": {
+          "text": "2,871 mi",
+          "somevalue": 4620514
+        },
+        "duration": {
+          "text": "1 day 18 hours",
+          "somevalue": 152913
+        },
+        "status": "OK"
+      }
+    ]
+  }],
+  "status": "OK"}
+  ]
+'

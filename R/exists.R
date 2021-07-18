@@ -27,27 +27,27 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_exists(src, "mtcars")
 #' docdb_exists(src, "asdfasf")
-#' 
+#'
 #' # MongoDB
 #' src <- src_mongo(collection = "mtcars")
 #' docdb_create(src, key = "mtcars", value = mtcars)
 #' docdb_exists(src, "mtcars")
-#' 
+#'
 #' # SQLite
-#' (src <- src_sqlite())
+#' src <- src_sqlite()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_exists(src, "mtcars")
-#' docdb_exists(src, "yellowcheese")
+#' docdb_exists(src, "nonExistingCollection")
 #' }
-#' 
-docdb_exists <- function(src, key, ...){
+#'
+docdb_exists <- function(src, key, ...) {
   UseMethod("docdb_exists")
 }
 
 #' @export
 docdb_exists.src_couchdb <- function(src, key, ...) {
   assert(key, 'character')
-  tmp <- tryCatch(sofa::db_info(src$con, dbname = key, ...), 
+  tmp <- tryCatch(sofa::db_info(src$con, dbname = key, ...),
     error = function(e) e)
   !inherits(tmp, "error")
 }

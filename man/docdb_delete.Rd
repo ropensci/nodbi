@@ -2,7 +2,7 @@
 % Please edit documentation in R/delete.R
 \name{docdb_delete}
 \alias{docdb_delete}
-\title{Delete documents}
+\title{Delete documents or collections}
 \usage{
 docdb_delete(src, key, ...)
 }
@@ -10,12 +10,15 @@ docdb_delete(src, key, ...)
 \item{src}{source object, result of call to src, an
 object of class \code{docdb_src}}
 
-\item{key}{(character) A key (collection for mongo)}
+\item{key}{(character) A key (collection for MongoDB
+and RSQLite)}
 
-\item{...}{Ignored for now}
+\item{...}{For MongoDB and RSQLite: Can include
+a query for documents to delete, without query
+deletes collection}
 }
 \description{
-Delete documents
+Delete documents or collections
 }
 \details{
 Note that with etcd, you have to prefix a key with a
@@ -52,7 +55,7 @@ docdb_delete(src, "iris")
 # SQLite
 src <- src_sqlite()
 docdb_create(src, "iris", iris)
-docdb_get(src, "iris")
-docdb_delete(src, "iris")
+(docdb_delete(src, "iris", query = '{"Species": {"$regex": "a$"}}'))
+(docdb_delete(src, "iris"))
 }
 }
