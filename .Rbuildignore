@@ -10,5 +10,8 @@ man-roxygen
 ^cran-comments\.md$
 ^codemeta\.json$
 ^\.github$
+^check$
 ^revdep$
 ^LICENSE\.md$
+^private$
+.DS_Store

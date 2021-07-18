@@ -61,7 +61,7 @@ NULL
 #' @docType data
 #' @keywords data
 #' @export
-#' 
+#'
 contacts <- '
 [
   {
@@ -72,7 +72,7 @@ contacts <- '
     "eyeColor": "green",
     "name": "Lacy Chen",
     "email": "lacychen@conjurica.com",
-    "about": "Sunt consequat ad dolore irure mollit aliquip labore aute. Exercitation nisi nisi reprehenderit.",
+    "about": "Sunt consequat ad dolore. Exercitation nisi reprehenderit.",
     "registered": "2014-08-03T12:11:54 -02:00",
     "tags": [
       "nulla",
@@ -106,7 +106,7 @@ contacts <- '
     "eyeColor": "brown",
     "name": "Rae Colon",
     "email": "raecolon@conjurica.com",
-    "about": "Nisi excepteur duis duis aliquip qui occaecat exercitation id consequat consequat.",
+    "about": "Nisi excepteur duis duis aliquip qui id consequat consequat.",
     "registered": "2018-12-19T06:23:35 -01:00",
     "tags": [
       "nostrud",
@@ -136,7 +136,7 @@ contacts <- '
     "eyeColor": "brown",
     "name": "Williamson French",
     "email": "williamsonfrench@conjurica.com",
-    "about": "Nulla do sunt magna consectetur officia. Laboris pariatur minim exercitation incididunt.",
+    "about": "Nulla do sunt consectetur officia. Laboris pariatur incididunt.",
     "registered": "2018-02-14T10:59:57 -01:00",
     "tags": [
       "exercitation",
@@ -170,7 +170,7 @@ contacts <- '
     "eyeColor": "brown",
     "name": "Pace Bell",
     "email": "pacebell@conjurica.com",
-    "about": "Eiusmod sunt Lorem voluptate laborum ipsum do cupidatat qui id dolore do.",
+    "about": "Eiusmod sunt laborum ipsum do cupidatat qui id dolore do.",
     "registered": "2018-08-17T12:23:42 -02:00",
     "tags": [
       "aliqua",
@@ -204,7 +204,7 @@ contacts <- '
     "eyeColor": "blue",
     "name": "Krista Baxter",
     "email": "kristabaxter@conjurica.com",
-    "about": "Sint quis nulla ea fugiat nisi velit eu reprehenderit nulla esse. Commodo nisi qui elit laborum eu sit.",
+    "about": "Sint quis nulla ea fugiat. Commodo nisi qui eu sit.",
     "registered": "2017-07-19T05:03:47 -02:00",
     "tags": [
       "sit",

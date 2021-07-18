@@ -1,5 +1,5 @@
 #' @export
-docdb_create.src_riak <- function(src, key, value, ...){
+docdb_create.src_riak <- function(src, key, value, ...) {
   stopifnot(is.data.frame(value))
   stopifnot(length(attr(src, "dbs")) == 1)
   src$con$create(bucket = attr(src, "dbs"), key = key,

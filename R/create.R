@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param src source object, result of call to an [src] function
-#' @param key (character) A key (collection for mongo)
+#' @param key (character) A key (collection for MongoDB)
 #' @param value (data.frame) A single data.frame
 #' @param ... Ignored
 #' @template deets
@@ -43,35 +43,35 @@
 #' docdb_create(src, key = "contacts", value = contacts_df)
 #' docdb_get(src, "contacts")[["friends"]]
 #' }
-docdb_create <- function(src, key, value, ...){
+docdb_create <- function(src, key, value, ...) {
   UseMethod("docdb_create")
 }
 
 #' @export
 docdb_create.src_couchdb <- function(src, key, value, ...) {
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
   trycr <- tryCatch(sofa::db_create(src$con, dbname = key),
                     error = function(e) e)
   invisible(sofa::db_bulk_create(src$con, dbname = key, doc = value, ...))
 }
 
 #' @export
-docdb_create.src_elastic <- function(src, key, value, ...){
-  assert(value, 'data.frame')
+docdb_create.src_elastic <- function(src, key, value, ...) {
+  assert(value, "data.frame")
   elastic::index_create(src$con, index = key, verbose = FALSE)
   invisible(elastic::docs_bulk(src$con, value, index = key))
 }
 
 #' @export
 docdb_create.src_redis <- function(src, key, value, ...) {
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
   src$con$SET(key, redux::object_to_string(value), ...)
 }
 
 #' @export
-docdb_create.src_mongo <- function(src, key, value, ...){
+docdb_create.src_mongo <- function(src, key, value, ...) {
 
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
 
   # check expectations
   if (exists("key", inherits = FALSE) &&
@@ -127,14 +127,14 @@ docdb_create.src_mongo <- function(src, key, value, ...){
 
         # if not in square brackets, add them
         if (!grepl("^\\[.*\\]$", value[i, valcol]))
-          value[i, -idcol] <- paste0('[', value[i, valcol], ']')
+          value[i, -idcol] <- paste0("[", value[i, valcol], "]")
 
         # splice value element into json elements
         subvalue <- jsonlite::fromJSON(value[i, valcol], simplifyVector = FALSE)
         subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
 
         # iterate over elements and each has an _id
-        sapply(seq_along(subvalue), function(ii){
+        sapply(seq_along(subvalue), function(ii) {
 
           # insert
           src$con$insert(subvalue[ii], ...)$nInserted
@@ -147,8 +147,9 @@ docdb_create.src_mongo <- function(src, key, value, ...){
         # if the json string does not yet have it.
         tmpvalue <- value[i, valcol, drop = TRUE]
         if (length(idcol) && !grepl('"_id"', tmpvalue))
-          tmpvalue <- jsonlite::toJSON(c(list("_id" = value[i, idcol, drop = TRUE]),
-                                         jsonlite::fromJSON(tmpvalue)), auto_unbox = TRUE)
+          tmpvalue <- jsonlite::toJSON(
+            c(list("_id" = value[i, idcol, drop = TRUE]),
+            jsonlite::fromJSON(tmpvalue)), auto_unbox = TRUE)
 
         # insert
         src$con$insert(data = tmpvalue, ...)$nInserted
@@ -196,7 +197,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   }
 
   ### return if no value provided,
-  # such as to create empty table
+  # such as to create an empty table
   if (is.null(value)) return(invisible(0L))
 
   # check if _id in data.frame
@@ -230,7 +231,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
           # if not in square brackets, add them
           if (!grepl("^\\[.*\\]$", tmp)) {
-            tmp <- paste0('[', tmp, ']')
+            tmp <- paste0("[", tmp, "]")
           }
 
           # remove _ids

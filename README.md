@@ -1,53 +1,53 @@
-nodbi
-=====
 
+# nodbi
 
-
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![cran checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![cran
+checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi)
 [![R-CMD-check](https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check)
 [![codecov](https://codecov.io/gh/ropensci/nodbi/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/nodbi)
-[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cranlogs.app)
-[![cran version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
+[![rstudio mirror
+downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cranlogs.app)
+[![cran
+version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
 
-
-`nodbi` provides a single user interface for interacting with many NoSQL databases.
+`nodbi` provides a single user interface for interacting with several
+NoSQL databases.
 
 So far we support the following DBs:
 
-* MongoDB
-* Redis (server based)
-* CouchDB
-* Elasticsearch
-* SQLite
+-   MongoDB
+-   Redis (server based)
+-   CouchDB
+-   Elasticsearch
+-   RSQLite
 
-Currently we have support for data.frame's for the following operations
+Currently we have support for data.frame’s for the following operations
 
-* Create - all DBs
-* Exists - all DBs, except MongoDB
-* Get - all DBs
-* Query - all DBs, except Redis
-* Delete - all DBs
-* Update - just CouchDB
+-   Create - all DBs
+-   Exists - all DBs, except MongoDB
+-   Get - all DBs
+-   Query - all DBs, except Redis
+-   Delete - all DBs
+-   Update - MongoDB, CouchDB, and RSQLite
 
 ## Install
 
 cran version
 
-
-```r
+``` r
 install.packages("nodbi")
 ```
 
 dev version
 
-
-```r
+``` r
 pak::pkg_install("ropensci/nodbi")
 ```
 
-
-```r
+``` r
 library("nodbi")
 ```
 
@@ -55,41 +55,37 @@ library("nodbi")
 
 Start CouchDB on the cli or with the app
 
-
-```r
+``` r
 src_couchdb()
 ```
 
 Start Elasticsearch, e.g.:
 
-```sh
+``` sh
 cd /usr/local/elasticsearch && bin/elasticsearch
 ```
 
-
-```r
+``` r
 src_elastic()
 ```
 
-If you want to use classic Redis server, we do that through the [redux][]
-package, and you'll need to start up Redis by e.g,. `redis-server` in your shell.
+If you want to use classic Redis server, we do that through the
+[redux](https://cran.r-project.org/package=redux) package, and you’ll
+need to start up Redis by e.g,. `redis-server` in your shell.
 
-
-```r
+``` r
 src_redis()
 ```
 
 Start MongoDB: `mongod` (may need to do `sudo mongod`)
 
-
-```r
+``` r
 src_mongo()
 ```
 
 ## CouchDB
 
-
-```r
+``` r
 src <- src_couchdb()
 docout <- docdb_create(src, key = "mtcars", value = mtcars)
 head( docdb_get(src, "mtcars") )
@@ -99,10 +95,7 @@ head( docdb_get(src, "mtcars") )
 
 Put the `iris` dataset into ES
 
-
-
-
-```r
+``` r
 src <- src_elastic()
 ff <- docdb_create(src, "iris", iris)
 head( docdb_get(src, "iris") )
@@ -117,69 +110,72 @@ head( docdb_get(src, "iris") )
 
 ## Redis
 
-
-```r
+``` r
 src <- src_redis()
 docdb_create(src, "mtcars", mtcars)
 ```
 
-
-```r
+``` r
 docdb_get(src, "mtcars")
 ```
 
 ## MongoDB
 
-
-```r
-library("ggplot2")
-src <- src_mongo(verbose = FALSE)
+``` r
+src <- src_mongo(collection = "diamonds", verbose = FALSE)
 ff <- docdb_create(src, "diamonds", diamonds)
 docdb_get(src, "diamonds")
 ```
 
 ## SQLite
 
-
-```r
+``` r
 src <- src_sqlite(dbname = ":memory:")
 ff <- docdb_create(src, key = "mtcars", value = mtcars)
 docdb_get(src, key = "mtcars")
 ```
 
-Extension [json1](https://www.sqlite.org/json1.html) is enabled in Package `RSQLite` (since version 1.1). This extension is used to emulate the behaviour of MongoDB with the methods for SQLite: 
+Extension [json1](https://www.sqlite.org/json1.html) is enabled in
+Package `RSQLite` (since version 1.1). This extension is used to emulate
+the behaviour of MongoDB with the methods for SQLite:
 
-- Parameter `collection` corresponds to the name of a table (parameter `key`) in the SQLite database `dbname`. 
-- Json strings in parameters `query` and `fields` are translated into SQL commands, unless too complex. 
-- Tables created by `docdb_create()` are defined as follows, with exactly two columns, an index column named `_id` and a column with json data named `json`: 
-``` 
-CREATE TABLE mtcars ( _id TEXT PRIMARY_KEY NOT NULL, json JSON );
-CREATE UNIQUE INDEX mtcars_index ON mtcars ( _id );
-```
+-   Parameter `collection` corresponds to the name of a table (parameter
+    `key`) in the SQLite database `dbname`.
+-   Json strings in parameters `query` and `fields` are translated into
+    SQL commands, unless too complex.
+-   Tables created by `docdb_create()` are defined as follows, with
+    exactly two columns, an index column named `_id` and a column with
+    json data named `json`:
 
-The following examples show the maximum level of complexity that can be used at this time with available json operaters ("\$eq", "\$gt", "\$gte", "\$lt", "\$lte", "\$ne"); `query` implies AND of the comma separated expressions in the absence of a prefixed logical operator (available at this time: "\$and", "\$or"). 
+<!-- -->
 
+    CREATE TABLE mtcars ( _id TEXT PRIMARY_KEY NOT NULL, json JSON );
+    CREATE UNIQUE INDEX mtcars_index ON mtcars ( _id );
 
-```r
-ff <- docdb_create(src, key = "mtcars", value = contacts)
+The following examples show the maximum level of complexity that can be
+used at this time with available json operaters (“$eq”, “$gt”, “$gte”,
+“$lt”, “$lte”, “$ne”); `query` implies AND of the comma separated
+expressions in the absence of a prefixed logical operator (available at
+this time: “$and”, “$or”).
+
+``` r
+ff <- docdb_create(src, key = "mtcars", 
+                   value = data.frame(contacts, stringsAsFactors = FALSE))
 docdb_query(src, "mtcars", 
             query = '{"$or": {"eyeColor": "blue", 
                               "age": {"$lt": 22}},  
-                              "name": {"$regex": "L%"} }',
+                              "name": {"$regex": "^L.+"} }',
             fields = '{"age": 1, "eyeColor": 1, "name": 1}')
 ```
 
-
 ## Use with dplyr
 
-
-```r
+``` r
 library("dplyr")
-src <- src_mongo(verbose = FALSE)
+src <- src_mongo(collection = "diamonds", verbose = FALSE)
 ```
 
-
-```r
+``` r
 docdb_get(src, "diamonds") %>%
   group_by(cut) %>%
   summarise(mean_depth = mean(depth), mean_price = mean(price))
@@ -187,9 +183,11 @@ docdb_get(src, "diamonds") %>%
 
 ## Meta
 
-* Please [report any issues or bugs](https://github.com/ropensci/nodbi/issues).
-* License: MIT
-* Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
-* Please note that this package is released with a [Contributor Code of Conduct](https://ropensci.org/code-of-conduct/). By contributing to this project, you agree to abide by its terms.
-
-[redux]: https://cran.r-project.org/package=redux
+-   Please [report any issues or
+    bugs](https://github.com/ropensci/nodbi/issues).
+-   License: MIT
+-   Get citation information for `nodbi` in R doing
+    `citation(package = 'nodbi')`
+-   Please note that this package is released with a [Contributor Code
+    of Conduct](https://ropensci.org/code-of-conduct/). By contributing
+    to this project, you agree to abide by its terms.

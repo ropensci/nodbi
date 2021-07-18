@@ -11,7 +11,7 @@ skip_if_no_couchdb <- function() {
   COUCHDB_TEST_PWD <- Sys.getenv("COUCHDB_TEST_PWD")
   testthat::skip_if_not_installed("sofa")
   if (inherits(try(
-    src_couchdb(user=COUCHDB_TEST_USER, pwd=COUCHDB_TEST_PWD), 
+    src_couchdb(user = COUCHDB_TEST_USER, pwd = COUCHDB_TEST_PWD),
       silent = TRUE), "try-error")) {
     skip("couchdb is not available")
   }
@@ -19,7 +19,7 @@ skip_if_no_couchdb <- function() {
 
 skip_if_no_mongo <- function() {
   testthat::skip_if_not_installed("mongolite")
-  if (inherits(try(src_mongo(), silent=TRUE), "try-error")) {
+  if (inherits(try(src_mongo(), silent = TRUE), "try-error")) {
     skip("mongodb is not available")
   }
 }

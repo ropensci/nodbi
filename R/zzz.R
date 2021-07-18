@@ -6,7 +6,7 @@ pluck <- function(x, name, type) {
   }
 }
 
-doc_wrap <- function (..., indent = 0, width = getOption("width")){
+doc_wrap <- function(..., indent = 0, width = getOption("width")) {
   x <- paste0(..., collapse = "")
   wrapped <- strwrap(x, indent = indent, exdent = indent + 5, width = width)
   paste0(wrapped, collapse = "\n")
@@ -63,4 +63,5 @@ dbWithTransaction <- function(conn, statement) {
   error = rollback,
   interrupt = rollback
   )
+
 }

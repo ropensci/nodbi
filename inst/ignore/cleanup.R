@@ -18,7 +18,7 @@ invisible(lapply(keys, con$DEL))
 # riak
 x <- reeack::riak(host = "127.0.0.1", port = 8098)
 keys <- x$keys(bucket = "test")$keys
-invisible(lapply(keys, function(z) x$delete(key = z, bucket = 'test')))
+invisible(lapply(keys, function(z) x$delete(key = z, bucket = "test")))
 
 # elasticsearch
 elastic::connect()

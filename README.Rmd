@@ -1,3 +1,8 @@
+---
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
 nodbi
 =====
 
@@ -11,15 +16,15 @@ knitr::knit_hooks$set(output = function(x, options) {
    }
    x <- unlist(strsplit(x, "\n"))
    more <- "..."
-   if (length(lines)==1) {        # first n lines
+   if (length(lines) == 1) {        # first n lines
      if (length(x) > lines) {
        # truncate the output, but add ....
        x <- c(head(x, lines), more)
      }
    } else {
-     x <- c(if (abs(lines[1])>1) more else NULL,
+     x <- c(if (abs(lines[1]) > 1) more else NULL,
             x[lines],
-            if (length(x)>lines[abs(length(lines))]) more else NULL
+            if (length(x) > lines[abs(length(lines))]) more else NULL
            )
    }
    # paste these lines together
@@ -44,7 +49,7 @@ knitr::opts_chunk$set(
 [![cran version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
 
 
-`nodbi` provides a single user interface for interacting with many NoSQL databases.
+`nodbi` provides a single user interface for interacting with several NoSQL databases.
 
 So far we support the following DBs:
 
@@ -52,7 +57,7 @@ So far we support the following DBs:
 * Redis (server based)
 * CouchDB
 * Elasticsearch
-* SQLite
+* RSQLite
 
 Currently we have support for data.frame's for the following operations
 
@@ -61,7 +66,7 @@ Currently we have support for data.frame's for the following operations
 * Get - all DBs
 * Query - all DBs, except Redis
 * Delete - all DBs
-* Update - just CouchDB
+* Update - MongoDB, CouchDB, and RSQLite
 
 ## Install
 
@@ -156,8 +161,7 @@ docdb_get(src, "mtcars")
 ## MongoDB
 
 ```{r output.lines=1:10}
-library("ggplot2")
-src <- src_mongo(verbose = FALSE)
+src <- src_mongo(collection = "diamonds", verbose = FALSE)
 ff <- docdb_create(src, "diamonds", diamonds)
 docdb_get(src, "diamonds")
 ```
@@ -183,11 +187,12 @@ CREATE UNIQUE INDEX mtcars_index ON mtcars ( _id );
 The following examples show the maximum level of complexity that can be used at this time with available json operaters ("\$eq", "\$gt", "\$gte", "\$lt", "\$lte", "\$ne"); `query` implies AND of the comma separated expressions in the absence of a prefixed logical operator (available at this time: "\$and", "\$or"). 
 
 ```{r}
-ff <- docdb_create(src, key = "mtcars", value = contacts)
+ff <- docdb_create(src, key = "mtcars", 
+                   value = data.frame(contacts, stringsAsFactors = FALSE))
 docdb_query(src, "mtcars", 
             query = '{"$or": {"eyeColor": "blue", 
                               "age": {"$lt": 22}},  
-                              "name": {"$regex": "L%"} }',
+                              "name": {"$regex": "^L.+"} }',
             fields = '{"age": 1, "eyeColor": 1, "name": 1}')
 ```
 
@@ -196,7 +201,7 @@ docdb_query(src, "mtcars",
 
 ```{r}
 library("dplyr")
-src <- src_mongo(verbose = FALSE)
+src <- src_mongo(collection = "diamonds", verbose = FALSE)
 ```
 
 ```{r}

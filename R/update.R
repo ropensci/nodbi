@@ -62,7 +62,7 @@ docdb_update <- function(src, key, value, ...) {
 
 #' @export
 docdb_update.src_couchdb <- function(src, key, value, ...) {
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
   if (!key %in% attr(src, "dbs")) sofa::db_create(src[[1]], dbname = key)
   sofa::db_bulk_update(src[[1]], dbname = key, doc = value, ...)
 }
@@ -77,7 +77,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
             "was given as ", src$collection, " in src_mongo().")
 
   # The aim is to use this method:
-  # mongolite::mongo()$update(query, update = '{"$set":{}}', upsert = FALSE, multiple = FALSE)
+  # mongo()$update(query, update = '{"$set":{}}', upsert = F, multiple = F)
   # It is necessary to define:
   # - which documents to update (based on parameter "query" if specified,
   #   or column _id in dataframe value, or all documents in collection)
@@ -86,7 +86,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   #   in the document to update, and will be replaced with non-NA values
   #   in the dataframe for the respective document)
 
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
 
   # Get ellipsis
   dotparams <- list(...)
@@ -98,7 +98,8 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
 
   # - Is _id in dataframe value?
   if (all(query != "{}") & any(grepl("_id", names(value)))) {
-    stop("Specify only one of query = '...' or '_id' as column in data frame 'value'.")
+    stop("Specify only one of query = '...' or '_id' as column ",
+    "in data frame 'value'.")
   }
 
   # - Get query from dataframe value
@@ -112,8 +113,8 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
     # use FIRST for query and remove it
     if (ncol(value) >= 2L) {
       quoting <- ifelse(class(value[, 1]) == "character", "\"", "")
-      query <- paste0('{"', names(value)[1], '":{"$eq":', quoting, value[, 1, drop = TRUE], quoting, '}}')
-      query <- paste0('{"', names(value)[1], '":', quoting, value[, 1, drop = TRUE], quoting, '}')
+      query <- paste0('{"', names(value)[1], '":{"$eq":', quoting, value[, 1, drop = TRUE], quoting, "}}")
+      query <- paste0('{"', names(value)[1], '":', quoting, value[, 1, drop = TRUE], quoting, "}")
       value <- value[, -1, drop = FALSE]
     }
   }
@@ -124,12 +125,12 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   #   No conversion if already json string.
   value <- sapply(X = seq_len(nrow(value)),
                   FUN = function(i)
-                    ifelse(!is.character(value[i,]) ||
-                             !jsonlite::validate(value[i,]),
+                    ifelse(!is.character(value[i, ]) ||
+                             !jsonlite::validate(value[i, ]),
                            jsonlite::toJSON(x = value[i, , drop = FALSE],
                                             dataframe = "rows",
                                             auto_unbox = TRUE),
-                           value[i,]))
+                           value[i, ]))
 
   # - Remove outer []
   value <- gsub(pattern = "^\\[|\\]$",
@@ -137,27 +138,28 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
                 x = value)
 
   # - Turn into json set
-  value <- paste0('{"$set":', value, '}')
+  value <- paste0('{"$set":', value, "}")
 
   # - To update, iterate over json set vector
   nrowaffected <-
     sapply(seq_len(length(value)),
            function(i)
-             # update(query, update = '{"$set":{}}', upsert = FALSE, multiple = FALSE)
+             # update(query, update = '{"$set":{}}', upsert = F, multiple = F)
              src$con$update(query = query[i],  # which documents?
                             update = value[i], # with what to update?
                             upsert = TRUE,     # ok to add new documents
                             multiple = TRUE)   # ok to update several documents
     )
 
-  # Extract number of modified or added documents
+  # Extract number of matched or added documents
   #               [,1]
   # modifiedCount 0
   # matchedCount  0
   # upsertedCount 1
   # upsertedId    "NCT00097292"
-  nrowaffected <- data.frame(nrowaffected,
-                             stringsAsFactors = FALSE)[c(1, 3), , drop = TRUE]
+  nrowaffected <- data.frame(
+    nrowaffected,
+    stringsAsFactors = FALSE)[c(2,3), , drop = TRUE]
 
   invisible(sum(unlist(nrowaffected), na.rm = TRUE))
 
@@ -167,7 +169,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
 docdb_update.src_sqlite <- function(src, key, value, ...) {
 
   assert(key, "character")
-  assert(value, 'data.frame')
+  assert(value, "data.frame")
 
   # If table does not exist, create empty table
   if (!docdb_exists(src = src, key = key)) {
@@ -313,18 +315,17 @@ valueEscape <- function(x) {
 
          # - character: '"stringvalue"'
          "character" = ifelse(test = grepl("^[{].*[}]$", trimws(x)),
-                              yes = paste0('\'', x, '\''),
-                              no = paste0('\'\"', x, '\"\'')),
+                              yes = paste0("\'", x, "\'"),
+                              no = paste0("\'\"", x, "\"\'")),
 
          # - list e.g.: '{"a": "something", "b": 2}'
-         "list" = paste0('\'', jsonlite::toJSON(x), '\''),
+         "list" = paste0("\'", jsonlite::toJSON(x), "\'"),
 
          # - no quotation for integers, real
          "numeric" = paste0(x),
 
          # - default, all others: 'value'
-         paste0('\'', x, '\'')
+         paste0("\'", x, "\'")
   )
 
 }
-

@@ -26,7 +26,7 @@ src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
     pwd = pwd, force = force, ...)
   dbs <- names(elastic::aliases_get(x))
   structure(list(con = x, info = x$ping(), dbs = dbs),
-            class = c("src_elastic","docdb_src"),
+            class = c("src_elastic", "docdb_src"),
             type = "elasticsearch")
 }
 

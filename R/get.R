@@ -51,21 +51,22 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_get(src, "mtcars", limit = 4L)
 #' }
-docdb_get <- function(src, key, limit = NULL, ...){
+docdb_get <- function(src, key, limit = NULL, ...) {
   UseMethod("docdb_get")
 }
 
 #' @export
 docdb_get.src_couchdb <- function(src, key, limit = NULL, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   dropmeta(makedf(
-    pluck(sofa::db_alldocs(src$con, dbname = key,
-                           include_docs = TRUE, limit = limit, ...)$rows, "doc")))
+    pluck(sofa::db_alldocs(
+      src$con, dbname = key,
+      include_docs = TRUE, limit = limit, ...)$rows, "doc")))
 }
 
 #' @export
-docdb_get.src_elastic <- function(src, key, limit = NULL, ...){
-  assert(key, 'character')
+docdb_get.src_elastic <- function(src, key, limit = NULL, ...) {
+  assert(key, "character")
   ids <- pluck(elastic::Search(src$con, key, source = FALSE,
                                size = limit, ...)$hits$hits, "_id", "")
   tmp <- elastic::docs_mget(src$con, index = key, type = key, ids = ids,
@@ -75,7 +76,7 @@ docdb_get.src_elastic <- function(src, key, limit = NULL, ...){
 
 #' @export
 docdb_get.src_redis <- function(src, key, limit = NULL, ...) {
-  assert(key, 'character')
+  assert(key, "character")
   res <- src$con$GET(key)
   if (is.null(res)) stop("no matching result found")
   redux::string_to_object(res)
@@ -90,12 +91,12 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
     message("Parameter 'key' is different from parameter 'collection', ",
             "was given as ", src$collection, " in src_mongo().")
 
-  # FIXME: or use $find() here? not if doing a separate query method
-  if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
-  dump <- tempfile()
-  src$con$export(file(dump))
-  # remove first column, a mongodb identifier
-  jsonlite::stream_in(file(dump), verbose = FALSE) # [,-1]
+  # set limit if null
+  if (is.null(limit)) limit <- 0L
+
+  # get data. note: find() does not include _id
+  src$con$find(limit = limit, ...)
+
 }
 
 #' @export
@@ -105,10 +106,7 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   assert(limit, "integer")
 
   # arguments for call
-  statement <- paste0(
-    # _id is included into json for use with jsonlite::stream_in
-    "SELECT '{\"_id\": \"' || _id || '\", ' || substr(json, 2) ",
-    "FROM \"", key, "\" ;")
+  statement <- paste0("SELECT json FROM \"", key, "\" ;")
 
   # set limit if not null
   n <- -1L

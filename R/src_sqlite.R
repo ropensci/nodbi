@@ -42,7 +42,7 @@ src_sqlite <- function(dbname = ":memory:",
       RSQLite::initRegExp(db = con)
       DBI::dbExecute(
         conn = con,
-        statement = paste0('SELECT * FROM (VALUES ("Astring")) WHERE 1 REGEXP "[A-Z][a-z]+";'))
+        statement = paste0('SELECT * FROM (VALUES ("Astring")) WHERE 1 REGEXP "[A-Z]+";'))
     }, silent = TRUE)
   ), "try-error")) {
     stop("SQLite does not support REGEXP. Call ",
@@ -71,12 +71,13 @@ print.src_sqlite <- function(x, ...) {
               srv, dbsize / 2^10, dbname))
 
   if (grepl(":memory:", dbname)) {
-    warning("Database is only in memory, will not persist after R ends! Consider to copy it with \n",
-            "RSQLite::sqliteCopyDatabase(\n",
-            "  from = <your nodbi::src_sqlite() object>$con, \n",
-            "  to = <e.g. RSQLite::dbConnect(RSQLite::SQLite(), 'local_file.db')>\n",
-            "  )",
-            call. = FALSE)
+    warning(
+      "Database is only in memory, will not persist after R ends! Consider to copy ",
+      "it with \nRSQLite::sqliteCopyDatabase(\n",
+      "  from = <your nodbi::src_sqlite() object>$con, \n",
+      "  to = <e.g. RSQLite::dbConnect(RSQLite::SQLite(), 'local_file.db')>\n",
+      "  )",
+      call. = FALSE)
   }
 
 }

@@ -14,7 +14,6 @@ test_that("Source (Redis)", {
 context("redis: create")
 test_that("db into Redis", {
   skip_on_cran()
-  
   skip_if_no_redis()
   d <- mtcars
   key <- "mtcars"

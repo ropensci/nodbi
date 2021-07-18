@@ -42,25 +42,25 @@
 #' (docdb_delete(src, "iris", query = '{"Species": {"$regex": "a$"}}'))
 #' (docdb_delete(src, "iris"))
 #' }
-docdb_delete <- function(src, key, ...){
+docdb_delete <- function(src, key, ...) {
   UseMethod("docdb_delete")
 }
 
 #' @export
 docdb_delete.src_couchdb <- function(src, key, ...) {
-	assert(key, 'character')
+  assert(key, "character")
   sofa::db_delete(src$con, dbname = key, ...)
 }
 
 #' @export
 docdb_delete.src_elastic <- function(src, key, ...) {
-	assert(key, 'character')
+  assert(key, "character")
   elastic::index_delete(src$con, key, verbose = FALSE)
 }
 
 #' @export
 docdb_delete.src_redis <- function(src, key, ...) {
-	assert(key, 'character')
+  assert(key, "character")
   src$con$DEL(key)
 }
 
@@ -98,7 +98,7 @@ docdb_delete.src_mongo <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_sqlite <- function(src, key, ...) {
-  assert(key, 'character')
+  assert(key, "character")
 
   # make dotted parameters accessible
   tmpdots <- list(...)
@@ -117,7 +117,7 @@ docdb_delete.src_sqlite <- function(src, key, ...) {
     # document delete
     statement <- paste0(
       "DELETE FROM \"", key, "\" WHERE _id IN (",
-      paste0('"', tmpids, '"', collapse = ','), ");")
+      paste0('"', tmpids, '"', collapse = ","), ");")
 
     # do delete
     dbWithTransaction(
