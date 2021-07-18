@@ -93,5 +93,5 @@ docdb_exists.src_mongo <- function(src, key, ...) {
 #' @export
 docdb_exists.src_sqlite <- function(src, key, ...) {
   assert(key, 'character')
-  key %in% DBI::dbListTables(src$con)
+  any(key == DBI::dbListTables(src$con))
 }

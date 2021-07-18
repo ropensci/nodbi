@@ -252,9 +252,12 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
         )
 
         # execute sql statement
-        DBI::dbExecute(
-          conn = src$con,
-          statement = statement)
+        dbWithTransaction(
+          src$con, {
+            DBI::dbExecute(
+              conn = src$con,
+              statement = statement)
+          })
 
       }) # by column with json
 
@@ -277,9 +280,12 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
       )
 
       # execute sql statement
-      DBI::dbExecute(
-        conn = src$con,
-        statement = statement)
+      dbWithTransaction(
+        src$con, {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = statement)
+        })
 
     } # no json
 
