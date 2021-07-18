@@ -7,15 +7,17 @@ Description: Simplified document database manipulation and analysis,
     SQLite/json1.
 Version: 0.4.2
 Authors@R: c(
-    person("Scott", "Chamberlain", role = c("aut", "cre"),
-        email = "sckott@protonmail.com",
-        comment = c(ORCID = "0000-0003-1444-9135")),
-    person("Rich", "FitzJohn", role = "aut"),
-    person("Jeroen", "Ooms", role = "aut"),
     person(given = "Ralf",
            family = "Herold",
+           role = c("aut", "cre"),
+           email = "ralf.herold@mailbox.org",
+           comment = c(ORCID = "0000-0002-8148-6748")),
+    person(given = "Scott", 
+           family = "Chamberlain", 
            role = "aut",
-           comment = c(ORCID = "0000-0002-8148-6748"))
+           comment = c(ORCID = "0000-0003-1444-9135")),
+    person("Rich", "FitzJohn", role = "aut"),
+    person("Jeroen", "Ooms", role = "aut")
   )
 License: MIT + file LICENSE
 LazyData: true
