@@ -22,10 +22,10 @@
 #' you may be better of using \pkg{elastic} package directly
 #' - MongoDB: query parameters, see \pkg{mongolite} docs for
 #' help with searches
-#' - SQLite: `fields`, an optional json string of fields to be
-#' returned from anywhere in the tree.
-#' Parameter `query`, a JSON string; supported at the moment:
-#' one level of $or or $and operators with
+#' - SQLite: `fields`, an optional JSON string of fields to be
+#' returned from anywhere in the tree (in dot paths notation).
+#' Parameter `query`, a JSON string; supported at the moment
+#' is only one level of $or or $and operators with
 #' $eq, $gt, $gte, $lt, $lte, $ne and $regex as tests.
 #'
 #'
@@ -352,6 +352,9 @@ jsonEscape <- function(x, y) {
   #     with columns fullkey and type as per json_tree()
   # - y is the name of a variable / column of x that is of interest
 
+  # json.org: A value can be a string in double quotes,
+  # or a number, or true or false or null, or an object or an array.
+
   # format field like fullkeys
   y <- paste0("$.", y)
   tmp <- unique(x$type[x$fullkey == y])
@@ -447,6 +450,13 @@ json2querySql <- function(x, con) {
 
   # main logical operation for concatenated criteria:
   # - implicit AND, when specifying a comma separated list of expressions
+  # - check if "AND" operation is specified
+  if (grepl(pattern = '^[{]"[$]and":', x = x)) {
+    # remove outer brackets
+    x <- gsub(pattern = '^[{]"[$]and":[[{]', replacement = "", x = x)
+    x <- gsub(pattern = "][}]$", replacement = "", x = x)
+    op <- "AND"
+  }
   # - check if "OR" operation is specified
   if (grepl(pattern = '^[{]"[$]or":', x = x)) {
     # remove outer brackets
@@ -486,10 +496,7 @@ json2querySql <- function(x, con) {
 
   # special case
   # https://docs.mongodb.com/manual/reference/operator/query/regex/#pcre-vs-javascript
-  x <- gsub(pattern = "[$]regex:",
-            replacement = ifelse(TRUE,
-                                 "REGEXP ", "LIKE "),
-            x = x)
+  x <- gsub(pattern = "[$]regex:", replacement = "REGEXP ", x = x)
 
   # make right hand side
   RHS <- x
@@ -508,15 +515,74 @@ json2querySql <- function(x, con) {
 # json2querySql(x = '{ "$or": [ { "gear": { "$lt": 5 } }, { "cyl": 6 } ] }')
 # json2querySql(x = "{}")
 
+# generate regular expressions for
+# fields so that fullkey matches
+fieldsSql2fullKey <- function(x) {
 
+  # check e.g. if only fields = '{"_id": 1}'
+  if (!length(x)) return("")
 
+  # remove array indices from fields
+  x <- gsub("\\[[-#0-9]+\\][.]", ".", x)
 
+  # protect "." between item and subitem using lookahead for overlapping groups
+  x <- gsub("([a-zA-Z]+)[.](?=[a-zA-Z]+)", "\\1@@@\\2", x, perl = TRUE)
 
+  # add in regexps to match any arrayIndex in fullkey
+  x <- paste0("^[$][.]", gsub("@@@", "[-#\\\\[\\\\]0-9]*[.]", x), "$")
 
+  # return
+  return(x)
+}
 
-
-
-
-
-
+# for transform column types
+# - from character to num
+trans2num <- function(clmn) {
+  o <- lapply(
+    clmn,
+    function(r) {
+      r <- as.numeric(r)
+      if (!length(r)) {NA} else {r}
+    })
+  if (all(vapply(o, length, numeric(1)) == 1L)) {
+    o <- unlist(o, recursive = FALSE)
+  }
+  o
+}
+# - from character to list of character
+trans2str <- function(clmn) {
+  o <- lapply(
+    clmn,
+    function(r) {
+      r <- as.character(r)
+      if (!length(r)) {NA} else {r}
+    })
+  if (all(vapply(o, length, numeric(1)) == 1L)) {
+    o <- unlist(o, recursive = FALSE)
+  }
+  o
+}
+# - helper
+json2data <- function(x, ...) {
+  out <- try(
+    # this already validates
+    jsonlite::fromJSON(x, ...),
+    silent = TRUE)
+  if (inherits(out, "try-error")) return(x)
+  return(out)
+}
+# - from json to data frame
+trans2df <- function(clmn) {
+  sapply(
+    clmn,
+    function(r) {
+      if (!length(r) || all(is.na(r))) {NA} else {
+        tmp <- sapply(r, function(i)
+          unlist(i, use.names = FALSE),
+          USE.NAMES = FALSE)
+        sapply(tmp, json2data, USE.NAMES = FALSE,
+               flatten = FALSE, simplify = FALSE)
+      }
+    }, USE.NAMES = TRUE, simplify = TRUE)
+}
 
