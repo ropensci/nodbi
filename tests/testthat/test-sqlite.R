@@ -90,9 +90,7 @@ test_that("query in sqlite works", {
   # depending on availability of regular expression operator
   expect_length(
     docdb_query(con, "mt-cars",
-                query = paste0('{"gear" : 4, "cyl": {"$lte": 8}, "_row": {"$regex": "',
-                               ifelse(attr(x = con$con, which = "regexp.extension"),
-                                      '^M[a-z].*', 'M%'), '"} }'),
+                query = '{"gear" : 4, "cyl": {"$lte": 8}, "_row": {"$regex": "^M[a-z].*"} }',
                 fields = '{"mpg":1, "cyl": 1, "_row": 1}')[["_id"]],
     6L)
 
