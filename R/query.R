@@ -3,16 +3,15 @@
 #' @export
 #' @param src source object, result of call to src
 #' @param key (character) A key (collection for mongo)
-#' @param query various. see Query section below.
+#' @param query various, see Query section below.
 #' @param ... Additional named parameters passed on to each package:
-#'
 #' - CouchDB: passed on to [sofa::db_query()]
 #' - Elasticsearch: passed on to [elastic::Search()]
 #' - MongoDB: passed on to the `$find` method of \pkg{mongolite}
 #'
 #' @template deets
-#' @section What is expected for each source:
 #'
+#' @section What is expected for each source:
 #' - CouchDB: a list, see docs for [sofa::db_query()]
 #' - Elasticsearch: query parameters, see [elastic::Search()]; passed to
 #' the `query` parameter of `elastic::Search`, thus performs a URI
@@ -20,17 +19,15 @@
 #' In theory you can instead pass in a JSON or list to the `body`
 #' parameter, but if you want to do complicated Elasticsearch queries
 #' you may be better of using \pkg{elastic} package directly
-#' - MongoDB: query parameters, see \pkg{mongolite} docs for
-#' help with searches
-#' - SQLite: `fields`, an optional JSON string of fields to be
-#' returned from anywhere in the tree (in dot paths notation).
-#' Parameter `query`, a JSON string; supported at the moment
+#' - MongoDB: a JSON `query` string and optionally other parameters
+#' such as `fields`, see \pkg{mongolite}
+#' - SQLite: arameter `query`, a JSON string; supported at the moment
 #' is only one level of $or or $and operators with
 #' $eq, $gt, $gte, $lt, $lte, $ne and $regex as tests.
-#'
+#' Optionally, `fields` a JSON string of fields to be
+#' returned from anywhere in the tree (in dot paths notation).
 #'
 #' @section Not supported yet:
-#'
 #' - Redis
 #'
 #' @examples \dontrun{
@@ -89,7 +86,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   assert(key, 'character')
   dropmeta(makedf(
     sofa::db_query(src$con, dbname = key,
-      selector = query, limit = 10, ...)$docs))
+                   selector = query, limit = 10, ...)$docs))
 }
 
 #' @export
@@ -116,7 +113,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   tmp <- src$con$find(query = query, ...)
 
   # ensure results are flattened
-  jsonlite::flatten(tmp)
+  jsonlite::flatten(tmp, recursive = TRUE)
 
 }
 

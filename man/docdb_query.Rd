@@ -11,7 +11,7 @@ docdb_query(src, key, query, ...)
 
 \item{key}{(character) A key (collection for mongo)}
 
-\item{query}{various. see Query section below.}
+\item{query}{various, see Query section below.}
 
 \item{...}{Additional named parameters passed on to each package:
 \itemize{
@@ -37,13 +37,13 @@ based search where the query is passed in the URI instead of the body.
 In theory you can instead pass in a JSON or list to the \code{body}
 parameter, but if you want to do complicated Elasticsearch queries
 you may be better of using \pkg{elastic} package directly
-\item MongoDB: query parameters, see \pkg{mongolite} docs for
-help with searches
-\item SQLite: \code{fields}, an optional JSON string of fields to be
-returned from anywhere in the tree (in dot paths notation).
-Parameter \code{query}, a JSON string; supported at the moment
+\item MongoDB: a JSON \code{query} string and optionally other parameters
+such as \code{fields}, see \pkg{mongolite}
+\item SQLite: arameter \code{query}, a JSON string; supported at the moment
 is only one level of $or or $and operators with
 $eq, $gt, $gte, $lt, $lte, $ne and $regex as tests.
+Optionally, \code{fields} a JSON string of fields to be
+returned from anywhere in the tree (in dot paths notation).
 }
 }
 

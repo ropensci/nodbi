@@ -61,7 +61,7 @@ NULL
 #' @docType data
 #' @keywords data
 #' @export
-#' 
+#'
 contacts <- '
 [
   {

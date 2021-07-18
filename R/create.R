@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param src source object, result of call to an [src] function
-#' @param key (character) A key (collection for mongo)
+#' @param key (character) A key (collection for MongoDB)
 #' @param value (data.frame) A single data.frame
 #' @param ... Ignored
 #' @template deets
@@ -43,7 +43,7 @@
 #' docdb_create(src, key = "contacts", value = contacts_df)
 #' docdb_get(src, "contacts")[["friends"]]
 #' }
-docdb_create <- function(src, key, value, ...){
+docdb_create <- function(src, key, value, ...) {
   UseMethod("docdb_create")
 }
 
@@ -56,7 +56,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 }
 
 #' @export
-docdb_create.src_elastic <- function(src, key, value, ...){
+docdb_create.src_elastic <- function(src, key, value, ...) {
   assert(value, 'data.frame')
   elastic::index_create(src$con, index = key, verbose = FALSE)
   invisible(elastic::docs_bulk(src$con, value, index = key))
@@ -69,7 +69,7 @@ docdb_create.src_redis <- function(src, key, value, ...) {
 }
 
 #' @export
-docdb_create.src_mongo <- function(src, key, value, ...){
+docdb_create.src_mongo <- function(src, key, value, ...) {
 
   assert(value, 'data.frame')
 
@@ -134,7 +134,7 @@ docdb_create.src_mongo <- function(src, key, value, ...){
         subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
 
         # iterate over elements and each has an _id
-        sapply(seq_along(subvalue), function(ii){
+        sapply(seq_along(subvalue), function(ii) {
 
           # insert
           src$con$insert(subvalue[ii], ...)$nInserted
@@ -147,8 +147,9 @@ docdb_create.src_mongo <- function(src, key, value, ...){
         # if the json string does not yet have it.
         tmpvalue <- value[i, valcol, drop = TRUE]
         if (length(idcol) && !grepl('"_id"', tmpvalue))
-          tmpvalue <- jsonlite::toJSON(c(list("_id" = value[i, idcol, drop = TRUE]),
-                                         jsonlite::fromJSON(tmpvalue)), auto_unbox = TRUE)
+          tmpvalue <- jsonlite::toJSON(
+            c(list("_id" = value[i, idcol, drop = TRUE]),
+            jsonlite::fromJSON(tmpvalue)), auto_unbox = TRUE)
 
         # insert
         src$con$insert(data = tmpvalue, ...)$nInserted

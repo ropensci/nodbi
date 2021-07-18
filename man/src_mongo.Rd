@@ -2,7 +2,7 @@
 % Please edit documentation in R/src_mongo.R
 \name{src_mongo}
 \alias{src_mongo}
-\title{Setup a mongoDB database connection}
+\title{Setup a MongoDB database connection}
 \usage{
 src_mongo(collection = "test", db = "test", url = "mongodb://localhost", ...)
 }
@@ -11,21 +11,21 @@ src_mongo(collection = "test", db = "test", url = "mongodb://localhost", ...)
 
 \item{db}{(character) name of database}
 
-\item{url}{(character) address of the mongodb server in mongo connection
-string URI format.}
+\item{url}{(character) address of the MongoDB server in mongo connection
+string URI format, see to \link[mongolite:mongo]{mongolite::mongo}}
 
 \item{...}{additional named params passed on to \link[mongolite:mongo]{mongolite::mongo}}
 }
 \description{
-Setup a mongoDB database connection
+Setup a MongoDB database connection
 }
 \details{
-uses \pkg{monoglite} under the hood; uses \code{\link[mongolite:mongo]{mongolite::mongo()}} for
+uses \pkg{monoglite} under the hood; uses \link[mongolite:mongo]{mongolite::mongo} for
 connecting
 }
 \examples{
 \dontrun{
-(con <- src_mongo())
+con <- src_mongo()
 print(con)
 }
 }

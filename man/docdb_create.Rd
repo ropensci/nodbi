@@ -9,7 +9,7 @@ docdb_create(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to an \link{src} function}
 
-\item{key}{(character) A key (collection for mongo)}
+\item{key}{(character) A key (collection for MongoDB)}
 
 \item{value}{(data.frame) A single data.frame}
 

@@ -77,7 +77,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
             "was given as ", src$collection, " in src_mongo().")
 
   # The aim is to use this method:
-  # mongolite::mongo()$update(query, update = '{"$set":{}}', upsert = FALSE, multiple = FALSE)
+  # mongo()$update(query, update = '{"$set":{}}', upsert = F, multiple = F)
   # It is necessary to define:
   # - which documents to update (based on parameter "query" if specified,
   #   or column _id in dataframe value, or all documents in collection)
@@ -98,7 +98,8 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
 
   # - Is _id in dataframe value?
   if (all(query != "{}") & any(grepl("_id", names(value)))) {
-    stop("Specify only one of query = '...' or '_id' as column in data frame 'value'.")
+    stop("Specify only one of query = '...' or '_id' as column ",
+    "in data frame 'value'.")
   }
 
   # - Get query from dataframe value
@@ -124,12 +125,12 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   #   No conversion if already json string.
   value <- sapply(X = seq_len(nrow(value)),
                   FUN = function(i)
-                    ifelse(!is.character(value[i,]) ||
-                             !jsonlite::validate(value[i,]),
+                    ifelse(!is.character(value[i, ]) ||
+                             !jsonlite::validate(value[i, ]),
                            jsonlite::toJSON(x = value[i, , drop = FALSE],
                                             dataframe = "rows",
                                             auto_unbox = TRUE),
-                           value[i,]))
+                           value[i, ]))
 
   # - Remove outer []
   value <- gsub(pattern = "^\\[|\\]$",
@@ -143,7 +144,7 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
   nrowaffected <-
     sapply(seq_len(length(value)),
            function(i)
-             # update(query, update = '{"$set":{}}', upsert = FALSE, multiple = FALSE)
+             # update(query, update = '{"$set":{}}', upsert = F, multiple = F)
              src$con$update(query = query[i],  # which documents?
                             update = value[i], # with what to update?
                             upsert = TRUE,     # ok to add new documents
@@ -327,4 +328,3 @@ valueEscape <- function(x) {
   )
 
 }
-
