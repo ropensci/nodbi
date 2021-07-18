@@ -84,10 +84,17 @@ docdb_get(src, "mtcars")
 
 # SQLite
 src <- src_sqlite()
+
+# various query combinations:
 docdb_create(src, "mtcars", mtcars)
-docdb_query(src, "mtcars", query = "{}", fields = '{"mpg":1, "cyl":1}')
-docdb_query(src, "mtcars", query = '{"gear": {"$lte": 4}}', fields = '{"gear": 1}')
-# for RSQLite from 2.1.2 using PCRE regular expressions
+docdb_query(src, "mtcars", query = '{"mpg":21}')
+docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
 docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
+
+# regular expressions except for [...] can be used to select fields:
+docdb_create(src, "mapdata", value = data.frame(mapdata, stringsAsFactors = FALSE))
+docdb_query(src, "mapdata", fields = '{"rows.elements.d.*text": 1}', query = '{}')
+docdb_query(src, "mapdata", fields = '{"rows.elements.\\\\\\\\S+.text": 1}', query = '{}')
+docdb_query(src, "mapdata", fields = '{"rows.elements.*somevalue": 1}', query = '{}')
 }
 }
