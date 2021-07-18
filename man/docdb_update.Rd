@@ -9,9 +9,14 @@ docdb_update(src, key, value, ...)
 \arguments{
 \item{src}{source object, result of call to src}
 
-\item{key}{(character) A key (collection for mongo)}
+\item{key}{(character) A key (collection for MongoDB and
+RSQLite)}
 
-\item{value}{(data.frame) A single data.frame}
+\item{value}{(data.frame) A single data.frame. For
+MongoDB and RSQLite, its first column identifies the
+documents to be updated by means of the name of the
+column and the value(s) in the respective row(s),
+see examples.}
 
 \item{...}{Ignored}
 }

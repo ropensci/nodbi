@@ -2,8 +2,13 @@
 #'
 #' @export
 #' @param src source object, result of call to src
-#' @param key (character) A key (collection for mongo)
-#' @param value (data.frame) A single data.frame
+#' @param key (character) A key (collection for MongoDB and
+#' RSQLite)
+#' @param value (data.frame) A single data.frame. For
+#' MongoDB and RSQLite, its first column identifies the
+#' documents to be updated by means of the name of the
+#' column and the value(s) in the respective row(s),
+#' see examples.
 #' @param ... Ignored
 #' @details Only CouchDB and sqlite supported for now
 #' @examples \dontrun{
@@ -182,35 +187,37 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
   # Check data frame value
   vn <- names(value)
 
+  # Updating based on query in the data
+  # frame that has values for the update:
+  # replace query params with _id's
   if ("_id" != vn[1]) {
 
     # get _id of records to be updated
-    idsaffected <- sapply(seq_len(nrow(value)), function(i) {
+    idsaffected <- lapply(seq_len(nrow(value)), function(i) {
 
-      statement <- sprintf(
-        "SELECT _id
-         FROM \"%s\", json_each(\"%s\".json)
-         WHERE key = '%s'
-         AND value = %s;",
-        key, key,
-        vn[1],
-        ifelse(inherits(value[i, 1], "character"),
-               paste0("'", value[i , 1], "'"),
-               value[i , 1])
-      )
+        docdb_query(
+          src = src,
+          key = key,
+          fields = '{"_id": 1}',
+          query = paste0(
+            paste0("{\"", vn[1], "\": "),
+            ifelse(
+              inherits(value[i, 1, drop = TRUE], "character"),
+              paste0("\"", value[i, 1, drop = TRUE], "\""),
+              value[i, 1]), "}")
+        )[, "_id", drop = TRUE]
 
-      DBI::dbGetQuery(conn = src$con,
-                      statement = statement)
-    })
+      })
 
     # replace first column with _id
     value <- lapply(seq_len(nrow(value)), function(i) {
 
-      tmp <- data.frame(idsaffected[i],
-                        value[i, -1],
-                        stringsAsFactors = FALSE,
-                        check.rows = FALSE,
-                        row.names = NULL)
+      tmp <- data.frame(
+        idsaffected[[i]],
+        value[i, -1, drop = FALSE],
+        stringsAsFactors = FALSE,
+        check.rows = FALSE,
+        row.names = NULL)
 
       names(tmp) <- c("_id", vn[-1])
 
@@ -218,7 +225,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
 
     })
 
-    # make new value data frame
+    # modify value data frame
     value <- do.call(rbind, value)
 
   }
@@ -236,7 +243,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
     if (all(sapply(tmpval,
                    function(col)
                      is.character(col) &&
-                     jsonlite::validate(col)))) {
+                   jsonlite::validate(col)))) {
 
       # iterate over columns
       ncoliterated <- sapply(tmpval, function(ii) {
@@ -244,11 +251,11 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
         # construct sql statment
         statement <- sprintf(
           "UPDATE \"%s\"
-           SET json = json_patch (\"%s\".json, %s )
+           SET json = json_patch( \"%s\".json, %s )
            WHERE _id = '%s';",
           key,
           key, valueEscape(ii),
-          value[i, 1]
+          value[i, 1, drop = TRUE]
         )
 
         # execute sql statement
@@ -264,7 +271,7 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
       # return number of records modified
       sum(ncoliterated, na.rm = TRUE) >= 1L
 
-    } else {# no json
+    } else { # no json
 
       # construct json from columns
       tmpval <- jsonlite::toJSON(jsonlite::unbox(tmpval))
@@ -272,11 +279,11 @@ docdb_update.src_sqlite <- function(src, key, value, ...) {
       # construct sql statement
       statement <- sprintf(
         "UPDATE \"%s\"
-         SET json = json_patch (\"%s\".json, %s )
+         SET json = json_patch( \"%s\".json, %s )
          WHERE _id = '%s';",
         key,
         key, valueEscape(tmpval),
-        value[i, 1]
+        value[i, 1, drop = TRUE]
       )
 
       # execute sql statement
@@ -308,10 +315,13 @@ valueEscape <- function(x) {
          "character" = ifelse(test = grepl("^[{].*[}]$", trimws(x)),
                               yes = paste0('\'', x, '\''),
                               no = paste0('\'\"', x, '\"\'')),
+
          # - list e.g.: '{"a": "something", "b": 2}'
          "list" = paste0('\'', jsonlite::toJSON(x), '\''),
+
          # - no quotation for integers, real
          "numeric" = paste0(x),
+
          # - default, all others: 'value'
          paste0('\'', x, '\'')
   )
