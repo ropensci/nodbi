@@ -33,7 +33,7 @@ Suggests:
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
     redux,
-    RSQLite (>= 1.1),
+    RSQLite (>= 2.2.4),
     DBI,
     testthat
 RoxygenNote: 7.1.1

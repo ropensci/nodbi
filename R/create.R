@@ -170,7 +170,7 @@ docdb_create.src_mongo <- function(src, key, value, ...){
 }
 
 #' @export
-docdb_create.src_sqlite <- function(src, key, value, ...){
+docdb_create.src_sqlite <- function(src, key, value, ...) {
 
   assert(value,  "data.frame")
   assert(key, "character")
@@ -181,16 +181,21 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
     ### defining the standard for a nodbi json table in sqlite:
     # CREATE TABLE mtcars ( _id TEXT PRIMARY_KEY NOT NULL, json JSON );
     # CREATE UNIQUE INDEX mtcars_index ON mtcars ( _id );
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0("CREATE TABLE \"", key, "\"",
-                         " ( _id TEXT PRIMARY_KEY NOT NULL,",
-                         "  json JSON);"))
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0("CREATE UNIQUE INDEX ",
-                         "\"", key, "_index\" ON ",
-                         "\"", key, "\" ( _id );"))
+
+    dbWithTransaction(
+      src$con, {
+
+        DBI::dbExecute(
+          conn = src$con,
+          statement = paste0("CREATE TABLE \"", key, "\"",
+                             " ( _id TEXT PRIMARY_KEY NOT NULL,",
+                             "  json JSON);"))
+        DBI::dbExecute(
+          conn = src$con,
+          statement = paste0("CREATE UNIQUE INDEX ",
+                             "\"", key, "_index\" ON ",
+                             "\"", key, "\" ( _id );"))
+      })
   }
 
   ### return if no value provided,
@@ -279,7 +284,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
     } else {
       # has idcol
       jsonlite::stream_out(
-        x = value[ -idcol ],
+        x = value[-idcol],
         con = dumpcon,
         verbose = FALSE)
     }
@@ -299,12 +304,14 @@ docdb_create.src_sqlite <- function(src, key, value, ...){
   }
 
   ### load into database
-  nrowaffected <-
-    DBI::dbAppendTable(
-      conn = src$con,
-      name = key,
-      value = value,
-      ...)
+  nrowaffected <- dbWithTransaction(
+    src$con, {
+      DBI::dbAppendTable(
+        conn = src$con,
+        name = key,
+        value = value,
+        ...)
+    })
 
   return(invisible(nrowaffected))
 

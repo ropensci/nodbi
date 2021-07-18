@@ -431,7 +431,7 @@ json2querySql <- function(x, con) {
   # special case
   # https://docs.mongodb.com/manual/reference/operator/query/regex/#pcre-vs-javascript
   x <- gsub(pattern = "[$]regex:",
-            replacement = ifelse(attr(x = con, which = "regexp.extension"),
+            replacement = ifelse(TRUE,
                                  "REGEXP ", "LIKE "),
             x = x)
 
