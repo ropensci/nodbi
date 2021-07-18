@@ -41,7 +41,7 @@
 #' ## contacts is a dataset included in this package
 #' contacts_df <- data.frame(contacts, stringsAsFactors = FALSE)
 #' docdb_create(src, key = "contacts", value = contacts_df)
-#' docdb_get(src, "contacts")
+#' docdb_get(src, "contacts")[["friends"]]
 #' }
 docdb_create <- function(src, key, value, ...){
   UseMethod("docdb_create")
@@ -178,10 +178,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   ### if table does not exist, create one
   if (!docdb_exists(src, key)) {
 
-    ### defining the standard for a nodbi json table in sqlite:
-    # CREATE TABLE mtcars ( _id TEXT PRIMARY_KEY NOT NULL, json JSON );
-    # CREATE UNIQUE INDEX mtcars_index ON mtcars ( _id );
-
+    # standard for a nodbi json table in sqlite
     dbWithTransaction(
       src$con, {
 
@@ -213,56 +210,54 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
       all(sapply(value[, valcol], is.character)) &&
       all(sapply(value[, valcol], jsonlite::validate))) {
 
-    # # convert dataframe rows into json
-    # # respect any pre-existing json
-    # if (all(sapply(value, is.character)) &&
-    #     all(sapply(value, jsonlite::validate))) {
-
     # process json row by row
-    value2 <- lapply(X = seq_len(nrow(value)),
-                     FUN = function(x) {
+    value2 <- lapply(
+      X = seq_len(nrow(value)),
+      function(x) {
 
-                       # get row from data frame
-                       tmp <- value[x, valcol]
+        # get row from data frame
+        tmp <- value[x, valcol]
 
-                       # minify for regexp
-                       tmp <- as.character(jsonlite::minify(tmp))
+        # minify for regexp
+        tmp <- as.character(jsonlite::minify(tmp))
 
-                       # check if _id's in json and get them
-                       subids <- gregexpr('"_id":".*?"', tmp)
-                       subids <- regmatches(tmp, subids)
-                       subids <- sub(".*:\"(.*)\".*", "\\1", unlist(subids))
-                       #
-                       if (length(subids)) {
+        # check if _id's in json and get them
+        subids <- gregexpr('"_id":".*?"', tmp)
+        subids <- regmatches(tmp, subids)
+        subids <- sub(".*:\"(.*)\".*", "\\1", unlist(subids))
+        #
+        if (length(subids)) {
 
-                         # if not in square brackets, add them
-                         if (!grepl("^\\[.*\\]$", tmp)) {
-                           tmp <- paste0('[', tmp, ']')
-                         }
+          # if not in square brackets, add them
+          if (!grepl("^\\[.*\\]$", tmp)) {
+            tmp <- paste0('[', tmp, ']')
+          }
 
-                         # remove _ids
-                         tmp <- gsub('"_id":".*?",', "", tmp)
+          # remove _ids
+          tmp <- gsub('"_id":".*?",', "", tmp)
 
-                         # splice tmp element into json elements and merge again
-                         subvalue <- jsonlite::fromJSON(tmp, simplifyVector = FALSE)
-                         subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
+          # splice tmp element into json elements and merge again
+          subvalue <- jsonlite::fromJSON(tmp, simplifyVector = FALSE)
+          subvalue <- sapply(subvalue, function(x) jsonlite::toJSON(x, auto_unbox = TRUE))
 
-                         # output
-                         data.frame("_id" = subids,
-                                    "json" = subvalue,
-                                    stringsAsFactors = FALSE,
-                                    check.names = FALSE)
+          # output
+          data.frame(
+            "_id" = subids,
+            "json" = subvalue,
+            stringsAsFactors = FALSE,
+            check.names = FALSE)
 
-                       } else {
+        } else {
 
-                         # output
-                         data.frame("_id" = value[x, idcol],
-                                    "json" = tmp,
-                                    stringsAsFactors = FALSE,
-                                    check.names = FALSE)
+          # output
+          data.frame(
+            "_id" = value[x, idcol],
+            "json" = tmp,
+            stringsAsFactors = FALSE,
+            check.names = FALSE)
 
-                       }
-                     })
+        }
+      })
 
     # value included json subelements
     value <- do.call(rbind, value2)
@@ -324,20 +319,20 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 # make_bulk("diamonds", diamonds, "~/diamonds.json")
 make_bulk <- function(key, value, filename = "~/docdbi_bulk.json") {
   unlink(filename)
-  for (i in 1:NROW(value)) {
+  for (i in seq_len(nrow(value))) {
     dat <- list(index = list(`_index` = key, `_type` = key, `_id` = i - 1))
     cat(proc_doc(dat), sep = "\n", file = filename, append = TRUE)
-    cat(proc_doc(value[i,]), sep = "\n", file = filename, append = TRUE)
+    cat(proc_doc(value[i, ]), sep = "\n", file = filename, append = TRUE)
   }
 }
 
-proc_doc <- function(x){
+proc_doc <- function(x) {
   b <- jsonlite::toJSON(x, auto_unbox = TRUE)
   gsub("\\[|\\]", "", as.character(b))
 }
 
 rand_id <- function() {
-  v = c(sample(0:9,     12, replace = TRUE),
-        sample(letters, 12, replace = TRUE))
+  v <- c(sample(0:9,     12, replace = TRUE),
+         sample(letters, 12, replace = TRUE))
   paste0(sample(v), collapse = "")
 }

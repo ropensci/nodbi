@@ -58,6 +58,6 @@ if (docdb_exists(src, "contacts")) docdb_delete(src, "contacts")
 ## contacts is a dataset included in this package
 contacts_df <- data.frame(contacts, stringsAsFactors = FALSE)
 docdb_create(src, key = "contacts", value = contacts_df)
-docdb_get(src, "contacts")
+docdb_get(src, "contacts")[["friends"]]
 }
 }
