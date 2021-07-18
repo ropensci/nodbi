@@ -197,7 +197,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   }
 
   ### return if no value provided,
-  # such as to create empty table
+  # such as to create an empty table
   if (is.null(value)) return(invisible(0L))
 
   # check if _id in data.frame

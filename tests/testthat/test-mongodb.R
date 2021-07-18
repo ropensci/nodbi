@@ -21,10 +21,9 @@ test_that("db into mongo", {
 
   iris$Species <- as.character(iris$Species)
   docdb_create(con, "iris", iris)
-  d2 <- docdb_get(con, "iris")#[, -1]
-  # FIXME: skipping for now, for some reason this is now failing, not sure why
-  ## seems like just data.frame names are different, where mongo
-  ## replaces dots with underscores
+  d2 <- docdb_get(con, "iris")
+  # FIXME: skipping for now, apparently just the names of data.frame
+  # are different; mongolite seems to replace dots with underscores
   names(d2) <- NULL
   names(iris) <- NULL
   expect_equal(d2, iris)
@@ -124,7 +123,7 @@ test_that("update in mongo works", {
                       # to have _id as column name
                       check.names = FALSE)
 
-  expect_equal((docdb_update(con, "mtcars", value)), 1L)
+  expect_equal(docdb_update(con, "mtcars", value), 1L)
   tmp <- docdb_query(con, "mtcars", query = "{}", fields = '{"gear": 1}')
   expect_equal(tmp[["gear"]][tmp[["_id"]] == "2"], 9)
 

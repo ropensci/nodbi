@@ -97,19 +97,6 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
   # get data. note: find() does not include _id
   src$con$find(limit = limit, ...)
 
-  # # note: not using find() since this does not include _id
-  # # FIXME: or use $find() here? not if doing a separate query method
-  # # if (!is.null(limit)) return(src$con$iterate(limit = limit)$page())
-  # dump <- tempfile()
-  #
-  # # register to remove file
-  # # after used for streaming
-  # on.exit(unlink(dump))
-  #
-  # # save data
-  # src$con$export(file(dump))
-  # # remove first column, a MongoDB identifier
-  # jsonlite::stream_in(file(dump), verbose = FALSE) # [,-1]
 }
 
 #' @export
@@ -119,10 +106,7 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
   assert(limit, "integer")
 
   # arguments for call
-  statement <- paste0(
-    # _id is included into json for use with jsonlite::stream_in
-    # "SELECT '{\"_id\": \"' || _id || '\", ' || substr(json, 2) ",
-    "SELECT '{' || substr(json, 2) FROM \"", key, "\" ;")
+  statement <- paste0("SELECT json FROM \"", key, "\" ;")
 
   # set limit if not null
   n <- -1L
