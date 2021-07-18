@@ -11,9 +11,10 @@ docdb_get(src, key, limit = NULL, ...)
 
 \item{key}{(character) A key (collection for mongo)}
 
-\item{limit}{(integer) number of records/rows to return. by default
-not passed, so you get all results. Only works for CouchDB,
-Elasticsearch and MongoDB; ignored for others}
+\item{limit}{(integer) number of records/rows to return.
+By default not passed, so you get all results.
+Only works for CouchDB, Elasticsearch, MongoDB and
+RSQLite; ignored for others}
 
 \item{...}{passed on to functions:
 \itemize{
@@ -64,7 +65,6 @@ docdb_get(src, "mtcars", limit = 4)
 # SQLite
 src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
-docdb_get(src, "mtcars")
 docdb_get(src, "mtcars", limit = 4L)
 }
 }
