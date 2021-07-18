@@ -151,14 +151,15 @@ docdb_update.src_mongo <- function(src, key, value, ...) {
                             multiple = TRUE)   # ok to update several documents
     )
 
-  # Extract number of modified or added documents
+  # Extract number of matched or added documents
   #               [,1]
   # modifiedCount 0
   # matchedCount  0
   # upsertedCount 1
   # upsertedId    "NCT00097292"
-  nrowaffected <- data.frame(nrowaffected,
-                             stringsAsFactors = FALSE)[c(1, 3), , drop = TRUE]
+  nrowaffected <- data.frame(
+    nrowaffected,
+    stringsAsFactors = FALSE)[c(2,3), , drop = TRUE]
 
   invisible(sum(unlist(nrowaffected), na.rm = TRUE))
 
