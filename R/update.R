@@ -43,7 +43,7 @@
 #' dfupd <- data.frame("cyl" = c(4, 6),
 #'                     "gear" = c(88, 99),
 #'                     stringsAsFactors = FALSE)
-#' docdb_update(src, "mtcars", dfupd)
+#' (docdb_update(src, "mtcars", dfupd))
 #' docdb_query(src, "mtcars",
 #'             query = '{"gear": {"$gte": 88}}',
 #'             fields = '{"gear": 1, "cyl": 1}')
@@ -51,7 +51,7 @@
 #'                     "somejson" = c('{"gear": 77, "carb": 55}',
 #'                                    '{"gear": 66, "newvar": 55}'),
 #'                     stringsAsFactors = FALSE)
-#' docdb_update(src, "mtcars", dfupd)
+#' (docdb_update(src, "mtcars", dfupd))
 #' docdb_query(src, "mtcars",
 #'             query = '{"gear": {"$eq": 66}}',
 #'             fields = '{"gear": 1, "cyl": 1, "carb": 1, "newvar": 1}')

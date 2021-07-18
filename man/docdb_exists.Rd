@@ -54,10 +54,10 @@ docdb_create(src, key = "mtcars", value = mtcars)
 docdb_exists(src, "mtcars")
 
 # SQLite
-(src <- src_sqlite())
+src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_exists(src, "mtcars")
-docdb_exists(src, "yellowcheese")
+docdb_exists(src, "nonExistingCollection")
 }
 
 }
