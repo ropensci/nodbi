@@ -9,6 +9,8 @@ test_that("Source", {
   expect_is(con, "docdb_src")
   expect_is(con, "src_sqlite")
   expect_is(con$con, "SQLiteConnection")
+
+  con
 })
 
 context("sqlitedb: create")
@@ -22,15 +24,33 @@ test_that("db into sqlite", {
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
-  iris$Species <- as.character(iris$Species)
-  invisible(docdb_create(con, "iris", iris))
+  # create empty table
+  expect_equal(docdb_create(con, "iris", NULL), 0L)
 
-  invisible(tryCatch(docdb_delete(con, "diamonds"), error = function(e) e))
+  iris$Species <- as.character(iris$Species)
+  docdb_create(con, "iris", iris)
+
+  d2 <- docdb_get(con, "iris", limit = 1L)
   d2 <- docdb_get(con, "iris")
   expect_equal(d2, iris)
 
+  # create json
+  docdb_create(
+    con, "iris",
+    data.frame(
+      "_id" = "someid",
+      "somejson" = contacts,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    ))
+  d2 <- docdb_get(con, "iris")
+  expect_true(mean(d2$age, na.rm = TRUE) == 23L)
+
+  invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
+
   # check if timing acceptable
   docdb_create(con, "diamonds", diamonds)
+  invisible(tryCatch(docdb_delete(con, "diamonds"), error = function(e) e))
 
 })
 
@@ -89,12 +109,25 @@ test_that("query in sqlite works", {
 
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "mt-cars"), error = function(e) e))
-
-  invisible(docdb_create(con, "mt-cars", mtcars))
+  docdb_create(con, "mt-cars", mtcars)
 
   expect_is(
     docdb_query(con, "mt-cars", query = "{}", fields = '{"mpg":1, "cyl": 1}'),
     "data.frame")
+
+  # test limit
+  expect_equal(nrow(docdb_query(
+    src = con, key = "mt-cars",
+    query = "{}",
+    fields = '{}',
+    limit = 12L)), 12L)
+
+  # test non-existing fields
+  expect_equal(names(docdb_query(
+    src = con, key = "mt-cars",
+    query = "{}",
+    fields = '{"doesnotexist": 1, "_id": 1}',
+    limit = 12L)), c( "_id", "doesnotexist"))
 
   # test if _id only works
   expect_equal(nrow(docdb_query(
