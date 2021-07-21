@@ -342,47 +342,6 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 ## helpers --------------------------------------
 
 
-# column type escaping
-jsonEscape <- function(x, y) {
-
-  # parameters:
-  # - x is a data frame created in docdb_query.src_sqlite
-  #     with columns fullkey and type as per json_tree()
-  # - y is the name of a variable / column of x that is of interest
-
-  # json.org: A value can be a string in double quotes,
-  # or a number, or true or false or null, or an object or an array.
-
-  # format field like fullkeys
-  y <- paste0("$.", y)
-  tmp <- unique(x$type[x$fullkey == y])
-
-  # sprintf("' \"%s\": %sjson_extract(%s.json, '$.%s')%s , ' ||",
-  #              o[1]---|                     o[2] ---|
-
-  # no escaping for:
-  # - lists (correspond to arrays)
-  # - numerics
-  # - default
-  o <- c("' || ", " || '")
-
-  # do escaping for:
-  # - row names
-  # - strings
-  if (y == "$._row" ||
-      all(tmp == "text")) {
-    o <- c("\"' || ", " || '\"")
-  }
-  # - arrays if mixed with other types in same key
-  if (length(tmp) >= 2 &&
-      "array" %in% tmp) {
-    o <- c("' || json_array(", ") || '")
-  }
-
-  return(o)
-}
-
-
 # converst json string into
 # string with sql fields
 json2fieldsSql <- function(x) {

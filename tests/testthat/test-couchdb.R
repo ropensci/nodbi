@@ -7,6 +7,7 @@ test_that("Source", {
 
   skip_if_no_couchdb()
   src <- src_couchdb(user = COUCHDB_TEST_USER, pwd = COUCHDB_TEST_PWD)
+  capture.output(print(src))
   expect_is(src, "docdb_src")
   expect_is(src, "src_couchdb")
   expect_is(unclass(src), "list")
@@ -14,7 +15,7 @@ test_that("Source", {
   expect_equal(attr(src, "info")$couchdb, "Welcome")
 })
 
-context("couchdb: create")
+context("couchdb: create, exists, get")
 test_that("db into couchdb", {
   skip_on_cran()
 
@@ -27,6 +28,8 @@ test_that("db into couchdb", {
   invisible(tryCatch(docdb_delete(src, "df"), error = function(e) e))
 
   invisible(docdb_create(src, "df", df))
+  expect_true(docdb_exists(src, "df"))
+
   d2 <- docdb_get(src, "df")
   expect_equal(data.frame(d2), df)
 })

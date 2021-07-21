@@ -48,7 +48,7 @@ docdb_exists <- function(src, key, ...) {
 docdb_exists.src_couchdb <- function(src, key, ...) {
   assert(key, "character")
   tmp <- tryCatch(sofa::db_info(src$con, dbname = key, ...),
-    error = function(e) e)
+                  error = function(e) e)
   !inherits(tmp, "error")
 }
 
@@ -68,26 +68,14 @@ docdb_exists.src_redis <- function(src, key, ...) {
 docdb_exists.src_mongo <- function(src, key, ...) {
   assert(key, "character")
 
-  # need to connect to check collection key
-  test <- src_mongo(collection = key,
-                    db = src$db,
-                    url = src$url)
-
-  # check collection
-
-  # rights may be insufficient to call info(),
-  # hence try() blocks and consecutive tries
-  tmp <- try(!is.null(test$con$info()$stats) &&
-               test$con$info()$stats$count != 0L,
-             silent = TRUE)
-  if (!inherits(class(tmp), "try-error")) return(tmp)
-
-  tmp <- try(docdb_query(src = test,
+  # check if any document
+  tmp <- try(docdb_query(src = src,
                          key = key,
                          query = '{"_id": {"$ne": ""}}',
                          limit = 1L),
              silent = TRUE)
-  if (!inherits(class(tmp), "try-error")) return(nrow(tmp) > 0L)
+
+  return(nrow(tmp) > 0L)
 }
 
 #' @export

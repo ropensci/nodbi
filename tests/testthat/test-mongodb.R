@@ -8,6 +8,8 @@ test_that("Source", {
   expect_is(src, "src_mongo")
   expect_is(src$con, "mongo")
   expect_equal(src$db, "test")
+
+  capture.output(print(src))
 })
 
 context("mongodb: create")
@@ -20,19 +22,52 @@ test_that("db into mongo", {
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
   iris$Species <- as.character(iris$Species)
-  docdb_create(con, "iris", iris)
+
+  expect_message(
+    docdb_create(con, "notiris", iris),
+    "Parameter 'key' is different from parameter 'collection'")
+
+  expect_message(
+    docdb_get(con, "notiris"),
+    "Parameter 'key' is different from parameter 'collection'")
   d2 <- docdb_get(con, "iris")
+
   # FIXME: skipping for now, apparently just the names of data.frame
   # are different; mongolite seems to replace dots with underscores
   names(d2) <- NULL
   names(iris) <- NULL
   expect_equal(d2, iris)
 
+  # create json
+  docdb_create(
+    con, "iris",
+    data.frame(
+      "_id" = "someid",
+      "somejson" = contacts,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    ))
+  d2 <- docdb_get(con, "iris")
+  expect_true(mean(d2$age, na.rm = TRUE) == 23L)
+
+  # create json
+  docdb_create(
+    con, "iris",
+    data.frame(
+      "_id" = "someid",
+      "otherjson" = mapdata,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    ))
+  d2 <- docdb_get(con, "iris")
+  # TODO here but not with src_sqlite we have a double [[1]]
+  d2 <- d2[!sapply(d2$rows, is.null), ]
+  d2 <- d2$rows[[1]][[1]]$elements[[1]]$duration$somevalue
+  expect_identical(d2, c(14064L, 151772L, 67405L, 152913L))
+
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
-  # clean up
-  invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 })
 
 context("mongodb: delete")
@@ -41,7 +76,11 @@ test_that("delete in mongo works", {
 
   skip_if_no_mongo()
   con <- src_mongo(collection = "iris")
+
   # delete if exists
+  expect_message(
+    docdb_delete(con, "notiris"),
+    "Parameter 'key' is different from parameter 'collection'")
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
   docdb_create(con, "iris", iris)
@@ -79,8 +118,15 @@ test_that("query in mongo works", {
   con <- src_mongo(collection = "mtcars")
 
   invisible(docdb_create(con, "mtcars", mtcars))
-  expect_is(suppressWarnings(docdb_query(con, "mtcars", query = '{"mpg":21}')),
-            "data.frame")
+
+  expect_message(
+    docdb_query(con, "notmtcars", query = '{"mpg":21}'),
+    "Parameter 'key' is different from parameter 'collection'")
+
+  expect_is(suppressWarnings(
+    docdb_query(con, "mtcars", query = '{"mpg":21}')),
+    "data.frame")
+
   expect_is(suppressWarnings(
     docdb_query(con, query = '{"mpg":21}', "mtcars", fields = '{"mpg":1, "cyl":1}')),
     "data.frame"
