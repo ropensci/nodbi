@@ -52,6 +52,20 @@ test_that("db into sqlite", {
   docdb_create(con, "diamonds", diamonds)
   invisible(tryCatch(docdb_delete(con, "diamonds"), error = function(e) e))
 
+  # create json
+  docdb_create(
+    con, "mapdata",
+    data.frame(
+      "_id" = "someid",
+      "otherjson" = mapdata,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    ))
+  d2 <- docdb_get(con, "mapdata")
+  d2 <- d2$rows[[1]]$elements[[1]]$duration$somevalue
+  expect_identical(d2, c(14064L, 151772L, 67405L, 152913L))
+  invisible(tryCatch(docdb_delete(con, "mapdata"), error = function(e) e))
+
 })
 
 context("sqlitedb: delete")

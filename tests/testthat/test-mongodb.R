@@ -50,6 +50,21 @@ test_that("db into mongo", {
   d2 <- docdb_get(con, "iris")
   expect_true(mean(d2$age, na.rm = TRUE) == 23L)
 
+  # create json
+  docdb_create(
+    con, "iris",
+    data.frame(
+      "_id" = "someid",
+      "otherjson" = mapdata,
+      check.names = FALSE,
+      stringsAsFactors = FALSE
+    ))
+  d2 <- docdb_get(con, "iris")
+  # TODO here but not with src_sqlite we have a double [[1]]
+  d2 <- d2[!sapply(d2$rows, is.null), ]
+  d2 <- d2$rows[[1]][[1]]$elements[[1]]$duration$somevalue
+  expect_identical(d2, c(14064L, 151772L, 67405L, 152913L))
+
   # delete if exists
   invisible(tryCatch(docdb_delete(con, "iris"), error = function(e) e))
 
