@@ -235,8 +235,7 @@ contacts <- '
 #' @export
 #'
 mapdata <- '
-  [{"_id": "first_id",
-  "destination_addresses": [
+  [{"destination_addresses": [
     "Miami, FL, USA",
     "Austin, TX, USA",
     "Napa County, CA, USA"
@@ -294,8 +293,7 @@ mapdata <- '
   }],
   "status": "OK"},
 
-  {"_id": "second_id",
-  "destination_addresses": [
+  {"destination_addresses": [
     "Washington, DC, USA",
     "Philadelphia, PA, USA",
     "Napa County, CA, USA"
