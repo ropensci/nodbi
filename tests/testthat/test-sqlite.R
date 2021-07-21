@@ -10,7 +10,7 @@ test_that("Source", {
   expect_is(con, "src_sqlite")
   expect_is(con$con, "SQLiteConnection")
 
-  con
+  print(con)
 })
 
 context("sqlitedb: create")

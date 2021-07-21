@@ -75,8 +75,6 @@ docdb_exists.src_mongo <- function(src, key, ...) {
                          limit = 1L),
              silent = TRUE)
 
-  if (inherits(class(tmp), "try-error")) return(FALSE)
-
   return(nrow(tmp) > 0L)
 }
 

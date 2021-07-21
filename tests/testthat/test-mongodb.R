@@ -9,7 +9,7 @@ test_that("Source", {
   expect_is(src$con, "mongo")
   expect_equal(src$db, "test")
 
-  src
+  print(src)
 })
 
 context("mongodb: create")

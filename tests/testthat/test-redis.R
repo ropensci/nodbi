@@ -4,6 +4,7 @@ test_that("Source (Redis)", {
 
   skip_if_no_redis()
   src <- src_redis()
+  print(src)
   expect_that(src, is_a("docdb_src"))
   expect_that(src, is_a("src_redis"))
   expect_that(src$con, is_a("redis_api"))
@@ -21,4 +22,5 @@ test_that("db into Redis", {
   docdb_create(con, key, d)
   d2 <- docdb_get(con, key)
   expect_that(d2, equals(d))
+  expect_true(con, key)
 })
