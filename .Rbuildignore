@@ -15,3 +15,4 @@ man-roxygen
 ^LICENSE\.md$
 ^private$
 .DS_Store
+.lintr
