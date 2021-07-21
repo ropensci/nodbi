@@ -12,7 +12,7 @@ test_that("Source (Redis)", {
   expect_equal(src$con$type(), "redux")
 })
 
-context("redis: create")
+context("redis: create, exists, get")
 test_that("db into Redis", {
   skip_on_cran()
   skip_if_no_redis()
@@ -20,6 +20,7 @@ test_that("db into Redis", {
   key <- "mtcars"
   con <- src_redis()
   docdb_create(con, key, d)
+  expect_true(docdb_exists(con, key))
   d2 <- docdb_get(con, key)
   expect_that(d2, equals(d))
   expect_true(docdb_exists(con, key))

@@ -15,7 +15,7 @@ test_that("Source", {
   expect_equal(attr(src, "info")$couchdb, "Welcome")
 })
 
-context("couchdb: create")
+context("couchdb: create, exists, get")
 test_that("db into couchdb", {
   skip_on_cran()
 
@@ -28,6 +28,8 @@ test_that("db into couchdb", {
   invisible(tryCatch(docdb_delete(src, "df"), error = function(e) e))
 
   invisible(docdb_create(src, "df", df))
+  expect_true(docdb_exists(src, "df"))
+
   d2 <- docdb_get(src, "df")
   expect_equal(data.frame(d2), df)
 })
