@@ -7,6 +7,7 @@ test_that("Source", {
 
   skip_if_no_couchdb()
   src <- src_couchdb(user = COUCHDB_TEST_USER, pwd = COUCHDB_TEST_PWD)
+  capture.output(print(src))
   expect_is(src, "docdb_src")
   expect_is(src, "src_couchdb")
   expect_is(unclass(src), "list")
