@@ -10,19 +10,25 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.3 Patched (2021-01-08 r79819)",
+  "runtimePlatform": "R version 4.1.0 (2021-05-18)",
   "author": [
+    {
+      "@type": "Person",
+      "givenName": "Ralf",
+      "familyName": "Herold",
+      "email": "ralf.herold@mailbox.org",
+      "@id": "https://orcid.org/0000-0002-8148-6748"
+    },
     {
       "@type": "Person",
       "givenName": "Scott",
       "familyName": "Chamberlain",
-      "email": "sckott@protonmail.com",
       "@id": "https://orcid.org/0000-0003-1444-9135"
     },
     {
@@ -34,21 +40,15 @@
       "@type": "Person",
       "givenName": "Jeroen",
       "familyName": "Ooms"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Ralf",
-      "familyName": "Herold",
-      "@id": "https://orcid.org/0000-0002-8148-6748"
     }
   ],
   "maintainer": [
     {
       "@type": "Person",
-      "givenName": "Scott",
-      "familyName": "Chamberlain",
-      "email": "sckott@protonmail.com",
-      "@id": "https://orcid.org/0000-0003-1444-9135"
+      "givenName": "Ralf",
+      "familyName": "Herold",
+      "email": "ralf.herold@mailbox.org",
+      "@id": "https://orcid.org/0000-0002-8148-6748"
     }
   ],
   "softwareSuggestions": [
@@ -107,7 +107,7 @@
       "@type": "SoftwareApplication",
       "identifier": "RSQLite",
       "name": "RSQLite",
-      "version": ">= 1.1",
+      "version": ">= 2.2.4",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -174,7 +174,7 @@
     }
   ],
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
-  "fileSize": "446.838KB",
+  "fileSize": "457.775KB",
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Redis", "Elasticsearch", "CouchDB", "SQLite", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "redis", "r", "r-package", "sqlite"],

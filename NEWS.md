@@ -1,12 +1,17 @@
-nodbi 0.4.2.9000
+nodbi 0.4.3
 ===========
 
 ### MINOR IMPROVEMENTS
-* `docdb_query()` now handles JSON objects for src_sqlite (#40)
-* src_sqlite now uses transactions for relevant functions (#39)
-
+* `docdb_query.src_sqlite()` now handles JSON objects, returning nested lists (#40)
+* `src_sqlite()` now uses transactions for relevant functions (#39)
+* `docdb_update.src_mongo()` now returns the number of upserted or matched documents, irrespective of whether
+  they were updated or not
+  
 ### BUG FIXES
-* `docdb_get()` to not return '_id' field for src_{sqlite,mongo}
+* `docdb_get()` to not return '_id' field for `src_{sqlite,mongo}` since already used for row names
+
+### OTHER
+* change of maintainer agreed
 
 nodbi 0.4.2
 ===========
