@@ -1,99 +1,123 @@
-#' Delete documents or collections
+#' Delete documents or container
+#'
+#' @inheritParams docdb_create
+#' @param ... optional \code{query} parameter with a JSON query as per
+#' [mongolite::mongo()] and as working in [docdb_query()] to identify
+#' documents to be deleted. The default is to delete the container
+#' \code{key}. Other parameters passed on to database backends.
+#'
+#' @return (logical) success of operation. Typically \code{TRUE} if document
+#' or collection existed and \code{FALSE} is document did not exist or
+#' collection did not exist or delete was not successful.
 #'
 #' @export
-#' @param src source object, result of call to src, an
-#' object of class `docdb_src`
-#' @param key (character) A key (collection for MongoDB
-#' and RSQLite)
-#' @param ... For MongoDB and RSQLite: Can include
-#' a query for documents to delete, without query
-#' deletes collection
-#' @template deets
+#'
 #' @examples \dontrun{
-#' # couchdb
-#' (src <- src_couchdb())
-#' docdb_create(src, "mtcars", mtcars)
-#' docdb_get(src, "mtcars")
-#' docdb_delete(src, "mtcars")
-#'
-#' # elasticsearch
-#' src <- src_elastic()
-#' if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
-#' docdb_create(src, "iris", iris)
-#' Sys.sleep(2)
-#' docdb_get(src, "iris")
-#' docdb_delete(src, "iris")
-#'
-#' # Redis
-#' src <- src_redis()
-#' docdb_create(src, key = "mtcars", value = mtcars)
-#' docdb_get(src, "mtcars")
-#' docdb_delete(src, "mtcars")
-#'
-#' # mongo
-#' src <- src_mongo(collection = "iris")
-#' docdb_create(src, "iris", iris)
-#' docdb_get(src, "iris")
-#' docdb_delete(src, "iris")
-#'
-#' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, "iris", iris)
-#' (docdb_delete(src, "iris", query = '{"Species": {"$regex": "a$"}}'))
-#' (docdb_delete(src, "iris"))
+#' docdb_delete(src, "iris", query = '{"Species": {"$regex": "a$"}}')
+#' docdb_delete(src, "iris")
 #' }
 docdb_delete <- function(src, key, ...) {
-  UseMethod("docdb_delete")
+  assert(src, "docdb_src")
+  assert(key, "character")
+  UseMethod("docdb_delete", src)
 }
 
 #' @export
 docdb_delete.src_couchdb <- function(src, key, ...) {
-  assert(key, "character")
-  sofa::db_delete(src$con, dbname = key, ...)
+
+  params <- list(...)
+
+  if (!is.null(params[["query"]])) {
+
+    # get relevant doc _id's and delete
+    ids <- docdb_query(src, key, params[["query"]], fields = '{"_id": 1}')
+    if (!length(ids)) return(FALSE)
+    ids <- ids[, "_id", drop = TRUE]
+    params[["query"]] <- NULL
+    result <- lapply(ids, function(i)
+      try(
+        do.call(
+          sofa::doc_delete,
+          c(list(
+            cushion = src$con,
+            dbname = key,
+            docid = i,
+            as = "list"),
+            params)),
+        silent = TRUE)
+    ) # lapply
+
+  } else {
+
+    # delete database
+    result <- try(sofa::db_delete(
+      src$con, dbname = key, as = "list", ...), silent = TRUE)
+  }
+
+  # prepare return value
+  result <- unlist(result)
+  result <- result[names(result) == "ok"] == "TRUE"
+  return(!inherits(result, "try-error") && length(result))
 }
 
 #' @export
 docdb_delete.src_elastic <- function(src, key, ...) {
-  assert(key, "character")
-  elastic::index_delete(src$con, key, verbose = FALSE)
-}
 
-#' @export
-docdb_delete.src_redis <- function(src, key, ...) {
-  assert(key, "character")
-  src$con$DEL(key)
+  params <- list(...)
+
+  if (!is.null(params[["query"]])) {
+    # get docids
+    docids <- try(
+      docdb_query(src, key, query = params[["query"]],
+                  fields = '{"_id": 1}')[, "_id", drop = TRUE],
+      silent = TRUE)
+    if (inherits(docids, "try-error")) return(FALSE)
+    # delete document(s) if any
+    if (length(docids)) result <- sapply(docids, function(i) {
+      out <- try(
+        elastic::docs_delete(conn = src$con,
+                             index = key,
+                             id = i),
+      silent = TRUE)
+      if (inherits(out, "try-error")) {
+        out <- 0L
+      } else {
+        out <- out[["result"]] == "deleted"
+      }
+      out
+    }, USE.NAMES = FALSE, simplify = TRUE)
+    result <- any(result)
+  } else {
+    # delete collection
+    result <- try(elastic::index_delete(src$con, key, verbose = FALSE), silent = TRUE)
+    result <- !inherits(result, "try-error") && result[["acknowledged"]] == TRUE
+  }
+
+  return(as.logical(result))
 }
 
 #' @export
 docdb_delete.src_mongo <- function(src, key, ...) {
 
-  # check expectations
-  if (exists("key", inherits = FALSE) &&
-      src$collection != key)
-    message("Parameter 'key' is different from parameter 'collection', ",
-            "was given as ", src$collection, " in src_mongo().")
+  chkSrcMongo(src, key)
 
-  # https://docs.mongodb.com/manual/tutorial/remove-documents/
-  # https://jeroen.github.io/mongolite/manipulate-data.html#remove
-
-  # make dotted parameters accessible
-  tmpdots <- list(...)
-
-  # if valid json, try to delete
-  # document(s) instead of collection
-  if (!is.null(tmpdots$query) &&
-      jsonlite::validate(tmpdots$query)) {
-
-    # delete document
-    src$con$remove(query = tmpdots$query,
-                   just_one = FALSE)
-
+  params <- list(...)
+  if (!is.null(params$query) &&
+      jsonlite::validate(params$query)) {
+    # count document(s)
+    result <- src$con$count(
+      query = params$query)
+    # delete document(s) if any
+    if (result) result <- src$con$remove(
+      query = params$query,
+      just_one = FALSE)
   } else {
-
-    # delete collection
-    src$con$drop()
-
+    # delete collection with metadata
+    result <- src$con$drop()
   }
+  return(as.logical(result))
 }
 
 #' @export
@@ -120,22 +144,24 @@ docdb_delete.src_sqlite <- function(src, key, ...) {
       paste0('"', tmpids, '"', collapse = ","), ");")
 
     # do delete
-    dbWithTransaction(
-      src$con, {
-        DBI::dbExecute(
-          conn = src$con,
-          statement = statement)
-      })
+    as.logical(
+      dbWithTransaction(
+        src$con, {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = statement)
+        }))
 
   } else {
 
     # remove table
-    dbWithTransaction(
-      src$con, {
-        DBI::dbRemoveTable(
-          conn = src$con,
-          name = key)
-      })
+    as.logical(
+      dbWithTransaction(
+        src$con, {
+          DBI::dbRemoveTable(
+            conn = src$con,
+            name = key)
+        }))
 
   }
 }

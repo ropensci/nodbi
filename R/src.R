@@ -5,17 +5,23 @@
 #' of the database backends. Each has their own unique set of parameters.
 #'
 #' - MongoDB - [src_mongo()]
-#' - CouchDB - [src_couchdb()]
-#' - Elasticsearch - [src_elastic()]
-#' - Redis - [src_redis()]
 #' - SQLite - [src_sqlite()]
+#' - Elasticsearch - [src_elastic()]
+#' - CouchDB - [src_couchdb()]
 #'
 #' Documentation details for each database:
 #'
-#' - MongoDB - https://docs.mongodb.com/
-#' - CouchDB - http://docs.couchdb.org/
+#' - MongoDB - \url{https://docs.mongodb.com/}
+#' - SQLite/JSON1 - \url{https://www.sqlite.org/json1.html}
+#' - CouchDB - \url{http://docs.couchdb.org/}
 #' - Elasticsearch -
-#'  https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
-#' - Redis - https://redis.io/documentation
-#' - SQLite/json1 - https://www.sqlite.org/json1.html
+#'  \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
+#'
+#'  Documentation for R packages used by `nodbi` for the databases:
+#'
+#'  - mongolite - \url{https://CRAN.R-project.org/package=mongolite}
+#'  - RSQLite - \url{https://CRAN.R-project.org/package=RSQLite}
+#'  - sofa - \url{https://CRAN.R-project.org/package=sofa}
+#'  - elastic - \url{https://CRAN.R-project.org/package=elastic}
+#'
 NULL

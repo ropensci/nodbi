@@ -4,72 +4,46 @@
 \alias{docdb_update}
 \title{Update documents}
 \usage{
-docdb_update(src, key, value, ...)
+docdb_update(src, key, value, query, ...)
 }
 \arguments{
-\item{src}{source object, result of call to src}
+\item{src}{Source object, result of call to any of functions
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
 
-\item{key}{(character) A key (collection for MongoDB and
-RSQLite)}
+\item{key}{(character) A key as name of the container
+(corresponds to parameter \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+a table name for SQLite)}
 
-\item{value}{(data.frame) A single data.frame. For
-MongoDB and RSQLite, its first column identifies the
-documents to be updated by means of the name of the
-column and the value(s) in the respective row(s),
-see examples.}
+\item{value}{The data to be created in the database:
+a single data.frame, a JSON string or a list}
 
-\item{...}{Ignored}
+\item{query}{(character) A JSON query string, see examples}
+
+\item{...}{Passed on to functions:
+\itemize{
+\item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
+\item Elasticsearch: \link[elastic:docs_bulk_update]{elastic::docs_bulk_update}
+\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
+\item RSQLite: ignored
+}}
+}
+\value{
+(integer) Number of successfully updated documents
 }
 \description{
-Update documents
-}
-\details{
-Only CouchDB and sqlite supported for now
+Documents identified by the query are updated
+by patching their JSON with \code{value}.
+This is native with MongoDB and SQLite and is
+emulated for Elasticsearch and CouchDB using
+SQLite/JSON1.
 }
 \examples{
 \dontrun{
-# CouchDB
-src <- src_couchdb()
-docdb_create(src, "mtcars2", mtcars)
-docdb_get(src, "mtcars2")
-
-mtcars$letter <- sample(letters, NROW(mtcars), replace = TRUE)
-invisible(docdb_update(src, "mtcars2", mtcars))
-docdb_get(src, "mtcars2")
-
-# MongoDB
-src <- src_mongo(collection = "mtcars")
-docdb_create(src, key = "mtcars", value = mtcars)
-# - update of carb for each matching gear
-value <- data.frame("gear" = c(4, 5),
-                    "carb" = c(8.1, 7.9),
-                    stringsAsFactors = FALSE)
-docdb_update(src, "mtcars", value)
-# - update of gear where _id / oid is "2"
-value <- data.frame("_id" = "2",
-                    "gear" = 9,
-                    stringsAsFactors = FALSE,
-                    check.names = FALSE)
-docdb_update(src, "mtcars", value)
-docdb_get(src, "mtcars")
-
-# SQLite
 src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
-dfupd <- data.frame("cyl" = c(4, 6),
-                    "gear" = c(88, 99),
-                    stringsAsFactors = FALSE)
-(docdb_update(src, "mtcars", dfupd))
-docdb_query(src, "mtcars",
-            query = '{"gear": {"$gte": 88}}',
-            fields = '{"gear": 1, "cyl": 1}')
-dfupd <- data.frame("cyl" = c(8, 6),
-                    "somejson" = c('{"gear": 77, "carb": 55}',
-                                   '{"gear": 66, "newvar": 55}'),
-                    stringsAsFactors = FALSE)
-(docdb_update(src, "mtcars", dfupd))
-docdb_query(src, "mtcars",
-            query = '{"gear": {"$eq": 66}}',
-            fields = '{"gear": 1, "cyl": 1, "carb": 1, "newvar": 1}')
+docdb_update(src, "mtcars", value = mtcars[3, 4:5], query = '{"gear": 3}')
+docdb_update(src, "mtcars", value = '{"carb":999}', query = '{"gear": 5}')
+docdb_get(src, "mtcars")
 }
 }

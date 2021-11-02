@@ -3,14 +3,14 @@
 \docType{data}
 \name{contacts}
 \alias{contacts}
-\title{contacts}
+\title{contacts JSON data set}
 \format{
-A json string with ragged, nested contact details
+A JSON string with ragged, nested contact details
 }
 \usage{
 contacts
 }
 \description{
-contacts
+contacts JSON data set
 }
 \keyword{data}

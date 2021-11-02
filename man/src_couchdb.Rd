@@ -21,7 +21,7 @@ src_couchdb(
 set, set this parameter to NULL. Default: 5984}
 
 \item{path}{(character) context path that is appended to the end
-of the url. e.g., bar in http://foo.com/bar. Default: NULL, ignored}
+of the url, e.g., bar in http://foo.com/bar. Default: NULL, ignored}
 
 \item{transport}{(character) http or https. Default: http}
 
@@ -35,7 +35,7 @@ of the url. e.g., bar in http://foo.com/bar. Default: NULL, ignored}
 Setup a CouchDB database connection
 }
 \details{
-uses \pkg{sofa} under the hood; uses \link[sofa:Cushion]{sofa::Cushion} for
+uses \pkg{sofa} under the hood; uses \code{\link[sofa:Cushion]{sofa::Cushion()}} for
 connecting
 }
 \examples{

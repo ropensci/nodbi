@@ -1,3 +1,36 @@
+nodbi 0.5
+===========
+
+### IMPROVEMENTS
+* identical API for `docdb_*()` functions so that `query` and `fields` parameters can be used across database backends
+* identical return values across database backends
+
+### UNDER THE HOOD
+* re-factored recently added functions for RSQLite
+* re-factored most functions to provide identical API
+* performance (timing and memory use) profiled and optimised as far as possible
+
+### OTHER CHANGES
+* testing now uses the same test file across databases
+* currently, no more support for redis (no way was found to query and update specific documents in a container)
+* `docdb_list()` added as function to list container in database
+
+### NOTES
+* Support for complex queries not yet implemented for Elasticsearch
+* Only root fields (no subitems) returned by Elasticsearch and CouchDB
+
+nodbi 0.4.4
+===========
+
+### MINOR IMPROVEMENTS
+* made remaining `docdb_*()` functions return a logical indicating the success of the function (`docdb_create`, `docdb_delete`), or a data frame (`docdb_get`, `docdb_query`), or the number of documents affected by the function (`docdb_update`)
+  
+### BUG FIXES
+* `docdb_get()` to not return '_id' field for `src_{sqlite,mongo}` since already used for row names
+
+### OTHER
+* change testing approach
+
 nodbi 0.4.3
 ===========
 
