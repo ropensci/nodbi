@@ -45,10 +45,10 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   tmpFields <- ""
   if (length(params[["fields"]])) {
     tmpFields <- params[["fields"]]
-    m <- gregexec('"([-._\\w]+?)":[ ]*1', params[["fields"]], perl = TRUE)
-    if (m[[1]][1] != -1L) fields <- regmatches(params[["fields"]], m)[[1]][2, , drop = TRUE]
+    m <- stringi::stri_match_all_regex(params[["fields"]], '"([-._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) fields <- m
     params[["fields"]] <- NULL
-    if (m[[1]][1] != -1L && length(fields)) {
+    if (!is.na(m[1]) && length(fields)) {
       # cannot filter for subitems in documents, thus keep only their roots
       if (any(grepl("[.]", fields))) message(
         "Note: return root field(s) because subfields cannot be accessed for: ",
@@ -89,8 +89,8 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
     if (length(rM)) out <- out[, -rM, drop = FALSE]
     rm <- NULL
     # remove any column with field_name: 0
-    m <- gregexec('"([-._\\w]+?)":[ ]*0', tmpFields, perl = TRUE)
-    if (m[[1]][1] != -1L) tmpFields <- regmatches(tmpFields, m)[[1]][2, , drop = TRUE]
+    m <- stringi::stri_match_all_regex(tmpFields, '"([-._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) tmpFields <- m
     rM <- stats::na.omit(match(tmpFields, names(out)))
     if (length(rM)) out <- out[, -rM, drop = FALSE]
   }
@@ -112,9 +112,9 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
   # params <- list(); params$fields <- '{"_id": 1, "name":1, "me_not": 0}'
   if (length(params[["fields"]])) {
     #
-    m <- gregexec('"([-._\\w]+?)":[ ]*1', params[["fields"]], perl = TRUE)
-    if (m[[1]][1] != -1L) fields <- regmatches(params[["fields"]], m)[[1]][2, , drop = TRUE]
-    if (m[[1]][1] != -1L && length(fields)) {
+    m <- stringi::stri_match_all_regex(params[["fields"]], '"([-._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) fields <- m
+    if (!is.na(m[1]) && length(fields)) {
       # cannot filter for subitems in documents, thus keep only their roots
       if (any(grepl("[.]", fields))) message(
         "Note: return root field(s) because subfields cannot be accessed for: ",
@@ -122,9 +122,9 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
       params[["source_includes"]] <- gsub("(.+?)[.].*", "\\1", fields)
     }
     #
-    m <- gregexec('"([-._\\w]+?)":[ ]*0', params[["fields"]], perl = TRUE)
-    if (m[[1]][1] != -1L) fields <- regmatches(params[["fields"]], m)[[1]][2, , drop = TRUE]
-    if (m[[1]][1] != -1L && length(fields)) params[["source_excludes"]] <- fields
+    m <- stringi::stri_match_all_regex(params[["fields"]], '"([-._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) fields <- m
+    if (!is.na(m[1]) && length(fields)) params[["source_excludes"]] <- fields
     params[["fields"]] <- NULL
   }
 
@@ -211,14 +211,14 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   if (length(params[["fields"]])) {
     tmpFields <- params[["fields"]]
     params[["fields"]] <- '{}'
-    m <- gregexec('"([-._\\w]+?)":[ ]*1', tmpFields, perl = TRUE)
-    if (m[[1]][1] != -1L) fields <- regmatches(tmpFields, m)[[1]][2, , drop = TRUE]
-    if (m[[1]][1] != -1L && length(fields)) params[["fields"]] <-
+    m <- stringi::stri_match_all_regex(tmpFields, '"([-._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) fields <- m
+    if (!is.na(m[1]) && length(fields)) params[["fields"]] <-
       paste0('{', paste0('"', fields, '":1', collapse = ','), '}', collapse = '')
     fields <- NULL
-    m <- gregexec('"([-._\\w]+?)":[ ]*0', tmpFields, perl = TRUE)
-    if (m[[1]][1] != -1L) tmpFields <- regmatches(tmpFields, m)[[1]][2, , drop = TRUE]
-    if (m[[1]][1] != -1L && length(tmpFields)) fields <- tmpFields
+    m <- stringi::stri_match_all_regex(tmpFields, '"([-._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) tmpFields <- m
+    if (!is.na(m[1]) && length(tmpFields)) fields <- tmpFields
   }
 
   # if regexp query lacks options, add them in
@@ -456,15 +456,15 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   if (length(params[["fields"]])) {
     # any fields that were to be included
     rM <- NULL
-    m <- gregexec('"([-._\\w]+?)":[ ]*1', params[["fields"]], perl = TRUE)
-    if (m[[1]][1] != -1L) rM <- stats::na.omit(match(
+    m <- stringi::stri_match_all_regex(params[["fields"]], '"([-._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) rM <- stats::na.omit(match(
       unique(c(fields, rootFields, unlist(subFields))), names(out)))
     if (length(rM)) out <- out[, rM, drop = FALSE]
     # any fields that were requested to not be included
     rM <- NULL
-    m <- gregexec('"([-._\\w]+?)":[ ]*0', params[["fields"]], perl = TRUE)
-    if (m[[1]][1] != -1L) rM <- regmatches(params[["fields"]], m)[[1]][2, , drop = TRUE]
-    if (m[[1]][1] != -1L && length(rM)) rM <- stats::na.omit(match(rM, names(out)))
+    m <- stringi::stri_match_all_regex(params[["fields"]], '"([-._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]
+    if (!is.na(m[1])) rM <- m
+    if (!is.na(m[1]) && length(rM)) rM <- stats::na.omit(match(rM, names(out)))
     if (length(rM)) out <- out[, -rM, drop = FALSE]
     #
   }

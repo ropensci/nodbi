@@ -1,26 +1,11 @@
 # helper functions
 
-# # used with sofa, elastic
-# pluck <- function(x, name, type) {
-#   if (missing(type)) {
-#     lapply(x, "[[", name)
-#   } else {
-#     vapply(x, "[[", name, FUN.VALUE = type)
-#   }
-# }
-
 # used with redis, couchdb, elastic
 doc_wrap <- function(..., indent = 0, width = getOption("width")) {
   x <- paste0(..., collapse = "")
   wrapped <- strwrap(x, indent = indent, exdent = indent + 5L, width = width)
   paste0(wrapped, collapse = "\n")
 }
-
-# # used with couchdb, elastic
-# makedf <- function(x) {
-#   return((data.table::setDF(
-#     data.table::rbindlist(x, use.names = TRUE, fill = TRUE))))
-# }
 
 # used across
 assert <- function(x, y) {
