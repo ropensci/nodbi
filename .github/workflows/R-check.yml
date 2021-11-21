@@ -67,6 +67,10 @@ jobs:
       #   with:
       #     redis-version: 6
 
+      - name: Install development libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y libjq-dev
+
       - name: Install pak
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
@@ -86,7 +90,7 @@ jobs:
           while read -r cmd
           do
             eval sudo $cmd
-          done < <(Rscript -e 'writeLines(pak::local_system_requirements("ubuntu", "16.04"))')
+          done < <(Rscript -e 'writeLines(pak::local_system_requirements("ubuntu", "20.04"))')
 
       - name: Install dependencies
         run: |
@@ -117,6 +121,6 @@ jobs:
           path: check
 
       - name: Test coverage
-        if: matrix.config.os == 'ubuntu-16.04' && matrix.config.r == 'latest'
+        if: matrix.config.os == 'ubuntu-20.04' && matrix.config.r == 'latest'
         run: |
           Rscript -e "install.packages('covr')" -e 'covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")'
