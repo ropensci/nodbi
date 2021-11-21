@@ -1,10 +1,6 @@
 
 # nodbi
 
-<!--
-
--->
-
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -44,10 +40,11 @@ and for executing the following operations:
 -   Delete
 -   List
 
-across all database backends. \*Only simple queries (and updates, e.g.
-equality for a single field) supported for Elasticsearch at the moment.
-\*\*Only root fields can be specified for CouchDB and Elasticsearch,
-whereas subitems in fields can be specified for MongoDB and SQLite.
+across all database backends. \*Only simple queries (and updates,
+e.g. equality for a single field) supported for Elasticsearch at the
+moment. \*\*Only root fields can be specified for CouchDB and
+Elasticsearch, whereas subitems in fields can be specified for MongoDB
+and SQLite.
 
 For details of operations and parameter combinations across any of the
 database backends, see the main file for package testing, here:
@@ -80,14 +77,14 @@ Parameters for `docdb_*()` functions are the same across functions.
 | Purpose                                                                                          | Function call                                                                                                     |
 |--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | Create database connection (see below)                                                           | `src <- nodbi::src_{mongo, sqlite, couchdb, elastic}(<see below for parameters>)`                                 |
-| Load data frame, list or JSON string from `myData` into database, table `dbTbl`                  | `nodbi::docdb_create(src = src, key = "dbTbl", value = myData)`                                                   |
+| Load data frame, list or JSON string from `myData` into database, container `dbTbl`              | `nodbi::docdb_create(src = src, key = "dbTbl", value = myData)`                                                   |
 | Get all documents back into a data frame                                                         | `nodbi::docdb_get(src = src, key = "dbTbl")`                                                                      |
 | Get documents selected with query (as MongoDB-compatible JSON) into a data frame                 | `nodbi::docdb_query(src = src, key = "dbTbl", query = '{"age": 20}')`                                             |
 | Get selected fields (in MongoDB compatible JSON) from documents selected query                   | `nodbi::docdb_query(src = src, key = "dbTbl", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
 | Update (patch) selected documents with new data in data frame, list or JSON string from `myData` | `nodbi::docdb_update(src = src, key = "dbTbl", value = myData, query = '{"age": 20}')`                            |
-| Check if table exists                                                                            | `nodbi::docdb_exists(src = src, key = "dbTbl")`                                                                   |
-| List all tables in database                                                                      | `nodbi::docdb_list(src = src)`                                                                                    |
-| Delete document(s) in table                                                                      | `nodbi::docdb_delete(src = src, key = "dbTbl", query = '{"age": 20}')`                                            |
+| Check if container exists                                                                        | `nodbi::docdb_exists(src = src, key = "dbTbl")`                                                                   |
+| List all containers in database                                                                  | `nodbi::docdb_list(src = src)`                                                                                    |
+| Delete document(s) in container                                                                  | `nodbi::docdb_delete(src = src, key = "dbTbl", query = '{"age": 20}')`                                            |
 | Delete database                                                                                  | `nodbi::docdb_delete(src = src, key = "dbTbl")`                                                                   |
 | Close and remove database connection                                                             | `rm(src)`                                                                                                         |
 
@@ -99,8 +96,8 @@ use with `nodbi`.
 
 ### MongoDB
 
-(Note that only MongoDB requires to specify the table already in the
-`src_*()` function.)
+Note that only MongoDB requires to specify the container already in the
+`src_*()` function. “Container” refers to a MongoDB collection.
 
 ``` r
 src_mongo(
@@ -112,6 +109,7 @@ src_mongo(
 
 The functionality to process JSON is based on the SQLite extension
 [JSON1](https://www.sqlite.org/json1.html), available in RSQLite.
+“Container” refers to an SQLite table.
 
 ``` r
 src_sqlite(dbname = ":memory:", ...)
@@ -125,7 +123,7 @@ src_couchdb(
   transport = "http", user = NULL, pwd = NULL, headers = NULL)
 ```
 
-### Elasticsearch
+### ElasticSearch
 
 ``` r
 src_elastic(
@@ -245,7 +243,7 @@ data <- as.data.frame(diamonds)[1:2000,]
 
 testFunction <- function(src, key, value, query, fields) {
   docdb_create(src, key, data)
-  # Elastic needs a moment to process the data
+  # ElasticSearch needs a moment to process the data
   if (inherits(src, "src_elastic")) Sys.sleep(1)
   head(docdb_get(src, key))
   docdb_query(src, key, query = query, fields = fields)
@@ -261,7 +259,7 @@ rbenchmark::benchmark(
   replications = 10L,
   columns = c('test', 'replications', 'elapsed')
 )
-#> results with 10 s subtracted for Elastic
+#> on 2015 macOS hardware with local databases; after subtracting 10s for ElasticSearch
 #>      test replications elapsed
 #> 4 CouchDB           10    48.2
 #> 3 Elastic           10    28.2

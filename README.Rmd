@@ -17,59 +17,9 @@ knitr::opts_chunk$set(
 
 ```
 
-<!--
-```{r echo=FALSE}
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![cran checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi) [![R-CMD-check](https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check) [![codecov](https://codecov.io/gh/ropensci/nodbi/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/nodbi) [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cranlogs.app) [![cran version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
 
-library("knitr")
-hook_output <- knitr::knit_hooks$get("output")
-knitr::knit_hooks$set(output = function(x, options) {
-lines <- options$output.lines
-if (is.null(lines)) {
-return(hook_output(x, options))  # pass to default hook
-}
-x <- unlist(strsplit(x, "\n"))
-more <- "..."
-if (length(lines) == 1) {        # first n lines
-if (length(x) > lines) {
-# truncate the output, but add ....
-x <- c(head(x, lines), more)
-}
-} else {
-x <- c(if (abs(lines[1]) > 1) more else NULL,
-x[lines],
-if (length(x) > lines[abs(length(lines))]) more else NULL
-)
-}
-# paste these lines together
-x <- paste(c(x, ""), collapse = "\n")
-hook_output(x, options)
-})
-
-knitr::opts_chunk$set(
-comment = "#>",
-collapse = TRUE,
-warning = FALSE,
-message = FALSE,
-eval = FALSE
-)
-```
--->
-
-[![Project Status: Active – The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![cran
-checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi)
-[![R-CMD-check](https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check)
-[![codecov](https://codecov.io/gh/ropensci/nodbi/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/nodbi)
-[![rstudio mirror
-downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cranlogs.app)
-[![cran
-version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
-
-`nodbi` is an R package that provides a single interface for several
-NoSQL databases, with the same function parameters and return values
-across backends.
+`nodbi` is an R package that provides a single interface for several NoSQL databases, with the same function parameters and return values across backends.
 
 Currently, `nodbi` supports the following database backends:
 
@@ -94,14 +44,9 @@ and for executing the following operations:
 -   Delete
 -   List
 
-across all database backends. \*Only simple queries (and updates, e.g.
-equality for a single field) supported for Elasticsearch at the moment. 
-\*\*Only root fields can be specified for CouchDB and Elasticsearch, 
-whereas subitems in fields can be specified for MongoDB and SQLite.
+across all database backends. \*Only simple queries (and updates, e.g. equality for a single field) supported for Elasticsearch at the moment. \*\*Only root fields can be specified for CouchDB and Elasticsearch, whereas subitems in fields can be specified for MongoDB and SQLite.
 
-For details of operations and parameter combinations across any of the
-database backends, see the main file for package testing, here:
-[core-nodbi.R](./tests/testthat/core-nodbi.R).
+For details of operations and parameter combinations across any of the database backends, see the main file for package testing, here: [core-nodbi.R](./tests/testthat/core-nodbi.R).
 
 ## Install
 
@@ -130,27 +75,24 @@ Parameters for `docdb_*()` functions are the same across functions.
 | Purpose                                                                                          | Function call                                                                                                     |
 |--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | Create database connection (see below)                                                           | `src <- nodbi::src_{mongo, sqlite, couchdb, elastic}(<see below for parameters>)`                                 |
-| Load data frame, list or JSON string from `myData` into database, table `dbTbl`                  | `nodbi::docdb_create(src = src, key = "dbTbl", value = myData)`                                                   |
+| Load data frame, list or JSON string from `myData` into database, container `dbTbl`                  | `nodbi::docdb_create(src = src, key = "dbTbl", value = myData)`                                                   |
 | Get all documents back into a data frame                                                         | `nodbi::docdb_get(src = src, key = "dbTbl")`                                                                      |
-| Get documents selected with query (as MongoDB-compatible JSON) into a data frame                               | `nodbi::docdb_query(src = src, key = "dbTbl", query = '{"age": 20}')`                                             |
+| Get documents selected with query (as MongoDB-compatible JSON) into a data frame                 | `nodbi::docdb_query(src = src, key = "dbTbl", query = '{"age": 20}')`                                             |
 | Get selected fields (in MongoDB compatible JSON) from documents selected query                   | `nodbi::docdb_query(src = src, key = "dbTbl", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
 | Update (patch) selected documents with new data in data frame, list or JSON string from `myData` | `nodbi::docdb_update(src = src, key = "dbTbl", value = myData, query = '{"age": 20}')`                            |
-| Check if table exists                                                                            | `nodbi::docdb_exists(src = src, key = "dbTbl")`                                                                   |
-| List all tables in database                                                                      | `nodbi::docdb_list(src = src)`                                                                                    |
-| Delete document(s) in table                                                                      | `nodbi::docdb_delete(src = src, key = "dbTbl", query = '{"age": 20}')`                                            |
+| Check if container exists                                                                            | `nodbi::docdb_exists(src = src, key = "dbTbl")`                                                                   |
+| List all containers in database                                                                      | `nodbi::docdb_list(src = src)`                                                                                    |
+| Delete document(s) in container                                                                      | `nodbi::docdb_delete(src = src, key = "dbTbl", query = '{"age": 20}')`                                            |
 | Delete database                                                                                  | `nodbi::docdb_delete(src = src, key = "dbTbl")`                                                                   |
 | Close and remove database connection                                                             | `rm(src)`                                                                                                         |
 
 ## Database connections
 
-Overview on parameters that are specific to the database backend. These
-are only needed once, for `src_*()` to create a connection object for
-use with `nodbi`.
+Overview on parameters that are specific to the database backend. These are only needed once, for `src_*()` to create a connection object for use with `nodbi`.
 
 ### MongoDB
 
-(Note that only MongoDB requires to specify the table already in the
-`src_*()` function.)
+Note that only MongoDB requires to specify the container already in the `src_*()` function. "Container" refers to a MongoDB collection. 
 
 ```{r}
 src_mongo(
@@ -160,8 +102,7 @@ src_mongo(
 
 ### SQLite
 
-The functionality to process JSON is based on the SQLite extension
-[JSON1](https://www.sqlite.org/json1.html), available in RSQLite.
+The functionality to process JSON is based on the SQLite extension [JSON1](https://www.sqlite.org/json1.html), available in RSQLite. "Container" refers to an SQLite table. 
 
 ```{r}
 src_sqlite(dbname = ":memory:", ...)
@@ -175,7 +116,7 @@ src_couchdb(
   transport = "http", user = NULL, pwd = NULL, headers = NULL)
 ```
 
-### Elasticsearch
+### ElasticSearch
 
 ```{r}
 src_elastic(
@@ -295,7 +236,7 @@ data <- as.data.frame(diamonds)[1:2000,]
 
 testFunction <- function(src, key, value, query, fields) {
   docdb_create(src, key, data)
-  # Elastic needs a moment to process the data
+  # ElasticSearch needs a moment to process the data
   if (inherits(src, "src_elastic")) Sys.sleep(1)
   head(docdb_get(src, key))
   docdb_query(src, key, query = query, fields = fields)
@@ -311,7 +252,7 @@ rbenchmark::benchmark(
   replications = 10L,
   columns = c('test', 'replications', 'elapsed')
 )
-#> results with 10 s subtracted for Elastic
+#> on 2015 macOS hardware with local databases; after subtracting 10s for ElasticSearch
 #>      test replications elapsed
 #> 4 CouchDB           10    48.2
 #> 3 Elastic           10    28.2
@@ -325,48 +266,41 @@ rbenchmark::benchmark(
 ```{r}
 testthat::test_local()
 ```
-```
-✓ | F W S  OK | Context
-✓ |         5 | couchdb [0.6s]                                                                            
-✓ |        27 | - create, exists, list, get, delete [2.2s]                                                
-✓ |        26 | - query [1.1s]                                                                            
-✓ |        14 | - update, query [5.1s]                                                                    
-✓ |         3 | elastic [0.8s]                                                                            
-✓ |        27 | - create, exists, list, get, delete [16.4s]                                               
-✓ |     1  10 | - query [2.2s]                                                                            
-──────────────────────────────────────────────────────────────
-Skip (core-nodbi.R:106:3): docdb_query
-Reason: queries need to be translated into elastic syntax
-──────────────────────────────────────────────────────────────
-✓ |        12 | - update, query [3.6s]                                                                    
-✓ |         3 | mongodb [0.3s]                                                                            
-✓ |        27 | - create, exists, list, get, delete [0.8s]                                                
-✓ |        26 | - query [0.3s]                                                                            
-✓ |        14 | - update, query [0.1s]                                                                    
-✓ |         3 | sqlite                                                                                    
-✓ |        27 | - create, exists, list, get, delete [0.5s]                                                
-✓ |        26 | - query [0.2s]                                                                            
-✓ |        14 | - update, query [0.1s]                                                                    
 
-══ Results ══════════════════════════════════════════
-Duration: 34.3 s
+    ✓ | F W S  OK | Context
+    ✓ |         5 | couchdb [0.6s]                                                                            
+    ✓ |        27 | - create, exists, list, get, delete [2.2s]                                                
+    ✓ |        26 | - query [1.1s]                                                                            
+    ✓ |        14 | - update, query [5.1s]                                                                    
+    ✓ |         3 | elastic [0.8s]                                                                            
+    ✓ |        27 | - create, exists, list, get, delete [16.4s]                                               
+    ✓ |     1  10 | - query [2.2s]                                                                            
+    ──────────────────────────────────────────────────────────────
+    Skip (core-nodbi.R:106:3): docdb_query
+    Reason: queries need to be translated into elastic syntax
+    ──────────────────────────────────────────────────────────────
+    ✓ |        12 | - update, query [3.6s]                                                                    
+    ✓ |         3 | mongodb [0.3s]                                                                            
+    ✓ |        27 | - create, exists, list, get, delete [0.8s]                                                
+    ✓ |        26 | - query [0.3s]                                                                            
+    ✓ |        14 | - update, query [0.1s]                                                                    
+    ✓ |         3 | sqlite                                                                                    
+    ✓ |        27 | - create, exists, list, get, delete [0.5s]                                                
+    ✓ |        26 | - query [0.2s]                                                                            
+    ✓ |        14 | - update, query [0.1s]                                                                    
 
-── Skipped tests  ───────────────────────────────────────────
-• queries need to be translated into elastic syntax (1)
+    ══ Results ══════════════════════════════════════════
+    Duration: 34.3 s
 
-[ FAIL 0 | WARN 0 | SKIP 1 | PASS 264 ]
-```
+    ── Skipped tests  ───────────────────────────────────────────
+    • queries need to be translated into elastic syntax (1)
 
+    [ FAIL 0 | WARN 0 | SKIP 1 | PASS 264 ]
 
 ## Notes
 
--   Please [report any issues or
-bugs](https://github.com/ropensci/nodbi/issues).
+-   Please [report any issues or bugs](https://github.com/ropensci/nodbi/issues).
 -   License: MIT
--   Get citation information for `nodbi` in R doing
-`citation(package = 'nodbi')`
--   Please note that this package is released with a [Contributor Code
-of Conduct](https://ropensci.org/code-of-conduct/). By contributing
-to this project, you agree to abide by its terms.
--   Support for redis has been removed for version 0.5, because no way
-was found to query and update specific documents in a container.
+-   Get citation information for `nodbi` in R doing `citation(package = 'nodbi')`
+-   Please note that this package is released with a [Contributor Code of Conduct](https://ropensci.org/code-of-conduct/). By contributing to this project, you agree to abide by its terms.
+-   Support for redis has been removed for version 0.5, because no way was found to query and update specific documents in a container.
