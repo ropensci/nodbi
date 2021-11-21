@@ -1,8 +1,10 @@
 #' Document database connector
 #'
-#' Supports NoSQL databases (Elasticsearch, CouchDB, MongoDB),
-#' key-value databases (Redis), and SQLite with json1 extension
-#' as in R package RSQLite.
+#'
+#' Simplified document database access and manipulation,
+#' providing a common API across supported 'NoSQL' databases
+#' 'Elasticsearch', 'CouchDB', 'MongoDB' as well as
+#' 'SQLite/JSON1'.
 #'
 #' @name nodbi-package
 #' @aliases nodbi
@@ -15,22 +17,28 @@
 NULL
 
 #' This function is defunct.
-#' @export
 #' @rdname src_etcd-defunct
 #' @keywords internal
 src_etcd <- function() {
   .Defunct(msg = "This function is defunct; etcd removed")
 }
 
+#' This function is defunct.
+#' @rdname src_redis-defunct
+#' @keywords internal
+src_redis <- function() {
+  .Defunct(msg = "This function is defunct; redis removed")
+}
+
 #' Defunct functions in nodbi
 #'
-#' - [src_etcd]: etcd removed, as long as S3 methods for all `docdb_*`
-#' functions
+#' - [src_etcd]: etcd removed, with all its S3 methods for `docdb_*`
+#' - [src_redis]: redis removed, with all its S3 methods for `docdb_*`
 #'
 #' @name nodbi-defunct
 NULL
 
-#' diamonds
+#' diamonds data set
 #'
 #' @format A data frame with 53940 rows and 10 variables:
 #'
@@ -54,9 +62,9 @@ NULL
 NULL
 
 
-#' contacts
+#' contacts JSON data set
 #'
-#' @format A json string with ragged, nested contact details
+#' @format A JSON string with ragged, nested contact details
 #' @name contacts
 #' @docType data
 #' @keywords data
@@ -226,9 +234,9 @@ contacts <- '
 '
 
 
-#' mapdata
+#' mapdata JSON data set
 #'
-#' @format A json string with ragged, nested map
+#' @format A JSON string with ragged, nested map
 #' @name mapdata
 #' @docType data
 #' @keywords data
@@ -347,7 +355,7 @@ mapdata <- '
         "status": "OK"
       },
       {
-        "duration": {
+        "distance": {
           "text": "2,871 mi",
           "somevalue": 4620514
         },

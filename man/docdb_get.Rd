@@ -2,69 +2,42 @@
 % Please edit documentation in R/get.R
 \name{docdb_get}
 \alias{docdb_get}
-\title{Get documents}
+\title{Get all documents from container in database}
 \usage{
 docdb_get(src, key, limit = NULL, ...)
 }
 \arguments{
-\item{src}{source object, result of call to src}
+\item{src}{Source object, result of call to any of functions
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
 
-\item{key}{(character) A key (collection for mongo)}
+\item{key}{(character) A key as name of the container
+(corresponds to parameter \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+a table name for SQLite)}
 
-\item{limit}{(integer) number of records/rows to return.
-By default not passed, so you get all results.
-Only works for CouchDB, Elasticsearch, MongoDB and
-RSQLite; ignored for others}
+\item{limit}{(integer) Maximum number of documents
+to return (defaults to all for MongoDB,
+all for SQLite, 10,000 for Elasticsearch and
+all for CouchDB}
 
-\item{...}{passed on to functions:
+\item{...}{Passed on to functions:
 \itemize{
-\item CouchDB: passed to \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
-\item Elasticsearch: passed to \code{\link[elastic:Search]{elastic::Search()}}
-\item Redis: ignored
-\item MongoDB: ignored
+\item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
 \item SQLite: ignored
+\item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
+\item CouchDB: \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
 }}
 }
-\description{
-Get documents
+\value{
+Document(s) in a data frame
 }
-\details{
-Note that with etcd, you have to prefix a key with a
-forward slash.
+\description{
+Get all documents from container in database
 }
 \examples{
 \dontrun{
-# CouchDB
-src <- src_couchdb()
-docout <- docdb_create(src, key = "mtcars2", value = mtcars)
-docdb_get(src, "mtcars2")
-docdb_get(src, "mtcars2", limit = 5)
-
-# Elasticsearch
-src <- src_elastic()
-if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
-docdb_create(src, "iris", iris)
-Sys.sleep(2)
-docdb_get(src, "iris")
-if (docdb_exists(src, "d2")) docdb_delete(src, "d2")
-docdb_create(src, "d2", diamonds)
-Sys.sleep(3)
-docdb_get(src, "d2", limit = 1010)
-
-# Redis
-src <- src_redis()
-docdb_create(src, "mtcars", mtcars)
-docdb_get(src, "mtcars")
-
-# Mongo
-src <- src_mongo(collection = "mtcars")
-docdb_create(src, "mtcars", mtcars)
-docdb_get(src, "mtcars")
-docdb_get(src, "mtcars", limit = 4)
-
-# SQLite
 src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
-docdb_get(src, "mtcars", limit = 4L)
+docdb_get(src, "mtcars", limit = 10L)
 }
 }

@@ -3,7 +3,7 @@
 \docType{data}
 \name{diamonds}
 \alias{diamonds}
-\title{diamonds}
+\title{diamonds data set}
 \format{
 A data frame with 53940 rows and 10 variables:
 \itemize{
@@ -25,6 +25,6 @@ SI1, SI2, VS1, VS2, VVS1, VVS2, IF (best))
 from \pkg{ggplot2}
 }
 \description{
-diamonds
+diamonds data set
 }
 \keyword{data}

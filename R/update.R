@@ -1,331 +1,299 @@
 #' Update documents
 #'
+#' Documents identified by the query are updated
+#' by patching their JSON with \code{value}.
+#' This is native with MongoDB and SQLite and is
+#' emulated for Elasticsearch and CouchDB using
+#' SQLite/JSON1.
+#'
+#' @inheritParams docdb_create
+#'
+#' @param query (character) A JSON query string, see examples
+#'
+#' @param ... Passed on to functions:
+#' - CouchDB: [sofa::db_bulk_create()]
+#' - Elasticsearch: [elastic::docs_bulk_update]
+#' - MongoDB: [mongolite::mongo()]
+#' - RSQLite: ignored
+#'
+#' @return (integer) Number of successfully updated documents
+#'
 #' @export
-#' @param src source object, result of call to src
-#' @param key (character) A key (collection for MongoDB and
-#' RSQLite)
-#' @param value (data.frame) A single data.frame. For
-#' MongoDB and RSQLite, its first column identifies the
-#' documents to be updated by means of the name of the
-#' column and the value(s) in the respective row(s),
-#' see examples.
-#' @param ... Ignored
-#' @details Only CouchDB and sqlite supported for now
+#'
 #' @examples \dontrun{
-#' # CouchDB
-#' src <- src_couchdb()
-#' docdb_create(src, "mtcars2", mtcars)
-#' docdb_get(src, "mtcars2")
-#'
-#' mtcars$letter <- sample(letters, NROW(mtcars), replace = TRUE)
-#' invisible(docdb_update(src, "mtcars2", mtcars))
-#' docdb_get(src, "mtcars2")
-#'
-#' # MongoDB
-#' src <- src_mongo(collection = "mtcars")
-#' docdb_create(src, key = "mtcars", value = mtcars)
-#' # - update of carb for each matching gear
-#' value <- data.frame("gear" = c(4, 5),
-#'                     "carb" = c(8.1, 7.9),
-#'                     stringsAsFactors = FALSE)
-#' docdb_update(src, "mtcars", value)
-#' # - update of gear where _id / oid is "2"
-#' value <- data.frame("_id" = "2",
-#'                     "gear" = 9,
-#'                     stringsAsFactors = FALSE,
-#'                     check.names = FALSE)
-#' docdb_update(src, "mtcars", value)
-#' docdb_get(src, "mtcars")
-#'
-#' # SQLite
 #' src <- src_sqlite()
 #' docdb_create(src, "mtcars", mtcars)
-#' dfupd <- data.frame("cyl" = c(4, 6),
-#'                     "gear" = c(88, 99),
-#'                     stringsAsFactors = FALSE)
-#' (docdb_update(src, "mtcars", dfupd))
-#' docdb_query(src, "mtcars",
-#'             query = '{"gear": {"$gte": 88}}',
-#'             fields = '{"gear": 1, "cyl": 1}')
-#' dfupd <- data.frame("cyl" = c(8, 6),
-#'                     "somejson" = c('{"gear": 77, "carb": 55}',
-#'                                    '{"gear": 66, "newvar": 55}'),
-#'                     stringsAsFactors = FALSE)
-#' (docdb_update(src, "mtcars", dfupd))
-#' docdb_query(src, "mtcars",
-#'             query = '{"gear": {"$eq": 66}}',
-#'             fields = '{"gear": 1, "cyl": 1, "carb": 1, "newvar": 1}')
+#' docdb_update(src, "mtcars", value = mtcars[3, 4:5], query = '{"gear": 3}')
+#' docdb_update(src, "mtcars", value = '{"carb":999}', query = '{"gear": 5}')
+#' docdb_get(src, "mtcars")
 #' }
-docdb_update <- function(src, key, value, ...) {
-  UseMethod("docdb_update")
+docdb_update <- function(src, key, value, query, ...) {
+  assert(src, "docdb_src")
+  assert(key, "character")
+  assert(value, c("data.frame", "list", "character"))
+  assert(query, "character")
+  UseMethod("docdb_update", src)
 }
 
 #' @export
-docdb_update.src_couchdb <- function(src, key, value, ...) {
-  assert(value, "data.frame")
-  if (!key %in% attr(src, "dbs")) sofa::db_create(src[[1]], dbname = key)
-  sofa::db_bulk_update(src[[1]], dbname = key, doc = value, ...)
-}
+docdb_update.src_couchdb <- function(src, key, value, query, ...) {
 
-#' @export
-docdb_update.src_mongo <- function(src, key, value, ...) {
+  # If you want to change a document in CouchDB, you don’t tell it to go and
+  # find a field in a specific document and insert a new value. Instead,
+  # you load the full document out of CouchDB, make your changes in the
+  # JSON structure (or object, when you are doing actual programming),
+  # and save the entire new revision (or version) of that document back into CouchDB.
 
-  # check expectations
-  if (exists("key", inherits = FALSE) &&
-      src$collection != key)
-    message("Parameter 'key' is different from parameter 'collection', ",
-            "was given as ", src$collection, " in src_mongo().")
-
-  # The aim is to use this method:
-  # mongo()$update(query, update = '{"$set":{}}', upsert = F, multiple = F)
-  # It is necessary to define:
-  # - which documents to update (based on parameter "query" if specified,
-  #   or column _id in dataframe value, or all documents in collection)
-  # - what to use for updating (the dataframe value will be converted
-  #   into a set of changes, where column names indicate what element
-  #   in the document to update, and will be replaced with non-NA values
-  #   in the dataframe for the respective document)
-
-  assert(value, "data.frame")
-
-  # Get ellipsis
-  dotparams <- list(...)
-
-  # Which documents to update?
-  # - Check if query is specified
-  query <- rep.int(x = ifelse(is.null(dotparams$query), "{}", dotparams$query),
-                   times = nrow(value))
-
-  # - Is _id in dataframe value?
-  if (all(query != "{}") & any(grepl("_id", names(value)))) {
-    stop("Specify only one of query = '...' or '_id' as column ",
-    "in data frame 'value'.")
+  # therefore emulate update for couchdb as follows
+  if (!length(find.package("RSQLite", quiet = TRUE))) {
+    stop("Package RSQLite needed to calculate json update, ",
+         "but it is not installed. Install or use docdb_create().",
+         call. = FALSE)
   }
 
-  # - Get query from dataframe value
-  if (any(grepl("_id", names(value)))) {
-    # if dataframe has has a column _id,
-    # turn it into query and then remove it
-    query <- paste0('{"_id":"', value[["_id"]], '"}')
-    value <- value[, -match("_id", names(value)), drop = FALSE]
-  } else {
-    # if dataframe has at least two columns,
-    # use FIRST for query and remove it
-    if (ncol(value) >= 2L) {
-      quoting <- ifelse(class(value[, 1]) == "character", "\"", "")
-      query <- paste0('{"', names(value)[1], '":{"$eq":', quoting, value[, 1, drop = TRUE], quoting, "}}")
-      query <- paste0('{"', names(value)[1], '":', quoting, value[, 1, drop = TRUE], quoting, "}")
-      value <- value[, -1, drop = FALSE]
+  # get original set
+  input <- docdb_query(src, key, query)
+
+  # early return if not found
+  if (!length(input)) return(0L)
+
+  # data frame to json
+  if (class(value) == "data.frame") {
+    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+  }
+  # list to json
+  if (class(value) == "list") {
+    value <- jsonify::to_json(value, unbox = TRUE)
+  }
+
+  # calculate new document(s)
+  value <- jsonify::from_ndjson(
+    paste0(
+      sapply(
+        strsplit(
+          jsonify::to_ndjson(input),
+          split = "\n")[[1]],
+        function(i)
+          jsonUpdate(
+            jsonT = i,
+            jsonP = value),
+        USE.NAMES = FALSE,
+        simplify = TRUE),
+      collapse = "\n"),
+    simplify = TRUE)
+
+  # note: sofa::db_bulk_update changes all
+  # documents in the container, therefore
+  # - delete documents
+  invisible(docdb_delete(src, key, query = query, ...))
+  # - create documents
+  result <- suppressMessages(
+    docdb_create(src, key, value, ...))
+
+  # return
+  return(result)
+
+}
+
+#' @export
+docdb_update.src_elastic <- function(src, key, value, query, ...) {
+
+  # get _id's
+  ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[[1]]
+
+  # early return if not found
+  if (!length(ids)) return(0L)
+  # if (!length(ids)) docdb_create(src, key, value)
+
+  # json to data frame
+  if (class(value) == "character") {
+    value <- jsonlite::fromJSON(value)
+  }
+
+  # list to data frame
+  if (class(value) == "list") {
+    # value = testList
+    value <- jsonlite::fromJSON(
+      jsonlite::toJSON(value, auto_unbox = TRUE))
+    # if value is still simple list
+    value <- as.data.frame(value)
+  }
+
+  # data frame
+  row.names(value) <- NULL
+
+  # how to handle?
+  if (nrow(value) != length(ids)) {
+    # expanding data frame as needed to match _id's
+    indf <- value
+    value <- NULL
+    #
+    if (nrow(indf) == 1L) {
+      for (i in seq_len(length(ids))) {
+        value <- rbind(value, indf)
+      }}
+    #
+    if (nrow(indf) > 1L) {
+      message(
+        "Number of rows of 'value' is not 1L and not the same as ",
+        "the number of documents (_id's) that are to be updated; ",
+        "iterating over _id's. ")
+      # value = mtcars[1:2, 4:5]
+      for (i in seq_len(length(ids))) {
+        value <- rbind(value, t(cbind(as.list(indf))))
+      }
+      value <- as.data.frame(value)
     }
   }
 
-  # What to use for update`
-  # - Convert dataframe value's rows into vector of
-  #   json sets. Note: NAs are removed by toJSON.
-  #   No conversion if already json string.
-  value <- sapply(X = seq_len(nrow(value)),
-                  FUN = function(i)
-                    ifelse(!is.character(value[i, ]) ||
-                             !jsonlite::validate(value[i, ]),
-                           jsonlite::toJSON(x = value[i, , drop = FALSE],
-                                            dataframe = "rows",
-                                            auto_unbox = TRUE),
-                           value[i, ]))
+  # Error: no 'docs_bulk_update' method for class list
+  # therefore using data frame only for update
+  result <- elastic::docs_bulk_update(
+    conn = src$con,
+    index = key,
+    x = value,
+    doc_ids = ids,
+    quiet = TRUE,
+    digits = NA,
+    ...
+  )
 
-  # - Remove outer []
-  value <- gsub(pattern = "^\\[|\\]$",
-                replacement = "",
-                x = value)
-
-  # - Turn into json set
-  value <- paste0('{"$set":', value, "}")
-
-  # - To update, iterate over json set vector
-  nrowaffected <-
-    sapply(seq_len(length(value)),
-           function(i)
-             # update(query, update = '{"$set":{}}', upsert = F, multiple = F)
-             src$con$update(query = query[i],  # which documents?
-                            update = value[i], # with what to update?
-                            upsert = TRUE,     # ok to add new documents
-                            multiple = TRUE)   # ok to update several documents
-    )
-
-  # Extract number of matched or added documents
-  #               [,1]
-  # modifiedCount 0
-  # matchedCount  0
-  # upsertedCount 1
-  # upsertedId    "NCT00097292"
-  nrowaffected <- data.frame(
-    nrowaffected,
-    stringsAsFactors = FALSE)[c(2,3), , drop = TRUE]
-
-  invisible(sum(unlist(nrowaffected), na.rm = TRUE))
+  # prepare return value
+  if (inherits(result, "try-error") || any(sapply(result, "[[", "errors"))) {
+    error <- unlist(result, use.names = TRUE)
+    error <- error[grepl("caused_by[.]reason$", names(error))]
+    warning(
+      "Could not create some documents, reason: ",
+      unique(error), call. = FALSE, immediate. = TRUE)
+  }
+  result <- unlist(result, use.names = TRUE)
+  result <- result[names(result) == "items.update.result"]
+  if (any(result != "updated")) {
+    warning("Could not create some documents, reason: ",
+            unique(result[result != "updated"]), call. = FALSE, immediate. = TRUE)
+  }
+  result <- sum(result == "updated")
+  return(result)
 
 }
 
 #' @export
-docdb_update.src_sqlite <- function(src, key, value, ...) {
+docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
-  assert(key, "character")
-  assert(value, "data.frame")
+  # special check for mongo
+  chkSrcMongo(src, key)
 
-  # If table does not exist, create empty table
-  if (!docdb_exists(src = src, key = key)) {
-    docdb_create(src = src, key = key, value = NULL)
+  # if regexp query lacks options, add them in
+  if (grepl('"[$]regex" *: *"[^,$:}]+?" *}', query)) query <-
+      sub('("[$]regex" *: *"[^,$:}]+?" *)', '\\1, "$options": ""', query)
+
+  # process value, target is json string
+
+  # data frame to json
+  if (class(value) == "data.frame") {
+    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+  }
+  # list to json
+  if (class(value) == "list") {
+    value <- jsonify::to_json(value, unbox = TRUE)
   }
 
-  # value: data frame where first column has the name _id
-  # or the name of a variable in the data-to-be-updated;
-  # the rows of the data frame value then have values
-  # that identify the records that are to be updated.
-  #
-  # When the data frame value has only two columns and the
-  # second column consists of json strings, these json
-  # sets will be used to update (json_patch) the data-to-
-  # be-updated, https://www.sqlite.org/json1.html#jpatch
+  # turn into json set
+  value <- paste0('{"$set":', value, "}")
 
-  # Check data frame value
-  vn <- names(value)
+  # do update
+  result <- try(
+    suppressWarnings(
+      src$con$update(
+        query = query,
+        update = value,
+        upsert = FALSE,
+        multiple = TRUE,
+        ...))[c("matchedCount", "upsertedCount")],
+    silent = TRUE)
+  result <- unlist(result)
 
-  # Updating based on query in the data
-  # frame that has values for the update:
-  # replace query params with _id's
-  if ("_id" != vn[1]) {
+  # generate user info
+  if (inherits(result, "try-error") ||
+      any(grepl("error", result))) {
+    error <- result[grepl("rror", result)]
+    error <- trimws(sub(".+E[0-9]+(.*?):.+", "\\1", error))
+    warning(
+      "Could not create some documents, reason: ",
+      unique(error), call. = FALSE, immediate. = TRUE)
+    result <- result[!grepl("rror", result)]
+    result <- min(0, as.integer(result))
+  }
+  return(max(result))
 
-    # get _id of records to be updated
-    idsaffected <- lapply(seq_len(nrow(value)), function(i) {
+}
 
-        docdb_query(
-          src = src,
-          key = key,
-          fields = '{"_id": 1}',
-          query = paste0(
-            paste0("{\"", vn[1], "\": "),
-            ifelse(
-              inherits(value[i, 1, drop = TRUE], "character"),
-              paste0("\"", value[i, 1, drop = TRUE], "\""),
-              value[i, 1]), "}")
-        )[, "_id", drop = TRUE]
+#' @export
+docdb_update.src_sqlite <- function(src, key, value, query, ...) {
 
-      })
-
-    # replace first column with _id
-    value <- lapply(seq_len(nrow(value)), function(i) {
-
-      tmp <- data.frame(
-        idsaffected[[i]],
-        value[i, -1, drop = FALSE],
-        stringsAsFactors = FALSE,
-        check.rows = FALSE,
-        row.names = NULL)
-
-      names(tmp) <- c("_id", vn[-1])
-
-      tmp
-
-    })
-
-    # modify value data frame
-    value <- do.call(rbind, value)
-
+  # data frame to json
+  if (class(value) == "data.frame") {
+    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+  }
+  # list to json
+  if (class(value) == "list") {
+    value <- jsonify::to_json(value, unbox = TRUE)
   }
 
-  # iterate over rows to handle any mixed data
-  nrowiterated <- sapply(seq_len(nrow(value)), function(i) {
+  # get docs to update
+  ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
 
-    # get row except first column,
-    # which identifies the records
-    # that are to be updated
-    tmpval <- value[i, -1, drop = FALSE]
+  # SQL for patching, see https://www.sqlite.org/json1.html#jpatch
+  statement <- paste0(
+    'UPDATE "', key, '" SET json = json_patch(json,\'',
+    value, '\') WHERE _id IN (',
+    paste0('"', ids, '"', collapse = ","), ');'
+  )
+  # message(statement)
 
-    # all values in these columns json?
-    # if (all(is.character(tmpval)) &&
-    if (all(sapply(tmpval,
-                   function(col)
-                     is.character(col) &&
-                   jsonlite::validate(col)))) {
-
-      # iterate over columns
-      ncoliterated <- sapply(tmpval, function(ii) {
-
-        # construct sql statment
-        statement <- sprintf(
-          "UPDATE \"%s\"
-           SET json = json_patch( \"%s\".json, %s )
-           WHERE _id = '%s';",
-          key,
-          key, valueEscape(ii),
-          value[i, 1, drop = TRUE]
+  # update data
+  result <- try(
+    dbWithTransaction(
+      src$con, {
+        DBI::dbExecute(
+          conn = src$con,
+          statement = statement
         )
+      }),
+    silent = TRUE)
 
-        # execute sql statement
-        dbWithTransaction(
-          src$con, {
-            DBI::dbExecute(
-              conn = src$con,
-              statement = statement)
-          })
-
-      }) # by column with json
-
-      # return number of records modified
-      sum(ncoliterated, na.rm = TRUE) >= 1L
-
-    } else { # no json
-
-      # construct json from columns
-      tmpval <- jsonlite::toJSON(jsonlite::unbox(tmpval))
-
-      # construct sql statement
-      statement <- sprintf(
-        "UPDATE \"%s\"
-         SET json = json_patch( \"%s\".json, %s )
-         WHERE _id = '%s';",
-        key,
-        key, valueEscape(tmpval),
-        value[i, 1, drop = TRUE]
-      )
-
-      # execute sql statement
-      dbWithTransaction(
-        src$con, {
-          DBI::dbExecute(
-            conn = src$con,
-            statement = statement)
-        })
-
-    } # no json
-
-  })
-
-  # return value
-  invisible(sum(nrowiterated, na.rm = TRUE))
+  # return
+  return(result)
 
 }
 
 
 ## helpers --------------------------------------
 
-valueEscape <- function(x) {
+# emulating json update by calculating
+# the patch result using RSQLite
+jsonUpdate <- function(jsonT, jsonP) {
+  # https://www.sqlite.org/json1.html#jpatch
 
-  # cf. https://www.sqlite.org/json1.html#jset
-  switch(class(x),
+  # get connection
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
-         # - character: '"stringvalue"'
-         "character" = ifelse(test = grepl("^[{].*[}]$", trimws(x)),
-                              yes = paste0("\'", x, "\'"),
-                              no = paste0("\'\"", x, "\"\'")),
+  # register deconstructor
+  on.exit(try(DBI::dbDisconnect(con), silent = TRUE), add = TRUE)
 
-         # - list e.g.: '{"a": "something", "b": 2}'
-         "list" = paste0("\'", jsonlite::toJSON(x), "\'"),
-
-         # - no quotation for integers, real
-         "numeric" = paste0(x),
-
-         # - default, all others: 'value'
-         paste0("\'", x, "\'")
+  # construct json command
+  jsonPatch <- paste0(
+    'SELECT json_patch(\'',
+    jsonT, '\',\'', jsonP,
+    '\') AS json;'
   )
+
+  # calculate patch
+  out <- DBI::dbGetQuery(
+    conn = con,
+    statement = jsonPatch)
+
+  # return
+  return(out[[1]])
 
 }

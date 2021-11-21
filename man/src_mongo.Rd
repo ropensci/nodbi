@@ -7,20 +7,20 @@
 src_mongo(collection = "test", db = "test", url = "mongodb://localhost", ...)
 }
 \arguments{
-\item{collection}{(character) name of collection}
+\item{collection}{(character) Name of collection}
 
-\item{db}{(character) name of database}
+\item{db}{(character) Name of database}
 
-\item{url}{(character) address of the MongoDB server in mongo connection
-string URI format, see to \link[mongolite:mongo]{mongolite::mongo}}
+\item{url}{(character) Address of the MongoDB server in Mongo connection
+string URI format, see to \code{\link[mongolite:mongo]{mongolite::mongo()}}}
 
-\item{...}{additional named params passed on to \link[mongolite:mongo]{mongolite::mongo}}
+\item{...}{Additional named parameters passed on to \code{\link[mongolite:mongo]{mongolite::mongo()}}}
 }
 \description{
 Setup a MongoDB database connection
 }
 \details{
-uses \pkg{monoglite} under the hood; uses \link[mongolite:mongo]{mongolite::mongo} for
+Uses \pkg{monoglite} under the hood; uses \code{\link[mongolite:mongo]{mongolite::mongo()}} for
 connecting
 }
 \examples{

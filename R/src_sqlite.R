@@ -4,9 +4,9 @@
 #'
 #' @param dbname (character) name of database file,
 #'   defaults to ":memory:" for an in-memory database,
-#'   see [RSQLite::SQLite]
+#'   see [RSQLite::SQLite()]
 #' @param ... additional named parameters passed
-#'   on to [RSQLite::SQLite]
+#'   on to [RSQLite::SQLite()]
 #'
 #' @details uses \pkg{RSQLite} under the hood
 #'
@@ -27,9 +27,9 @@ src_sqlite <- function(dbname = ":memory:",
   # check if json1 extension is supported
   if (inherits(class(
     try(
-      DBI::dbExecute(
+      DBI::dbGetQuery(
         conn = con,
-        statement = paste0('SELECT * FROM json_each(\'{"test":"1"}\');')
+        statement = paste0("SELECT json_patch('{\"a\":1}','{\"a\":9}');")
       ), silent = TRUE)
   ), "try-error")) {
     stop("SQLite does not have json1 extension enabled. Call ",
@@ -67,8 +67,9 @@ print.src_sqlite <- function(x, ...) {
   # RSQLite::rsqliteVersion() was introduced with
   # same version that introduced json1 extension
   srv <- rev(RSQLite::rsqliteVersion())[1]
-  cat(sprintf("SQLite library version: %s\n size: %s kBytes\n dbname: %s\n",
-              srv, dbsize / 2^10, dbname))
+  cat(sprintf(
+    "src: sqlite\nSQLite library version: %s\n size: %s kBytes\n dbname: %s\n",
+    srv, dbsize / 2^10, dbname))
 
   if (grepl(":memory:", dbname)) {
     warning(

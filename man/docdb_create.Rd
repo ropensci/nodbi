@@ -2,62 +2,58 @@
 % Please edit documentation in R/create.R
 \name{docdb_create}
 \alias{docdb_create}
-\title{Create documents}
+\title{Create documents in a database}
 \usage{
 docdb_create(src, key, value, ...)
 }
 \arguments{
-\item{src}{source object, result of call to an \link{src} function}
+\item{src}{Source object, result of call to any of functions
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
 
-\item{key}{(character) A key (collection for MongoDB)}
+\item{key}{(character) A key as name of the container
+(corresponds to parameter \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+a table name for SQLite)}
 
-\item{value}{(data.frame) A single data.frame}
+\item{value}{The data to be created in the database:
+a single data.frame, a JSON string or a list}
 
-\item{...}{Ignored}
+\item{...}{Passed to functions:
+\itemize{
+\item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
+\item Elasticsearch: \link[elastic:docs_bulk]{elastic::docs_bulk}
+\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
+\item RSQLite: ignored
+}}
+}
+\value{
+(integer) Number of successfully created documents
 }
 \description{
-Create documents
+A message is emitted if the container \code{key} already exists.
 }
-\details{
-Note that with etcd, you have to prefix a key with a
-forward slash.
+\section{Identifiers}{
+
+Any _id's in \code{value} will be used as _id's and primary index
+in the database. If there are no _id's in \code{value},
+row names (if any exist) will be used as _id's,
+or random _id's will be created (using
+\code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE}).
+
+A warning is emitted if a document(s) with _id's already
+exist in \code{value} and that document in \code{value} is not newly
+created in the database; use \code{\link[=docdb_update]{docdb_update()}} to update
+such document(s).
 }
+
 \examples{
 \dontrun{
-# CouchDB
-src <- src_couchdb()
-docdb_create(src, key="mtcars2", value=mtcars)
-docdb_get(src, "mtcars2")
-
-# Elasticsearch
-src <- src_elastic()
-if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
-if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
-if (docdb_exists(src, "diamonds_small")) docdb_delete(src, "diamonds_small")
-docdb_create(src, key = "mtcars", value = mtcars)
-docdb_create(src, key = "iris", value = iris)
-docdb_create(src, key = "diamonds_small", value = diamonds[1:3000L,])
-
-# Redis
-src <- src_redis()
-docdb_create(src, key = "mtcars", value = mtcars)
-docdb_get(src, "mtcars")
-docdb_delete(src, "mtcars")
-
-# MongoDB
-src <- src_mongo(collection = "mtcars")
-docdb_create(src, key = "mtcars", value = mtcars)
-docdb_get(src, "mtcars")
-
-# SQLite
 src <- src_sqlite()
-if (docdb_exists(src, "mtcars")) docdb_delete(src, "mtcars")
-docdb_create(src, key = "mtcars", value = mtcars)
-docdb_get(src, "mtcars")
-if (docdb_exists(src, "contacts")) docdb_delete(src, "contacts")
-## contacts is a dataset included in this package
-contacts_df <- data.frame(contacts, stringsAsFactors = FALSE)
-docdb_create(src, key = "contacts", value = contacts_df)
+docdb_create(src, key = "diamonds_small",
+  value = as.data.frame(diamonds[1:3000L,]))
+head(docdb_get(src, "diamonds_small"))
+docdb_create(src, key = "contacts", value = contacts)
 docdb_get(src, "contacts")[["friends"]]
 }
+
 }

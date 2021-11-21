@@ -13,175 +13,297 @@ downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cra
 [![cran
 version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
 
-`nodbi` provides a single user interface for interacting with several
-NoSQL databases.
+`nodbi` is an R package that provides a single interface for several
+NoSQL databases, with the same function parameters and return values
+across backends.
 
-So far we support the following DBs:
+Currently, `nodbi` supports the following database backends:
 
 -   MongoDB
--   Redis (server based)
+-   SQLite
 -   CouchDB
 -   Elasticsearch
--   RSQLite
 
-Currently we have support for data.frame’s for the following operations
+for an `R` object of any of these data types:
 
--   Create - all DBs
--   Exists - all DBs, except MongoDB
--   Get - all DBs
--   Query - all DBs, except Redis
--   Delete - all DBs
--   Update - MongoDB, CouchDB, and RSQLite
+-   data.frame
+-   list
+-   JSON string
+
+and for executing the following operations:
+
+-   Create
+-   Exists
+-   Get
+-   Query\* \*\*
+-   Update\* \*\*
+-   Delete
+-   List
+
+across all database backends. \*Only simple queries (and updates,
+e.g. equality for a single field) supported for Elasticsearch at the
+moment. \*\*Only root fields can be specified for CouchDB and
+Elasticsearch, whereas subitems in fields can be specified for MongoDB
+and SQLite.
+
+For details of operations and parameter combinations across any of the
+database backends, see the main file for package testing, here:
+[core-nodbi.R](./tests/testthat/core-nodbi.R).
 
 ## Install
 
-cran version
+CRAN version
 
 ``` r
 install.packages("nodbi")
 ```
 
-dev version
+Development version
 
 ``` r
-pak::pkg_install("ropensci/nodbi")
+remotes::install_github("ropensci/nodbi")
 ```
+
+Load package from library
 
 ``` r
 library("nodbi")
 ```
 
-## Initialize connections
+## API overview
 
-Start CouchDB on the cli or with the app
+Parameters for `docdb_*()` functions are the same across functions.
 
-``` r
-src_couchdb()
-```
+| Purpose                                                                                          | Function call                                                                                                     |
+|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| Create database connection (see below)                                                           | `src <- nodbi::src_{mongo, sqlite, couchdb, elastic}(<see below for parameters>)`                                 |
+| Load data frame, list or JSON string from `myData` into database, container `dbTbl`              | `nodbi::docdb_create(src = src, key = "dbTbl", value = myData)`                                                   |
+| Get all documents back into a data frame                                                         | `nodbi::docdb_get(src = src, key = "dbTbl")`                                                                      |
+| Get documents selected with query (as MongoDB-compatible JSON) into a data frame                 | `nodbi::docdb_query(src = src, key = "dbTbl", query = '{"age": 20}')`                                             |
+| Get selected fields (in MongoDB compatible JSON) from documents selected query                   | `nodbi::docdb_query(src = src, key = "dbTbl", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
+| Update (patch) selected documents with new data in data frame, list or JSON string from `myData` | `nodbi::docdb_update(src = src, key = "dbTbl", value = myData, query = '{"age": 20}')`                            |
+| Check if container exists                                                                        | `nodbi::docdb_exists(src = src, key = "dbTbl")`                                                                   |
+| List all containers in database                                                                  | `nodbi::docdb_list(src = src)`                                                                                    |
+| Delete document(s) in container                                                                  | `nodbi::docdb_delete(src = src, key = "dbTbl", query = '{"age": 20}')`                                            |
+| Delete database                                                                                  | `nodbi::docdb_delete(src = src, key = "dbTbl")`                                                                   |
+| Close and remove database connection                                                             | `rm(src)`                                                                                                         |
 
-Start Elasticsearch, e.g.:
+## Database connections
 
-``` sh
-cd /usr/local/elasticsearch && bin/elasticsearch
-```
+Overview on parameters that are specific to the database backend. These
+are only needed once, for `src_*()` to create a connection object for
+use with `nodbi`.
 
-``` r
-src_elastic()
-```
+### MongoDB
 
-If you want to use classic Redis server, we do that through the
-[redux](https://cran.r-project.org/package=redux) package, and you’ll
-need to start up Redis by e.g,. `redis-server` in your shell.
-
-``` r
-src_redis()
-```
-
-Start MongoDB: `mongod` (may need to do `sudo mongod`)
-
-``` r
-src_mongo()
-```
-
-## CouchDB
+Note that only MongoDB requires to specify the container already in the
+`src_*()` function. “Container” refers to a MongoDB collection.
 
 ``` r
-src <- src_couchdb()
-docout <- docdb_create(src, key = "mtcars", value = mtcars)
-head( docdb_get(src, "mtcars") )
+src_mongo(
+  collection = "test", db = "test",
+  url = "mongodb://localhost", ...)
 ```
 
-## Elasticsearch
+### SQLite
 
-Put the `iris` dataset into ES
+The functionality to process JSON is based on the SQLite extension
+[JSON1](https://www.sqlite.org/json1.html), available in RSQLite.
+“Container” refers to an SQLite table.
 
 ``` r
-src <- src_elastic()
-ff <- docdb_create(src, "iris", iris)
-head( docdb_get(src, "iris") )
-#>   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-#>          5.0         3.6          1.4         0.2  setosa
-#>          4.9         3.1          1.5         0.1  setosa
-#>          4.8         3.4          1.6         0.2  setosa
-#>          5.4         3.9          1.3         0.4  setosa
-#>          5.1         3.3          1.7         0.5  setosa
-#>          5.2         3.4          1.4         0.2  setosa
+src_sqlite(dbname = ":memory:", ...)
 ```
 
-## Redis
+### CouchDB
 
 ``` r
-src <- src_redis()
-docdb_create(src, "mtcars", mtcars)
+src_couchdb(
+  host = "127.0.0.1", port = 5984, path = NULL,
+  transport = "http", user = NULL, pwd = NULL, headers = NULL)
 ```
 
+### ElasticSearch
+
 ``` r
-docdb_get(src, "mtcars")
+src_elastic(
+  host = "127.0.0.1", port = 9200, path = NULL,
+  transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...)
 ```
 
-## MongoDB
+## Walk-through
+
+This example is meant to show how functional `nodbi` is at this time.
 
 ``` r
-src <- src_mongo(collection = "diamonds", verbose = FALSE)
-ff <- docdb_create(src, "diamonds", diamonds)
-docdb_get(src, "diamonds")
-```
+# connect database backend
+src <- src_sqlite()
 
-## SQLite
+# load data (here data frame, alternatively list or JSON)
+docdb_create(src, key = "myTbl", value = mtcars)
+#> [1] 32
 
-``` r
-src <- src_sqlite(dbname = ":memory:")
-ff <- docdb_create(src, key = "mtcars", value = mtcars)
-docdb_get(src, key = "mtcars")
-```
+# load additionally contacts JSON data, from package nodbi
+docdb_create(src, key = "myTbl", contacts)
+#> Note: container 'myTbl' already exists
+#> [1] 5
 
-Extension [json1](https://www.sqlite.org/json1.html) is enabled in
-Package `RSQLite` (since version 1.1). This extension is used to emulate
-the behaviour of MongoDB with the methods for SQLite:
+# get all documents, irrespective of schema
+dplyr::tibble(docdb_get(src, "myTbl"))
+#> # A tibble: 37 × 22
+#>    `_id`  isActive balance    age eyeColor name  email about  registered
+#>    <chr>  <lgl>    <chr>    <int> <chr>    <chr> <chr> <chr>  <chr>     
+#>  1 5cd67… TRUE     $2,412.…    20 blue     Kris… kris… Sint … 2017-07-1…
+#>  2 5cd67… FALSE    $3,400.…    20 brown    Rae … raec… Nisi … 2018-12-1…
+# ...
+#>  9 Chrys… NA       NA          NA NA       NA    NA    NA     NA        
+#> 10 Datsu… NA       NA          NA NA       NA    NA    NA     NA        
+#> # … with 27 more rows, and 13 more variables: tags <list>,
+#> #   friends <list>, mpg <dbl>, cyl <dbl>, disp <dbl>, hp <dbl>,
+#> #   drat <dbl>, wt <dbl>, qsec <dbl>, vs <dbl>, am <dbl>, gear <dbl>,
+#> #   carb <dbl>
 
--   Parameter `collection` corresponds to the name of a table (parameter
-    `key`) in the SQLite database `dbname`.
--   Json strings in parameters `query` and `fields` are translated into
-    SQL commands, unless too complex.
--   Tables created by `docdb_create()` are defined as follows, with
-    exactly two columns, an index column named `_id` and a column with
-    json data named `json`:
+# query some documents
+docdb_query(src, "myTbl", query = '{"mpg": {"$gte": 30}}')
+#>              _id mpg cyl disp  hp drat  wt qsec vs am gear carb
+#> 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1
+#> 2    Honda Civic  30   4   76  52  4.9 1.6   19  1  1    4    2
+#> 3   Lotus Europa  30   4   95 113  3.8 1.5   17  9  1    5    2
+#> 4 Toyota Corolla  34   4   71  65  4.2 1.8   20  1  1    4    1
 
-<!-- -->
+# query some fields from some documents; 
+# query is mandatory parameter and is used
+# her ein its position in the signature
+docdb_query(src, "myTbl", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "mpg": 1}')
+#>    wt mpg
+#> 1 2.2  32
+#> 2 1.6  30
+#> 3 1.5  30
+#> 4 1.8  34
 
-    CREATE TABLE mtcars ( _id TEXT PRIMARY_KEY NOT NULL, json JSON );
-    CREATE UNIQUE INDEX mtcars_index ON mtcars ( _id );
+# query some subitem fields from some documents
+str(docdb_query(src, "myTbl", '{"age": {"$gte": 22}}', 
+                fields = '{"age": 1, "friends.name": 1}'))
+#> 'data.frame':    3 obs. of  2 variables:
+#>  $ age    : int  22 30 23
+#>  $ friends:'data.frame': 3 obs. of  1 variable:
+#>   ..$ name:List of 3
+#>   .. ..$ : chr  "Baird Keller" "Francesca Reese" "Dona Bartlett"
+#>   .. ..$ : chr  "Coleen Dunn" "Doris Phillips" "Concetta Turner"
+#>   .. ..$ : chr  "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
 
-The following examples show the maximum level of complexity that can be
-used at this time with available json operaters (“$eq”, “$gt”, “$gte”,
-“$lt”, “$lte”, “$ne”); `query` implies AND of the comma separated
-expressions in the absence of a prefixed logical operator (available at
-this time: “$and”, “$or”).
+# update some data; needs four parameters
+docdb_update(src, "myTbl", value = '{"vs": 9}', query = '{"carb": 3}')
+#> [1] 3
+docdb_query(src, "myTbl", '{"carb": {"$in": [1,3]}}', fields = '{"vs": 1}')[[1]]
+#> [1] 1 1 1 1 9 9 9 1 1 1
 
-``` r
-ff <- docdb_create(src, key = "mtcars", 
-                   value = data.frame(contacts, stringsAsFactors = FALSE))
-docdb_query(src, "mtcars", 
-            query = '{"$or": {"eyeColor": "blue", 
-                              "age": {"$lt": 22}},  
-                              "name": {"$regex": "^L.+"} }',
-            fields = '{"age": 1, "eyeColor": 1, "name": 1}')
-```
-
-## Use with dplyr
-
-``` r
+# use with dplyr
 library("dplyr")
-src <- src_mongo(collection = "diamonds", verbose = FALSE)
+docdb_get(src, "myTbl") %>%
+  group_by(gear) %>%
+  summarise(mean_mpg = mean(mpg))
+# # A tibble: 4 × 2
+#    gear mean_mpg
+#   <dbl>    <dbl>
+# 1     3     16.1
+# 2     4     24.5
+# 3     5     21.4
+# 4    NA     NA  
+
+# delete documents; query is optional parameter and thus has to be specified 
+# to delete documents; the complex query supported only by MongoDB and RSQLite
+docdb_delete(src, "myTbl", query = '{"$or": {"gear": 5, "age": {"$gte": 22}}}')
+#> TRUE
+nrow(docdb_get(src, "myTbl"))
+#> [1] 29
+
+# delete database
+docdb_delete(src, "myTbl")
+#> TRUE
 ```
+
+## Benchmark
 
 ``` r
-docdb_get(src, "diamonds") %>%
-  group_by(cut) %>%
-  summarise(mean_depth = mean(depth), mean_price = mean(price))
+library("nodbi")
+
+COUCHDB_TEST_USER <- Sys.getenv("COUCHDB_TEST_USER")
+COUCHDB_TEST_PWD <- Sys.getenv("COUCHDB_TEST_PWD")
+
+srcMongo <- src_mongo()
+srcSqlite <- src_sqlite()
+srcElastic <- src_elastic()
+srcCouchdb <- src_couchdb(user = COUCHDB_TEST_USER, pwd = COUCHDB_TEST_PWD)
+key <- "test"
+query <- '{"clarity": "I1"}'
+fields <- '{"cut": 1, "_id": 1}'
+value <- '{"clarity": "XYZ"}'
+data <- as.data.frame(diamonds)[1:2000,]
+
+testFunction <- function(src, key, value, query, fields) {
+  docdb_create(src, key, data)
+  # ElasticSearch needs a moment to process the data
+  if (inherits(src, "src_elastic")) Sys.sleep(1)
+  head(docdb_get(src, key))
+  docdb_query(src, key, query = query, fields = fields)
+  docdb_update(src, key, value = value, query = query)
+  docdb_delete(src, key)
+}
+
+rbenchmark::benchmark(
+  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
+  RSQLite = testFunction(src = srcSqlite, key, value, query, fields),
+  Elastic = testFunction(src = srcElastic, key, value, query, fields),
+  CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
+  replications = 10L,
+  columns = c('test', 'replications', 'elapsed')
+)
+#> on 2015 macOS hardware with local databases; after subtracting 10s for ElasticSearch
+#>      test replications elapsed
+#> 4 CouchDB           10    48.2
+#> 3 Elastic           10    28.2
+#> 1 MongoDB           10     4.5
+#> 2 RSQLite           10     4.0
 ```
 
-## Meta
+## Testing
+
+``` r
+testthat::test_local()
+```
+
+    ✓ | F W S  OK | Context
+    ✓ |         5 | couchdb [0.6s]                                                                            
+    ✓ |        27 | - create, exists, list, get, delete [2.2s]                                                
+    ✓ |        26 | - query [1.1s]                                                                            
+    ✓ |        14 | - update, query [5.1s]                                                                    
+    ✓ |         3 | elastic [0.8s]                                                                            
+    ✓ |        27 | - create, exists, list, get, delete [16.4s]                                               
+    ✓ |     1  10 | - query [2.2s]                                                                            
+    ──────────────────────────────────────────────────────────────
+    Skip (core-nodbi.R:106:3): docdb_query
+    Reason: queries need to be translated into elastic syntax
+    ──────────────────────────────────────────────────────────────
+    ✓ |        12 | - update, query [3.6s]                                                                    
+    ✓ |         3 | mongodb [0.3s]                                                                            
+    ✓ |        27 | - create, exists, list, get, delete [0.8s]                                                
+    ✓ |        26 | - query [0.3s]                                                                            
+    ✓ |        14 | - update, query [0.1s]                                                                    
+    ✓ |         3 | sqlite                                                                                    
+    ✓ |        27 | - create, exists, list, get, delete [0.5s]                                                
+    ✓ |        26 | - query [0.2s]                                                                            
+    ✓ |        14 | - update, query [0.1s]                                                                    
+
+    ══ Results ══════════════════════════════════════════
+    Duration: 34.3 s
+
+    ── Skipped tests  ───────────────────────────────────────────
+    • queries need to be translated into elastic syntax (1)
+
+    [ FAIL 0 | WARN 0 | SKIP 1 | PASS 264 ]
+
+## Notes
 
 -   Please [report any issues or
     bugs](https://github.com/ropensci/nodbi/issues).
@@ -191,3 +313,5 @@ docdb_get(src, "diamonds") %>%
 -   Please note that this package is released with a [Contributor Code
     of Conduct](https://ropensci.org/code-of-conduct/). By contributing
     to this project, you agree to abide by its terms.
+-   Support for redis has been removed for version 0.5, because no way
+    was found to query and update specific documents in a container.

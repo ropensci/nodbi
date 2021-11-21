@@ -2,62 +2,40 @@
 % Please edit documentation in R/exists.R
 \name{docdb_exists}
 \alias{docdb_exists}
-\title{Check if a database exists}
+\title{Check if container exists in database}
 \usage{
 docdb_exists(src, key, ...)
 }
 \arguments{
-\item{src}{source object, result of call to src}
+\item{src}{Source object, result of call to any of functions
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
 
-\item{key}{(chartacter) A key. ignored for mongo}
+\item{key}{(character) A key as name of the container
+(corresponds to parameter \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+a table name for SQLite)}
 
-\item{...}{Ignored for now}
+\item{...}{Passed to functions:
+\itemize{
+\item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
+\item RSQLite: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
+\item Elasticsearch: \code{\link[elastic:indices]{elastic::index_exists()}}
+\item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
+}}
 }
 \value{
-logical, \code{TRUE} or \code{FALSE}
+(logical) \code{TRUE} or \code{FALSE} to indicate
+existence of container \code{key} in database
 }
 \description{
-Check if a database exists
-}
-\details{
-Note that with etcd, you have to prefix a key with a
-forward slash.
-}
-\note{
-no docdb_exists method for MongoDB at this time
+Check if container exists in database
 }
 \examples{
 \dontrun{
-# CouchDB
-(src <- src_couchdb())
-docout <- docdb_create(src, key = "mtcars2", value = mtcars)
-docdb_exists(src, "mtcars2")
-docdb_exists(src, "asdfadf")
-
-# Elasticsearch
-(src <- src_elastic())
-if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
-docdb_exists(src, "iris")
-docdb_create(src, "iris", iris)
-docdb_exists(src, "iris")
-docdb_exists(src, "adfadf")
-
-# Redis
-(src <- src_redis())
-docdb_create(src, "mtcars", mtcars)
-docdb_exists(src, "mtcars")
-docdb_exists(src, "asdfasf")
-
-# MongoDB
-src <- src_mongo(collection = "mtcars")
-docdb_create(src, key = "mtcars", value = mtcars)
-docdb_exists(src, "mtcars")
-
-# SQLite
 src <- src_sqlite()
+docdb_exists(src, "nonexistingcontainer")
 docdb_create(src, "mtcars", mtcars)
 docdb_exists(src, "mtcars")
-docdb_exists(src, "nonExistingCollection")
 }
 
 }

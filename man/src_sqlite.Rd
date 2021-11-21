@@ -9,10 +9,10 @@ src_sqlite(dbname = ":memory:", ...)
 \arguments{
 \item{dbname}{(character) name of database file,
 defaults to ":memory:" for an in-memory database,
-see \link[RSQLite:SQLite]{RSQLite::SQLite}}
+see \code{\link[RSQLite:SQLite]{RSQLite::SQLite()}}}
 
 \item{...}{additional named parameters passed
-on to \link[RSQLite:SQLite]{RSQLite::SQLite}}
+on to \code{\link[RSQLite:SQLite]{RSQLite::SQLite()}}}
 }
 \description{
 Setup a RSQLite database connection

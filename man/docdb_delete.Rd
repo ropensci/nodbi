@@ -2,60 +2,37 @@
 % Please edit documentation in R/delete.R
 \name{docdb_delete}
 \alias{docdb_delete}
-\title{Delete documents or collections}
+\title{Delete documents or container}
 \usage{
 docdb_delete(src, key, ...)
 }
 \arguments{
-\item{src}{source object, result of call to src, an
-object of class \code{docdb_src}}
+\item{src}{Source object, result of call to any of functions
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
 
-\item{key}{(character) A key (collection for MongoDB
-and RSQLite)}
+\item{key}{(character) A key as name of the container
+(corresponds to parameter \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+a table name for SQLite)}
 
-\item{...}{For MongoDB and RSQLite: Can include
-a query for documents to delete, without query
-deletes collection}
+\item{...}{optional \code{query} parameter with a JSON query as per
+\code{\link[mongolite:mongo]{mongolite::mongo()}} and as working in \code{\link[=docdb_query]{docdb_query()}} to identify
+documents to be deleted. The default is to delete the container
+\code{key}. Other parameters passed on to database backends.}
+}
+\value{
+(logical) success of operation. Typically \code{TRUE} if document
+or collection existed and \code{FALSE} is document did not exist or
+collection did not exist or delete was not successful.
 }
 \description{
-Delete documents or collections
-}
-\details{
-Note that with etcd, you have to prefix a key with a
-forward slash.
+Delete documents or container
 }
 \examples{
 \dontrun{
-# couchdb
-(src <- src_couchdb())
-docdb_create(src, "mtcars", mtcars)
-docdb_get(src, "mtcars")
-docdb_delete(src, "mtcars")
-
-# elasticsearch
-src <- src_elastic()
-if (docdb_exists(src, "iris")) docdb_delete(src, "iris")
-docdb_create(src, "iris", iris)
-Sys.sleep(2)
-docdb_get(src, "iris")
-docdb_delete(src, "iris")
-
-# Redis
-src <- src_redis()
-docdb_create(src, key = "mtcars", value = mtcars)
-docdb_get(src, "mtcars")
-docdb_delete(src, "mtcars")
-
-# mongo
-src <- src_mongo(collection = "iris")
-docdb_create(src, "iris", iris)
-docdb_get(src, "iris")
-docdb_delete(src, "iris")
-
-# SQLite
 src <- src_sqlite()
 docdb_create(src, "iris", iris)
-(docdb_delete(src, "iris", query = '{"Species": {"$regex": "a$"}}'))
-(docdb_delete(src, "iris"))
+docdb_delete(src, "iris", query = '{"Species": {"$regex": "a$"}}')
+docdb_delete(src, "iris")
 }
 }

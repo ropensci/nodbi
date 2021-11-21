@@ -5,7 +5,7 @@
 \title{Defunct functions in nodbi}
 \description{
 \itemize{
-\item \link{src_etcd}: etcd removed, as long as S3 methods for all \verb{docdb_*}
-functions
+\item \link{src_etcd}: etcd removed, with all its S3 methods for \verb{docdb_*}
+\item \link{src_redis}: redis removed, with all its S3 methods for \verb{docdb_*}
 }
 }

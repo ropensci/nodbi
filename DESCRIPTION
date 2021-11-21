@@ -1,11 +1,9 @@
 Package: nodbi
 Title: 'NoSQL' Database Connector
-Description: Simplified document database manipulation and analysis,
-    including support for many 'NoSQL' databases, including document 
-    databases ('Elasticsearch', 'CouchDB', 'MongoDB'), 
-    'key-value' databases ('Redis'), and (with limitations)
-    SQLite/json1.
-Version: 0.4.3
+Description: Simplified document database access and manipulation,
+     providing a common API across supported 'NoSQL' databases 
+     'Elasticsearch', 'CouchDB', 'MongoDB' as well as 'SQLite/JSON1'.
+Version: 0.5.0
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -28,17 +26,19 @@ Depends: R (>= 2.10)
 Encoding: UTF-8
 Language: en-US
 Imports:
-    data.table,
-    jsonlite
-Suggests:
+    stringi,
+    jsonlite,
+    jsonify,
+    uuid,
+    jqr,
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
-    redux,
     RSQLite (>= 2.2.4),
-    DBI,
+    DBI
+Suggests:
     testthat
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 X-schema.org-applicationCategory: Databases
-X-schema.org-keywords: database, MongoDB, Redis, Elasticsearch, CouchDB, SQLite, NoSQL, JSON, documents
+X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org
