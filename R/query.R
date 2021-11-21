@@ -39,6 +39,8 @@ docdb_query <- function(src, key, query, ...) {
 #' @export
 docdb_query.src_couchdb <- function(src, key, query, ...) {
 
+  # https://cran.r-project.org/web/packages/sofa/vignettes/query_tutorial.html
+
   # make dotted parameters accessible
   params <- list(...)
   # for fields, change from MongoDB to couchdb syntax
@@ -102,6 +104,8 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 
 #' @export
 docdb_query.src_elastic <- function(src, key, query, ...) {
+
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
 
   # make dotted parameters accessible
   params <- list(...)
