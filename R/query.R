@@ -391,20 +391,28 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # adapt user regexp's such as \\S
   statement <- gsub("\\\\", "\\", statement, fixed = TRUE)
 
-  # temporary file
+  # temporary file and connection
   tfname <- tempfile()
-  # register to remove file after used for streaming
+  tfnameCon <- file(tfname, open = "wt", encoding = "native.enc")
+  # register to close and remove file after used for streaming
+  #on.exit(close(tfnameCon), add = TRUE)
   on.exit(unlink(tfname), add = TRUE)
 
-  ## finally get data, write to file in ndjson format ("\n")
-  cat(
-    # eliminate rows without any json
-    stats::na.omit(
-      DBI::dbGetQuery(
-        conn = src$con,
-        statement = statement,
-        n = n)[["json"]]
-    ), sep = "\n", file = tfname)
+  ## get data, write to file in ndjson format ("\n")
+  writeLines(
+    paste0(
+      # protect against empty query result
+      "",
+      # eliminate rows without any json
+      stats::na.omit(
+        DBI::dbGetQuery(
+          conn = src$con,
+          statement = statement,
+          n = n)[["json"]])),
+    con = tfnameCon,
+    sep = "\n",
+    useBytes = TRUE)
+  close(tfnameCon)
 
   # to extract subFields if any, run jq line-by-line
   if (length(subFields)) {
@@ -439,21 +447,32 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       collapse = ", ")), collapse = ""), "}")
 
     # get second file name
-    tnameJq <- tempfile()
-    on.exit(unlink(tnameJq), add = TRUE)
-    cat(
-      jsonlite::fromJSON(
-        jsonlite::toJSON(
-          jqr::jq(file(tfname), jqFields)
-        )), file = tnameJq, sep = "\n")
+    tjname <- tempfile()
+    tjnameCon <- file(tjname, open = "wt", encoding = "native.enc")
+    # register to remove file after used for streaming
+    on.exit(unlink(tjname), add = TRUE)
+
+    # write data
+    writeLines(
+      paste0(
+        "", # protect against no string
+        jsonlite::fromJSON(
+          jsonlite::toJSON(
+            jqr::jq(file(tfname, encoding = "UTF-8"), jqFields)
+          ))),
+      # to create ndjson
+      con = tjnameCon,
+      sep = "\n",
+      useBytes = TRUE)
+    close(tjnameCon)
 
     # swap file name
-    tfname <- tnameJq
+    tfname <- tjname
 
   } # if subFields
 
   # stream_in automatically opens and later closes (and destroys) connection
-  out <- jsonlite::stream_in(file(tfname), verbose = FALSE)
+  out <- jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE)
 
   # exclude any root fields with name:0 or that were not specified
   # params <- list(); params$fields <- fields

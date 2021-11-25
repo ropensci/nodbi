@@ -10,11 +10,9 @@
 
 0 errors | 0 warnings | 0 notes
 
-## Changes
+## Bug fix
 
-- created identical API and identical return values for `docdb_*()` functions across database backends
-- re-factored recently added functions for RSQLite
-- performance (timing, memory) profiled and optimised
+- for SQLite under Windows ensure handling of special characters by avoiding encoding conversions with file operations that stream out / in NDJSON
 
 ## Reverse dependencies
 

@@ -1,4 +1,10 @@
-nodbi 0.5
+nodbi 0.5.1
+===========
+
+### BUG FIXES
+* for SQLite under Windows ensure handling of special characters (avoiding encoding conversions with file operations that stream out / in NDJSON)
+
+nodbi 0.5.0
 ===========
 
 ### IMPROVEMENTS
