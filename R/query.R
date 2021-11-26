@@ -395,7 +395,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   tfname <- tempfile()
   tfnameCon <- file(tfname, open = "wt", encoding = "native.enc")
   # register to close and remove file after used for streaming
-  #on.exit(close(tfnameCon), add = TRUE)
+  on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
   on.exit(unlink(tfname), add = TRUE)
 
   ## get data, write to file in ndjson format ("\n")
@@ -450,6 +450,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
     tjname <- tempfile()
     tjnameCon <- file(tjname, open = "wt", encoding = "native.enc")
     # register to remove file after used for streaming
+    on.exit(try(close(tjnameCon), silent = TRUE), add = TRUE)
     on.exit(unlink(tjname), add = TRUE)
 
     # write data
