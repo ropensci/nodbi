@@ -58,9 +58,14 @@ jobs:
           discovery type: 'single-node'
 
       - name: Start CouchDB
-        uses: sckott/couchdb-action@master
+        uses: iamssen/couchdb-github-action@master
         with:
-          couchdb version: '3.1.1'
+          couchdb-version: '3.1'
+
+      # - name: Start CouchDB
+      #   uses: sckott/couchdb-action@master
+      #   with:
+      #     couchdb version: '3.1.1'
 
       # - name: Start Redis
       #   uses: supercharge/redis-github-action@1.1.0
