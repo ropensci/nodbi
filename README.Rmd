@@ -252,13 +252,12 @@ rbenchmark::benchmark(
   replications = 10L,
   columns = c('test', 'replications', 'elapsed')
 )
-#> on 2015 macOS hardware with local databases; after subtracting 10s for ElasticSearch
+#> on 2015 macOS hardware with local databases
 #>      test replications elapsed
-#> 4 CouchDB           10    48.2
-#> 3 Elastic           10    28.2
-#> 1 MongoDB           10     4.5
-#> 2 RSQLite           10     4.0
-
+#> 4 CouchDB           10    48.8
+#> 3 Elastic           10    38.1 # 10s subtracted but skips a third of tests
+#> 1 MongoDB           10     3.9
+#> 2 RSQLite           10     3.8
 ```
 
 ## Testing

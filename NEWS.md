@@ -1,3 +1,9 @@
+nodbi 0.5.2
+===========
+
+### BUG FIXES
+* for SQLite under Windows add closing file references also on exit
+
 nodbi 0.5.1
 ===========
 
