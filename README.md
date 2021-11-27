@@ -21,8 +21,9 @@ Currently, `nodbi` supports the following database backends:
 
 -   MongoDB
 -   SQLite
--   CouchDB
 -   Elasticsearch
+-   CouchDB
+-   PostgreSQL (new in `nodbi` version 0.6.0)
 
 for an `R` object of any of these data types:
 
@@ -42,9 +43,9 @@ and for executing the following operations:
 
 across all database backends. \*Only simple queries (and updates,
 e.g. equality for a single field) supported for Elasticsearch at the
-moment. \*\*Only root fields can be specified for CouchDB and
-Elasticsearch, whereas subitems in fields can be specified for MongoDB
-and SQLite.
+moment. \*\*Only root fields can be specified for CouchDB, whereas
+subitems in fields in dot notation can be specified for Elasticsearch,
+MongoDB, SQLite and PostgreSQL.
 
 For details of operations and parameter combinations across any of the
 database backends, see the main file for package testing, here:
@@ -119,16 +120,25 @@ src_sqlite(dbname = ":memory:", ...)
 
 ``` r
 src_couchdb(
-  host = "127.0.0.1", port = 5984, path = NULL,
+  host = "127.0.0.1", port = 5984L, path = NULL,
   transport = "http", user = NULL, pwd = NULL, headers = NULL)
 ```
 
-### ElasticSearch
+### Elasticsearch
 
 ``` r
 src_elastic(
-  host = "127.0.0.1", port = 9200, path = NULL,
+  host = "127.0.0.1", port = 9200L, path = NULL,
   transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...)
+```
+
+### PostgreSQL
+
+The order of variables is not maintained by this database.
+
+``` r
+src_postgres(
+  dbname = "test", host = "127.0.0.1", port = 5432L, ...)
 ```
 
 ## Walk-through
@@ -235,15 +245,16 @@ srcMongo <- src_mongo()
 srcSqlite <- src_sqlite()
 srcElastic <- src_elastic()
 srcCouchdb <- src_couchdb(user = COUCHDB_TEST_USER, pwd = COUCHDB_TEST_PWD)
+srcPostgres <- src_postgres()
 key <- "test"
 query <- '{"clarity": "I1"}'
 fields <- '{"cut": 1, "_id": 1}'
 value <- '{"clarity": "XYZ"}'
-data <- as.data.frame(diamonds)[1:2000,]
+data <- as.data.frame(diamonds)[1:12000,]
 
 testFunction <- function(src, key, value, query, fields) {
   docdb_create(src, key, data)
-  # ElasticSearch needs a moment to process the data
+  # Elasticsearch needs a delay to process the data
   if (inherits(src, "src_elastic")) Sys.sleep(1)
   head(docdb_get(src, key))
   docdb_query(src, key, query = query, fields = fields)
@@ -256,15 +267,16 @@ rbenchmark::benchmark(
   RSQLite = testFunction(src = srcSqlite, key, value, query, fields),
   Elastic = testFunction(src = srcElastic, key, value, query, fields),
   CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
+  PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
   replications = 10L,
   columns = c('test', 'replications', 'elapsed')
 )
-#> on 2015 macOS hardware with local databases
-#>      test replications elapsed
-#> 4 CouchDB           10    48.8
-#> 3 Elastic           10    38.1 # 10s subtracted but skips a third of tests
-#> 1 MongoDB           10     3.9
-#> 2 RSQLite           10     3.8
+#>         test replications elapsed
+#> 4    CouchDB           10     262
+#> 3    Elastic           10     100 # 10s delay subtracted
+#> 5 PostgreSQL           10      70
+#> 2    RSQLite           10      68
+#> 1    MongoDB           10      66
 ```
 
 ## Testing
@@ -273,35 +285,40 @@ rbenchmark::benchmark(
 testthat::test_local()
 ```
 
-    ✓ | F W S  OK | Context
-    ✓ |         5 | couchdb [0.6s]                                                                            
-    ✓ |        27 | - create, exists, list, get, delete [2.2s]                                                
-    ✓ |        26 | - query [1.1s]                                                                            
-    ✓ |        14 | - update, query [5.1s]                                                                    
-    ✓ |         3 | elastic [0.8s]                                                                            
-    ✓ |        27 | - create, exists, list, get, delete [16.4s]                                               
-    ✓ |     1  10 | - query [2.2s]                                                                            
-    ──────────────────────────────────────────────────────────────
-    Skip (core-nodbi.R:106:3): docdb_query
-    Reason: queries need to be translated into elastic syntax
-    ──────────────────────────────────────────────────────────────
-    ✓ |        12 | - update, query [3.6s]                                                                    
-    ✓ |         3 | mongodb [0.3s]                                                                            
-    ✓ |        27 | - create, exists, list, get, delete [0.8s]                                                
-    ✓ |        26 | - query [0.3s]                                                                            
-    ✓ |        14 | - update, query [0.1s]                                                                    
-    ✓ |         3 | sqlite                                                                                    
-    ✓ |        27 | - create, exists, list, get, delete [0.5s]                                                
-    ✓ |        26 | - query [0.2s]                                                                            
-    ✓ |        14 | - update, query [0.1s]                                                                    
+✓ \| F W S OK \| Context ✓ \| 5 \| couchdb \[0.2s\]  
+✓ \| 28 \| - create, exists, list, get, delete \[1.7s\]  
+✓ \| 27 \| - query \[0.9s\]  
+✓ \| 14 \| - update, query \[4.0s\]  
+✓ \| 3 \| elastic  
+✓ \| 28 \| - create, exists, list, get, delete \[10.6s\]  
+✓ \| 1 12 \| - query \[1.9s\]  
+─────────────────────────────────────────────────────────────────────────────────────────
+Skip (core-nodbi.R:111:3): docdb_query Reason: queries need to be
+translated into elastic syntax
+─────────────────────────────────────────────────────────────────────────────────────────
+✓ \| 12 \| - update, query \[2.8s\]  
+✓ \| 3 \| mongodb  
+✓ \| 28 \| - create, exists, list, get, delete \[0.4s\]  
+✓ \| 28 \| - query \[0.3s\]  
+✓ \| 14 \| - update, query \[0.1s\]  
+✓ \| 3 \| postgres \[0.2s\]  
+✓ \| 27 \| - create, exists, list, get, delete \[0.5s\]  
+✓ \| 28 \| - query \[0.4s\]  
+✓ \| 14 \| - update, query \[0.2s\]  
+✓ \| 3 \| sqlite  
+✓ \| 28 \| - create, exists, list, get, delete \[0.3s\]  
+✓ \| 28 \| - query \[0.2s\]  
+✓ \| 14 \| - update, query \[0.1s\]
 
-    ══ Results ══════════════════════════════════════════
-    Duration: 34.3 s
+══ Results
+══════════════════════════════════════════════════════════════════════════════
+Duration: 24.8 s
 
-    ── Skipped tests  ───────────────────────────────────────────
-    • queries need to be translated into elastic syntax (1)
+── Skipped tests
+───────────────────────────────────────────────────────────────────────
+• queries need to be translated into elastic syntax (1)
 
-    [ FAIL 0 | WARN 0 | SKIP 1 | PASS 264 ]
+\[ FAIL 0 \| WARN 0 \| SKIP 1 \| PASS 347 \]
 
 ## Notes
 

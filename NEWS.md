@@ -1,3 +1,9 @@
+nodbi 0.6.0
+===========
+
+### IMPROVEMENTS
+* support for PostgreSQL
+
 nodbi 0.5.2
 ===========
 

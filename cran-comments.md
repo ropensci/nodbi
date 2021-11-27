@@ -1,6 +1,6 @@
 ## Test environments
 
-* Local: macOS, R 4.1.2 and R 3.6.3;  with CouchDB, ElasticSearch, MongoDB and SQLite databases
+* Local: macOS, R 4.1.2 and R 3.6.3;  with CouchDB, Elasticsearch, MongoDB SQLite and PostgreSQL databases
 * Github Actions: Ubuntu 20.04; R release and R devel
 * win-builder: R Under development (unstable) (2021-11-19 r81213)
 * R-hub builder: Windows Server 2008 R2 SP1, R-devel, 32/64 bit; Ubuntu Linux 20.04.1 LTS, R-release, GCC; Fedora Linux, R-devel, clang, gfortran
@@ -9,6 +9,10 @@
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes
+
+## Improvements
+
+- added PostgreSQL as database backend
 
 ## Bug fix
 

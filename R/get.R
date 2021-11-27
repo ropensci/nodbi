@@ -4,14 +4,15 @@
 #'
 #' @param limit (integer) Maximum number of documents
 #'  to return (defaults to all for MongoDB,
-#'  all for SQLite, 10,000 for Elasticsearch and
-#'  all for CouchDB
+#'  all for SQLite, 10,000 for Elasticsearch,
+#'  all for CouchDB, and all for PostgreSQL
 #'
 #' @param ... Passed on to functions:
 #' - MongoDB: find() in [mongolite::mongo()]
 #' - SQLite: ignored
 #' - Elasticsearch: [elastic::Search()]
 #' - CouchDB: [sofa::db_alldocs()]
+#' - PostgreSQL: ignored
 #'
 #' @return Document(s) in a data frame
 #'
@@ -114,6 +115,47 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
 
   statement <- paste0(
     "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json, '{') ",
+    "AS json FROM \"", key,
+    # canonical sorting in nodbi
+    "\" ORDER BY _id ASC;")
+
+  # set limit if not null
+  n <- -1L
+  if (!is.null(limit)) n <- limit
+
+  # temporary file for streaming
+  tfname <- tempfile()
+  tfnameCon <- file(description = tfname, open = "wt", encoding = "native.enc")
+  # register to remove file after used for streaming
+  on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+  on.exit(unlink(tfname), add = TRUE)
+
+  # get data, write to file in ndjson format
+  writeLines(
+    # eliminate rows without any json
+    stats::na.omit(
+      DBI::dbGetQuery(
+        conn = src$con,
+        statement = statement,
+        n = n)[["json"]]),
+    con = tfnameCon,
+    sep = "\n",
+    useBytes = TRUE)
+  close(tfnameCon)
+
+  # from jsonlite documentation:
+  # Because parsing huge JSON strings is difficult and inefficient,
+  # JSON streaming is done using lines of minified JSON records, ndjson
+  return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE))
+
+}
+
+#' @export
+docdb_get.src_postgres <- function(src, key, limit = NULL, ...) {
+
+  # query to return full json column as text
+  statement <- paste0(
+    "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json::TEXT, '{') ",
     "AS json FROM \"", key,
     # canonical sorting in nodbi
     "\" ORDER BY _id ASC;")

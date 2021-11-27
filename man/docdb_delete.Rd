@@ -8,17 +8,26 @@ docdb_delete(src, key, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
+or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) A key as name of the container
 (corresponds to parameter \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite)}
+a table name for SQLite and for PostgreSQL)}
 
 \item{...}{optional \code{query} parameter with a JSON query as per
 \code{\link[mongolite:mongo]{mongolite::mongo()}} and as working in \code{\link[=docdb_query]{docdb_query()}} to identify
 documents to be deleted. The default is to delete the container
-\code{key}. Other parameters passed on to database backends.}
+\code{key}.
+Other parameters are passed on to functions:
+\itemize{
+\item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
+\item SQLite: ignored
+\item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
+\item CouchDB: \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
+\item PostgreSQL: ignored
+}}
 }
 \value{
 (logical) success of operation. Typically \code{TRUE} if document

@@ -9,7 +9,7 @@
 Simplified document database access and manipulation,
 providing a common API across supported 'NoSQL' databases
 'Elasticsearch', 'CouchDB', 'MongoDB' as well as
-'SQLite/JSON1'.
+'SQLite/JSON1' and 'PostgreSQL'.
 }
 \author{
 Scott Chamberlain \email{sckott@protonmail.com}
