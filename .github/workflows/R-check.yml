@@ -105,6 +105,11 @@ jobs:
           postgres-version: 14
           database: test
 
+      - name: Install plpgsql
+        if: runner.os != 'Windows'
+        run: |
+          createlang plpgsql test
+
       - name: Check
         run: Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')"
 

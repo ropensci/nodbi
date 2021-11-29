@@ -38,8 +38,9 @@ src_postgres <- function(dbname = "test",
   # but still recommended; if you delete the object containing the connection,
   # it will be automatically disconnected during the next GC with a warning.
 
-  # credits: https://stackoverflow.com/a/65093455
-  try(DBI::dbExecute(conn = con, statement = '
+  # credits: Joao Haas, https://stackoverflow.com/a/65093455
+  if (inherits(class(
+    try(DBI::dbExecute(conn = con, statement = '
    CREATE OR REPLACE FUNCTION
     jsonb_merge_patch("target" jsonb, "patch" jsonb)
     RETURNS jsonb AS $$
@@ -61,6 +62,10 @@ src_postgres <- function(dbname = "test",
    END;
   $$ LANGUAGE plpgsql;
   '), silent = TRUE)
+  ), "try-error")) {
+    stop("PostgreSQL does not support plpgsql. Please install, e.g. by ",
+         "'createlang plpgsql ", dbname, "' on the command line.")
+  }
 
   # return standard nodbi structure
   structure(list(con = con,
