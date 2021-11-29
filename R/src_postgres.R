@@ -38,33 +38,33 @@ src_postgres <- function(dbname = "test",
   # but still recommended; if you delete the object containing the connection,
   # it will be automatically disconnected during the next GC with a warning.
 
-  # credits: Joao Haas, https://stackoverflow.com/a/65093455
-  if (inherits(class(
-    try(DBI::dbExecute(conn = con, statement = '
-   CREATE OR REPLACE FUNCTION
-    jsonb_merge_patch("target" jsonb, "patch" jsonb)
-    RETURNS jsonb AS $$
-   BEGIN
-    RETURN COALESCE(jsonb_object_agg(
-     COALESCE("tkey", "pkey"),
-     CASE
-      WHEN "tval" ISNULL THEN "pval"
-      WHEN "pval" ISNULL THEN "tval"
-      WHEN jsonb_typeof("tval") != \'object\'
-       OR jsonb_typeof("pval") != \'object\' THEN "pval"
-      ELSE json_merge_patch("tval", "pval")
-    END
-    ), \'{}\'::jsonb)
-   FROM jsonb_each("target") e1("tkey", "tval")
-   FULL JOIN jsonb_each("patch") e2("pkey", "pval")
-    ON "tkey" = "pkey"
-    WHERE jsonb_typeof("pval") != \'null\' OR "pval" ISNULL;
-   END;
-  $$ LANGUAGE plpgsql;
-  '), silent = TRUE)
-  ), "try-error")) {
-    stop("PostgreSQL does not support plpgsql. Please install, e.g. by ",
-         "'createlang plpgsql ", dbname, "' on the command line.")
+  # add plpgsql function for docdb_update(), which should only raise
+  # an error if the plpgsql extension is not installed in dbname
+  if (inherits(try(
+    # credits: Joao Haas, https://stackoverflow.com/a/65093455
+    DBI::dbExecute(conn = con, statement = 'CREATE OR REPLACE FUNCTION
+     jsonb_merge_patch("target" jsonb, "patch" jsonb)
+     RETURNS jsonb AS $$
+    BEGIN
+     RETURN COALESCE(jsonb_object_agg(
+      COALESCE("tkey", "pkey"),
+      CASE
+       WHEN "tval" ISNULL THEN "pval"
+       WHEN "pval" ISNULL THEN "tval"
+       WHEN jsonb_typeof("tval") != \'object\'
+        OR jsonb_typeof("pval") != \'object\' THEN "pval"
+       ELSE jsonb_merge_patch("tval", "pval")
+     END
+     ), \'{}\'::jsonb)
+    FROM jsonb_each("target") e1("tkey", "tval")
+    FULL JOIN jsonb_each("patch") e2("pkey", "pval")
+     ON "tkey" = "pkey"
+     WHERE jsonb_typeof("pval") != \'null\' OR "pval" ISNULL;
+    END;
+   $$ LANGUAGE plpgsql;
+  '), silent = TRUE), "try-error")) {
+    stop("PostgreSQL does not support plpgsql in table '", dbname,
+         "', but this is needed for nodbi::docdb_update()")
   }
 
   # return standard nodbi structure

@@ -37,8 +37,8 @@ a single data.frame, a JSON string or a list}
 Documents identified by the query are updated
 by patching their JSON with \code{value}.
 This is native with MongoDB and SQLite and is
-emulated for ElasticSearch and CouchDB using
-SQLite/JSON1, and uses a custom function for
+emulated for Elasticsearch and CouchDB using
+SQLite/JSON1, and uses a plpgsql function for
 PostgreSQL.
 }
 \examples{

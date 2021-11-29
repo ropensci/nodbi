@@ -4,7 +4,7 @@
 #' by patching their JSON with \code{value}.
 #' This is native with MongoDB and SQLite and is
 #' emulated for Elasticsearch and CouchDB using
-#' SQLite/JSON1, and uses a custom function for
+#' SQLite/JSON1, and uses a plpgsql function for
 #' PostgreSQL.
 #'
 #' @inheritParams docdb_create
