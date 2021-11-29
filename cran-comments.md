@@ -16,7 +16,7 @@
 
 ## Bug fix
 
-- for SQLite under Windows ensure handling of special characters by avoiding encoding conversions with file operations that stream out / in NDJSON
+- for SQLite under Windows add closing file references also on exit
 
 ## Reverse dependencies
 

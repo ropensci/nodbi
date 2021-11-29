@@ -4,9 +4,6 @@ nodbi 0.6.0
 ### IMPROVEMENTS
 * support for PostgreSQL
 
-nodbi 0.5.2
-===========
-
 ### BUG FIXES
 * for SQLite under Windows add closing file references also on exit
 
