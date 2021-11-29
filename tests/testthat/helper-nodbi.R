@@ -44,7 +44,7 @@ skip_if_no_elastic <- function() {
 skip_if_no_postgres <- function() {
   testthat::skip_if_not_installed("RPostgres")
   if (inherits(try(tmp <- src_postgres(), silent = TRUE), "try-error")) {
-    skip("sqlite is not available")
+    skip("postgres is not available")
   }
   RPostgres::dbDisconnect(tmp$con)
 }
