@@ -32,6 +32,15 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
+      - name: Start PostgreSQL on Ubuntu
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready
+
+      - name: Create PostgreSQL database
+        run: |
+          sudo -u postgres createdb test
+
       - name: Start MongoDB
         if: runner.os == 'Linux'
         uses: supercharge/mongodb-github-action@1.3.0
