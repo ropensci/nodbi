@@ -71,7 +71,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
         row.names(value) <- NULL
       }
     }
-    value <- jsonify::from_json(jsonify::to_json(value, unbox = TRUE) , simplify = FALSE)
+    value <- jsonify::from_json(jsonify::to_json(value, unbox = TRUE), simplify = FALSE)
   } # if data.frame
 
   # convert JSON string to list
@@ -104,19 +104,11 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   errors <- result[names(result) == "error"]
   oks <- result[names(result) == "ok"] == "TRUE"
 
-  if (length(errors)) {warning(
-    "Could not create ", length(errors), " documents, reason: ",
-    unique(errors), call. = FALSE, immediate. = TRUE)
+  if (length(errors)) {
+    warning("Could not create ", length(errors),
+    " documents, reason: ", unique(errors),
+    call. = FALSE, immediate. = TRUE)
   }
-
-  # # add index
-  # if (length(oks)) {
-  # sofa::db_index_create(
-  #   cushion = src$con,
-  #   dbname = key,
-  #   body = list(index = list(fields = I("_id")))
-  # )
-  # }
 
   # return
   return(length(oks))

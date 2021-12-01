@@ -105,7 +105,6 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
 
   # early return if not found
   if (!length(ids)) return(0L)
-  # if (!length(ids)) docdb_create(src, key, value)
 
   # json to data frame
   if (class(value) == "character") {
@@ -114,7 +113,6 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
 
   # list to data frame
   if (class(value) == "list") {
-    # value = testList
     value <- jsonlite::fromJSON(
       jsonlite::toJSON(value, auto_unbox = TRUE))
     # if value is still simple list
@@ -140,7 +138,6 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
         "Number of rows of 'value' is not 1L and not the same as ",
         "the number of documents (_id's) that are to be updated; ",
         "iterating over _id's. ")
-      # value = mtcars[1:2, 4:5]
       for (i in seq_len(length(ids))) {
         value <- rbind(value, t(cbind(as.list(indf))))
       }
@@ -251,7 +248,6 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
     value, '\') WHERE _id IN (',
     paste0('"', ids, '"', collapse = ","), ');'
   )
-  # message(statement)
 
   # update data
   result <- try(
@@ -288,8 +284,8 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
   # uses a function inserted by src_postgres
   statement <- paste0(
     'UPDATE "', key, '" SET json = jsonb_merge_patch(json,\'',
-    value, '\') WHERE _id IN (',
-    paste0('\'', ids, '\'', collapse = ","), ');'
+    value, "') WHERE _id IN (",
+    paste0("'", ids, "'", collapse = ","), ");"
   )
 
   # update data
@@ -324,9 +320,9 @@ jsonUpdate <- function(jsonT, jsonP) {
 
   # construct json command
   jsonPatch <- paste0(
-    'SELECT json_patch(\'',
-    jsonT, '\',\'', jsonP,
-    '\') AS json;'
+    "SELECT json_patch('",
+    jsonT, "','", jsonP,
+    "') AS json;"
   )
 
   # calculate patch

@@ -24,7 +24,7 @@ Documentation details for each database:
 \item Elasticsearch -
 \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
 \item CouchDB - \url{http://docs.couchdb.org/}
-\item PostgreSQL - \url{https://www.postgresql.org/docs/functions-json.html}
+\item PostgreSQL - \url{https://www.postgresql.org/docs/current/functions-json.html}
 }
 
 Documentation for R packages used by \code{nodbi} for the databases:

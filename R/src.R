@@ -17,7 +17,7 @@
 #' - Elasticsearch -
 #'  \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
 #' - CouchDB - \url{http://docs.couchdb.org/}
-#' - PostgreSQL - \url{https://www.postgresql.org/docs/functions-json.html}
+#' - PostgreSQL - \url{https://www.postgresql.org/docs/current/functions-json.html}
 #'
 #'  Documentation for R packages used by `nodbi` for the databases:
 #'

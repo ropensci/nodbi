@@ -144,8 +144,6 @@ test_that("docdb_update", {
   key <- tmp$testKey
   on.exit(rm(src), add = TRUE)
 
-  #if (inherits(src, "src_postgres")) skip("updates to be implemented for postgres")
-
   expect_equal(docdb_create(src = src, key = key, value = testDf), nrow(testDf))
   if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
   #

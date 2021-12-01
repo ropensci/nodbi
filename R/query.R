@@ -108,11 +108,9 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 
   # make dotted parameters accessible
   params <- list(...)
-  # params <- list(); params[["fields"]] <- fields
   if (!is.null(params[["limit"]])) limit <- params$limit
   if (is.null(params[["limit"]])) limit <- 10000
   # for fields, change from MongoDB to couchdb syntax
-  # params <- list(); params$fields <- '{"_id": 1, "name":1, "me_not": 0}'
   if (length(params[["fields"]])) {
     #
     m <- stringi::stri_match_all_regex(params[["fields"]], '"([-@._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
@@ -203,14 +201,12 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
   # make dotted parameters accessible
   params <- list(...)
-  # params <- list(); params$fields <- fields
 
   # canonical sorting in nodbi
   if (!length(params[["sort"]])) params[["sort"]] <- '{"_id": 1}'
   if (!length(params[["fields"]])) params[["fields"]] <- '{}'
 
   # separate fields to keep and to remove
-  # params <- list(); params$fields <- '{"_id": 1, "name":1, "me_not": 0}'
   if (length(params[["fields"]])) {
     tmpFields <- params[["fields"]]
     params[["fields"]] <- '{}'
@@ -242,7 +238,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   # remove any fields with field_name: 0
   if (length(out)) {
     rM <- stats::na.omit(match(fields, names(out)))
-    if (length(rM)) out <- out[, -rM, drop = FALSE] # length(rM) && !is.na(rM)
+    if (length(rM)) out <- out[, -rM, drop = FALSE]
   }
 
   # remove rownames
@@ -284,7 +280,6 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # all following is to emulate mongodb behaviour, which includes avoiding
   # path collisions with overlapping fields; see https://docs.mongodb.com/
   # manual/release-notes/4.4-compatibility/#path-collision-restrictions
-  # params <- list(); params$fields <- fields
   fields <- "{}"
   if (!is.null(params$fields)) fields <- params$fields
   fields <- json2fieldsSql(fields)
@@ -404,9 +399,6 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   ## special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    # TODO only retrieves outer items
-    # https://dba.stackexchange.com/questions/226914/extract-all-of-the-keys-including-nested-from-postgres-jsonb-column
-
     # get all fullkeys and types
     fields <- DBI::dbGetQuery(
       conn = src$con,
@@ -427,7 +419,6 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   # all following is to emulate mongodb behaviour, which includes avoiding
   # path collisions with overlapping fields; see https://docs.mongodb.com/
   # manual/release-notes/4.4-compatibility/#path-collision-restrictions
-  # params <- list(); params$fields <- fields
   fields <- "{}"
   if (!is.null(params$fields)) fields <- params$fields
   fields <- json2fieldsSql(fields)
@@ -442,17 +433,6 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
       statement = statement)
     return(out)
   }
-
-  ## target conversion
-  # docdb_query(src = dbc, key = "testTbl",
-  #             query = '{"$or": [{"age": {"$gte": 23}}, {"friends.name": "Dona Bartlett"}]}',
-  #             fields = '{"_id": 1, "age": 1, "friends.name": 1}')
-  # DBI::dbGetQuery(
-  #  dbc$con,
-  #  "SELECT jsonb_build_object('_id', _id, 'age', json->'age', 'friends.name', json->'friends')
-  #   AS json FROM \"testTbl\"
-  #   WHERE jsonb_path_exists(json, '$[*] ? (@.\"age\" >= 23)') OR
-  #         jsonb_path_exists(json, '$[*] ? (@.\"friends\".\"name\" == \"Dona Bartlett\")') ;")
 
   ## mangle fields for sql and jq
   # - requested root fields
@@ -646,7 +626,6 @@ dbiGetProcessData <- function(
   out <- jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE)
 
   # exclude any root fields with name:0 or that were not specified
-  # params <- list(); params$fields <- fields
   if (length(params[["fields"]])) {
     # any fields that were to be included
     rM <- NULL
@@ -827,7 +806,6 @@ fieldsSql2fullKey <- function(x) {
   x <- gsub("([a-zA-Z]+)[.](?=[a-zA-Z]+)", "\\1@@@\\2", x, perl = TRUE)
 
   # add in regexps to match any arrayIndex in fullkey
-  # x <- paste0("^[$][.]", gsub("@@@", "[-#\\\\[\\\\]0-9]*[.]", x), "$")
   x <- paste0("[$][.]", gsub("@@@", "[-#\\\\[\\\\]0-9]*[.]", x), "")
 
   # return

@@ -12,16 +12,15 @@
 
 ## Improvements
 
-- added PostgreSQL as database backend
+- added PostgreSQL, which is fully supported as database backend
 
 ## Bug fix
 
-- for SQLite under Windows add closing file references also on exit
+- for SQLite add closing file references also on exit
 
 ## Reverse dependencies
 
 * I have run R CMD check on 2 downstream dependencies, no errors or warnings
-* 1 of the downstream dependencies is my package ctrdata, for which a new release will be submitted immediately
 
 --------
 

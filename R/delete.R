@@ -193,7 +193,7 @@ docdb_delete.src_postgres <- function(src, key, ...) {
     # document delete
     statement <- paste0(
       "DELETE FROM \"", key, "\" WHERE _id IN (",
-      paste0('\'', tmpids, '\'', collapse = ","), ");")
+      paste0("'", tmpids, "'", collapse = ","), ");")
 
     # do delete
     docdb_exists(src, key) &&
