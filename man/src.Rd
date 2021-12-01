@@ -14,22 +14,25 @@ of the database backends. Each has their own unique set of parameters.
 \item SQLite - \code{\link[=src_sqlite]{src_sqlite()}}
 \item Elasticsearch - \code{\link[=src_elastic]{src_elastic()}}
 \item CouchDB - \code{\link[=src_couchdb]{src_couchdb()}}
+\item PostgreSQL - \code{\link[=src_postgres]{src_postgres()}}
 }
 
 Documentation details for each database:
 \itemize{
 \item MongoDB - \url{https://docs.mongodb.com/}
 \item SQLite/JSON1 - \url{https://www.sqlite.org/json1.html}
-\item CouchDB - \url{http://docs.couchdb.org/}
 \item Elasticsearch -
 \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
+\item CouchDB - \url{http://docs.couchdb.org/}
+\item PostgreSQL - \url{https://www.postgresql.org/docs/current/functions-json.html}
 }
 
 Documentation for R packages used by \code{nodbi} for the databases:
 \itemize{
 \item mongolite - \url{https://CRAN.R-project.org/package=mongolite}
 \item RSQLite - \url{https://CRAN.R-project.org/package=RSQLite}
-\item sofa - \url{https://CRAN.R-project.org/package=sofa}
 \item elastic - \url{https://CRAN.R-project.org/package=elastic}
+\item sofa - \url{https://CRAN.R-project.org/package=sofa}
+\item RPostgres - \url{https://rpostgres.r-dbi.org/}
 }
 }

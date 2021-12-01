@@ -25,25 +25,25 @@ src_sqlite <- function(dbname = ":memory:",
     ...)
 
   # check if json1 extension is supported
-  if (inherits(class(
+  if (inherits(
     try(
       DBI::dbGetQuery(
         conn = con,
         statement = paste0("SELECT json_patch('{\"a\":1}','{\"a\":9}');")
-      ), silent = TRUE)
+      ), silent = TRUE
   ), "try-error")) {
     stop("SQLite does not have json1 extension enabled. Call ",
          "install.packages('RSQLite') to install a current version.")
   }
 
   # check if regular expressions are supported (RSQLite >= 2.1.2)
-  if (inherits(class(
+  if (inherits(
     try({
       RSQLite::initRegExp(db = con)
       DBI::dbExecute(
         conn = con,
         statement = paste0('SELECT * FROM (VALUES ("Astring")) WHERE 1 REGEXP "[A-Z]+";'))
-    }, silent = TRUE)
+    }, silent = TRUE
   ), "try-error")) {
     stop("SQLite does not support REGEXP. Call ",
          "install.packages('RSQLite') to install a current version.")

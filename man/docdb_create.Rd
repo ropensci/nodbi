@@ -8,12 +8,13 @@ docdb_create(src, key, value, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
+or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) A key as name of the container
 (corresponds to parameter \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite)}
+a table name for SQLite and for PostgreSQL)}
 
 \item{value}{The data to be created in the database:
 a single data.frame, a JSON string or a list}
@@ -23,7 +24,8 @@ a single data.frame, a JSON string or a list}
 \item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
 \item Elasticsearch: \link[elastic:docs_bulk]{elastic::docs_bulk}
 \item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item RSQLite: ignored
+\item SQLite: ignored
+\item PostgreSQL: ignored
 }}
 }
 \value{

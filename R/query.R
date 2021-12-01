@@ -7,13 +7,12 @@
 #' @param ... Optionally, `fields` a JSON string of fields to
 #' be returned from anywhere in the tree (dot paths notation).
 #'
-#' Other parameters passed on to functions:
+#' Main functions used per database:
 #' - MongoDB: find() in [mongolite::mongo()]
-#' - RSQLite: for mangling into SQL query
+#' - SQLite: SQL query using `json_tree()`
 #' - Elasticsearch: [elastic::Search()]
 #' - CouchDB: [sofa::db_query()]
-#'
-#'
+#' - PostgreSQL: SQL query using `jsonb_build_object()`
 #'
 #' @return Data frame with requested data, may have nested
 #'  lists in columns
@@ -109,11 +108,9 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 
   # make dotted parameters accessible
   params <- list(...)
-  # params <- list(); params[["fields"]] <- fields
   if (!is.null(params[["limit"]])) limit <- params$limit
   if (is.null(params[["limit"]])) limit <- 10000
   # for fields, change from MongoDB to couchdb syntax
-  # params <- list(); params$fields <- '{"_id": 1, "name":1, "me_not": 0}'
   if (length(params[["fields"]])) {
     #
     m <- stringi::stri_match_all_regex(params[["fields"]], '"([-@._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
@@ -204,14 +201,12 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
   # make dotted parameters accessible
   params <- list(...)
-  # params <- list(); params$fields <- fields
 
   # canonical sorting in nodbi
   if (!length(params[["sort"]])) params[["sort"]] <- '{"_id": 1}'
   if (!length(params[["fields"]])) params[["fields"]] <- '{}'
 
   # separate fields to keep and to remove
-  # params <- list(); params$fields <- '{"_id": 1, "name":1, "me_not": 0}'
   if (length(params[["fields"]])) {
     tmpFields <- params[["fields"]]
     params[["fields"]] <- '{}'
@@ -243,7 +238,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   # remove any fields with field_name: 0
   if (length(out)) {
     rM <- stats::na.omit(match(fields, names(out)))
-    if (length(rM)) out <- out[, -rM, drop = FALSE] # length(rM) && !is.na(rM)
+    if (length(rM)) out <- out[, -rM, drop = FALSE]
   }
 
   # remove rownames
@@ -285,7 +280,6 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # all following is to emulate mongodb behaviour, which includes avoiding
   # path collisions with overlapping fields; see https://docs.mongodb.com/
   # manual/release-notes/4.4-compatibility/#path-collision-restrictions
-  # params <- list(); params$fields <- fields
   fields <- "{}"
   if (!is.null(params$fields)) fields <- params$fields
   fields <- json2fieldsSql(fields)
@@ -386,6 +380,162 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
     " ) GROUP BY _id;"
   )
 
+  # get and process data
+  out <- dbiGetProcessData(
+    statement, src, key, n, fields, subFields, rootFields, params)
+
+  # return
+  return(out)
+
+}
+
+
+#' @export
+docdb_query.src_postgres <- function(src, key, query, ...) {
+
+  # make dotted parameters accessible
+  params <- list(...)
+
+  ## special case: return all fields if listfields != NULL
+  if (!is.null(params$listfields)) {
+
+    # get all fullkeys and types
+    fields <- DBI::dbGetQuery(
+      conn = src$con,
+      statement = paste0(
+        "SELECT DISTINCT jsonb_object_keys(json)",
+        " FROM \"", key, "\";"
+      ))[, 1, drop = TRUE]
+
+    # return field names
+    return(fields)
+  }
+
+  ## add limit if not in params
+  n <- -1L
+  if (!is.null(params$limit)) n <- params$limit
+
+  ## handle fields
+  # all following is to emulate mongodb behaviour, which includes avoiding
+  # path collisions with overlapping fields; see https://docs.mongodb.com/
+  # manual/release-notes/4.4-compatibility/#path-collision-restrictions
+  fields <- "{}"
+  if (!is.null(params$fields)) fields <- params$fields
+  fields <- json2fieldsSql(fields)
+
+  ## special case: early return if only _id is requested
+  if (query == "{}" && length(fields) == 1L && fields == "_id") {
+    statement <- paste0(
+      " SELECT DISTINCT ON (_id) _id FROM \"", key, "\" GROUP BY _id")
+    out <- DBI::dbGetQuery(
+      conn = src$con,
+      n = n,
+      statement = statement)
+    return(out)
+  }
+
+  ## mangle fields for sql and jq
+  # - requested root fields
+  rootFields <- fields[!grepl("[.]", fields)]
+  # - requested subfields
+  subFields <- strsplit(fields[grepl("[.]", fields)], split = "[.]")
+  #   keep only subFields that are not in rootFields
+  subFields <- subFields[is.na(match(sapply(subFields, "[[", 1), rootFields))]
+
+  ## convert from json to sql
+  querySql <- json2querySql(query)
+
+  ## construct sql query statement
+  # head of sql
+  # -1- no fields specified, get full documents
+  if (length(fields) == 1L && fields == "") {
+    statement <- paste0(
+      "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json::TEXT, '{')
+       AS json FROM \"", key, "\" ")
+  }
+  # -2- only _id is specified
+  if (length(fields) == 1L && fields == "_id") {
+    statement <- paste0(
+      "SELECT '{\"_id\": \"' || _id || '\"}' AS json FROM \"", key, "\" ")
+  }
+  # -3- other fields specified
+  if (length(fields[fields != "_id" & fields != ""]) >= 1L) {
+    nonidFs <- c(rootFields[rootFields != "_id" & rootFields != ""],
+                 sapply(subFields, "[[", 1))
+    statement <- paste0(
+      "SELECT json_build_object('_id', _id, ",
+      paste0("'", nonidFs, "', json->'", nonidFs, "'", collapse = ", "),
+      ") AS json FROM \"", key, "\" ")
+  }
+
+  # sql where for identifying documents and
+  # for identifying jsonb_path_exists() rows
+  if (any(querySql != "")) {
+
+    statement <- paste0(
+      statement, "WHERE ",
+      paste0(
+        sapply(querySql, function(x) paste0(
+          ifelse(
+            test = x[1] == "\"_id\"",
+            # handle _id in query, since it is not in json
+            yes = ifelse(
+              # special handling of regular expression
+              test = grepl("REGEXP", x[2]),
+              yes = paste0(" _id ~ '", sub(".+\"(.+)\"", "\\1", x[2]), "'"),
+              no = paste0(" _id ", gsub("\"", "'", x[2]), " ")
+            ), # ifelse
+            # querySql for other than _id
+            no = paste0(
+              " jsonb_path_exists(json, '$[*] ? (",
+              ifelse(
+                test = grepl("^ IN ", x[2]),
+                yes = paste0(
+                  "@.", x[1], " == ",
+                  strsplit(sub(" IN [(](.+)[)]", "\\1", x[2]), ",")[[1]],
+                  collapse = " || "),
+                no = paste0(
+                  "@.",
+                  gsub("[.]", "\".\"", x[1]),
+                  # special handling of regular expression
+                  ifelse(
+                    test = grepl("REGEXP", x[2]),
+                    yes = sub("REGEXP ", " like_regex ", x[2]),
+                    # special case equality
+                    no = sub("^ = ", " == ", x[2])
+                  ) # ifelse
+                ) # paste0
+              ), # ifelse
+              ")') "
+            ) # no
+          ) # ifelse
+        ), # paste0
+        USE.NAMES = FALSE), # sapply
+        # attr contains the logical operator
+        collapse = attr(x = querySql, which = "op")
+      ) # paste0
+    ) # paste0
+  } # if query
+
+  # close statement
+  statement <- paste0(statement, ";")
+
+  # get and process data
+  out <- dbiGetProcessData(
+    statement, src, key, n, fields, subFields, rootFields, params)
+
+  # return
+  return(out)
+
+}
+
+
+
+## helpers --------------------------------------
+
+dbiGetProcessData <- function(
+  statement, src, key, n, fields, subFields, rootFields, params) {
+
   # minify statement
   statement <- gsub("[\n\t ]+", " ", statement)
   # adapt user regexp's such as \\S
@@ -476,7 +626,6 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   out <- jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE)
 
   # exclude any root fields with name:0 or that were not specified
-  # params <- list(); params$fields <- fields
   if (length(params[["fields"]])) {
     # any fields that were to be included
     rM <- NULL
@@ -495,11 +644,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
   # return
   return(out)
-
 }
-
-
-## helpers --------------------------------------
 
 
 # converts json string into
@@ -591,7 +736,7 @@ json2querySql <- function(x) {#, con
   }
 
   # find which commas can be used for splitting
-  x <- gsub(",([\"\\w{}]+:)", "~\\1", x, perl = TRUE)
+  x <- gsub(",([\"\\w{}.]+:)", "~\\1", x, perl = TRUE)
   x <- unlist(strsplit(x = x, split = "~", fixed = TRUE))
 
   # get left hand side and remove special characters
@@ -644,6 +789,7 @@ json2querySql <- function(x) {#, con
 # json2querySql(x = '{"mpg": {"$lte": 18}, "gear": {"$gt": 3}}')
 # json2querySql(x = '{"mpg": {"$lte": 18}, "gear": 4}')
 # json2querySql(x = '{"mpg": {"$lte": 18}, {"gear": 4}}') # no json
+# json2querySql(x = '{"$or": [{"age": {"$gte": 23}}, {"friends.name": "Dona Bartlett"}]}')
 # json2querySql(x = "{}")
 
 # generate regular expressions for
@@ -660,7 +806,6 @@ fieldsSql2fullKey <- function(x) {
   x <- gsub("([a-zA-Z]+)[.](?=[a-zA-Z]+)", "\\1@@@\\2", x, perl = TRUE)
 
   # add in regexps to match any arrayIndex in fullkey
-  # x <- paste0("^[$][.]", gsub("@@@", "[-#\\\\[\\\\]0-9]*[.]", x), "$")
   x <- paste0("[$][.]", gsub("@@@", "[-#\\\\[\\\\]0-9]*[.]", x), "")
 
   # return

@@ -8,24 +8,26 @@ docdb_query(src, key, query, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
+or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) A key as name of the container
 (corresponds to parameter \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite)}
+a table name for SQLite and for PostgreSQL)}
 
 \item{query}{(character) A JSON query string, see examples}
 
 \item{...}{Optionally, \code{fields} a JSON string of fields to
 be returned from anywhere in the tree (dot paths notation).
 
-Other parameters passed on to functions:
+Main functions used per database:
 \itemize{
 \item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item RSQLite: for mangling into SQL query
+\item SQLite: SQL query using \code{json_tree()}
 \item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
 \item CouchDB: \code{\link[sofa:db_query]{sofa::db_query()}}
+\item PostgreSQL: SQL query using \code{jsonb_build_object()}
 }}
 }
 \value{

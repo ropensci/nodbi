@@ -8,17 +8,18 @@ docdb_get(src, key, limit = NULL, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
+or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) A key as name of the container
 (corresponds to parameter \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite)}
+a table name for SQLite and for PostgreSQL)}
 
 \item{limit}{(integer) Maximum number of documents
 to return (defaults to all for MongoDB,
-all for SQLite, 10,000 for Elasticsearch and
-all for CouchDB}
+all for SQLite, 10,000 for Elasticsearch,
+all for CouchDB, and all for PostgreSQL}
 
 \item{...}{Passed on to functions:
 \itemize{
@@ -26,6 +27,7 @@ all for CouchDB}
 \item SQLite: ignored
 \item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
 \item CouchDB: \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
+\item PostgreSQL: ignored
 }}
 }
 \value{

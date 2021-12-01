@@ -8,12 +8,13 @@ docdb_exists(src, key, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
+or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) A key as name of the container
 (corresponds to parameter \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite)}
+a table name for SQLite and for PostgreSQL)}
 
 \item{...}{Passed to functions:
 \itemize{
@@ -21,6 +22,7 @@ a table name for SQLite)}
 \item RSQLite: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 \item Elasticsearch: \code{\link[elastic:indices]{elastic::index_exists()}}
 \item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
+\item PostgreSQL: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 }}
 }
 \value{

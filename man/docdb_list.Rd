@@ -8,14 +8,16 @@ docdb_list(src, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
+or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{...}{Passed to functions:
 \itemize{
-\item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
-\item Elasticsearch: \code{\link[elastic:alias]{elastic::aliases_get()}}
 \item MongoDB: ignored
-\item RSQLite: ignored
+\item SQLite: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
+\item Elasticsearch: \code{\link[elastic:alias]{elastic::aliases_get()}}
+\item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
+\item PostgreSQL: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 }}
 }
 \value{
@@ -24,7 +26,7 @@ used as parameter \code{key} with other functions such as
 \code{\link[=docdb_create]{docdb_create()}}.
 Parameter \code{key} corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and
-a table name for RSQLite)
+a table name for SQLite and PostgreSQL
 }
 \description{
 List containers in database

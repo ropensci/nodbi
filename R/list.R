@@ -3,17 +3,18 @@
 #' @inheritParams docdb_create
 #'
 #' @param ... Passed to functions:
-#' - CouchDB: [sofa::db_info()]
-#' - Elasticsearch: [elastic::aliases_get()]
 #' - MongoDB: ignored
-#' - RSQLite: ignored
+#' - SQLite: [DBI::dbListTables()]
+#' - Elasticsearch: [elastic::aliases_get()]
+#' - CouchDB: [sofa::db_info()]
+#' - PostgreSQL: [DBI::dbListTables()]
 #'
 #' @return (vector) of names of containers that can be
 #' used as parameter `key` with other functions such as
 #' [docdb_create()].
 #' Parameter `key` corresponds to `collection` for MongoDB,
 #' `dbname` for CouchDB, `index` for Elasticsearch and
-#' a table name for RSQLite)
+#' a table name for SQLite and PostgreSQL
 #'
 #' @export
 #'
@@ -63,6 +64,13 @@ docdb_list.src_mongo <- function(src, ...) {
 #' @export
 docdb_list.src_sqlite <- function(src, ...) {
 
-  return(DBI::dbListTables(src$con))
+  return(DBI::dbListTables(src$con, ...))
+
+}
+
+#' @export
+docdb_list.src_postgres <- function(src, ...) {
+
+  return(DBI::dbListTables(src$con, ...))
 
 }

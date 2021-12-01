@@ -4,7 +4,8 @@
 #' by patching their JSON with \code{value}.
 #' This is native with MongoDB and SQLite and is
 #' emulated for Elasticsearch and CouchDB using
-#' SQLite/JSON1.
+#' SQLite/JSON1, and uses a plpgsql function for
+#' PostgreSQL.
 #'
 #' @inheritParams docdb_create
 #'
@@ -14,7 +15,8 @@
 #' - CouchDB: [sofa::db_bulk_create()]
 #' - Elasticsearch: [elastic::docs_bulk_update]
 #' - MongoDB: [mongolite::mongo()]
-#' - RSQLite: ignored
+#' - SQLite: ignored
+#' - PostgreSQL: ignored
 #'
 #' @return (integer) Number of successfully updated documents
 #'
@@ -103,7 +105,6 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
 
   # early return if not found
   if (!length(ids)) return(0L)
-  # if (!length(ids)) docdb_create(src, key, value)
 
   # json to data frame
   if (class(value) == "character") {
@@ -112,7 +113,6 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
 
   # list to data frame
   if (class(value) == "list") {
-    # value = testList
     value <- jsonlite::fromJSON(
       jsonlite::toJSON(value, auto_unbox = TRUE))
     # if value is still simple list
@@ -138,7 +138,6 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
         "Number of rows of 'value' is not 1L and not the same as ",
         "the number of documents (_id's) that are to be updated; ",
         "iterating over _id's. ")
-      # value = mtcars[1:2, 4:5]
       for (i in seq_len(length(ids))) {
         value <- rbind(value, t(cbind(as.list(indf))))
       }
@@ -249,11 +248,49 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
     value, '\') WHERE _id IN (',
     paste0('"', ids, '"', collapse = ","), ');'
   )
-  # message(statement)
 
   # update data
   result <- try(
     dbWithTransaction(
+      src$con, {
+        DBI::dbExecute(
+          conn = src$con,
+          statement = statement
+        )
+      }),
+    silent = TRUE)
+
+  # return
+  return(result)
+
+}
+
+#' @export
+docdb_update.src_postgres <- function(src, key, value, query, ...) {
+
+  # data frame to json
+  if (class(value) == "data.frame") {
+    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+  }
+  # list to json
+  if (class(value) == "list") {
+    value <- jsonify::to_json(value, unbox = TRUE)
+  }
+
+  # get docs to update
+  ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
+
+  # Since PostgreSQL has no internal function,
+  # uses a function inserted by src_postgres
+  statement <- paste0(
+    'UPDATE "', key, '" SET json = jsonb_merge_patch(json,\'',
+    value, "') WHERE _id IN (",
+    paste0("'", ids, "'", collapse = ","), ");"
+  )
+
+  # update data
+  result <- try(
+    DBI::dbWithTransaction(
       src$con, {
         DBI::dbExecute(
           conn = src$con,
@@ -283,9 +320,9 @@ jsonUpdate <- function(jsonT, jsonP) {
 
   # construct json command
   jsonPatch <- paste0(
-    'SELECT json_patch(\'',
-    jsonT, '\',\'', jsonP,
-    '\') AS json;'
+    "SELECT json_patch('",
+    jsonT, "','", jsonP,
+    "') AS json;"
   )
 
   # calculate patch

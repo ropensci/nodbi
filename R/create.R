@@ -15,12 +15,13 @@
 #' such document(s).
 #'
 #' @param src Source object, result of call to any of functions
-#' [src_mongo()], [src_sqlite()], [src_elastic()] or [src_couchdb()]
+#' [src_mongo()], [src_sqlite()], [src_elastic()], [src_couchdb()]
+#' or [src_postgres()]
 #'
 #' @param key (character) A key as name of the container
 #' (corresponds to parameter `collection` for MongoDB,
 #' `dbname` for CouchDB, `index` for Elasticsearch and to
-#' a table name for SQLite)
+#' a table name for SQLite and for PostgreSQL)
 #'
 #' @param value The data to be created in the database:
 #' a single data.frame, a JSON string or a list
@@ -29,7 +30,8 @@
 #' - CouchDB: [sofa::db_bulk_create()]
 #' - Elasticsearch: [elastic::docs_bulk]
 #' - MongoDB: [mongolite::mongo()]
-#' - RSQLite: ignored
+#' - SQLite: ignored
+#' - PostgreSQL: ignored
 #'
 #' @return (integer) Number of successfully created documents
 #'
@@ -69,7 +71,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
         row.names(value) <- NULL
       }
     }
-    value <- jsonify::from_json(jsonify::to_json(value, unbox = TRUE) , simplify = FALSE)
+    value <- jsonify::from_json(jsonify::to_json(value, unbox = TRUE), simplify = FALSE)
   } # if data.frame
 
   # convert JSON string to list
@@ -102,19 +104,11 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   errors <- result[names(result) == "error"]
   oks <- result[names(result) == "ok"] == "TRUE"
 
-  if (length(errors)) {warning(
-    "Could not create ", length(errors), " documents, reason: ",
-    unique(errors), call. = FALSE, immediate. = TRUE)
+  if (length(errors)) {
+    warning("Could not create ", length(errors),
+    " documents, reason: ", unique(errors),
+    call. = FALSE, immediate. = TRUE)
   }
-
-  # # add index
-  # if (length(oks)) {
-  # sofa::db_index_create(
-  #   cushion = src$con,
-  #   dbname = key,
-  #   body = list(index = list(fields = I("_id")))
-  # )
-  # }
 
   # return
   return(length(oks))
@@ -357,7 +351,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     } # if no _id column
     #
     if (ncol(value) > 2L || (ncol(value) == 2L &&
-        !all(sort(names(value)) == c("_id", "json")))) {
+                             !all(sort(names(value)) == c("_id", "json")))) {
       # convert if there is no json column yet
       value[["json"]] <- strsplit(
         jsonify::to_ndjson(
@@ -378,6 +372,130 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   # insert data
   result <- try(
     dbWithTransaction(
+      src$con, {
+        DBI::dbAppendTable(
+          conn = src$con,
+          name = key,
+          # canonical value: a data frame
+          # with 2 columns, _id and json
+          value = value)
+      }),
+    silent = TRUE)
+
+  # prepare returns
+  if (inherits(result, "try-error")) {
+    error <- trimws(sub(".+: (.*?):.+", "\\1", result))
+    warning(
+      "Could not create some documents, reeason: ",
+      unique(error), call. = FALSE, immediate. = TRUE)
+    result <- 0L
+  }
+  return(sum(result))
+
+}
+
+#' @export
+docdb_create.src_postgres <- function(src, key, value, ...) {
+
+  # reference: https://www.sqlite.org/json1.html
+
+  # if table does not exist, create one
+  if (!docdb_exists(src, key, ...)) {
+
+    # standard for a nodbi json table in PostgreSQL
+    # standard: columns _id and json
+    DBI::dbWithTransaction(
+      src$con, {
+        DBI::dbExecute(
+          conn = src$con,
+          statement = paste0("CREATE TABLE \"", key, "\"",
+                             " ( _id TEXT PRIMARY KEY,",
+                             "  json JSONB);"))
+
+        DBI::dbExecute(
+          conn = src$con,
+          statement = paste0("CREATE UNIQUE INDEX ",
+                             "\"", key, "_index\" ON ",
+                             "\"", key, "\" ( _id );"))
+      })
+  } else {
+    existsMessage(key)
+  }
+
+  # convert lists to json
+  if (class(value) == "list") {
+    value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+  }
+
+  # convert JSON string to data frame
+  if (class(value) == "character" ||
+      class(value) == "json") {
+    # target is data frame for next section
+
+    # convert
+    value <- jsonlite::fromJSON(value)
+
+    # process if value remained a list
+    if (class(value) == "list") {
+
+      # any _id (would be in top level of list)
+      ids <- value[["_id"]]
+      # remove _id's
+      if (length(ids)) value[["_id"]] <- NULL
+      # change back to json
+      value <- as.character(
+        jsonlite::toJSON(
+          value,
+          auto_unbox = TRUE,
+          digits = NA))
+      # construct data frame
+      value <- data.frame(
+        "_id" = ids,
+        "json" = value,
+        check.names = FALSE,
+        stringsAsFactors = FALSE
+      )
+    }
+  }
+
+  # data frame
+  if (class(value) == "data.frame") {
+    #
+    if (is.na(match("_id", names(value)))) {
+      # if no _id column
+      if (!identical(rownames(value),
+                     as.character(seq_len(nrow(value))))) {
+        # use rownames as _id's and remove rownames
+        value[["_id"]] <- row.names(value)
+        row.names(value) <- NULL
+      } else {
+        # add canonical _id's
+        value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
+      }
+    } # if no _id column
+    #
+    if (ncol(value) > 2L || (ncol(value) == 2L &&
+                             !all(sort(names(value)) == c("_id", "json")))) {
+      # convert if there is no json column yet
+      value[["json"]] <- strsplit(
+        jsonify::to_ndjson(
+          value[, -match("_id", names(value)), drop = FALSE],
+          unbox = TRUE),
+        split = "\n"
+      )[[1]]
+      # remove original columns
+      value <- value[, c("_id", "json"), drop = FALSE]
+    }
+    #
+    if (class(value[["_id"]]) == "list") {
+      # in case fromJSON created the _id column as list
+      value[["_id"]] <- unlist(value[["_id"]])
+    }
+  } # if data.frame
+
+  # insert data
+  result <- try(
+    DBI::dbWithTransaction(
       src$con, {
         DBI::dbAppendTable(
           conn = src$con,

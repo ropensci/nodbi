@@ -4,7 +4,13 @@
 #' @param ... optional \code{query} parameter with a JSON query as per
 #' [mongolite::mongo()] and as working in [docdb_query()] to identify
 #' documents to be deleted. The default is to delete the container
-#' \code{key}. Other parameters passed on to database backends.
+#' \code{key}.
+#' Other parameters are passed on to functions:
+#' - MongoDB: find() in [mongolite::mongo()]
+#' - SQLite: ignored
+#' - Elasticsearch: [elastic::Search()]
+#' - CouchDB: [sofa::db_alldocs()]
+#' - PostgreSQL: ignored
 #'
 #' @return (logical) success of operation. Typically \code{TRUE} if document
 #' or collection existed and \code{FALSE} is document did not exist or
@@ -162,6 +168,54 @@ docdb_delete.src_sqlite <- function(src, key, ...) {
             conn = src$con,
             name = key)
         }))
+
+  }
+}
+
+#' @export
+docdb_delete.src_postgres <- function(src, key, ...) {
+  assert(key, "character")
+
+  # make dotted parameters accessible
+  tmpdots <- list(...)
+
+  # if valid query, delete document(s), not table
+  if (!is.null(tmpdots$query) &&
+      jsonlite::validate(tmpdots$query)) {
+
+    # get _id's of document to be deleted
+    tmpids <- docdb_query(
+      src = src,
+      key = key,
+      query = tmpdots$query,
+      fields = '{"_id": 1}')[["_id"]]
+
+    # document delete
+    statement <- paste0(
+      "DELETE FROM \"", key, "\" WHERE _id IN (",
+      paste0("'", tmpids, "'", collapse = ","), ");")
+
+    # do delete
+    docdb_exists(src, key) &&
+      as.logical(
+        DBI::dbWithTransaction(
+          src$con, {
+            DBI::dbExecute(
+              conn = src$con,
+              statement = statement)
+          }))
+
+  } else {
+
+    docdb_exists(src, key) &&
+      # remove table
+      as.logical(
+        DBI::dbWithTransaction(
+          src$con, {
+            DBI::dbRemoveTable(
+              conn = src$con,
+              name = key)
+          }))
 
   }
 }
