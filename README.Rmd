@@ -71,7 +71,7 @@ library("nodbi")
 
 ## API overview
 
-Parameters for `docdb_*()` functions are the same across functions.
+Parameters for `docdb_*()` functions are the same across database backends.
 
 | Purpose                                                                                          | Function call                                                                                                     |
 |--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
