@@ -188,7 +188,7 @@ docdb_query(src, "myTbl", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "mpg": 1}
 # (only root, not subitems so far implemented for CouchDB)
 str(docdb_query(src, "myTbl", '
                 {"$or": [{"age": {"$lt": 21}}, 
-                         {"friends.name": {"$regex": "^B[a-z].*"}}]}', 
+                         {"friends.name": {"$regex": "^B[a-z]{3,6}.*"}}]}', 
                 fields = '{"age": 1, "friends.name": 1}'))
 #> 'data.frame':	4 obs. of  2 variables:
 #>  $ age    : int  20 20 22 23
@@ -254,7 +254,7 @@ srcPostgres <- src_postgres()
 key <- "test"
 query <- '{"clarity": "I1"}'
 fields <- '{"cut": 1, "_id": 1}'
-value <- '{"clarity": "XYZ"}'
+value <- '{"clarity": "XYZ", "new": ["ABC", "DEF"]}'
 data <- as.data.frame(diamonds)[1:12000,]
 
 testFunction <- function(src, key, value, query, fields) {
@@ -277,11 +277,11 @@ rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 #>         test replications elapsed
-#> 4    CouchDB           10     262
-#> 3    Elastic           10     100 # 10s delay subtracted
-#> 5 PostgreSQL           10      70
-#> 2    RSQLite           10      68
+#> 4    CouchDB           10     253
+#> 3    Elastic           10     101 # 10s subtracted
 #> 1    MongoDB           10      66
+#> 5 PostgreSQL           10      66
+#> 2    RSQLite           10      67
 ```
 
 ## Testing

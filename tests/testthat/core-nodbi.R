@@ -107,6 +107,11 @@ test_that("docdb_query", {
   if (!inherits(src, "src_sqlite")) expect_equal(nrow(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "doesnotexist": 1}')), 2L)
   # skip remainder for Elasticsearch
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$ne": "Lacy Chen"}}')), c(4L, 11L))
+  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$regex": "^[a-zA-Z]{3,4} "}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
+  if (!inherits(src, "src_elastic"))
+  # couchdb cannot search in array
+  if (!inherits(src, "src_elastic") & !inherits(src, "src_couchdb")) expect_equal(dim(
+    docdb_query(src = src, key = key, query = '{"tags": {"$regex": "^[a-z]{3,4}$"}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
   expect_true(docdb_delete(src = src, key = key))
   if (inherits(src, "src_elastic")) skip("queries need to be translated into elastic syntax")
 

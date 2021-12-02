@@ -746,8 +746,11 @@ json2querySql <- function(x) {#, con
   # get right hand side, that is, operator and value
   x <- gsub(pattern = ".*?:(.*)", replacement = "\\1", x = x)
 
-  # remote brackets, blanks and quotation marks around operator
+  # remove brackets, blanks and quotation marks around operator
+  x <- gsub(pattern = "[{]([,0-9]+)[}]", replacement = "|##\\1##|", x = x)
   x <- gsub(pattern = "[{}]", replacement = "", x = x)
+  x <- gsub(pattern = "[|]##", replacement = "{", x = x)
+  x <- gsub(pattern = "##[|]", replacement = "}", x = x)
   x <- gsub(pattern = "[ ]+:[ ]+", replacement = ":", x = x)
   x <- gsub(pattern = "\"([$][a-z]+)\"[ ]*:", replacement = "\\1:", x = x)
   x <- trimws(x)
@@ -791,6 +794,8 @@ json2querySql <- function(x) {#, con
 # json2querySql(x = '{"mpg": {"$lte": 18}, {"gear": 4}}') # no json
 # json2querySql(x = '{"$or": [{"age": {"$gte": 23}}, {"friends.name": "Dona Bartlett"}]}')
 # json2querySql(x = "{}")
+# json2querySql(x = '{"_id": { "$regex": "^NCT[0-9]{7,8}"} }')
+# json2querySql(x = '{"gear": {"$in": [5,4]}}')
 
 # generate regular expressions for
 # fields so that fullkey matches

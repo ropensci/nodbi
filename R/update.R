@@ -134,10 +134,7 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
       }}
     #
     if (nrow(indf) > 1L) {
-      message(
-        "Number of rows of 'value' is not 1L and not the same as ",
-        "the number of documents (_id's) that are to be updated; ",
-        "iterating over _id's. ")
+      # iterating over _id's
       for (i in seq_len(length(ids))) {
         value <- rbind(value, t(cbind(as.list(indf))))
       }
