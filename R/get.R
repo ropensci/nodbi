@@ -115,9 +115,9 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
 
   statement <- paste0(
     "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json, '{') ",
-    "AS json FROM \"", key,
+    "AS json FROM \"", key, "\" ",
     # canonical sorting in nodbi
-    "\" ORDER BY _id ASC;")
+    "ORDER BY _id ASC;")
 
   # set limit if not null
   n <- -1L
@@ -143,9 +143,7 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
     useBytes = TRUE)
   close(tfnameCon)
 
-  # from jsonlite documentation:
-  # Because parsing huge JSON strings is difficult and inefficient,
-  # JSON streaming is done using lines of minified JSON records, ndjson
+  # stream in ndjson records
   return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE))
 
 }
@@ -156,9 +154,9 @@ docdb_get.src_postgres <- function(src, key, limit = NULL, ...) {
   # query to return full json column as text
   statement <- paste0(
     "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json::TEXT, '{') ",
-    "AS json FROM \"", key,
+    "AS json FROM \"", key, "\" ",
     # canonical sorting in nodbi
-    "\" ORDER BY _id ASC;")
+    "ORDER BY _id ASC;")
 
   # set limit if not null
   n <- -1L
@@ -184,9 +182,7 @@ docdb_get.src_postgres <- function(src, key, limit = NULL, ...) {
     useBytes = TRUE)
   close(tfnameCon)
 
-  # from jsonlite documentation:
-  # Because parsing huge JSON strings is difficult and inefficient,
-  # JSON streaming is done using lines of minified JSON records, ndjson
+  # stream in ndjson records
   return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE))
 
 }

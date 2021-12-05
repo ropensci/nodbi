@@ -137,7 +137,7 @@ docdb_delete.src_sqlite <- function(src, key, ...) {
   if (!is.null(tmpdots$query) &&
       jsonlite::validate(tmpdots$query)) {
 
-    # get _id's of document to be deleted
+    # get _id's of document(s) to be deleted
     tmpids <- docdb_query(
       src = src,
       key = key,
