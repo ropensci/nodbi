@@ -1,3 +1,10 @@
+nodbi 0.6.0.9000
+===========
+
+### IMPROVEMENTS
+* supporting regular expressions with quantifiers (e.g., '[a-z]{2,3}')
+* better handle special characters and encodings under Windows
+
 nodbi 0.6.0
 ===========
 
