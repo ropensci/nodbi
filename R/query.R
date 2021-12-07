@@ -609,7 +609,7 @@ dbiGetProcessData <- function(
         "", # protect against no string
         jsonlite::fromJSON(
           jsonlite::toJSON(
-            jqr::jq(file(tfname), jqFields)
+            jqr::jq(file(tfname, encoding = "UTF-8"), jqFields)
           ))),
       # to create ndjson
       con = tjnameCon,
@@ -623,7 +623,7 @@ dbiGetProcessData <- function(
   } # if subFields
 
   # stream_in automatically opens and later closes (and destroys) connection
-  out <- jsonlite::stream_in(file(tfname), verbose = FALSE)
+  out <- jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE)
 
   # exclude any root fields with name:0 or that were not specified
   if (length(params[["fields"]])) {
