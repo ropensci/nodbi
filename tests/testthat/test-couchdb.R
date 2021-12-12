@@ -1,9 +1,9 @@
-COUCHDB_TEST_USER <- Sys.getenv("COUCHDB_TEST_USER")
-COUCHDB_TEST_PWD <- Sys.getenv("COUCHDB_TEST_PWD")
-
 test_that("Source", {
   skip_on_cran()
   skip_if_no_couchdb()
+
+  COUCHDB_TEST_USER <- Sys.getenv("COUCHDB_TEST_USER")
+  COUCHDB_TEST_PWD <- Sys.getenv("COUCHDB_TEST_PWD")
 
   # creating database connection has
   # unique parameters, see README.Rmd

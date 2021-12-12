@@ -10,9 +10,41 @@ testJson2 <- mapdata # no _id's
 testList <- jsonlite::fromJSON(mapdata, simplifyVector = FALSE)
 # factors cannot be expected to be maintained
 testDf2[["Species"]] <- as.character(testDf2[["Species"]])
+#
+# create file-based ndjson
+testFile <- tempfile(fileext = ".ndjson")
+on.exit(try(unlink(testFile), silent = TRUE), add = TRUE)
+jsonlite::stream_out(jsonlite::fromJSON(contacts), con = file(testFile), verbose = FALSE)
+#
+testFile2 <- tempfile(fileext = ".ndjson")
+on.exit(try(unlink(testFile2), silent = TRUE), add = TRUE)
+jsonlite::stream_out(diamonds, con = file(testFile2), verbose = FALSE)
 
 #### set up ####
 elasticSleep <- 1L # seconds
+
+
+#### create (ndjson file) ####
+context("- create (ndjson file)")
+test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
+
+  # get db connection
+  tmp <- dbSrcKey()
+  src <- tmp$testSrc
+  key <- tmp$testKey
+  on.exit(rm(src), add = TRUE)
+
+  # testFile
+
+  devtools::load_all()
+
+  docdb_delete(src, key = key)
+
+  docdb_create(src = src, key = key, value = testFile)
+
+  docdb_create(src = src, key = key, value = testFile2)
+
+})
 
 
 #### create get delete ####

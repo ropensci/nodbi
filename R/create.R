@@ -60,6 +60,8 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   result <- try(sofa::db_create(src$con, dbname = key, delifexists = FALSE), silent = TRUE)
   if (inherits(result, "try-error") && grepl("already exists", result)) existsMessage(key)
 
+  # convert into target list
+
   # data frame
   if (class(value) == "data.frame") {
     if (is.na(match("_id", names(value)))) {
@@ -76,6 +78,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
   # convert JSON string to list
   if (class(value) == "character") {
+    # value can be a string or a file
     value <- jsonify::from_json(value, simplify = FALSE)
   }
 
@@ -201,60 +204,75 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
   chkSrcMongo(src, key)
   if (docdb_exists(src, key, value, ...)) existsMessage(key)
 
-  # since mongolite does not accept valid JSON strings
-  # that come as an one-element array, convert to list
-  if (class(value) == "character") {
-    value <- jsonify::from_json(value, simplify = FALSE)
-  }
+  # directly import ndjson file
+  if (file.access(value, mode = 4) == 0L) {
 
-  # mongolite uses _id columns in dataframes as object _id's:
-  if (class(value) == "data.frame") {
-    if (is.na(match("_id", names(value)))) {
-      # if no _id column
-      if (!identical(rownames(value),
-                     as.character(seq_len(nrow(value))))) {
-        # use rownames as _id's and remove rownames
-        value[["_id"]] <- row.names(value)
-        row.names(value) <- NULL
-      } else {
-        # add canonical _id's
-        value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
+    result <- try(
+      suppressWarnings(
+        src$con$import(
+          # Stream import data in jsonlines format from a
+          # connection, similar to the mongoimport utility.
+          con = file(value))),
+      silent = TRUE)
+
+  } else {
+
+    # since mongolite does not accept valid JSON strings
+    # that come as an one-element array, convert to list
+    if (class(value) == "character") {
+      value <- jsonify::from_json(value, simplify = FALSE)
+    }
+
+    # mongolite uses _id columns in dataframes as object _id's:
+    if (class(value) == "data.frame") {
+      if (is.na(match("_id", names(value)))) {
+        # if no _id column
+        if (!identical(rownames(value),
+                       as.character(seq_len(nrow(value))))) {
+          # use rownames as _id's and remove rownames
+          value[["_id"]] <- row.names(value)
+          row.names(value) <- NULL
+        } else {
+          # add canonical _id's
+          value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
+        }
+      } # if no _id column
+      # early return if no data
+      if (!nrow(value)) return(0L)
+      # convert to ndjson which is the format in which errors are raised
+      # if names (keys) had problematic characters such as . or $
+      value <- strsplit(jsonify::to_ndjson(value, unbox = TRUE), split = "\n")[[1]]
+    } # if data.frame
+
+    # convert lists (incl. from previous step) to NDJSON
+    if (class(value) == "list") {
+      # add canonical _id's
+      if ((!is.null(names(value)) && !any(names(value) == "_id")) &&
+          !any(sapply(value, function(i) any(names(i) == "_id")))
+      ) {
+        value <- lapply(value, function(i) c(
+          "_id" = uuid::UUIDgenerate(use.time = TRUE), i))
       }
-    } # if no _id column
-    # early return if no data
-    if (!nrow(value)) return(0L)
-    # convert to ndjson which is the format in which errors are raised
-    # if names (keys) had problematic characters such as . or $
-    value <- strsplit(jsonify::to_ndjson(value, unbox = TRUE), split = "\n")[[1]]
-  } # if data.frame
-
-  # convert lists (incl. from previous step) to NDJSON
-  if (class(value) == "list") {
-    # add canonical _id's
-    if ((!is.null(names(value)) && !any(names(value) == "_id")) &&
-        !any(sapply(value, function(i) any(names(i) == "_id")))
-    ) {
-      value <- lapply(value, function(i) c(
-        "_id" = uuid::UUIDgenerate(use.time = TRUE), i))
+      # split into vector of ndjson records
+      value <- jsonify::to_ndjson(value, unbox = TRUE)
+      if (any(grepl("\\}\n\\{", value))) {
+        value <- strsplit(value, split = "[}]\n[{]")[[1]]
+        value <- sub("^([^{])", "{\\1", sub("([^}])$", "\\1}", value))
+      }
     }
-    # split into vector of ndjson records
-    value <- jsonify::to_ndjson(value, unbox = TRUE)
-    if (any(grepl("\\}\n\\{", value))) {
-      value <- strsplit(value, split = "[}]\n[{]")[[1]]
-      value <- sub("^([^{])", "{\\1", sub("([^}])$", "\\1}", value))
-    }
-  }
 
-  # insert data.frame or JSON
-  result <- try(
-    suppressWarnings(
-      src$con$insert(
-        # loading either a dataframe or
-        # vector of NDJSON (!) strings
-        data = value,
-        auto_unbox = TRUE,
-        digits = NA, ...))[["nInserted"]],
-    silent = TRUE)
+    # insert data.frame or JSON
+    result <- try(
+      suppressWarnings(
+        src$con$insert(
+          # loading either a dataframe or
+          # vector of NDJSON (!) strings
+          data = value,
+          auto_unbox = TRUE,
+          digits = NA, ...))[["nInserted"]],
+      silent = TRUE)
+
+  } # if file access directly import ndjson file
 
   # generate user info
   if (inherits(result, "try-error") ||
@@ -308,8 +326,12 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
       class(value) == "json") {
     # target is data frame for next section
 
-    # convert
-    value <- jsonlite::fromJSON(value)
+    # convert ndjson file or json string to data frame
+    if (file.access(value, mode = 4) == 0L) {
+      value <- jsonlite::stream_in(file(value), verbose = FALSE)
+    } else {
+      value <- jsonlite::fromJSON(value)
+    }
 
     # process if value remained a list
     if (class(value) == "list") {
@@ -432,8 +454,12 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
       class(value) == "json") {
     # target is data frame for next section
 
-    # convert
-    value <- jsonlite::fromJSON(value)
+    # convert ndjson file or json string to data frame
+    if (file.access(value, mode = 4) == 0L) {
+      value <- jsonlite::stream_in(file(value), verbose = FALSE)
+    } else {
+      value <- jsonlite::fromJSON(value)
+    }
 
     # process if value remained a list
     if (class(value) == "list") {
