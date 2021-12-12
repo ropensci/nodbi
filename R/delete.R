@@ -150,24 +150,26 @@ docdb_delete.src_sqlite <- function(src, key, ...) {
       paste0('"', tmpids, '"', collapse = ","), ");")
 
     # do delete
-    as.logical(
-      dbWithTransaction(
-        src$con, {
-          DBI::dbExecute(
-            conn = src$con,
-            statement = statement)
-        }))
+    docdb_exists(src, key) &&
+      as.logical(
+        dbWithTransaction(
+          src$con, {
+            DBI::dbExecute(
+              conn = src$con,
+              statement = statement)
+          }))
 
   } else {
 
-    # remove table
-    as.logical(
+    # remove table and handle error
+    # if table does not exist
+    docdb_exists(src, key) &&
       dbWithTransaction(
         src$con, {
           DBI::dbRemoveTable(
             conn = src$con,
             name = key)
-        }))
+        })
 
   }
 }

@@ -19,37 +19,15 @@ jsonlite::stream_out(jsonlite::fromJSON(contacts), con = file(testFile), verbose
 testFile2 <- tempfile(fileext = ".ndjson")
 on.exit(try(unlink(testFile2), silent = TRUE), add = TRUE)
 jsonlite::stream_out(diamonds, con = file(testFile2), verbose = FALSE)
+#
+testUrl <- "http://httpbin.org/stream/98"
 
 #### set up ####
 elasticSleep <- 1L # seconds
 
 
-#### create (ndjson file) ####
-context("- create (ndjson file)")
-test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
-
-  # get db connection
-  tmp <- dbSrcKey()
-  src <- tmp$testSrc
-  key <- tmp$testKey
-  on.exit(rm(src), add = TRUE)
-
-  # testFile
-
-  devtools::load_all()
-
-  docdb_delete(src, key = key)
-
-  docdb_create(src = src, key = key, value = testFile)
-
-  docdb_create(src = src, key = key, value = testFile2)
-
-})
-
-
 #### create get delete ####
-context("- create, exists, list, get, delete")
-test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
+test_that("- docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
 
   # get db connection
   tmp <- dbSrcKey()
@@ -113,8 +91,28 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
 
 })
 
+
+#### create (ndjson file) ####
+test_that("- docdb_create (ndjson file)", {
+
+  # get db connection
+  tmp <- dbSrcKey()
+  src <- tmp$testSrc
+  key <- tmp$testKey
+  on.exit(rm(src), add = TRUE)
+
+  # tests
+  expect_equal(docdb_create(src = src, key = key, value = testFile), 5L)
+  expect_equal(suppressWarnings(docdb_create(src = src, key = key, value = testFile)), 0L)
+  expect_equal(docdb_create(src = src, key = key, value = testFile2), nrow(diamonds))
+  expect_equal(docdb_create(src = src, key = key, value = testUrl), 98L)
+  expect_true(docdb_delete(src = src, key = key))
+  expect_false(docdb_delete(src = src, key = key))
+
+})
+
+
 #### query ####
-context("- query")
 test_that("docdb_query", {
 
   tmp <- dbSrcKey()
@@ -173,8 +171,7 @@ test_that("docdb_query", {
 })
 
 #### update ####
-context("- update, query")
-test_that("docdb_update", {
+test_that("docdb_update, docdb_query", {
 
   tmp <- dbSrcKey()
   src <- tmp$testSrc

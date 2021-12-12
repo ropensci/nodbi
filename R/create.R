@@ -78,8 +78,17 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
   # convert JSON string to list
   if (class(value) == "character") {
-    # value can be a string or a file
-    value <- jsonify::from_json(value, simplify = FALSE)
+    if (isUrl(value) || isFile(value)) {
+      # read ndjson file or url (does not work with jsonify)
+      if (isFile(value)) {
+        value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
+      } else if (isUrl(value)) {
+        value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
+      }
+    } else {
+      # read json string
+      value <- jsonify::from_json(value, simplify = FALSE)
+    }
   }
 
   # mangle lists
@@ -149,7 +158,20 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
 
   # convert JSON string to list
   if (class(value) == "character") {
-    value <- jsonify::from_json(value, simplify = FALSE)
+
+    # since cocument IDs cannot be passed in
+    # with files, create list from file
+
+    # convert ndjson file or json string to list
+    if (isUrl(value) || isFile(value)) {
+      if (isFile(value)) {
+        value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
+      } else if (isUrl(value)) {
+        value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
+      }
+    } else {
+      value <- jsonify::from_json(value, simplify = FALSE)
+    }
   }
 
   # mangle lists
@@ -205,14 +227,24 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
   if (docdb_exists(src, key, value, ...)) existsMessage(key)
 
   # directly import ndjson file
-  if (file.access(value, mode = 4) == 0L) {
+  if (class(value) == "character" &&
+      (isUrl(value) || isFile(value))) {
 
+    # turn into connection
+    if (isFile(value)) {
+      value <- file(value)
+    } else if (isUrl(value)) {
+      value <- url(value)
+    }
+
+    # import
     result <- try(
       suppressWarnings(
         src$con$import(
           # Stream import data in jsonlines format from a
           # connection, similar to the mongoimport utility.
-          con = file(value))),
+          con = value
+          )),
       silent = TRUE)
 
   } else {
@@ -327,8 +359,12 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if (file.access(value, mode = 4) == 0L) {
-      value <- jsonlite::stream_in(file(value), verbose = FALSE)
+    if (isUrl(value) || isFile(value)) {
+      if (isFile(value)) {
+        value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+      } else if (isUrl(value)) {
+        value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+      }
     } else {
       value <- jsonlite::fromJSON(value)
     }
@@ -455,8 +491,12 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if (file.access(value, mode = 4) == 0L) {
-      value <- jsonlite::stream_in(file(value), verbose = FALSE)
+    if (isUrl(value) || isFile(value)) {
+      if (isFile(value)) {
+        value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+      } else if (isUrl(value)) {
+        value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+      }
     } else {
       value <- jsonlite::fromJSON(value)
     }
@@ -548,4 +588,15 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
 existsMessage <- function(k) {
   message(paste0("Note: container '", k, "' already exists"))
+}
+
+isUrl <- function(x) {
+  # check if x is may be an url
+  return(grepl("^https?://", x))
+}
+
+isFile <- function(x) {
+  # check if x is the name of a readable file
+  out <- try(file.access(x, mode = 4) == 0L, silent = TRUE)
+  return(!inherits(out, "try-error") && out)
 }

@@ -1,3 +1,12 @@
+nodbi 0.6.1
+===========
+
+### IMPROVEMENTS
+* `docdb_create` now supports names of files and urls as argument `value` for importing data
+
+### BUG FIXES
+* for SQLite return `FALSE` like other backends when using `docdb_delete` for a non-existing container
+
 nodbi 0.6.0.9000
 ===========
 
