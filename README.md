@@ -30,21 +30,21 @@ for an `R` object of any of these data types:
 -   data.frame
 -   list
 -   JSON string
--   a file name or url with NDJSON records+
+-   a file name or URL with NDJSON records\*
 
 and for executing the following operations:
 
 -   Create
 -   Exists
 -   Get
--   Query\* \*\*
--   Update\* \*\*
+-   Query\*\*
+-   Update\*\*
 -   Delete
 -   List
 
-across all database backends. + Only for `docdb_create`. \*Only simple
-queries (and updates, e.g. equality for a single field) supported for
-Elasticsearch at the moment. \*\*Only root fields can be specified for
+across all database backends. \* `docdb_create`. \*\*Only simple
+(e.g. equality for a single field) queries (and updates) are supported
+for Elasticsearch at the moment. Only root fields can be specified for
 CouchDB, whereas fields with subitems (in dot notation) can be specified
 for Elasticsearch, MongoDB, SQLite and PostgreSQL.
 
