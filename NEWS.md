@@ -1,4 +1,4 @@
-nodbi 0.6.1
+nodbi 0.6.0.9001
 ===========
 
 ### IMPROVEMENTS

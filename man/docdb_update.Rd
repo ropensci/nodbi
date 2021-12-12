@@ -17,7 +17,8 @@ or \code{\link[=src_postgres]{src_postgres()}}}
 a table name for SQLite and for PostgreSQL)}
 
 \item{value}{The data to be created in the database:
-a single data.frame, a JSON string or a list}
+a single data.frame, a JSON string or a list;
+or the file name or URL of NDJSON documents}
 
 \item{query}{(character) A JSON query string, see examples}
 

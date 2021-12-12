@@ -30,6 +30,7 @@ for an `R` object of any of these data types:
 -   data.frame
 -   list
 -   JSON string
+-   a file name or url with NDJSON records+
 
 and for executing the following operations:
 
@@ -41,11 +42,11 @@ and for executing the following operations:
 -   Delete
 -   List
 
-across all database backends. \*Only simple queries (and updates,
-e.g. equality for a single field) supported for Elasticsearch at the
-moment. \*\*Only root fields can be specified for CouchDB, whereas
-fields with subitems (in dot notation) can be specified for
-Elasticsearch, MongoDB, SQLite and PostgreSQL.
+across all database backends. + Only for `docdb_create`. \*Only simple
+queries (and updates, e.g. equality for a single field) supported for
+Elasticsearch at the moment. \*\*Only root fields can be specified for
+CouchDB, whereas fields with subitems (in dot notation) can be specified
+for Elasticsearch, MongoDB, SQLite and PostgreSQL.
 
 For capabilities in terms of operations and parameter combinations
 across any of the database backends, see section
@@ -77,19 +78,19 @@ library("nodbi")
 Parameters for `docdb_*()` functions are the same across database
 backends.
 
-| Purpose                                                                                          | Function call                                                                                                     |
-|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| Create database connection (see below)                                                           | `src <- nodbi::src_{mongo, sqlite, couchdb, elastic}(<see below for parameters>)`                                 |
-| Load data frame, list or JSON string from `myData` into database, container `myTbl`              | `nodbi::docdb_create(src = src, key = "myTbl", value = myData)`                                                   |
-| Get all documents back into a data frame                                                         | `nodbi::docdb_get(src = src, key = "myTbl")`                                                                      |
-| Get documents selected with query (as MongoDB-compatible JSON) into a data frame                 | `nodbi::docdb_query(src = src, key = "myTbl", query = '{"age": 20}')`                                             |
-| Get selected fields (in MongoDB compatible JSON) from documents selected query                   | `nodbi::docdb_query(src = src, key = "myTbl", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
-| Update (patch) selected documents with new data in data frame, list or JSON string from `myData` | `nodbi::docdb_update(src = src, key = "myTbl", value = myData, query = '{"age": 20}')`                            |
-| Check if container exists                                                                        | `nodbi::docdb_exists(src = src, key = "myTbl")`                                                                   |
-| List all containers in database                                                                  | `nodbi::docdb_list(src = src)`                                                                                    |
-| Delete document(s) in container                                                                  | `nodbi::docdb_delete(src = src, key = "myTbl", query = '{"age": 20}')`                                            |
-| Delete container                                                                                 | `nodbi::docdb_delete(src = src, key = "myTbl")`                                                                   |
-| Close and remove database connection                                                             | `rm(src)`                                                                                                         |
+| Purpose                                                                                                                         | Function call                                                                                                     |
+|---------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| Create database connection (see below)                                                                                          | `src <- nodbi::src_{mongo, sqlite, couchdb, elastic}(<see below for parameters>)`                                 |
+| Load `myData` (a data frame, a list, a JSON string, or a file name or url with NDJSON records) into database, container `myTbl` | `nodbi::docdb_create(src = src, key = "myTbl", value = myData)`                                                   |
+| Get all documents back into a data frame                                                                                        | `nodbi::docdb_get(src = src, key = "myTbl")`                                                                      |
+| Get documents selected with query (as MongoDB-compatible JSON) into a data frame                                                | `nodbi::docdb_query(src = src, key = "myTbl", query = '{"age": 20}')`                                             |
+| Get selected fields (in MongoDB compatible JSON) from documents selected query                                                  | `nodbi::docdb_query(src = src, key = "myTbl", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
+| Update (patch) selected documents with new data in data frame, list or JSON string from `myData`                                | `nodbi::docdb_update(src = src, key = "myTbl", value = myData, query = '{"age": 20}')`                            |
+| Check if container exists                                                                                                       | `nodbi::docdb_exists(src = src, key = "myTbl")`                                                                   |
+| List all containers in database                                                                                                 | `nodbi::docdb_list(src = src)`                                                                                    |
+| Delete document(s) in container                                                                                                 | `nodbi::docdb_delete(src = src, key = "myTbl", query = '{"age": 20}')`                                            |
+| Delete container                                                                                                                | `nodbi::docdb_delete(src = src, key = "myTbl")`                                                                   |
+| Close and remove database connection                                                                                            | `rm(src)`                                                                                                         |
 
 ## Database connections
 
@@ -157,6 +158,11 @@ src <- src_sqlite()
 docdb_create(src, key = "myTbl", value = mtcars)
 #> [1] 32
 
+# load additionally 98 NDJSON records
+docdb_create(src, key = "myTbl", "http://httpbin.org/stream/98")
+#> Note: container 'myTbl' already exists
+#> [1] 98
+
 # load additionally contacts JSON data, from package nodbi
 docdb_create(src, key = "myTbl", contacts)
 #> Note: container 'myTbl' already exists
@@ -216,13 +222,13 @@ docdb_update(src, "myTbl", value = '{"vs": 9, "xy": [1, 2]}', query = '{"carb": 
 #> [1] 3
 docdb_query(src, "myTbl", '{"carb": {"$in": [1,3]}}', fields = '{"vs": 1}')[[1]]
 #> [1] 1 1 1 1 9 9 9 1 1 1
-docdb_get(src, "myTbl")[28:32, c(1, 22, 23)]
-#>                 _id carb   xy
-#> 28        Merc 280C    4 NULL
-#> 29       Merc 450SE    3 1, 2
-#> 30       Merc 450SL    3 1, 2
-#> 31      Merc 450SLC    3 1, 2
-#> 32 Pontiac Firebird    2 NULL
+docdb_get(src, "myTbl")[126:130, c(1, 27, 28)]
+#>                  _id carb   xy
+#> 126        Merc 280C    4 NULL
+#> 127       Merc 450SE    3 1, 2
+#> 128       Merc 450SL    3 1, 2
+#> 129      Merc 450SLC    3 1, 2
+#> 130 Pontiac Firebird    2 NULL
 
 # use with dplyr
 library("dplyr")
@@ -242,11 +248,11 @@ docdb_get(src, "myTbl") %>%
 docdb_delete(src, "myTbl", query = '{"$or": {"gear": 5, "age": {"$gte": 22}}}')
 #> TRUE
 nrow(docdb_get(src, "myTbl"))
-#> [1] 29
+#> [1] 127
 
 # delete container from database
 docdb_delete(src, "myTbl")
-#> TRUE
+#> [1] TRUE
 ```
 
 ## Benchmark
@@ -271,6 +277,8 @@ data <- as.data.frame(diamonds)[1:12000,]
 testFunction <- function(src, key, value, query, fields) {
   docdb_create(src, key, data)
   # Elasticsearch needs a delay to process the data
+  docdb_create(src, key, "http://httpbin.org/stream/89")
+  # Elasticsearch needs a delay to process the data
   if (inherits(src, "src_elastic")) Sys.sleep(1)
   head(docdb_get(src, key))
   docdb_query(src, key, query = query, fields = fields)
@@ -284,7 +292,7 @@ rbenchmark::benchmark(
   Elastic = testFunction(src = srcElastic, key, value, query, fields),
   CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
   PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
-  replications = 10L,
+  replications = 1L,
   columns = c('test', 'replications', 'elapsed')
 )
 #>         test replications elapsed
@@ -301,41 +309,6 @@ rbenchmark::benchmark(
 testthat::test_local()
 ```
 
-✓ \| F W S OK \| Context ✓ \| 5 \| couchdb \[0.2s\]  
-✓ \| 28 \| - create, exists, list, get, delete \[1.7s\]  
-✓ \| 27 \| - query \[0.9s\]  
-✓ \| 14 \| - update, query \[4.0s\]  
-✓ \| 3 \| elastic  
-✓ \| 28 \| - create, exists, list, get, delete \[10.6s\]  
-✓ \| 1 12 \| - query \[1.9s\]  
-─────────────────────────────────────────────────────────────────────────────────────────
-Skip (core-nodbi.R:111:3): docdb_query Reason: queries need to be
-translated into elastic syntax
-─────────────────────────────────────────────────────────────────────────────────────────
-✓ \| 12 \| - update, query \[2.8s\]  
-✓ \| 3 \| mongodb  
-✓ \| 28 \| - create, exists, list, get, delete \[0.4s\]  
-✓ \| 28 \| - query \[0.3s\]  
-✓ \| 14 \| - update, query \[0.1s\]  
-✓ \| 3 \| postgres \[0.2s\]  
-✓ \| 27 \| - create, exists, list, get, delete \[0.5s\]  
-✓ \| 28 \| - query \[0.4s\]  
-✓ \| 14 \| - update, query \[0.2s\]  
-✓ \| 3 \| sqlite  
-✓ \| 28 \| - create, exists, list, get, delete \[0.3s\]  
-✓ \| 28 \| - query \[0.2s\]  
-✓ \| 14 \| - update, query \[0.1s\]
-
-══ Results
-══════════════════════════════════════════════════════════════════════════════
-Duration: 24.8 s
-
-── Skipped tests
-───────────────────────────────────────────────────────────────────────
-• queries need to be translated into elastic syntax (1)
-
-\[ FAIL 0 \| WARN 0 \| SKIP 1 \| PASS 347 \]
-
 ## Notes
 
 -   Please [report any issues or
@@ -346,5 +319,5 @@ Duration: 24.8 s
 -   Please note that this package is released with a [Contributor Code
     of Conduct](https://ropensci.org/code-of-conduct/). By contributing
     to this project, you agree to abide by its terms.
--   Support for redis has been removed for version 0.5, because no way
+-   Support for redis has been removed since version 0.5, because no way
     was found to query and update specific documents in a container.

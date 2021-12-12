@@ -24,7 +24,8 @@
 #' a table name for SQLite and for PostgreSQL)
 #'
 #' @param value The data to be created in the database:
-#' a single data.frame, a JSON string or a list
+#' a single data.frame, a JSON string or a list;
+#' or the file name or URL of NDJSON documents
 #'
 #' @param ... Passed to functions:
 #' - CouchDB: [sofa::db_bulk_create()]
@@ -78,7 +79,8 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
   # convert JSON string to list
   if (class(value) == "character") {
-    if (isUrl(value) || isFile(value)) {
+    if ((length(value)  == 1L) &&
+        (isUrl(value) || isFile(value))) {
       # read ndjson file or url (does not work with jsonify)
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
@@ -163,7 +165,8 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
     # with files, create list from file
 
     # convert ndjson file or json string to list
-    if (isUrl(value) || isFile(value)) {
+    if ((length(value)  == 1L) &&
+        (isUrl(value) || isFile(value))) {
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
       } else if (isUrl(value)) {
@@ -227,7 +230,8 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
   if (docdb_exists(src, key, value, ...)) existsMessage(key)
 
   # directly import ndjson file
-  if (class(value) == "character" &&
+  if ((class(value) == "character") &&
+      (length(value)  == 1L) &&
       (isUrl(value) || isFile(value))) {
 
     # turn into connection
@@ -359,7 +363,8 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if (isUrl(value) || isFile(value)) {
+    if ((length(value)  == 1L) &&
+        (isUrl(value) || isFile(value))) {
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
       } else if (isUrl(value)) {
@@ -491,7 +496,8 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if (isUrl(value) || isFile(value)) {
+    if ((length(value)  == 1L) &&
+        (isUrl(value) || isFile(value))) {
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
       } else if (isUrl(value)) {
