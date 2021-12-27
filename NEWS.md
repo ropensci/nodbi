@@ -1,17 +1,12 @@
-nodbi 0.6.0.9001
+nodbi 0.7.0
 ===========
 
 ### IMPROVEMENTS
-* `docdb_create` now supports names of files and urls as argument `value` for importing data
+* `docdb_create` now supports file names and http urls as argument `value` for importing data
+* `docdb_create` (and thus `docdb_update`) now supports quantifiers (e.g., '[a-z]{2,3}') in regular expressions
 
 ### BUG FIXES
-* for SQLite return `FALSE` like other backends when using `docdb_delete` for a non-existing container
-
-nodbi 0.6.0.9000
-===========
-
-### IMPROVEMENTS
-* supporting regular expressions with quantifiers (e.g., '[a-z]{2,3}')
+* for SQLite, return `FALSE` like other backends when using `docdb_delete` for a non-existing container (table, in the case of SQLite)
 * better handle special characters and encodings under Windows
 
 nodbi 0.6.0

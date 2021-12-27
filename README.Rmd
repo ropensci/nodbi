@@ -258,10 +258,10 @@ srcElastic <- src_elastic()
 srcCouchdb <- src_couchdb(user = COUCHDB_TEST_USER, pwd = COUCHDB_TEST_PWD)
 srcPostgres <- src_postgres()
 key <- "test"
-query <- '{"clarity": "I1"}'
-fields <- '{"cut": 1, "_id": 1}'
+query <- '{"clarity": "SI1"}'
+fields <- '{"cut": 1, "_id": 1, "clarity": "1"}'
 value <- '{"clarity": "XYZ", "new": ["ABC", "DEF"]}'
-data <- as.data.frame(diamonds)[1:12000,]
+data <- as.data.frame(diamonds)[1:12000, ]
 
 testFunction <- function(src, key, value, query, fields) {
   docdb_create(src, key, data)
@@ -281,15 +281,16 @@ rbenchmark::benchmark(
   Elastic = testFunction(src = srcElastic, key, value, query, fields),
   CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
   PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
-  replications = 1L,
+  replications = 10L,
   columns = c('test', 'replications', 'elapsed')
 )
+#> on 2015 mobile computer without database optimisations
 #>         test replications elapsed
-#> 4    CouchDB           10     253
-#> 3    Elastic           10     101 # 10s subtracted
-#> 1    MongoDB           10      66
-#> 5 PostgreSQL           10      66
-#> 2    RSQLite           10      67
+#> 4    CouchDB           10    1795
+#> 3    Elastic           10     196 # 10s subtracted
+#> 5 PostgreSQL           10      85
+#> 2    RSQLite           10      76
+#> 1    MongoDB           10      75
 ```
 
 ## Testing

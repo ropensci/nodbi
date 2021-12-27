@@ -17,3 +17,4 @@ man-roxygen
 .DS_Store
 .lintr
 ^CRAN-RELEASE$
+^CRAN-SUBMISSION$
