@@ -460,7 +460,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 #' @export
 docdb_create.src_postgres <- function(src, key, value, ...) {
 
-  # reference: https://www.sqlite.org/json1.html
+  # reference: https://www.postgresql.org/docs/current/datatype-json.html
 
   # if table does not exist, create one
   if (!docdb_exists(src, key, ...)) {
@@ -512,9 +512,9 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
       # any _id (would be in top level of list)
       ids <- value[["_id"]]
-      # remove _id's
+      # remove _id's from list
       if (length(ids)) value[["_id"]] <- NULL
-      # change back to json
+      # change list back to json
       value <- as.character(
         jsonlite::toJSON(
           value,
