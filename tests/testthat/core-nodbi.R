@@ -132,7 +132,7 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "friends.id": 1}')), c(2L, 2L)) # full friends field for couchdb, elasticsearch
   expect_true(nrow(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 1}')) == 2L)
   expect_true(ncol(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 1}')) <= 3L)
-  # abnomaly that is very difficult to correct, nothing returned for non-existing field by RSQLite
+  # anomaly that is very difficult to correct, nothing returned for non-existing field by RSQLite
   if (inherits(src, "src_sqlite")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "doesnotexist": 1}')), c(0L, 0L))
   if (!inherits(src, "src_sqlite")) expect_equal(nrow(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "doesnotexist": 1}')), 2L)
   # skip remainder for Elasticsearch
@@ -143,18 +143,22 @@ test_that("docdb_query", {
   if (!inherits(src, "src_elastic") & !inherits(src, "src_couchdb")) expect_equal(dim(
     docdb_query(src = src, key = key, query = '{"tags": {"$regex": "^[a-z]{3,4}$"}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
   expect_true(docdb_delete(src = src, key = key))
+
+  # remainder skipped for Elasticsearch until queries implemented in nodbi::docdb_query.src_elastic()
   if (inherits(src, "src_elastic")) skip("queries need to be translated into elastic syntax")
 
   # testJson2
   expect_equal(docdb_create(src = src, key = key, value = testJson2), 2L)
-  if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
-  expect_equal(dim(docdb_query(src = src, key = key, fields = '{"rows.elements.distance.somevalue": 1}', query = '{}')), c(2L, 1L))
+  expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"rows.elements.distance.somevalue": 1}')), c(2L, 1L))
+  # 2022-05-03 handle fields and queries with special characters
+  expect_equal(nrow(docdb_query(src = src, key = key, query = '{}', fields = '{"destination_addresses": 1}')), 2L)
+  expect_equal(length(unlist(docdb_query(
+    src = src, key = key, query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA"]}}', fields = '{"destination_addresses": 1}'))), 3L)
   # note: str, typeof differ by database backend
   expect_true(docdb_delete(src = src, key = key))
 
   # testDf
   expect_equal(docdb_create(src = src, key = key, value = testDf), 32L)
-  if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
   expect_equal(dim(docdb_query(src, key, query = '{"gear": {"$in": [5,4]}}')), c(17L, 12L))
   expect_equal(dim(docdb_query(src, key, query = '{"_id": {"$in": ["Datsun 710", "Merc 280C"]}}')), c(2L, 12L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"mpg": {"$lte": 18}}', fields = '{"disp": 1, "carb": 1}')), c(13L, 2L))

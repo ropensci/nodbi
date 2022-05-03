@@ -1,3 +1,10 @@
+nodbi 0.7.0.9001
+================
+
+### BUG FIXES
+* fixed `docdb_query` to account for change in SQLite 3.38.3 adding quotation of labels (closes issue #44), test added
+* made `docdb_query` work for PostgreSQL when a string used with the `$in` operator has a comma(s), test added
+
 nodbi 0.7.0.9000
 ================
 
