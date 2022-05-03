@@ -492,7 +492,8 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
                 test = grepl("^ IN ", x[2]),
                 yes = paste0(
                   "@.", x[1], " == ",
-                  strsplit(sub(" IN [(](.+)[)]", "\\1", x[2]), ",")[[1]],
+                  # split on comma after number or double quote, avoid splitting on comma in string
+                  strsplit(gsub("([0-9\"]),", "\\1@", sub(" IN [(](.+)[)]", "\\1", x[2])), "@")[[1]],
                   collapse = " || "),
                 no = paste0(
                   "@.",
