@@ -1,3 +1,9 @@
+nodbi 0.7.1.9000
+================
+
+### Changes
+* new development version
+
 nodbi 0.7.1
 ================
 
