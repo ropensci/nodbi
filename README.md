@@ -23,7 +23,7 @@ Currently, `nodbi` supports the following database backends:
 -   SQLite
 -   Elasticsearch
 -   CouchDB
--   PostgreSQL (new in `nodbi` version 0.6.0)
+-   PostgreSQL (since v0.6.0)
 
 for an `R` object of any of these data types:
 
@@ -42,10 +42,10 @@ and for executing the following operations:
 -   Delete
 -   List
 
-across all database backends. \* `docdb_create`. \*\*Only simple
-(e.g. equality for a single field) queries (and updates) are supported
-for Elasticsearch at the moment. Only root fields can be specified for
-CouchDB, whereas fields with subitems (in dot notation) can be specified
+across all database backends. \* Only for `docdb_create`. \*\*Only
+simple queries (e.g. equality for a single field) and updates are
+supported for Elasticsearch at the moment. Only root fields can be
+specified for CouchDB, whereas subitems can be specified in dot notation
 for Elasticsearch, MongoDB, SQLite and PostgreSQL.
 
 For capabilities in terms of operations and parameter combinations
@@ -95,8 +95,8 @@ backends.
 ## Database connections
 
 Overview on parameters that are specific to the database backend. These
-are only needed once, for `src_*()` to create a connection object for
-use with `nodbi`.
+are only needed once, for `src_*()` to create a connection object that
+is used with other `nodbi` functions.
 
 ### MongoDB
 
@@ -104,9 +104,9 @@ Note that only MongoDB requires to specify the container already in the
 `src_*()` function. “Container” refers to a MongoDB collection.
 
 ``` r
-src_mongo(
-  collection = "test", db = "test",
-  url = "mongodb://localhost", ...)
+nodbi::src_mongo(
+ collection = "test", db = "test",
+ url = "mongodb://localhost", ...)
 ```
 
 ### SQLite
@@ -116,23 +116,23 @@ The functionality to process JSON is based on the SQLite extension
 “Container” refers to an SQLite table.
 
 ``` r
-src_sqlite(dbname = ":memory:", ...)
+nodbi::src_sqlite(dbname = ":memory:", ...)
 ```
 
 ### CouchDB
 
 ``` r
-src_couchdb(
-  host = "127.0.0.1", port = 5984L, path = NULL,
-  transport = "http", user = NULL, pwd = NULL, headers = NULL)
+nodbi::src_couchdb(
+ host = "127.0.0.1", port = 5984L, path = NULL,
+ transport = "http", user = NULL, pwd = NULL, headers = NULL)
 ```
 
 ### Elasticsearch
 
 ``` r
-src_elastic(
-  host = "127.0.0.1", port = 9200L, path = NULL,
-  transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...)
+nodbi::src_elastic(
+ host = "127.0.0.1", port = 9200L, path = NULL,
+ transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...)
 ```
 
 ### PostgreSQL
@@ -142,8 +142,8 @@ With this database, the order of variables in data frames returned by
 they were in `docdb_create()`.
 
 ``` r
-src_postgres(
-  dbname = "test", host = "127.0.0.1", port = 5432L, ...)
+nodbi::src_postgres(
+ dbname = "test", host = "127.0.0.1", port = 5432L, ...)
 ```
 
 ## Walk-through
@@ -151,10 +151,14 @@ src_postgres(
 This example is meant to show how functional `nodbi` is at this time.
 
 ``` r
+# load nodbi
+library(nodbi)
+
 # connect database backend
 src <- src_sqlite()
 
 # load data (here data frame, alternatively list or JSON)
+# into the container "myTbl" specified in the "key" parameter
 docdb_create(src, key = "myTbl", value = mtcars)
 #> [1] 32
 
@@ -170,25 +174,29 @@ docdb_create(src, key = "myTbl", contacts)
 
 # get all documents, irrespective of schema
 dplyr::tibble(docdb_get(src, "myTbl"))
-#> # A tibble: 37 × 22
-#>    `_id`  isActive balance    age eyeColor name  email about  registered
-#>    <chr>  <lgl>    <chr>    <int> <chr>    <chr> <chr> <chr>  <chr>     
-#>  1 5cd67… TRUE     $2,412.…    20 blue     Kris… kris… Sint … 2017-07-1…
-#>  2 5cd67… FALSE    $3,400.…    20 brown    Rae … raec… Nisi … 2018-12-1…
-# ...
-#>  9 Chrys… NA       NA          NA NA       NA    NA    NA     NA        
-#> 10 Datsu… NA       NA          NA NA       NA    NA    NA     NA        
-#> # … with 27 more rows, and 13 more variables: tags <list>,
-#> #   friends <list>, mpg <dbl>, cyl <dbl>, disp <dbl>, hp <dbl>,
-#> #   drat <dbl>, wt <dbl>, qsec <dbl>, vs <dbl>, am <dbl>, gear <dbl>,
-#> #   carb <dbl>
+#> A tibble: 135 × 27
+#>    `_id`       isActive balance   age eyeColor name  email about registered tags   friends url  
+#>    <chr>       <lgl>    <chr>   <int> <chr>    <chr> <chr> <chr> <chr>      <list> <list>  <chr>
+#>  1 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <chr>  <df>    NA   
+#>  2 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <chr>  <df>    NA   
+#>  3 5cd6785325… TRUE     $1,161…    22 brown    Pace… pace… Eius… 2018-08-1… <chr>  <df>    NA   
+#>  4 5cd6785335… FALSE    $2,579…    30 brown    Will… will… Null… 2018-02-1… <chr>  <df>    NA   
+#>  5 5cd67853f8… FALSE    $3,808…    23 green    Lacy… lacy… Sunt… 2014-08-0… <chr>  <df>    NA   
+#>  6 6529d28a-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#>  7 6529d2a8-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#>  8 6529d2b2-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#>  9 6529d2c6-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#> 10 6529d2d0-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#> # … with 125 more rows, and 15 more variables: args <named list>, headers <df[,4]>,
+#> #   origin <chr>, id <int>, mpg <dbl>, cyl <dbl>, disp <dbl>, hp <dbl>, drat <dbl>, wt <dbl>,
+#> #   qsec <dbl>, vs <dbl>, am <dbl>, gear <dbl>, carb <dbl>
 
 # query some documents
 docdb_query(src, "myTbl", query = '{"mpg": {"$gte": 30}}')
 #>              _id mpg cyl disp  hp drat  wt qsec vs am gear carb
 #> 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1
 #> 2    Honda Civic  30   4   76  52  4.9 1.6   19  1  1    4    2
-#> 3   Lotus Europa  30   4   95 113  3.8 1.5   17  9  1    5    2
+#> 3   Lotus Europa  30   4   95 113  3.8 1.5   17  1  1    5    2
 #> 4 Toyota Corolla  34   4   71  65  4.2 1.8   20  1  1    4    1
 
 # query some fields from some documents; 'query' is a mandatory 
@@ -204,17 +212,17 @@ docdb_query(src, "myTbl", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "mpg": 1}
 # (only simple queries so far implemented for Elasticsearch)
 # (only root, not subitems so far implemented for CouchDB)
 str(docdb_query(src, "myTbl", '
-                {"$or": [{"age": {"$lt": 21}}, 
-                         {"friends.name": {"$regex": "^B[a-z]{3,6}.*"}}]}', 
-                fields = '{"age": 1, "friends.name": 1}'))
-#> 'data.frame':    4 obs. of  2 variables:
-#>  $ age    : int  20 20 22 23
-#>  $ friends:'data.frame': 4 obs. of  1 variable:
-#>   ..$ name:List of 4
-#>   .. ..$ : chr "Pace Bell"
-#>   .. ..$ : chr  "Yang Yates" "Lacy Chen"
-#>   .. ..$ : chr  "Baird Keller" "Francesca Reese" "Dona Bartlett"
-#>   .. ..$ : chr  "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
+ {"$or": [{"age": {"$lt": 21}}, 
+ {"friends.name": {"$regex": "^B[a-z]{3,6}.*"}}]}', 
+ fields = '{"age": 1, "friends.name": 1}'))
+#> 'data.frame':    4 obs. of 2 variables:
+#> $ age : int 20 20 22 23
+#> $ friends:'data.frame':  4 obs. of 1 variable:
+#> ..$ name:List of 4
+#> .. ..$ : chr "Pace Bell"
+#> .. ..$ : chr "Yang Yates" "Lacy Chen"
+#> .. ..$ : chr "Baird Keller" "Francesca Reese" "Dona Bartlett"
+#> .. ..$ : chr "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
 
 # such queries can also be used for updating (patching) selected documents 
 # with a new 'value'(s) from a JSON string, a data frame or a list
@@ -233,15 +241,15 @@ docdb_get(src, "myTbl")[126:130, c(1, 27, 28)]
 # use with dplyr
 library("dplyr")
 docdb_get(src, "myTbl") %>%
-  group_by(gear) %>%
-  summarise(mean_mpg = mean(mpg))
-# # A tibble: 4 × 2
-#    gear mean_mpg
-#   <dbl>    <dbl>
-# 1     3     16.1
-# 2     4     24.5
-# 3     5     21.4
-# 4    NA     NA  
+ group_by(gear) %>%
+ summarise(mean_mpg = mean(mpg))
+#> # A tibble: 4 × 2
+#>    gear mean_mpg
+#>   <dbl>    <dbl>
+#> 1     3     16.1
+#> 2     4     24.5
+#> 3     5     21.4
+#> 4    NA     NA
 
 # delete documents; query is optional parameter and has to be 
 # specified for deleting documents instead of deleting the container
@@ -275,33 +283,34 @@ value <- '{"clarity": "XYZ", "new": ["ABC", "DEF"]}'
 data <- as.data.frame(diamonds)[1:12000, ]
 
 testFunction <- function(src, key, value, query, fields) {
-  docdb_create(src, key, data)
-  # Elasticsearch needs a delay to process the data
-  docdb_create(src, key, "http://httpbin.org/stream/89")
-  # Elasticsearch needs a delay to process the data
-  if (inherits(src, "src_elastic")) Sys.sleep(1)
-  head(docdb_get(src, key))
-  docdb_query(src, key, query = query, fields = fields)
-  docdb_update(src, key, value = value, query = query)
-  docdb_delete(src, key)
+ docdb_create(src, key, data)
+ # Elasticsearch needs a delay to process the data
+ docdb_create(src, key, "http://httpbin.org/stream/89")
+ # Elasticsearch needs a delay to process the data
+ if (inherits(src, "src_elastic")) Sys.sleep(1)
+ head(docdb_get(src, key))
+ docdb_query(src, key, query = query, fields = fields)
+ docdb_update(src, key, value = value, query = query)
+ docdb_delete(src, key)
 }
 
+#> 2022-05-04 with 2015 mobile hardware 
+#> without any database optimisations
 rbenchmark::benchmark(
-  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
-  RSQLite = testFunction(src = srcSqlite, key, value, query, fields),
-  Elastic = testFunction(src = srcElastic, key, value, query, fields),
-  CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
-  PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
-  replications = 10L,
-  columns = c('test', 'replications', 'elapsed')
+ MongoDB = testFunction(src = srcMongo, key, value, query, fields),
+ RSQLite = testFunction(src = srcSqlite, key, value, query, fields),
+ Elastic = testFunction(src = srcElastic, key, value, query, fields),
+ CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
+ PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
+ replications = 10L,
+ columns = c('test', 'replications', 'elapsed')
 )
-#> on 2015 mobile computer
 #>         test replications elapsed
-#> 4    CouchDB           10    1795
-#> 3    Elastic           10     196 # 10s subtracted
-#> 5 PostgreSQL           10      85
+#> 4    CouchDB           10    1639
+#> 3    Elastic           10     183 # 10s to be subtracted
+#> 1    MongoDB           10      74
+#> 5 PostgreSQL           10      81
 #> 2    RSQLite           10      76
-#> 1    MongoDB           10      75
 ```
 
 ## Testing
