@@ -60,11 +60,11 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   if (!length(input)) return(0L)
 
   # data frame to json
-  if (class(value) == "data.frame") {
+  if (isa(value, "data.frame")) {
     value <- jsonify::to_json(value, by = "col", unbox = TRUE)
   }
   # list to json
-  if (class(value) == "list") {
+  if (isa(value, "list")) {
     value <- jsonify::to_json(value, unbox = TRUE)
   }
 
@@ -107,12 +107,12 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
   if (!length(ids)) return(0L)
 
   # json to data frame
-  if (class(value) == "character") {
+  if (isa(value, "character")) {
     value <- jsonlite::fromJSON(value)
   }
 
   # list to data frame
-  if (class(value) == "list") {
+  if (isa(value, "list")) {
     value <- jsonlite::fromJSON(
       jsonlite::toJSON(value, auto_unbox = TRUE))
     # if value is still simple list
@@ -186,11 +186,11 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
   # process value, target is json string
 
   # data frame to json
-  if (class(value) == "data.frame") {
+  if (isa(value, "data.frame")) {
     value <- jsonify::to_json(value, by = "col", unbox = TRUE)
   }
   # list to json
-  if (class(value) == "list") {
+  if (isa(value, "list")) {
     value <- jsonify::to_json(value, unbox = TRUE)
   }
 
@@ -228,11 +228,11 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 docdb_update.src_sqlite <- function(src, key, value, query, ...) {
 
   # data frame to json
-  if (class(value) == "data.frame") {
+  if (isa(value, "data.frame")) {
     value <- jsonify::to_json(value, by = "col", unbox = TRUE)
   }
   # list to json
-  if (class(value) == "list") {
+  if (isa(value, "list")) {
     value <- jsonify::to_json(value, unbox = TRUE)
   }
 
@@ -266,11 +266,11 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
 docdb_update.src_postgres <- function(src, key, value, query, ...) {
 
   # data frame to json
-  if (class(value) == "data.frame") {
+  if (isa(value, "data.frame")) {
     value <- jsonify::to_json(value, by = "col", unbox = TRUE)
   }
   # list to json
-  if (class(value) == "list") {
+  if (isa(value, "list")) {
     value <- jsonify::to_json(value, unbox = TRUE)
   }
 
