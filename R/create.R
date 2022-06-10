@@ -64,7 +64,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   # convert into target list
 
   # data frame
-  if (isa(value, "data.frame")) {
+  if (inherits(value, "data.frame")) {
     if (is.na(match("_id", names(value)))) {
       # if no _id column
       if (!identical(rownames(value),
@@ -78,8 +78,8 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   } # if data.frame
 
   # convert JSON string to list
-  if (isa(value, "character")) {
-    if ((length(value)  == 1L) &&
+  if (inherits(value, "character")) {
+    if (isa(value, "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
       # read ndjson file or url (does not work with jsonify)
       if (isFile(value)) {
@@ -94,7 +94,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   }
 
   # mangle lists
-  if (isa(value, "list")) {
+  if (inherits(value, "list")) {
     if (all(sapply(lapply(value, "[[", "_id"), is.null))) {
       # add canonical _id's
       value <- lapply(value, function(i) c(
@@ -139,7 +139,7 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   # body of your documents, and map this field as a keyword field that has [doc_values] enabled
 
   # data frame
-  if (isa(value, "data.frame")) {
+  if (inherits(value, "data.frame")) {
     if (is.na(match("_id", names(value)))) {
       # if no _id column
       if (!identical(rownames(value),
@@ -159,14 +159,12 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   } # if data.frame
 
   # convert JSON string to list
-  if (isa(value, "character")) {
-
-    # since cocument IDs cannot be passed in
-    # with files, create list from file
-
+  if (inherits(value, c("character", "json"))) {
     # convert ndjson file or json string to list
-    if ((length(value)  == 1L) &&
+    if (isa(value, "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
+      # since document IDs cannot be passed in
+      # with files, create list from file
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
       } else if (isUrl(value)) {
@@ -255,12 +253,12 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
 
     # since mongolite does not accept valid JSON strings
     # that come as an one-element array, convert to list
-    if (isa(value, "character")) {
+    if (inherits(value, "character")) {
       value <- jsonify::from_json(value, simplify = FALSE)
     }
 
     # mongolite uses _id columns in dataframes as object _id's:
-    if (isa(value, "data.frame")) {
+    if (inherits(value, "data.frame")) {
       if (is.na(match("_id", names(value)))) {
         # if no _id column
         if (!identical(rownames(value),
@@ -281,7 +279,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
     } # if data.frame
 
     # convert lists (incl. from previous step) to NDJSON
-    if (isa(value, "list")) {
+    if (inherits(value, "list")) {
       # add canonical _id's
       if ((!is.null(names(value)) && !any(names(value) == "_id")) &&
           !any(sapply(value, function(i) any(names(i) == "_id")))
@@ -353,17 +351,16 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   }
 
   # convert lists to json
-  if (isa(value, "list")) {
+  if (inherits(value, "list")) {
     value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
   }
 
   # convert JSON string to data frame
-  if (isa(value, "character") ||
-      isa(value, "json")) {
+  if (inherits(value, c("character", "json"))) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if ((length(value)  == 1L) &&
+    if (isa(value, "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
@@ -375,7 +372,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     }
 
     # process if value remained a list
-    if (isa(value, "list")) {
+    if (inherits(value, "list")) {
 
       # any _id (would be in top level of list)
       ids <- value[["_id"]]
@@ -398,7 +395,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   }
 
   # data frame
-  if (isa(value, "data.frame")) {
+  if (inherits(value, "data.frame")) {
     #
     if (is.na(match("_id", names(value)))) {
       # if no _id column
@@ -414,7 +411,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     } # if no _id column
     #
     if (ncol(value) > 2L || (ncol(value) == 2L &&
-                             !all(sort(names(value)) == c("_id", "json")))) {
+       !all(sort(names(value)) == c("_id", "json")))) {
       # convert if there is no json column yet
       value[["json"]] <- strsplit(
         jsonify::to_ndjson(
@@ -486,17 +483,16 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
   }
 
   # convert lists to json
-  if (isa(value, "list")) {
+  if (inherits(value, "list")) {
     value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
   }
 
   # convert JSON string to data frame
-  if (isa(value, "character") ||
-      isa(value, "json")) {
+  if (inherits(value, c("character", "json"))) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if ((length(value)  == 1L) &&
+    if (isa(value, "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
@@ -508,7 +504,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     }
 
     # process if value remained a list
-    if (isa(value, "list")) {
+    if (inherits(value, "list")) {
 
       # any _id (would be in top level of list)
       ids <- value[["_id"]]
@@ -531,7 +527,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
   }
 
   # data frame
-  if (isa(value, "data.frame")) {
+  if (inherits(value, "data.frame")) {
     #
     if (is.na(match("_id", names(value)))) {
       # if no _id column
