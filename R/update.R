@@ -46,18 +46,14 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   # JSON structure (or object, when you are doing actual programming),
   # and save the entire new revision (or version) of that document back into CouchDB.
 
-  # therefore emulate update for couchdb as follows
-  if (!length(find.package("RSQLite", quiet = TRUE))) {
-    stop("Package RSQLite needed to calculate json update, ",
-         "but it is not installed. Install or use docdb_create().",
-         call. = FALSE)
-  }
-
   # get original set
   input <- docdb_query(src, key, query)
 
   # early return if not found
   if (!length(input)) return(0L)
+
+  # data frame to json
+  input <- jsonify::to_ndjson(input)
 
   # data frame to json
   if (isa(value, "data.frame")) {
@@ -68,21 +64,16 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
     value <- jsonify::to_json(value, unbox = TRUE)
   }
 
-  # calculate new document(s)
-  value <- jsonify::from_ndjson(
-    paste0(
-      sapply(
-        strsplit(
-          jsonify::to_ndjson(input),
-          split = "\n")[[1]],
-        function(i)
-          jsonUpdate(
-            jsonT = i,
-            jsonP = value),
-        USE.NAMES = FALSE,
-        simplify = TRUE),
-      collapse = "\n"),
-    simplify = TRUE)
+  # merge json with value
+  value <- jqr::jq(paste0(
+    "[",  jqr::jq(textConnection(input)),
+    ",", value, "]"), ' reduce .[] as $item ({}; . * $item) ')
+
+  # jqr output to list
+  value <- jsonlite::stream_in(
+    textConnection(value),
+    simplifyVector = FALSE,
+    verbose = FALSE)
 
   # note: sofa::db_bulk_update changes all
   # documents in the container, therefore
@@ -302,32 +293,3 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
 }
 
 
-## helpers --------------------------------------
-
-# emulating json update by calculating
-# the patch result using RSQLite
-jsonUpdate <- function(jsonT, jsonP) {
-  # https://www.sqlite.org/json1.html#jpatch
-
-  # get connection
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-
-  # register deconstructor
-  on.exit(try(DBI::dbDisconnect(con), silent = TRUE), add = TRUE)
-
-  # construct json command
-  jsonPatch <- paste0(
-    "SELECT json_patch('",
-    jsonT, "','", jsonP,
-    "') AS json;"
-  )
-
-  # calculate patch
-  out <- DBI::dbGetQuery(
-    conn = con,
-    statement = jsonPatch)
-
-  # return
-  return(out[[1]])
-
-}
