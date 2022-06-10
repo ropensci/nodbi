@@ -2,30 +2,6 @@
 # test_<database>.R files in order to
 # canonically test nodbi core functions
 
-#### test data ####
-testDf <- mtcars # has rownames
-testDf2 <- iris # no rownames
-testJson <- contacts # has _id's
-testJson2 <- mapdata # no _id's
-testList <- jsonlite::fromJSON(mapdata, simplifyVector = FALSE)
-# factors cannot be expected to be maintained
-testDf2[["Species"]] <- as.character(testDf2[["Species"]])
-#
-# create file-based ndjson
-testFile <- tempfile(fileext = ".ndjson")
-on.exit(try(unlink(testFile), silent = TRUE), add = TRUE)
-jsonlite::stream_out(jsonlite::fromJSON(contacts), con = file(testFile), verbose = FALSE)
-#
-testFile2 <- tempfile(fileext = ".ndjson")
-on.exit(try(unlink(testFile2), silent = TRUE), add = TRUE)
-jsonlite::stream_out(diamonds, con = file(testFile2), verbose = FALSE)
-#
-testUrl <- "http://httpbin.org/stream/98"
-
-#### set up ####
-elasticSleep <- 1L # seconds
-
-
 #### create get delete ####
 test_that("- docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
 
@@ -33,7 +9,10 @@ test_that("- docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
   tmp <- dbSrcKey()
   src <- tmp$testSrc
   key <- tmp$testKey
-  on.exit(rm(src), add = TRUE)
+  on.exit(try({
+    docdb_delete(src = src, key = key)
+    rm(src)
+  }, silent = TRUE), add = TRUE)
 
   # clean up databases
   if (FALSE) {
@@ -99,12 +78,19 @@ test_that("- docdb_create (ndjson file)", {
   tmp <- dbSrcKey()
   src <- tmp$testSrc
   key <- tmp$testKey
-  on.exit(rm(src), add = TRUE)
+  on.exit(try({
+    docdb_delete(src = src, key = key)
+    rm(src)
+  }, silent = TRUE), add = TRUE)
+
+  # get temporary local files with ndjson
+  tF <- testFile()
+  tF2 <- testFile2()
 
   # tests
-  expect_equal(docdb_create(src = src, key = key, value = testFile), 5L)
-  expect_equal(suppressWarnings(docdb_create(src = src, key = key, value = testFile)), 0L)
-  expect_equal(docdb_create(src = src, key = key, value = testFile2), nrow(diamonds))
+  expect_equal(docdb_create(src = src, key = key, value = tF), 5L)
+  expect_equal(suppressWarnings(docdb_create(src = src, key = key, value = tF)), 0L)
+  expect_equal(docdb_create(src = src, key = key, value = tF2), nrow(diamonds))
   expect_equal(docdb_create(src = src, key = key, value = testUrl), 98L)
   expect_true(docdb_delete(src = src, key = key))
   expect_false(docdb_delete(src = src, key = key))
@@ -118,7 +104,10 @@ test_that("docdb_query", {
   tmp <- dbSrcKey()
   src <- tmp$testSrc
   key <- tmp$testKey
-  on.exit(rm(src), add = TRUE)
+  on.exit(try({
+    docdb_delete(src = src, key = key)
+    rm(src)
+  }, silent = TRUE), add = TRUE)
 
   # testJson
   expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
@@ -139,9 +128,9 @@ test_that("docdb_query", {
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$ne": "Lacy Chen"}}')), c(4L, 11L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$regex": "^[a-zA-Z]{3,4} "}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
   if (!inherits(src, "src_elastic"))
-  # couchdb cannot search in array
-  if (!inherits(src, "src_elastic") & !inherits(src, "src_couchdb")) expect_equal(dim(
-    docdb_query(src = src, key = key, query = '{"tags": {"$regex": "^[a-z]{3,4}$"}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
+    # couchdb cannot search in array
+    if (!inherits(src, "src_elastic") & !inherits(src, "src_couchdb")) expect_equal(dim(
+      docdb_query(src = src, key = key, query = '{"tags": {"$regex": "^[a-z]{3,4}$"}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
   expect_true(docdb_delete(src = src, key = key))
 
   # remainder skipped for Elasticsearch until queries implemented in nodbi::docdb_query.src_elastic()
@@ -180,7 +169,10 @@ test_that("docdb_update, docdb_query", {
   tmp <- dbSrcKey()
   src <- tmp$testSrc
   key <- tmp$testKey
-  on.exit(rm(src), add = TRUE)
+  on.exit(try({
+    docdb_delete(src = src, key = key)
+    rm(src)
+  }, silent = TRUE), add = TRUE)
 
   expect_equal(docdb_create(src = src, key = key, value = testDf), nrow(testDf))
   if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)

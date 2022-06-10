@@ -1,4 +1,51 @@
-## helper for tests --------------------------------------
+
+#### params for tests ####
+
+# delay needed
+elasticSleep <- 1L # seconds
+
+# Warning (core-nodbi.R:176:3): docdb_update, docdb_query
+# Changing language has no effect when envvar LANG='C'
+Sys.unsetenv("LANG")
+
+
+
+#### data for tests ####
+
+testDf <- mtcars # has rownames
+testDf2 <- iris  # no rownames
+# factors cannot be expected to be maintained
+testDf2[["Species"]] <- as.character(testDf2[["Species"]])
+
+testJson <- contacts # has _id's
+testJson2 <- mapdata # no _id's
+
+testList <- jsonlite::fromJSON(mapdata, simplifyVector = FALSE)
+
+
+testFile <- function(..., env = parent.frame()) {
+  testFile <- tempfile(fileext = ".ndjson")
+  jsonlite::stream_out(jsonlite::fromJSON(contacts), con = file(testFile), verbose = FALSE)
+  withr::defer(
+    try(unlink(testFile), silent = TRUE),
+    envir = env)
+  testFile
+}
+
+testFile2 <- function(..., env = parent.frame()) {
+  testFile2 <- tempfile(fileext = ".ndjson")
+  jsonlite::stream_out(diamonds, con = file(testFile2), verbose = FALSE)
+  withr::defer(
+    try(unlink(testFile2), silent = TRUE),
+    envir = env)
+  testFile2
+}
+
+testUrl <- "http://httpbin.org/stream/98"
+
+
+
+#### helper for tests ####
 
 createKey <- function() paste0(
   "test_nodbi_",
