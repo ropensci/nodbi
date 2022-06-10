@@ -2,7 +2,7 @@ nodbi 0.7.1.9000
 ================
 
 ### Changes
-* new development version
+* refactored `docdb_update.src_couchdb`
 
 nodbi 0.7.1
 ================
