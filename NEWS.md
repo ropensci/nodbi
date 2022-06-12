@@ -1,5 +1,5 @@
-nodbi 0.7.1.9000
-================
+nodbi 0.8.0
+===========
 
 ### Changes
 * refactored `docdb_update.src_couchdb` to use `jqr`
