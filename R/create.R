@@ -59,7 +59,9 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
   # create database if not yet existing
   result <- try(sofa::db_create(src$con, dbname = key, delifexists = FALSE), silent = TRUE)
-  if (inherits(result, "try-error") && grepl("already exists", result)) existsMessage(key)
+  if (inherits(result, "try-error")) {
+    if (grepl("already exists", result))
+      existsMessage(key) else stop(result, call. = FALSE)}
 
   # convert into target list
 
@@ -132,7 +134,9 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 docdb_create.src_elastic <- function(src, key, value, ...) {
 
   result <- try(elastic::index_create(src$con, index = key, verbose = FALSE), silent = TRUE)
-  if (inherits(result, "try-error") && grepl("already exists", result)) existsMessage(key)
+  if (inherits(result, "try-error")) {
+    if (grepl("already exists", result))
+      existsMessage(key) else stop(result, call. = FALSE)}
 
   # Loading the fielddata on the _id field is deprecated and will be removed in future versions.
   # If you require sorting or aggregating on this field you should also include the id in the
