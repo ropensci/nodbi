@@ -37,10 +37,10 @@ Imports:
     mongolite (>= 1.6),
     RSQLite (>= 2.2.4),
     RPostgres,
-    DBI,
-    withr
+    DBI
 Suggests:
-    testthat
+    testthat,
+    withr
 RoxygenNote: 7.2.0
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, NoSQL, JSON, documents

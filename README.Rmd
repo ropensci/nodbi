@@ -324,6 +324,24 @@ rbenchmark::benchmark(
 
 ```{r}
 testthat::test_local()
+# ✔ | F W S  OK | Context
+# ✔ |        84 | couchdb [90.8s]                                                                             
+# ✔ |     1  62 | elastic [68.9s]                                                                             
+# ────────────────────────────────────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:138:3): docdb_query
+# Reason: queries need to be translated into elastic syntax
+# ────────────────────────────────────────────────────────────────────────────────────────────────────────────
+# ✔ |        84 | mongodb [4.4s]                                                                              
+# ✔ |        83 | postgres [7.2s]                                                                             
+# ✔ |        84 | sqlite [4.2s]                                                                               
+# 
+# ══ Results ═════════════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 175.5 s
+# 
+# ── Skipped tests  ──────────────────────────────────────────────────────────────────────────────────────────
+# • queries need to be translated into elastic syntax (1)
+# 
+# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 397 ]
 ```
 
 
