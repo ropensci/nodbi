@@ -81,7 +81,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
   # convert JSON string to list
   if (inherits(value, "character")) {
-    if (isa(value, "character") && (length(value)  == 1L) &&
+    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
       # read ndjson file or url (does not work with jsonify)
       if (isFile(value)) {
@@ -165,7 +165,7 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   # convert JSON string to list
   if (inherits(value, c("character", "json"))) {
     # convert ndjson file or json string to list
-    if (isa(value, "character") && (length(value)  == 1L) &&
+    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
       # since document IDs cannot be passed in
       # with files, create list from file
@@ -180,7 +180,7 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   }
 
   # mangle lists
-  if (isa(value, "list")) {
+  if (all(class(value) %in% "list")) {
     if (all(sapply(lapply(value, "[[", "_id"), is.null))) {
       # add canonical _id's
       docids <- uuid::UUIDgenerate(use.time = TRUE, n = length(value))
@@ -232,7 +232,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
   if (docdb_exists(src, key, value, ...)) existsMessage(key)
 
   # directly import ndjson file
-  if ((isa(value, "character")) &&
+  if ((all(class(value) %in% "character")) &&
       (length(value)  == 1L) &&
       (isUrl(value) || isFile(value))) {
 
@@ -364,7 +364,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if (isa(value, "character") && (length(value)  == 1L) &&
+    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
@@ -427,7 +427,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
       value <- value[, c("_id", "json"), drop = FALSE]
     }
     #
-    if (isa(value[["_id"]], "list")) {
+    if (all(class(value[["_id"]]) %in% "list")) {
       # in case fromJSON created the _id column as list
       value[["_id"]] <- unlist(value[["_id"]])
     }
@@ -496,7 +496,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
-    if (isa(value, "character") && (length(value)  == 1L) &&
+    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
       if (isFile(value)) {
         value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
@@ -559,7 +559,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
       value <- value[, c("_id", "json"), drop = FALSE]
     }
     #
-    if (isa(value[["_id"]], "list")) {
+    if (all(class(value[["_id"]]) %in% "list")) {
       # in case fromJSON created the _id column as list
       value[["_id"]] <- unlist(value[["_id"]])
     }
