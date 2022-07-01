@@ -1,3 +1,9 @@
+nodbi 0.8.1
+===========
+
+### Changes
+* replaced isa() as not available with R version 3.x
+
 nodbi 0.8.0
 ===========
 
