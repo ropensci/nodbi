@@ -603,6 +603,9 @@ isUrl <- function(x) {
 
 isFile <- function(x) {
   # check if x is the name of a readable file
-  out <- try(file.access(x, mode = 4) == 0L, silent = TRUE)
+  out <- try(
+    suppressWarnings(
+      file.access(x, mode = 4)) == 0L,
+    silent = TRUE)
   return(!inherits(out, "try-error") && out)
 }
