@@ -1,6 +1,7 @@
 
 # nodbi
 
+[![CRAN](https://cranchecks.info/badges/worst/nodbi)](https://cran.r-project.org/package=nodbi)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -19,28 +20,28 @@ function parameters and return values across all database backends.
 
 Currently, `nodbi` supports the following database backends:
 
--   MongoDB
--   SQLite
--   Elasticsearch
--   CouchDB
--   PostgreSQL (since v0.6.0)
+- MongoDB
+- SQLite
+- Elasticsearch
+- CouchDB
+- PostgreSQL (since v0.6.0)
 
 for an `R` object of any of these data types:
 
--   data.frame
--   list
--   JSON string
--   a file name or URL with NDJSON records\*
+- data.frame
+- list
+- JSON string
+- a file name or URL with NDJSON records\*
 
 and for executing the following operations:
 
--   List
--   Exists
--   Create
--   Get
--   Query\*\*
--   Update\*\*
--   Delete
+- List
+- Exists
+- Create
+- Get
+- Query\*\*
+- Update\*\*
+- Delete
 
 across all database backends. Limitations: \* Only `http(s)` and only
 for `docdb_create`. \*\*Only simple queries (e.g. equality for a single
@@ -364,13 +365,13 @@ testthat::test_local()
 
 ## Notes
 
--   Please [report any issues or
-    bugs](https://github.com/ropensci/nodbi/issues).
--   License: MIT
--   Get citation information for `nodbi` in R doing
-    `citation(package = 'nodbi')`
--   Please note that this package is released with a [Contributor Code
-    of Conduct](https://ropensci.org/code-of-conduct/). By contributing
-    to this project, you agree to abide by its terms.
--   Support for redis has been removed since version 0.5, because no way
-    was found to query and update specific documents in a container.
+- Please [report any issues or
+  bugs](https://github.com/ropensci/nodbi/issues).
+- License: MIT
+- Get citation information for `nodbi` in R doing
+  `citation(package = 'nodbi')`
+- Please note that this package is released with a [Contributor Code of
+  Conduct](https://ropensci.org/code-of-conduct/). By contributing to
+  this project, you agree to abide by its terms.
+- Support for redis has been removed since version 0.5, because no way
+  was found to query and update specific documents in a container.

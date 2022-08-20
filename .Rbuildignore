@@ -18,3 +18,4 @@ man-roxygen
 .lintr
 ^CRAN-RELEASE$
 ^CRAN-SUBMISSION$
+^docs

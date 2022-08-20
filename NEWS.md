@@ -1,9 +1,14 @@
+nodbi 0.8.1.9000
+================
+
+### Changes
+* suppressed warnings when checking if a string points to a file
+
 nodbi 0.8.1
 ===========
 
 ### Changes
 * replaced isa() as not available with R version 3.x
-* suppressed warnings when checking if a string points to a file
 
 nodbi 0.8.0
 ===========

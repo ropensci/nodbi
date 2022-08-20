@@ -4,7 +4,7 @@ Description: Simplified document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1' and 'PostgreSQL'.
-Version: 0.8.1
+Version: 0.8.1.9000
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -41,7 +41,7 @@ Imports:
 Suggests:
     testthat,
     withr
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org
