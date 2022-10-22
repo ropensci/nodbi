@@ -11,6 +11,7 @@
 #' - Elasticsearch: [elastic::Search()]
 #' - CouchDB: [sofa::db_alldocs()]
 #' - PostgreSQL: ignored
+#' - DuckDB: ignored
 #'
 #' @return (logical) success of operation. Typically \code{TRUE} if document
 #' or collection existed and \code{FALSE} is document did not exist or
@@ -128,55 +129,29 @@ docdb_delete.src_mongo <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_sqlite <- function(src, key, ...) {
-  assert(key, "character")
 
-  # make dotted parameters accessible
-  tmpdots <- list(...)
+  return(sqlDelete(src = src, key = key, ...))
 
-  # if valid query, delete document(s), not table
-  if (!is.null(tmpdots$query) &&
-      jsonlite::validate(tmpdots$query)) {
-
-    # get _id's of document(s) to be deleted
-    tmpids <- docdb_query(
-      src = src,
-      key = key,
-      query = tmpdots$query,
-      fields = '{"_id": 1}')[["_id"]]
-
-    # document delete
-    statement <- paste0(
-      "DELETE FROM \"", key, "\" WHERE _id IN (",
-      paste0('"', tmpids, '"', collapse = ","), ");")
-
-    # do delete
-    docdb_exists(src, key) &&
-      as.logical(
-        dbWithTransaction(
-          src$con, {
-            DBI::dbExecute(
-              conn = src$con,
-              statement = statement)
-          }))
-
-  } else {
-
-    # remove table and handle error
-    # if table does not exist
-    docdb_exists(src, key) &&
-      dbWithTransaction(
-        src$con, {
-          DBI::dbRemoveTable(
-            conn = src$con,
-            name = key)
-        })
-
-  }
 }
 
 #' @export
 docdb_delete.src_postgres <- function(src, key, ...) {
-  assert(key, "character")
+
+  return(sqlDelete(src = src, key = key, ...))
+
+}
+
+#' @export
+docdb_delete.src_duckdb <- function(src, key, ...) {
+
+  return(sqlDelete(src = src, key = key, ...))
+
+}
+
+## helpers --------------------------------------
+
+#' @export
+sqlDelete <- function(src, key, ...) {
 
   # make dotted parameters accessible
   tmpdots <- list(...)
@@ -198,18 +173,18 @@ docdb_delete.src_postgres <- function(src, key, ...) {
       paste0("'", tmpids, "'", collapse = ","), ");")
 
     # do delete
-    docdb_exists(src, key) &&
+    return(docdb_exists(src, key) &&
       as.logical(
         DBI::dbWithTransaction(
           src$con, {
             DBI::dbExecute(
               conn = src$con,
               statement = statement)
-          }))
+          })))
 
   } else {
 
-    docdb_exists(src, key) &&
+    return(docdb_exists(src, key) &&
       # remove table
       as.logical(
         DBI::dbWithTransaction(
@@ -217,7 +192,8 @@ docdb_delete.src_postgres <- function(src, key, ...) {
             DBI::dbRemoveTable(
               conn = src$con,
               name = key)
-          }))
+          })))
 
   }
+
 }

@@ -8,6 +8,7 @@
 #' - Elasticsearch: [elastic::index_exists()]
 #' - CouchDB: [sofa::db_info()]
 #' - PostgreSQL: [DBI::dbListTables()]
+#' - DuckDB: [DBI::dbListTables()]
 #'
 #' @return (logical) `TRUE` or `FALSE` to indicate
 #'  existence of container \code{key} in database
@@ -58,5 +59,10 @@ docdb_exists.src_sqlite <- function(src, key, ...) {
 
 #' @export
 docdb_exists.src_postgres <- function(src, key, ...) {
+  return(any(key == DBI::dbListTables(src$con, ...)))
+}
+
+#' @export
+docdb_exists.src_duckdb <- function(src, key, ...) {
   return(any(key == DBI::dbListTables(src$con, ...)))
 }

@@ -27,6 +27,7 @@ Other parameters are passed on to functions:
 \item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
 \item CouchDB: \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
 \item PostgreSQL: ignored
+\item DuckDB: ignored
 }}
 }
 \value{

@@ -41,7 +41,8 @@ Any _id's in \code{value} will be used as _id's and primary index
 in the database. If there are no _id's in \code{value},
 row names (if any exist) will be used as _id's,
 or random _id's will be created (using
-\code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE}).
+\code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE} for
+SQLite und PostgreSQL, and DuckDB's built-in \code{uuid()}).
 
 A warning is emitted if a document(s) with _id's already
 exist in \code{value} and that document in \code{value} is not newly

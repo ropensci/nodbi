@@ -17,6 +17,7 @@
 #' - MongoDB: [mongolite::mongo()]
 #' - SQLite: ignored
 #' - PostgreSQL: ignored
+#' - DuckDB: ignored
 #'
 #' @return (integer) Number of successfully updated documents
 #'
@@ -218,44 +219,38 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 #' @export
 docdb_update.src_sqlite <- function(src, key, value, query, ...) {
 
-  # data frame to json
-  if (all(class(value) %in% "data.frame")) {
-    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
-  }
-  # list to json
-  if (all(class(value) %in% "list")) {
-    value <- jsonify::to_json(value, unbox = TRUE)
-  }
-
-  # get docs to update
-  ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
-
   # SQL for patching, see https://www.sqlite.org/json1.html#jpatch
-  statement <- paste0(
-    'UPDATE "', key, '" SET json = json_patch(json,\'',
-    value, '\') WHERE _id IN (',
-    paste0('"', ids, '"', collapse = ","), ');'
-  )
+  updFunction <- "json_patch"
 
-  # update data
-  result <- try(
-    dbWithTransaction(
-      src$con, {
-        DBI::dbExecute(
-          conn = src$con,
-          statement = statement
-        )
-      }),
-    silent = TRUE)
-
-  # return
-  return(result)
+  return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
 
 }
 
 #' @export
 docdb_update.src_postgres <- function(src, key, value, query, ...) {
 
+  # Since PostgreSQL has no internal function,
+  # uses function inserted by nodbi::src_postgres
+  updFunction <- "jsonb_merge_patch"
+
+  return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
+
+}
+
+#' @export
+docdb_update.src_duckdb <- function(src, key, value, query, ...) {
+
+  # see https://duckdb.org/docs/extensions/json#json-creation-functions
+  updFunction <- "json_merge_patch"
+
+return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
+
+}
+
+## helpers --------------------------------------
+
+sqlUpdate <- function(src, key, value, query, updFunction) {
+
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
     value <- jsonify::to_json(value, by = "col", unbox = TRUE)
@@ -268,23 +263,23 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
   # get docs to update
   ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
 
-  # Since PostgreSQL has no internal function,
-  # uses a function inserted by src_postgres
+  # compose statement
   statement <- paste0(
-    'UPDATE "', key, '" SET json = jsonb_merge_patch(json,\'',
-    value, "') WHERE _id IN (",
-    paste0("'", ids, "'", collapse = ","), ");"
+    'UPDATE "', key, '" SET json = ', updFunction, '(json,\'',
+    value, '\') WHERE _id IN (',
+    paste0("'", ids, "'", collapse = ","), ');'
   )
 
   # update data
   result <- try(
-    DBI::dbWithTransaction(
-      src$con, {
-        DBI::dbExecute(
-          conn = src$con,
-          statement = statement
-        )
-      }),
+    # DBI::dbWithTransaction(
+    # src$con, {
+    DBI::dbExecute(
+      conn = src$con,
+      statement = statement
+    )
+    # })
+    ,
     silent = TRUE)
 
   # return

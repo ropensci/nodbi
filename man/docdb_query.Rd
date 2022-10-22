@@ -27,7 +27,8 @@ Main functions used per database:
 \item SQLite: SQL query using \code{json_tree()}
 \item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
 \item CouchDB: \code{\link[sofa:db_query]{sofa::db_query()}}
-\item PostgreSQL: SQL query using \code{jsonb_build_object()}
+\item PostgreSQL: SQL query using built-in \code{jsonb_build_object()}
+\item DuckDB: SQL using built-in \code{json_extract()}
 }}
 }
 \value{

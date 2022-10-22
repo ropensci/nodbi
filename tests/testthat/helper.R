@@ -17,11 +17,21 @@ testDf2 <- iris  # no rownames
 # factors cannot be expected to be maintained
 testDf2[["Species"]] <- as.character(testDf2[["Species"]])
 
+testDf3 <- data.frame(
+  json = strsplit(jsonify::to_ndjson(jsonify::from_json(contacts)), split = "\n")[[1]],
+  stringsAsFactors = FALSE)
+
+testDf4 <- data.frame(
+  `_id` = uuid::UUIDgenerate(n = nrow(testDf3)),
+  `json` = strsplit(jsonify::to_ndjson(jsonify::from_json(contacts)), split = "\n")[[1]],
+  stringsAsFactors = FALSE,
+  check.names = FALSE)
+
+
 testJson <- contacts # has _id's
 testJson2 <- mapdata # no _id's
 
 testList <- jsonlite::fromJSON(mapdata, simplifyVector = FALSE)
-
 
 testFile <- function(..., env = parent.frame()) {
   testFile <- tempfile(fileext = ".ndjson")
@@ -96,3 +106,9 @@ skip_if_no_postgres <- function() {
   RPostgres::dbDisconnect(tmp$con)
 }
 
+skip_if_no_duckdb <- function() {
+  testthat::skip_if_not_installed("duckdb")
+  if (inherits(try(src_duckdb(), silent = TRUE), "try-error")) {
+    skip("duckdb is not available")
+  }
+}

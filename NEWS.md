@@ -1,3 +1,9 @@
+nodbi 0.8.1.9001
+================
+
+### Changes
+* adding support for duckdb
+
 nodbi 0.8.1.9000
 ================
 

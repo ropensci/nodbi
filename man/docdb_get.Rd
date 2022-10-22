@@ -17,9 +17,9 @@ or \code{\link[=src_postgres]{src_postgres()}}}
 a table name for SQLite and for PostgreSQL)}
 
 \item{limit}{(integer) Maximum number of documents
-to return (defaults to all for MongoDB,
-all for SQLite, 10,000 for Elasticsearch,
-all for CouchDB, and all for PostgreSQL}
+to return (defaults 10,000 for Elasticsearch and
+all for MongoDB, SQLite, CouchDB, PostgreSQL, and
+DuckDB}
 
 \item{...}{Passed on to functions:
 \itemize{
@@ -28,6 +28,7 @@ all for CouchDB, and all for PostgreSQL}
 \item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
 \item CouchDB: \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
 \item PostgreSQL: ignored
+\item DuckDB: ignored
 }}
 }
 \value{

@@ -8,6 +8,7 @@
 #' - Elasticsearch: [elastic::aliases_get()]
 #' - CouchDB: [sofa::db_info()]
 #' - PostgreSQL: [DBI::dbListTables()]
+#' - DuckDB: [DBI::dbListTables()]
 #'
 #' @return (vector) of names of containers that can be
 #' used as parameter `key` with other functions such as
@@ -70,6 +71,13 @@ docdb_list.src_sqlite <- function(src, ...) {
 
 #' @export
 docdb_list.src_postgres <- function(src, ...) {
+
+  return(DBI::dbListTables(src$con, ...))
+
+}
+
+#' @export
+docdb_list.src_duckdb <- function(src, ...) {
 
   return(DBI::dbListTables(src$con, ...))
 

@@ -24,7 +24,8 @@ Currently, `nodbi` supports the following database backends:
 - SQLite
 - Elasticsearch
 - CouchDB
-- PostgreSQL (since v0.6.0)
+- PostgreSQL (since nodbi v0.6.0)
+- duckdb (since nodbi v0.8.1.9001)
 
 for an `R` object of any of these data types:
 
@@ -100,6 +101,16 @@ Overview on parameters and aspects that are specific to the database
 backend. These are only needed once: for `src_*()` to create a
 connection object. The connection object is subsequently used with
 `docdb_*` functions.
+
+### DuckDB
+
+``` r
+# install with
+install.packages('duckdb', repos = c('https://duckdb.r-universe.dev', 'https://cloud.r-project.org'))
+
+# connect
+nodbi::src_duckdb(dbdir = ":memory:", ...)
+```
 
 ### MongoDB
 
@@ -180,55 +191,55 @@ src <- src_couchdb()
 # load data (here data frame, alternatively list or JSON)
 # into the container "my_container" specified in the "key" parameter
 docdb_create(src, key = "my_container", value = mtcars)
-#> [1] 32
+# [1] 32
 
 # load additionally 98 NDJSON records
 docdb_create(src, key = "my_container", "http://httpbin.org/stream/98")
-#> Note: container 'my_container' already exists
-#> [1] 98
+# Note: container 'my_container' already exists
+# [1] 98
 
 # load additionally contacts JSON data, from package nodbi
 docdb_create(src, key = "my_container", contacts)
-#> Note: container 'my_container' already exists
-#> [1] 5
+# Note: container 'my_container' already exists
+# [1] 5
 
 # get all documents, irrespective of schema
 dplyr::tibble(docdb_get(src, "my_container"))
-#> A tibble: 135 × 27
-#>    `_id`       isActive balance   age eyeColor name  email about registered tags   friends url  
-#>    <chr>       <lgl>    <chr>   <int> <chr>    <chr> <chr> <chr> <chr>      <list> <list>  <chr>
-#>  1 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <chr>  <df>    NA   
-#>  2 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <chr>  <df>    NA   
-#>  3 5cd6785325… TRUE     $1,161…    22 brown    Pace… pace… Eius… 2018-08-1… <chr>  <df>    NA   
-#>  4 5cd6785335… FALSE    $2,579…    30 brown    Will… will… Null… 2018-02-1… <chr>  <df>    NA   
-#>  5 5cd67853f8… FALSE    $3,808…    23 green    Lacy… lacy… Sunt… 2014-08-0… <chr>  <df>    NA   
-#>  6 6529d28a-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
-#>  7 6529d2a8-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
-#>  8 6529d2b2-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
-#>  9 6529d2c6-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
-#> 10 6529d2d0-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
-#> # … with 125 more rows, and 15 more variables: args <named list>, headers <df[,4]>,
-#> #   origin <chr>, id <int>, mpg <dbl>, cyl <dbl>, disp <dbl>, hp <dbl>, drat <dbl>, wt <dbl>,
-#> #   qsec <dbl>, vs <dbl>, am <dbl>, gear <dbl>, carb <dbl>
+# A tibble: 135 × 27
+#    `_id`       isActive balance   age eyeColor name  email about registered tags   friends url  
+#    <chr>       <lgl>    <chr>   <int> <chr>    <chr> <chr> <chr> <chr>      <list> <list>  <chr>
+#  1 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <chr>  <df>    NA   
+#  2 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <chr>  <df>    NA   
+#  3 5cd6785325… TRUE     $1,161…    22 brown    Pace… pace… Eius… 2018-08-1… <chr>  <df>    NA   
+#  4 5cd6785335… FALSE    $2,579…    30 brown    Will… will… Null… 2018-02-1… <chr>  <df>    NA   
+#  5 5cd67853f8… FALSE    $3,808…    23 green    Lacy… lacy… Sunt… 2014-08-0… <chr>  <df>    NA   
+#  6 6529d28a-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#  7 6529d2a8-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#  8 6529d2b2-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+#  9 6529d2c6-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+# 10 6529d2d0-c… NA       NA         NA NA       NA    NA    NA    NA         <NULL> <NULL>  http…
+# # … with 125 more rows, and 15 more variables: args <named list>, headers <df[,4]>,
+# #   origin <chr>, id <int>, mpg <dbl>, cyl <dbl>, disp <dbl>, hp <dbl>, drat <dbl>, wt <dbl>,
+# #   qsec <dbl>, vs <dbl>, am <dbl>, gear <dbl>, carb <dbl>
 
 # query some documents
 # *note*: such complex queries do not yet work with src_elasticsearch()
 docdb_query(src, "my_container", query = '{"mpg": {"$gte": 30}}')
-#>              _id mpg cyl disp  hp drat  wt qsec vs am gear carb
-#> 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1
-#> 2    Honda Civic  30   4   76  52  4.9 1.6   19  1  1    4    2
-#> 3   Lotus Europa  30   4   95 113  3.8 1.5   17  1  1    5    2
-#> 4 Toyota Corolla  34   4   71  65  4.2 1.8   20  1  1    4    1
+#              _id mpg cyl disp  hp drat  wt qsec vs am gear carb
+# 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1
+# 2    Honda Civic  30   4   76  52  4.9 1.6   19  1  1    4    2
+# 3   Lotus Europa  30   4   95 113  3.8 1.5   17  1  1    5    2
+# 4 Toyota Corolla  34   4   71  65  4.2 1.8   20  1  1    4    1
 
 # query some fields from some documents; 'query' is a mandatory 
 # parameter and is used here in its position in the signature
 # *note*: such complex queries do not yet work with src_elasticsearch()
 docdb_query(src, "my_container", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "mpg": 1}')
-#>    wt mpg
-#> 1 2.2  32
-#> 2 1.6  30
-#> 3 1.5  30
-#> 4 1.8  34
+#    wt mpg
+# 1 2.2  32
+# 2 1.6  30
+# 3 1.5  30
+# 4 1.8  34
 
 # query some subitem fields from some documents
 # (only simple queries so far implemented for Elasticsearch)
@@ -238,29 +249,29 @@ str(docdb_query(src, "my_container", '
  {"$or": [{"age": {"$lt": 21}}, 
  {"friends.name": {"$regex": "^B[a-z]{3,6}.*"}}]}', 
  fields = '{"age": 1, "friends.name": 1}'))
-#> 'data.frame':    4 obs. of 2 variables:
-#> $ age : int 20 20 22 23
-#> $ friends:'data.frame':  4 obs. of 1 variable:
-#> ..$ name:List of 4
-#> .. ..$ : chr "Pace Bell"
-#> .. ..$ : chr "Yang Yates" "Lacy Chen"
-#> .. ..$ : chr "Baird Keller" "Francesca Reese" "Dona Bartlett"
-#> .. ..$ : chr "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
+# 'data.frame': 4 obs. of 2 variables:
+# $ age : int 20 20 22 23
+# $ friends:'data.frame':   4 obs. of 1 variable:
+# ..$ name:List of 4
+# .. ..$ : chr "Pace Bell"
+# .. ..$ : chr "Yang Yates" "Lacy Chen"
+# .. ..$ : chr "Baird Keller" "Francesca Reese" "Dona Bartlett"
+# .. ..$ : chr "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
 
 # such queries can also be used for updating (patching) selected documents 
 # with a new 'value'(s) from a JSON string, a data frame or a list
 docdb_update(src, "my_container", value = '{"vs": 9, "xy": [1, 2]}', query = '{"carb": 3}')
-#> [1] 3
+# [1] 3
 # *note*: such queries do not yet work with src_elasticsearch()
 docdb_query(src, "my_container", '{"carb": {"$in": [1,3]}}', fields = '{"vs": 1}')[[1]]
-#> [1] 1 1 1 1 9 9 9 1 1 1
+# [1] 1 1 1 1 9 9 9 1 1 1
 docdb_get(src, "my_container")[126:130, c(1, 27, 28)]
-#>                  _id carb   xy
-#> 126        Merc 280C    4 NULL
-#> 127       Merc 450SE    3 1, 2
-#> 128       Merc 450SL    3 1, 2
-#> 129      Merc 450SLC    3 1, 2
-#> 130 Pontiac Firebird    2 NULL
+#                  _id carb   xy
+# 126        Merc 280C    4 NULL
+# 127       Merc 450SE    3 1, 2
+# 128       Merc 450SL    3 1, 2
+# 129      Merc 450SLC    3 1, 2
+# 130 Pontiac Firebird    2 NULL
 
 # use with dplyr
 # *note* that dplyr includes a (deprecated) function src_sqlite
@@ -270,25 +281,25 @@ library("dplyr", exclude = c("src_sqlite", "src_postgres"))
 docdb_get(src, "my_container") %>%
  group_by(gear) %>%
  summarise(mean_mpg = mean(mpg))
-#> # A tibble: 4 × 2
-#>    gear mean_mpg
-#>   <dbl>    <dbl>
-#> 1     3     16.1
-#> 2     4     24.5
-#> 3     5     21.4
-#> 4    NA     NA
+# # A tibble: 4 × 2
+#    gear mean_mpg
+#   <dbl>    <dbl>
+# 1     3     16.1
+# 2     4     24.5
+# 3     5     21.4
+# 4    NA     NA
 
 # delete documents; query is optional parameter and has to be 
 # specified for deleting documents instead of deleting the container
 # *note*: such complex queries does not yet work with src_couchdb() or src_elasticsearch()
 docdb_delete(src, "my_container", query = '{"$or": {"gear": 5, "age": {"$gte": 22}}}')
-#> TRUE
+# TRUE
 nrow(docdb_get(src, "my_container"))
-#> [1] 127
+# [1] 127
 
 # delete container from database
 docdb_delete(src, "my_container")
-#> [1] TRUE
+# [1] TRUE
 ```
 
 ## Benchmark
@@ -301,16 +312,16 @@ srcSqlite <- src_sqlite()
 srcElastic <- src_elastic()
 srcCouchdb <- src_couchdb(user = Sys.getenv("COUCHDB_TEST_USER"), pwd = Sys.getenv("COUCHDB_TEST_PWD"))
 srcPostgres <- src_postgres()
+srcDuckdb <- src_duckdb()
 
 key <- "test"
 query <- '{"clarity": "SI1"}'
 fields <- '{"cut": 1, "_id": 1, "clarity": "1"}'
 value <- '{"clarity": "XYZ", "new": ["ABC", "DEF"]}'
-data <- as.data.frame(diamonds)[1:12000, ]
+data <- as.data.frame(diamonds)[1:8000, ]
 
 testFunction <- function(src, key, value, query, fields) {
  docdb_create(src, key, data)
- # Elasticsearch needs a delay to process the data
  docdb_create(src, key, "http://httpbin.org/stream/89")
  # Elasticsearch needs a delay to process the data
  if (inherits(src, "src_elastic")) Sys.sleep(1)
@@ -320,23 +331,26 @@ testFunction <- function(src, key, value, query, fields) {
  docdb_delete(src, key)
 }
 
-#> 2022-05-04 with 2015 mobile hardware 
-#> without any database optimisations
+# 2022-10-22 with 2015 mobile hardware 
+# without any database optimisations
 rbenchmark::benchmark(
  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
  RSQLite = testFunction(src = srcSqlite, key, value, query, fields),
  Elastic = testFunction(src = srcElastic, key, value, query, fields),
  CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
  PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
+ DuckDB = testFunction(src = srcDuckdb, key, value, query, fields),
  replications = 10L,
  columns = c('test', 'replications', 'elapsed')
 )
-#>         test replications elapsed
-#> 4    CouchDB           10    1639
-#> 3    Elastic           10     183 # 10s to be subtracted
-#> 1    MongoDB           10      74
-#> 5 PostgreSQL           10      81
-#> 2    RSQLite           10      76
+
+#         test replications elapsed
+# 4    CouchDB           10    1006
+# 3    Elastic           10     155 # 10s to be subtracted
+# 5 PostgreSQL           10      49
+# 2    RSQLite           10      45
+# 6     DuckDB           10      46
+# 1    MongoDB           10      43
 ```
 
 ## Testing
@@ -344,23 +358,29 @@ rbenchmark::benchmark(
 ``` r
 testthat::test_local()
 # ✔ | F W S  OK | Context
-# ✔ |        84 | couchdb [90.8s]                                                                             
-# ✔ |     1  62 | elastic [68.9s]                                                                             
-# ────────────────────────────────────────────────────────────────────────────────────────────────────────────
-# Skip (core-nodbi.R:138:3): docdb_query
+# ✔ |        90 | couchdb [100.1s]                                               
+# ✔ |     1  82 | duckdb [2.5s]                                                  
+# ───────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:205): docdb_update, docdb_query
+# Reason: updates do not yet work since query has issues converting number types
+# ───────────────────────────────────────────────────────────────────────────────
+# ✔ |     1  61 | elastic [75.2s]                                                
+# ───────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:154): docdb_query
 # Reason: queries need to be translated into elastic syntax
-# ────────────────────────────────────────────────────────────────────────────────────────────────────────────
-# ✔ |        84 | mongodb [4.4s]                                                                              
-# ✔ |        83 | postgres [7.2s]                                                                             
-# ✔ |        84 | sqlite [4.2s]                                                                               
+# ───────────────────────────────────────────────────────────────────────────────
+# ✔ |        95 | mongodb [4.4s]                                                 
+# ✔ |        95 | postgres [7.5s]                                                
+# ✔ |        94 | sqlite [4.4s]                                                  
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════════════════════════
-# Duration: 175.5 s
+# ══ Results ════════════════════════════════════════════════════════════════════
+# Duration: 194.5 s
 # 
-# ── Skipped tests  ──────────────────────────────────────────────────────────────────────────────────────────
+# ── Skipped tests  ─────────────────────────────────────────────────────────────
 # • queries need to be translated into elastic syntax (1)
+# • updates do not yet work since query has issues converting number types (1)
 # 
-# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 397 ]
+# [ FAIL 0 | WARN 0 | SKIP 2 | PASS 517 ]
 ```
 
 ## Notes

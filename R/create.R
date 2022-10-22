@@ -7,7 +7,8 @@
 #' in the database. If there are no _id's in `value`,
 #' row names (if any exist) will be used as _id's,
 #' or random _id's will be created (using
-#' [uuid::UUIDgenerate()] with \code{use.time = TRUE}).
+#' [uuid::UUIDgenerate()] with \code{use.time = TRUE} for
+#' SQLite und PostgreSQL, and DuckDB's built-in `uuid()`).
 #'
 #' A warning is emitted if a document(s) with _id's already
 #' exist in `value` and that document in `value` is not newly
@@ -337,19 +338,16 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
     # standard for a nodbi json table in sqlite
     # standard: columns _id and json
-    dbWithTransaction(
-      src$con, {
-        DBI::dbExecute(
-          conn = src$con,
-          statement = paste0("CREATE TABLE \"", key, "\"",
-                             " ( _id TEXT PRIMARY_KEY NOT NULL,",
-                             "  json JSON);"))
-        DBI::dbExecute(
-          conn = src$con,
-          statement = paste0("CREATE UNIQUE INDEX ",
-                             "\"", key, "_index\" ON ",
-                             "\"", key, "\" ( _id );"))
-      })
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0("CREATE TABLE \"", key, "\"",
+                         " ( _id TEXT PRIMARY_KEY NOT NULL,",
+                         "  json JSON);"))
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0("CREATE UNIQUE INDEX ",
+                         "\"", key, "_index\" ON ",
+                         "\"", key, "\" ( _id );"))
   } else {
     existsMessage(key)
   }
@@ -468,20 +466,17 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
     # standard for a nodbi json table in PostgreSQL
     # standard: columns _id and json
-    DBI::dbWithTransaction(
-      src$con, {
-        DBI::dbExecute(
-          conn = src$con,
-          statement = paste0("CREATE TABLE \"", key, "\"",
-                             " ( _id TEXT PRIMARY KEY,",
-                             "  json JSONB);"))
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0("CREATE TABLE \"", key, "\"",
+                         " ( _id TEXT PRIMARY KEY,",
+                         "  json JSONB);"))
 
-        DBI::dbExecute(
-          conn = src$con,
-          statement = paste0("CREATE UNIQUE INDEX ",
-                             "\"", key, "_index\" ON ",
-                             "\"", key, "\" ( _id );"))
-      })
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0("CREATE UNIQUE INDEX ",
+                         "\"", key, "_index\" ON ",
+                         "\"", key, "\" ( _id );"))
   } else {
     existsMessage(key)
   }
@@ -590,6 +585,164 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
 }
 
+#' @export
+docdb_create.src_duckdb <- function(src, key, value, ...) {
+
+  # if table does not exist, create one
+  if (!docdb_exists(src, key, ...)) {
+
+    # standard for a nodbi json table in duckdb
+    # standard: columns _id and json
+    # dbWithTransaction(
+    #   src$con, {
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0(
+        "CREATE TABLE \"", key, "\"",
+        " ( _id TEXT PRIMARY KEY NOT NULL,",
+        "  json JSON);"))
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0(
+        "CREATE UNIQUE INDEX ",
+        "\"", key, "_index\" ON ",
+        "\"", key, "\" ( _id );"))
+    # })
+  } else {
+    existsMessage(key)
+  }
+
+  # alternatives:
+  # - write out as ndjson and import (move up), low memory, but speed?
+  # - convert to df and AppendTable, memory, speed?
+  # => test
+
+  # if value is not a file name, convert value
+  # into ndjson and keep filename in value
+  if (!isFile(value)) {
+
+    # temporary file and connection
+    tfname <- tempfile()
+    tfnameCon <- file(tfname, open = "wt", encoding = "native.enc")
+    # register to close and remove file after used for streaming
+    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+    on.exit(unlink(tfname), add = TRUE)
+
+    # if json in character vector
+    if ((all(class(value) %in% "character")) &&
+        (length(value)  == 1L) &&
+        jsonify::validate_json(value)) {
+      # convert to list
+      # value <- jsonify::from_json(value, simplify = FALSE)
+      # value <- jsonlite::fromJSON(txt = value, simplifyVector = FALSE)
+      value <- jsonlite::fromJSON(txt = value, simplifyVector = TRUE)
+    }
+
+    # handle url
+    if (isUrl(value)) {
+      # converts to list
+      value <- jsonlite::stream_in(url(value), verbose = FALSE)
+    }
+
+    # handle data frame
+    if (inherits(value, "data.frame") &&
+        is.na(match("_id", names(value))) &&
+        !identical(rownames(value),
+                   as.character(seq_len(nrow(value))))) {
+      # use rownames as _id's and remove rownames
+      value[["_id"]] <- row.names(value)
+      row.names(value) <- NULL
+    }
+
+    # handle ready-made data frames
+    if (inherits(value, "data.frame") &&
+        identical(names(value),"json") &&
+        all(vapply(value[["json"]], jsonify::validate_json,
+                   logical(1L), USE.NAMES = FALSE))) {
+
+      if (!nrow(value)) return(0L)
+
+      writeLines(
+        text = value[["json"]],
+        con = tfnameCon,
+        sep = "\n",
+        useBytes = TRUE)
+
+    } else
+
+      # handle ready-made data frames with _id's
+      if (inherits(value, "data.frame") &&
+          identical(names(value), c("_id", "json")) &&
+          all(vapply(value[["json"]], jsonify::validate_json,
+                     logical(1L), USE.NAMES = FALSE))) {
+
+        if (!nrow(value)) return(0L)
+
+        writeLines(
+          text = sprintf(
+            '{"_id":%s, %s',
+            value[["_id"]],
+            # remove any _id's from json
+            gsub("(\"_id\":[^,]+?[,}])|(^[{])", "", value[["json"]])),
+          con = tfnameCon,
+          sep = "\n",
+          useBytes = TRUE)
+
+      } else {
+
+        if (!length(value) || # testing list
+            (is.character(value) && !nchar(value)) ||
+            (is.data.frame(value)) && !nrow(value)) return(0L)
+
+        # all else: write out
+        writeLines(
+          # time consuming
+          text = jsonify::to_ndjson(value, unbox = TRUE),
+          con = tfnameCon,
+          sep = "\n",
+          useBytes = TRUE)
+
+      } # handle ready-made data frames
+
+    # close
+    close(tfnameCon)
+
+    # make value the file name
+    value <- tfname
+
+  } # !isFile(value)
+
+  # import from ndjson file
+  result <- try(
+    suppressWarnings(
+      # dbWithTransaction(
+      # src$con, {
+      DBI::dbExecute(
+        conn = src$con,
+        statement = paste0(
+          "INSERT INTO \"", key, "\"",
+          " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
+          " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
+          " json_merge_patch(json, '{\"_id\": null}') AS json ",
+          " FROM read_ndjson_objects('",
+          value, "');"))
+      # })
+    ),
+    silent = TRUE)
+
+  # prepare returns
+  if (inherits(result, "try-error")) {
+    error <- trimws(sub(".+: (.*?):.+", "\\1", result))
+    warning(
+      "Could not create some documents, reeason: ",
+      unique(error), call. = FALSE, immediate. = TRUE)
+    result <- 0L
+  }
+  return(result)
+
+}
+
+
 ## helpers --------------------------------------
 
 existsMessage <- function(k) {
@@ -598,11 +751,13 @@ existsMessage <- function(k) {
 
 isUrl <- function(x) {
   # check if x is may be an url
+  if (!is.atomic(x) || !inherits(x, "character")) return(FALSE)
   return(grepl("^https?://", x))
 }
 
 isFile <- function(x) {
   # check if x is the name of a readable file
+  if (!is.atomic(x) || !inherits(x, "character")) return(FALSE)
   out <- try(
     suppressWarnings(
       file.access(x, mode = 4)) == 0L,

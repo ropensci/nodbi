@@ -18,6 +18,7 @@ or \code{\link[=src_postgres]{src_postgres()}}}
 \item Elasticsearch: \code{\link[elastic:alias]{elastic::aliases_get()}}
 \item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
 \item PostgreSQL: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
+\item DuckDB: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 }}
 }
 \value{

@@ -3,9 +3,9 @@
 #' @inheritParams docdb_create
 #'
 #' @param limit (integer) Maximum number of documents
-#'  to return (defaults to all for MongoDB,
-#'  all for SQLite, 10,000 for Elasticsearch,
-#'  all for CouchDB, and all for PostgreSQL
+#'  to return (defaults 10,000 for Elasticsearch and
+#'  all for MongoDB, SQLite, CouchDB, PostgreSQL, and
+#'  DuckDB
 #'
 #' @param ... Passed on to functions:
 #' - MongoDB: find() in [mongolite::mongo()]
@@ -13,6 +13,7 @@
 #' - Elasticsearch: [elastic::Search()]
 #' - CouchDB: [sofa::db_alldocs()]
 #' - PostgreSQL: ignored
+#' - DuckDB: ignored
 #'
 #' @return Document(s) in a data frame
 #'
@@ -119,45 +120,37 @@ docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
     # canonical sorting in nodbi
     "ORDER BY _id ASC;")
 
-  # set limit if not null
-  n <- -1L
-  if (!is.null(limit)) n <- limit
-
-  # temporary file for streaming
-  tfname <- tempfile()
-  tfnameCon <- file(description = tfname, open = "wt", encoding = "native.enc")
-  # register to remove file after used for streaming
-  on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-  on.exit(unlink(tfname), add = TRUE)
-
-  # get data, write to file in ndjson format
-  writeLines(
-    # eliminate rows without any json
-    stats::na.omit(
-      DBI::dbGetQuery(
-        conn = src$con,
-        statement = statement,
-        n = n)[["json"]]),
-    con = tfnameCon,
-    sep = "\n",
-    useBytes = TRUE)
-  close(tfnameCon)
-
-  # stream in ndjson records
-  return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE))
-
+  return(sqlGet(src = src, key = key, limit = limit, statement = statement, ...))
 }
 
 #' @export
 docdb_get.src_postgres <- function(src, key, limit = NULL, ...) {
 
-  # query to return full json column as text
   statement <- paste0(
     "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json::TEXT, '{') ",
     "AS json FROM \"", key, "\" ",
     # canonical sorting in nodbi
     "ORDER BY _id ASC;")
 
+  return(sqlGet(src = src, key = key, limit = limit, statement = statement, ...))
+}
+
+#' @export
+docdb_get.src_duckdb <- function(src, key, limit = NULL, ...) {
+
+  statement <- paste0(
+    "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json, '{') ",
+    "AS json FROM \"", key, "\" ",
+    # canonical sorting in nodbi
+    "ORDER BY _id ASC;")
+
+  return(sqlGet(src = src, key = key, limit = limit, statement = statement, ...))
+}
+
+## helpers --------------------------------------
+
+sqlGet <- function(src, key, limit = NULL, statement, ...) {
+
   # set limit if not null
   n <- -1L
   if (!is.null(limit)) n <- limit
@@ -183,6 +176,7 @@ docdb_get.src_postgres <- function(src, key, limit = NULL, ...) {
   close(tfnameCon)
 
   # stream in ndjson records
-  return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE))
+  return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE)) # # friends.id friends.name
+  # return(jsonify::from_ndjson(tfname, simplify = TRUE)) # tags.1 tags.2 tags.3 tags.4 friends.id friends.name
 
 }

@@ -23,6 +23,7 @@ a table name for SQLite and for PostgreSQL)}
 \item Elasticsearch: \code{\link[elastic:indices]{elastic::index_exists()}}
 \item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
 \item PostgreSQL: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
+\item DuckDB: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 }}
 }
 \value{

@@ -29,6 +29,7 @@ or the file name or URL of NDJSON documents}
 \item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
 \item SQLite: ignored
 \item PostgreSQL: ignored
+\item DuckDB: ignored
 }}
 }
 \value{
