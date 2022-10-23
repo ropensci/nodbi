@@ -67,6 +67,7 @@ jobs:
       - name: Install pak
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          install.packages('duckdb', repos = c('https://duckdb.r-universe.dev'))
         shell: Rscript {0}
 
       - name: Cache R packages

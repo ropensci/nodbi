@@ -11,7 +11,9 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
   key <- tmp$testKey
   on.exit(try({
     docdb_delete(src = src, key = key)
-    rm(src)
+    if (any(c(inherits(src, "src_sqlite"), inherits(src, "src_postgres")))) DBI::dbDisconnect(src$con, shutdown = TRUE)
+    if (inherits(src, "src_duckdb")) duckdb::dbDisconnect(src$con, shutdown = TRUE)
+    rm(src, key, tmp)
   }, silent = TRUE), add = TRUE)
 
   # testDf
@@ -81,7 +83,9 @@ test_that("docdb_create (ndjson)", {
   key <- tmp$testKey
   on.exit(try({
     docdb_delete(src = src, key = key)
-    rm(src)
+    if (any(c(inherits(src, "src_sqlite"), inherits(src, "src_postgres")))) DBI::dbDisconnect(src$con, shutdown = TRUE)
+    if (inherits(src, "src_duckdb")) duckdb::dbDisconnect(src$con, shutdown = TRUE)
+    rm(src, key, tmp)
   }, silent = TRUE), add = TRUE)
 
   # get temporary local files with ndjson
@@ -109,7 +113,9 @@ test_that("docdb_query", {
   key <- tmp$testKey
   on.exit(try({
     docdb_delete(src = src, key = key)
-    rm(src)
+    if (any(c(inherits(src, "src_sqlite"), inherits(src, "src_postgres")))) DBI::dbDisconnect(src$con, shutdown = TRUE)
+    if (inherits(src, "src_duckdb")) duckdb::dbDisconnect(src$con, shutdown = TRUE)
+    rm(src, key, tmp)
   }, silent = TRUE), add = TRUE)
 
   # testJson
@@ -190,11 +196,12 @@ test_that("docdb_update, docdb_query", {
   key <- tmp$testKey
   on.exit(try({
     docdb_delete(src = src, key = key)
-    rm(src)
+    if (any(c(inherits(src, "src_sqlite"), inherits(src, "src_postgres")))) DBI::dbDisconnect(src$con, shutdown = TRUE)
+    if (inherits(src, "src_duckdb")) duckdb::dbDisconnect(src$con, shutdown = TRUE)
+    rm(src, key, tmp)
   }, silent = TRUE), add = TRUE)
 
   expect_equal(docdb_create(src = src, key = key, value = testDf), nrow(testDf))
-
   if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
 
   # tests0
@@ -202,7 +209,7 @@ test_that("docdb_update, docdb_query", {
   if (!inherits(src, "src_elastic")) expect_true(all(docdb_query(src, key, query = '{"gear": {"$in": [5,4]}}', fields = '{"vs": 1}')[["vs"]] == 77L))
 
   # note
-  if (inherits(src, "src_duckdb")) skip("updates do not yet work since query has issues converting number types")
+  if (inherits(src, "src_duckdb")) skip("updates with queries using = or regexp for numbers do not yet work in duckdb, possibly due to type conversions")
 
   # tests1
   expect_equal(docdb_update(src = src, key = key, value = mtcars[3, 4:5], query = '{"gear": 3}'), 15L) # hp = 93, drat = 3.9

@@ -64,21 +64,15 @@ docdb_list.src_mongo <- function(src, ...) {
 
 #' @export
 docdb_list.src_sqlite <- function(src, ...) {
-
   return(DBI::dbListTables(src$con, ...))
-
 }
 
 #' @export
 docdb_list.src_postgres <- function(src, ...) {
-
   return(DBI::dbListTables(src$con, ...))
-
 }
 
 #' @export
 docdb_list.src_duckdb <- function(src, ...) {
-
   return(DBI::dbListTables(src$con, ...))
-
 }

@@ -1,10 +1,9 @@
 #' Document database connector
 #'
-#'
 #' Simplified document database access and manipulation,
 #' providing a common API across supported 'NoSQL' databases
 #' 'Elasticsearch', 'CouchDB', 'MongoDB' as well as
-#' 'SQLite/JSON1' and 'PostgreSQL'.
+#' 'SQLite/JSON1', 'PostgreSQL' and 'DuckDB'.
 #'
 #' @name nodbi-package
 #' @aliases nodbi

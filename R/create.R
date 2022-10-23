@@ -745,16 +745,22 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
 ## helpers --------------------------------------
 
+#' @keywords internal
+#' @noRd
 existsMessage <- function(k) {
   message(paste0("Note: container '", k, "' already exists"))
 }
 
+#' @keywords internal
+#' @noRd
 isUrl <- function(x) {
   # check if x is may be an url
   if (!is.atomic(x) || !inherits(x, "character")) return(FALSE)
   return(grepl("^https?://", x))
 }
 
+#' @keywords internal
+#' @noRd
 isFile <- function(x) {
   # check if x is the name of a readable file
   if (!is.atomic(x) || !inherits(x, "character")) return(FALSE)

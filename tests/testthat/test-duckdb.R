@@ -15,6 +15,7 @@ test_that("Source", {
   expect_is(tmp$testSrc, "docdb_src")
   expect_is(tmp$testSrc, "src_duckdb")
   expect_output(print(tmp$testSrc), "duckdb")
+  duckdb::dbDisconnect(tmp$testSrc$con, shutdown = TRUE)
   rm(tmp)
 
   # run generic (database independent) tests

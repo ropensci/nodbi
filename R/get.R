@@ -149,6 +149,8 @@ docdb_get.src_duckdb <- function(src, key, limit = NULL, ...) {
 
 ## helpers --------------------------------------
 
+#' @keywords internal
+#' @noRd
 sqlGet <- function(src, key, limit = NULL, statement, ...) {
 
   # set limit if not null

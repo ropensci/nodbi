@@ -19,7 +19,7 @@ src_duckdb <- function(
     dbdir = ':memory:',
     ...) {
 
-  con <- DBI::dbConnect(
+  con <- duckdb::dbConnect(
     drv = drv,
     dbdir = dbdir,
     ...
@@ -39,7 +39,7 @@ print.src_duckdb <- function(x, ...) {
 
   dbdir <- attr(attr(x$con, "driver"), "dbdir")
   size <- switch(dbdir,
-    ":memory:" = object.size(x),
+    ":memory:" = utils::object.size(x),
     file.size(dbdir))
 
   cat(sprintf(

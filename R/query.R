@@ -712,6 +712,8 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
 ## helpers --------------------------------------
 
+#' @keywords internal
+#' @noRd
 dbiGetProcessData <- function(
   statement, src, key, n, fields, subFields, rootFields, params,
   jqrSubsetFunction = NULL) {
@@ -874,6 +876,8 @@ dbiGetProcessData <- function(
 
 # converts json string into
 # string with sql fields
+#' @keywords internal
+#' @noRd
 json2fieldsSql <- function(x) {
 
   if (!jsonlite::validate(x)) stop("No json: ", x)
@@ -919,6 +923,8 @@ json2fieldsSql <- function(x) {
 
 # convert json query string to
 # string as part of sql WHERE
+#' @keywords internal
+#' @noRd
 json2querySql <- function(x) {#, con
 
   if (!jsonlite::validate(x)) stop("No json: ", x)
@@ -1024,6 +1030,8 @@ json2querySql <- function(x) {#, con
 
 # generate regular expressions for
 # fields so that fullkey matches
+#' @keywords internal
+#' @noRd
 fieldsSql2fullKey <- function(x) {
 
   # check e.g. if only fields = '{"_id": 1}'

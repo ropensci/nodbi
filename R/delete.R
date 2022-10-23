@@ -129,28 +129,23 @@ docdb_delete.src_mongo <- function(src, key, ...) {
 
 #' @export
 docdb_delete.src_sqlite <- function(src, key, ...) {
-
   return(sqlDelete(src = src, key = key, ...))
-
 }
 
 #' @export
 docdb_delete.src_postgres <- function(src, key, ...) {
-
   return(sqlDelete(src = src, key = key, ...))
-
 }
 
 #' @export
 docdb_delete.src_duckdb <- function(src, key, ...) {
-
   return(sqlDelete(src = src, key = key, ...))
-
 }
 
 ## helpers --------------------------------------
 
-#' @export
+#' @keywords internal
+#' @noRd
 sqlDelete <- function(src, key, ...) {
 
   # make dotted parameters accessible

@@ -249,6 +249,8 @@ return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction
 
 ## helpers --------------------------------------
 
+#' @keywords internal
+#' @noRd
 sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # data frame to json
@@ -272,14 +274,10 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # update data
   result <- try(
-    # DBI::dbWithTransaction(
-    # src$con, {
     DBI::dbExecute(
       conn = src$con,
       statement = statement
-    )
-    # })
-    ,
+    ),
     silent = TRUE)
 
   # return
