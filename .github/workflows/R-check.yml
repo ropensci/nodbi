@@ -66,7 +66,6 @@ jobs:
 
       - name: Install pak
         run: |
-          install.packages("duckdb", repos = "https://duckdb.r-universe.dev")
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
         shell: Rscript {0}
 
@@ -88,6 +87,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          utils::install.packages("duckdb", repos = "https://duckdb.r-universe.dev")
           pak::local_install_dev_deps()
           pak::pkg_install(c("rcmdcheck", "sofa", "elastic", "mongolite"))
         shell: Rscript {0}
