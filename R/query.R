@@ -860,9 +860,10 @@ dbiGetProcessData <- function(
   out <- out[, seq_len(ncol(out))[!sapply(out, function(r) all(is.na(r)))], drop = FALSE]
 
   # early return
-  if (identical(names(out), "_id")) return(out)
+  if (identical(names(out), "_id") || nrow(out) == 1L) return(out)
 
   # remove rows with all NAs except in _id
+  # apply requires more than 1 row data frame
   allEmpty <- unname(unlist(apply(
     out[, setdiff(names(out), "_id"), drop = FALSE], 1, function(r) {
       r <- unlist(r)
