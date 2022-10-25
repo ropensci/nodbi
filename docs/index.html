@@ -100,7 +100,7 @@
 <li>Delete</li>
 </ul>
 <p>across all database backends. Limitations: * Only <code>http(s)</code> and only for <code>docdb_create</code>. **Only simple queries (e.g. equality for a single field) and updates are supported for Elasticsearch at the moment. Only root fields can be specified for CouchDB, whereas subitems can be specified in dot notation for Elasticsearch, MongoDB, SQLite, PostgreSQL and DuckDB.</p>
-<p>For capabilities in terms of operations and parameter combinations across any of the database backends, see section <a href="#walk-through">walk-through</a> below and see the main file for package testing, here: <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>.</p>
+<p>For capabilities in terms of operations and parameter combinations across any of the database backends, see section <a href="#walk-through">walk-through</a> below and see the main file for package testing, here: <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>. See <a href="#benchmark">benchmark</a> below for comparisons of database backends.</p>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
@@ -253,13 +253,13 @@
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#</span></span>
-<span><span class="co"># parts of the example do not</span></span>
-<span><span class="co"># yet work these, see *notes*</span></span>
+<span><span class="co"># parts of the example do not yet work with </span></span>
+<span><span class="co"># these database backends, see *notes* below</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># load data (here data frame, alternatively list or JSON)</span></span>
-<span><span class="co"># into the container "my_container" specified in the "key" parameter</span></span>
+<span><span class="co"># into the container "my_container" specified in "key" parameter</span></span>
 <span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span>, value <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="co"># [1] 32</span></span>
 <span></span>
@@ -294,7 +294,6 @@
 <span></span>
 <span><span class="co"># query some documents</span></span>
 <span><span class="co"># *note*: such complex queries do not yet work with src_elasticsearch()</span></span>
-<span><span class="co"># *note*: queries with numbers may not work with src_duckdb()</span></span>
 <span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span>, query <span class="op">=</span> <span class="st">'{"mpg": {"$gte": 30}}'</span><span class="op">)</span></span>
 <span><span class="co">#              _id mpg cyl disp  hp drat  wt qsec vs am gear carb</span></span>
 <span><span class="co"># 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1</span></span>

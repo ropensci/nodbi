@@ -54,7 +54,8 @@ and DuckDB.
 For capabilities in terms of operations and parameter combinations
 across any of the database backends, see section
 [walk-through](#walk-through) below and see the main file for package
-testing, here: [core-nodbi.R](./tests/testthat/core-nodbi.R).
+testing, here: [core-nodbi.R](./tests/testthat/core-nodbi.R). See
+[benchmark](#benchmark) below for comparisons of database backends.
 
 ## Install
 
@@ -190,13 +191,13 @@ src <- src_mongo()
 src <- src_sqlite()
 src <- src_duckdb()
 #
-# parts of the example do not
-# yet work these, see *notes*
+# parts of the example do not yet work with 
+# these database backends, see *notes* below
 src <- src_elastic()
 src <- src_couchdb()
 
 # load data (here data frame, alternatively list or JSON)
-# into the container "my_container" specified in the "key" parameter
+# into the container "my_container" specified in "key" parameter
 docdb_create(src, key = "my_container", value = mtcars)
 # [1] 32
 
@@ -231,7 +232,6 @@ dplyr::tibble(docdb_get(src, "my_container"))
 
 # query some documents
 # *note*: such complex queries do not yet work with src_elasticsearch()
-# *note*: queries with numbers may not work with src_duckdb()
 docdb_query(src, "my_container", query = '{"mpg": {"$gte": 30}}')
 #              _id mpg cyl disp  hp drat  wt qsec vs am gear carb
 # 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1
