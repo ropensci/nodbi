@@ -32,14 +32,14 @@ Imports:
     jsonify,
     uuid,
     jqr,
+    DBI
+Suggests:
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
     RSQLite (>= 2.2.4),
     duckdb (>= 0.6.0),
     RPostgres,
-    DBI
-Suggests:
     testthat,
     withr
 RoxygenNote: 7.2.1

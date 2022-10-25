@@ -1,8 +1,8 @@
-nodbi 0.8.1.9001
+nodbi 0.9.0
 ================
 
 ### Changes
-* adding support for duckdb
+* adding support for duckdb (R package version 0.6.0 or higher) as database backend
 
 nodbi 0.8.1.9000
 ================
