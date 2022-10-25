@@ -589,11 +589,10 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   querySql <- json2querySql(query)
 
   # add query from subfields to include subfields
-  if (any(querySql != "") &&
-      any(grepl("[.]", sapply(querySql, "[[", 1)))) {
-    rootFields <- c(rootFields, sapply(
-      querySql, function(i) sub("\"?(.+?)[.].+", "\\1", i[1])))
-  }
+  rootFields <- unique(c(rootFields, unlist(sapply(
+    querySql[grepl("[.]", sapply(querySql, "[[", 1))],
+    function(i) sub("\"?(.+?)[.].+", "\\1", i[1])))
+  ))
 
   # https://duckdb.org/docs/extensions/json#json-extraction-functions
   # https://duckdb.org/docs/extensions/json#json-aggregate-functions
@@ -657,7 +656,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
               )), ") ELSE regexp_matches(json_extract(json, '$.", x[1], "'), '",
               sub("^REGEXP \"?(.+?)\"?$", "\\1", x[2]), "') END")),
             no = paste0(
-              "CASE WHEN json_type(json, '$.", x[1], "') = 'VARCHAR'",
+              "CASE WHEN json_type(json, '$.", x[1], "') IN ('VARCHAR', 'DOUBLE', 'BIGINT', 'UBIGINT') ",
               " THEN json_extract_string(json, '$.", x[1], "') ", gsub('"', "'", x[2]),
               " ELSE json_extract(json, '$.", x[1], "') ", gsub('"', "'", x[2]),
               " END")
@@ -736,15 +735,17 @@ dbiGetProcessData <- function(
       # protect against empty query result
       "",
       # eliminate rows without any json
-      stats::na.omit(
         DBI::dbGetQuery(
           conn = src$con,
           statement = statement,
-          n = n)[["json"]])),
+          n = n)[["json"]]),
     con = tfnameCon,
     sep = "\n",
     useBytes = TRUE)
   close(tfnameCon)
+
+  # early exit
+  if (file.size(tfname) <= 1L) return(NULL)
 
   # to implement WHERE where needed, run jq line-by-line
   if (!is.null(jqrSubsetFunction)) {
@@ -763,15 +764,15 @@ dbiGetProcessData <- function(
 
     # write data
     writeLines(
-      paste0(
-        "", # protect against no string
-        jqr::jq(file(tfname, encoding = "UTF-8"), jqFields)
-    ),
+      jqr::jq(file(tfname, encoding = "UTF-8"), jqFields),
       # to create ndjson
       con = tjnameCon,
       sep = "\n",
       useBytes = TRUE)
     close(tjnameCon)
+
+    # early exit
+    if (!file.size(tjname)) return(NULL)
 
     # swap file name
     tfname <- tjname
@@ -820,15 +821,15 @@ dbiGetProcessData <- function(
 
     # write data
     writeLines(
-      paste0(
-        "", # protect against no string
-        jqr::jq(file(tfname, encoding = "UTF-8"), jqFields)
-      ),
+      jqr::jq(file(tfname, encoding = "UTF-8"), jqFields),
       # to create ndjson
       con = tjnameCon,
       sep = "\n",
       useBytes = TRUE)
     close(tjnameCon)
+
+    # early exit
+    if (!file.size(tjname)) return(NULL)
 
     # swap file name
     tfname <- tjname
