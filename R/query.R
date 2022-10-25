@@ -735,10 +735,11 @@ dbiGetProcessData <- function(
       # protect against empty query result
       "",
       # eliminate rows without any json
+      stats::na.omit(
         DBI::dbGetQuery(
           conn = src$con,
           statement = statement,
-          n = n)[["json"]]),
+          n = n)[["json"]])),
     con = tfnameCon,
     sep = "\n",
     useBytes = TRUE)
