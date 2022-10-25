@@ -13,7 +13,7 @@
 
 ### Changes
 
- * replace isa() because it is not available with R version 3.x
+ * include DuckDB as new backend storage
 
 ## revdepcheck results
 

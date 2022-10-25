@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
@@ -78,7 +78,7 @@ or the file name or URL of NDJSON documents</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Passed to functions:</p><ul><li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_bulk_create.html" class="external-link">sofa::db_bulk_create()</a></code></p></li>
+<dd><p>Passed to functions:</p><ul><li><p>CouchDB: <code><a href="https://rdrr.io/pkg/sofa/man/db_bulk_create.html" class="external-link">sofa::db_bulk_create()</a></code></p></li>
 <li><p>Elasticsearch: <a href="https://docs.ropensci.org/elastic/reference/docs_bulk.html" class="external-link">elastic::docs_bulk</a></p></li>
 <li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
 <li><p>SQLite: ignored</p></li>
@@ -100,7 +100,8 @@ or the file name or URL of NDJSON documents</p></dd>
 in the database. If there are no _id's in <code>value</code>,
 row names (if any exist) will be used as _id's,
 or random _id's will be created (using
-<code><a href="https://rdrr.io/pkg/uuid/man/UUIDgenerate.html" class="external-link">uuid::UUIDgenerate()</a></code> with <code>use.time = TRUE</code>).</p>
+<code><a href="https://rdrr.io/pkg/uuid/man/UUIDgenerate.html" class="external-link">uuid::UUIDgenerate()</a></code> with <code>use.time = TRUE</code> for
+SQLite und PostgreSQL, and DuckDB's built-in <code>uuid()</code>).</p>
 <p>A warning is emitted if a document(s) with _id's already
 exist in <code>value</code> and that document in <code>value</code> is not newly
 created in the database; use <code><a href="docdb_update.html">docdb_update()</a></code> to update

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
@@ -81,8 +81,9 @@ be returned from anywhere in the tree (dot paths notation).</p>
 <p>Main functions used per database:</p><ul><li><p>MongoDB: find() in <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
 <li><p>SQLite: SQL query using <code>json_tree()</code></p></li>
 <li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/Search.html" class="external-link">elastic::Search()</a></code></p></li>
-<li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_query.html" class="external-link">sofa::db_query()</a></code></p></li>
-<li><p>PostgreSQL: SQL query using <code>jsonb_build_object()</code></p></li>
+<li><p>CouchDB: <code><a href="https://rdrr.io/pkg/sofa/man/db_query.html" class="external-link">sofa::db_query()</a></code></p></li>
+<li><p>PostgreSQL: SQL query using built-in <code>jsonb_build_object()</code></p></li>
+<li><p>DuckDB: SQL using built-in <code>json_extract()</code></p></li>
 </ul></dd>
 
 </dl></div>

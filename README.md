@@ -25,7 +25,7 @@ Currently, `nodbi` supports the following database backends:
 - Elasticsearch
 - CouchDB
 - PostgreSQL (since nodbi v0.6.0)
-- duckdb (since nodbi v0.8.1.9001)
+- DuckDB (since nodbi v0.9.0)
 
 for an `R` object of any of these data types:
 
@@ -48,8 +48,8 @@ across all database backends. Limitations: \* Only `http(s)` and only
 for `docdb_create`. \*\*Only simple queries (e.g. equality for a single
 field) and updates are supported for Elasticsearch at the moment. Only
 root fields can be specified for CouchDB, whereas subitems can be
-specified in dot notation for Elasticsearch, MongoDB, SQLite and
-PostgreSQL.
+specified in dot notation for Elasticsearch, MongoDB, SQLite, PostgreSQL
+and DuckDB.
 
 For capabilities in terms of operations and parameter combinations
 across any of the database backends, see section
@@ -109,14 +109,20 @@ connection object. The connection object is subsequently used with
 install.packages('duckdb', repos = c('https://duckdb.r-universe.dev', 'https://cloud.r-project.org'))
 
 # connect
-nodbi::src_duckdb(dbdir = ":memory:", ...)
+src <- nodbi::src_duckdb(dbdir = ":memory:", ...)
+
+# do disconnect and shutdown DuckDB
+DBI::dbDisconnect(src$con, shutdown = TRUE)
 ```
+
+See also <https://CRAN.R-project.org/package=duckdb> and
+<https://duckdb.org/docs/extensions/json>.
 
 ### MongoDB
 
 MongoDB but none of the other databases require to specify the container
 already in the `src_*()` function. “Container” refers to a MongoDB
-collection.
+collection. See <https://jeroen.github.io/mongolite/>.
 
 ``` r
 nodbi::src_mongo(
@@ -182,6 +188,7 @@ library(nodbi)
 src <- src_postgres()
 src <- src_mongo()
 src <- src_sqlite()
+src <- src_duckdb()
 #
 # parts of the example do not
 # yet work these, see *notes*
@@ -224,6 +231,7 @@ dplyr::tibble(docdb_get(src, "my_container"))
 
 # query some documents
 # *note*: such complex queries do not yet work with src_elasticsearch()
+# *note*: queries with numbers may not work with src_duckdb()
 docdb_query(src, "my_container", query = '{"mpg": {"$gte": 30}}')
 #              _id mpg cyl disp  hp drat  wt qsec vs am gear carb
 # 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1
@@ -244,19 +252,19 @@ docdb_query(src, "my_container", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "m
 # query some subitem fields from some documents
 # (only simple queries so far implemented for Elasticsearch)
 # (only root, not subitems so far implemented for CouchDB)
-# *note*: such complex queries do not yet work with src_elasticsearch()
-str(docdb_query(src, "my_container", '
- {"$or": [{"age": {"$lt": 21}}, 
- {"friends.name": {"$regex": "^B[a-z]{3,6}.*"}}]}', 
+# *note*: such complex queries do not yet work with src_couchdb() or src_elasticsearch()
+# *note*: with src_duckdb(), cannot use $or, can only use $and so far 
+# in query where one element has a dot path but the other hasn't
+str(docdb_query(src, key = "my_container", query = '
+ {"$and": [{"age": {"$gt": 21}}, 
+ {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}', 
  fields = '{"age": 1, "friends.name": 1}'))
-# 'data.frame': 4 obs. of 2 variables:
-# $ age : int 20 20 22 23
-# $ friends:'data.frame':   4 obs. of 1 variable:
-# ..$ name:List of 4
-# .. ..$ : chr "Pace Bell"
-# .. ..$ : chr "Yang Yates" "Lacy Chen"
-# .. ..$ : chr "Baird Keller" "Francesca Reese" "Dona Bartlett"
-# .. ..$ : chr "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
+# 'data.frame': 2 obs. of  2 variables:
+#  $ age    : int  23 22
+#  $ friends:'data.frame':  2 obs. of  1 variable:
+#   ..$ name:List of 2
+#   .. ..$ : chr  "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
+#   .. ..$ : chr  "Baird Keller" "Francesca Reese" "Dona Bartlett"
 
 # such queries can also be used for updating (patching) selected documents 
 # with a new 'value'(s) from a JSON string, a data frame or a list
@@ -265,13 +273,15 @@ docdb_update(src, "my_container", value = '{"vs": 9, "xy": [1, 2]}', query = '{"
 # *note*: such queries do not yet work with src_elasticsearch()
 docdb_query(src, "my_container", '{"carb": {"$in": [1,3]}}', fields = '{"vs": 1}')[[1]]
 # [1] 1 1 1 1 9 9 9 1 1 1
-docdb_get(src, "my_container")[126:130, c(1, 27, 28)]
+docdb_get(src, "my_container")[ , c(1, 27, 28)]
 #                  _id carb   xy
+# ...
 # 126        Merc 280C    4 NULL
 # 127       Merc 450SE    3 1, 2
 # 128       Merc 450SL    3 1, 2
 # 129      Merc 450SLC    3 1, 2
 # 130 Pontiac Firebird    2 NULL
+# ...
 
 # use with dplyr
 # *note* that dplyr includes a (deprecated) function src_sqlite
@@ -291,7 +301,9 @@ docdb_get(src, "my_container") %>%
 
 # delete documents; query is optional parameter and has to be 
 # specified for deleting documents instead of deleting the container
-# *note*: such complex queries does not yet work with src_couchdb() or src_elasticsearch()
+# *note*: such complex queries do not yet work with src_couchdb() or src_elasticsearch()
+# *note*: with src_duckdb(), cannot use $or, can only use $and so far 
+# in query where one element has a dot path but the other hasn't
 docdb_delete(src, "my_container", query = '{"$or": {"gear": 5, "age": {"$gte": 22}}}')
 # TRUE
 nrow(docdb_get(src, "my_container"))
@@ -300,6 +312,9 @@ nrow(docdb_get(src, "my_container"))
 # delete container from database
 docdb_delete(src, "my_container")
 # [1] TRUE
+# 
+# shutdown
+DBI::dbDisconnect(src$con, shutdown = TRUE)
 ```
 
 ## Benchmark
@@ -343,14 +358,14 @@ rbenchmark::benchmark(
  replications = 10L,
  columns = c('test', 'replications', 'elapsed')
 )
-
+# on 2015 mobile hardware as per above
 #         test replications elapsed
-# 4    CouchDB           10    1006
-# 3    Elastic           10     155 # 10s to be subtracted
-# 5 PostgreSQL           10      49
+# 4    CouchDB           10     937
+# 3    Elastic           10     153 # 10s to be subtracted
+# 5 PostgreSQL           10      45
 # 2    RSQLite           10      45
-# 6     DuckDB           10      46
-# 1    MongoDB           10      43
+# 1    MongoDB           10      42
+# 6     DuckDB           10      41
 ```
 
 ## Testing
@@ -358,29 +373,24 @@ rbenchmark::benchmark(
 ``` r
 testthat::test_local()
 # ✔ | F W S  OK | Context
-# ✔ |        90 | couchdb [100.1s]                                               
-# ✔ |     1  82 | duckdb [2.5s]                                                  
-# ───────────────────────────────────────────────────────────────────────────────
-# Skip (core-nodbi.R:205): docdb_update, docdb_query
-# Reason: updates do not yet work since query has issues converting number types
-# ───────────────────────────────────────────────────────────────────────────────
-# ✔ |     1  61 | elastic [75.2s]                                                
-# ───────────────────────────────────────────────────────────────────────────────
-# Skip (core-nodbi.R:154): docdb_query
+# ✔ |        89 | couchdb [89.1s]                                                 
+# ✔ |        91 | duckdb [2.7s]                                                   
+# ✔ |     1  61 | elastic [75.0s]                                                 
+# ────────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:160): docdb_query
 # Reason: queries need to be translated into elastic syntax
-# ───────────────────────────────────────────────────────────────────────────────
-# ✔ |        95 | mongodb [4.4s]                                                 
-# ✔ |        95 | postgres [7.5s]                                                
-# ✔ |        94 | sqlite [4.4s]                                                  
+# ────────────────────────────────────────────────────────────────────────────────
+# ✔ |        94 | mongodb [4.4s]                                                  
+# ✔ |        94 | postgres [6.8s]                                                 
+# ✔ |        93 | sqlite [4.1s]                                                   
 # 
-# ══ Results ════════════════════════════════════════════════════════════════════
-# Duration: 194.5 s
+# ══ Results ═════════════════════════════════════════════════════════════════════
+# Duration: 182.7 s
 # 
-# ── Skipped tests  ─────────────────────────────────────────────────────────────
+# ── Skipped tests  ──────────────────────────────────────────────────────────────
 # • queries need to be translated into elastic syntax (1)
-# • updates do not yet work since query has issues converting number types (1)
 # 
-# [ FAIL 0 | WARN 0 | SKIP 2 | PASS 517 ]
+# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 522 ]
 ```
 
 ## Notes
