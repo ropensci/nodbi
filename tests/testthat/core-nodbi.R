@@ -172,16 +172,16 @@ test_that("docdb_query", {
   expect_equal(docdb_create(src = src, key = key, value = testDf), 32L)
   expect_equal(dim(docdb_query(src, key, query = '{"gear": {"$in": [5,4]}}')), c(17L, 12L))
   expect_equal(dim(docdb_query(src, key, query = '{"_id": {"$in": ["Datsun 710", "Merc 280C"]}}')), c(2L, 12L))
-  expect_equal(dim(docdb_query(src = src, key = key, query = '{"mpg": {"$lte": 18}}', fields = '{"mpg": 1, "carb": 1}')), c(13L, 2L))
-  # duckdb appears to have a conversion problem between numeric types and also from json
-  if (!inherits(src, "src_duckdb")) expect_equal(sum(docdb_query(src = src, key = key, query = '{"disp": {"$gt": 350}}', fields = '{"carb": 1, "_id": 0}')[[1]]), 24L)
+  expect_equal(dim(docdb_query(src = src, key = key, query = '{"mpg": {"$lte": 18.9}}', fields = '{"mpg": 1, "carb": 1}')), c(15L, 2L)) # mpg is not integer
+  expect_equal(sum(docdb_query(src = src, key = key, query = '{"disp": {"$gt": 350}}', fields = '{"carb": 1, "_id": 0}')[[1]]), 24L)
   expect_identical(docdb_query(src = src, key = key, query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}'),
                    docdb_query(src = src, key = key, query = '          {"mpg": {"$lte": 18},   "gear": {"$gt": 3}}'))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"_id": 1}')), c(32L, 1L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}')), c(32L, 12L))
-  expect_equal(nrow(docdb_query(src = src, key = key, query = '{"$or": [{"mpg": {"$lte": 18}}, {"_id": {"$regex": "^F[a-z].*", "$options": ""}}]}')), 16L)
-  expect_equal(nrow(docdb_query(src = src, key = key, query = '{"$or": [{"mpg": {"$lte": 18}}, {"_id": {"$regex": "^F[a-z].*"}}]}')), 16L)
-  expect_error(docdb_get(src = src, key = key, query = '{"mpg": {"$lte": 18}}', fields = '{"mpg":1, "cyl":1, "_id": 0}'), "docdb_query")
+
+  # "$or" to be implemented for duckdb
+  if (!inherits(src, "src_duckdb")) expect_equal(nrow(docdb_query(src = src, key = key, query = '{"$or": [{"mpg": {"$lte": 18.0}}, {"_id": {"$regex": "^F[a-z].*", "$options": ""}}]}')), 16L)
+  if (!inherits(src, "src_duckdb")) expect_equal(nrow(docdb_query(src = src, key = key, query = '{"$or": [{"mpg": {"$lte": 18}}, {"_id": {"$regex": "^F[a-z].*"}}]}')), 16L)
 
   # clean up
   expect_true(docdb_delete(src = src, key = key))
@@ -207,9 +207,6 @@ test_that("docdb_update, docdb_query", {
   # tests0
   if (!inherits(src, "src_elastic")) expect_equal(docdb_update(src = src, key = key, value = '{"vs": 77}', query = '{"gear": {"$in": [5,4]}}'), 17L)
   if (!inherits(src, "src_elastic")) expect_true(all(docdb_query(src, key, query = '{"gear": {"$in": [5,4]}}', fields = '{"vs": 1}')[["vs"]] == 77L))
-
-  # note
-  if (inherits(src, "src_duckdb")) skip("updates with queries using = or regexp for numbers do not yet work in duckdb, possibly due to type conversions")
 
   # tests1
   expect_equal(docdb_update(src = src, key = key, value = mtcars[3, 4:5], query = '{"gear": 3}'), 15L) # hp = 93, drat = 3.9
