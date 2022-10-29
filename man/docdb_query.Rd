@@ -16,7 +16,9 @@ or \code{\link[=src_postgres]{src_postgres()}}}
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
 a table name for SQLite and for PostgreSQL)}
 
-\item{query}{(character) A JSON query string, see examples}
+\item{query}{(character) A JSON query string, see examples.
+Can use multiple comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
+with at most one logic operator ('$and' if not specified, or '$or').}
 
 \item{...}{Optionally, \code{fields} a JSON string of fields to
 be returned from anywhere in the tree (dot paths notation).
@@ -43,6 +45,7 @@ Get documents with a filtering query
 src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_query(src, "mtcars", query = '{"mpg":21}')
+docdb_query(src, "mtcars", query = '{"mpg":21, "gear": {"$lte": 4}}')
 docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
 docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
 # complex query, not supported for Elasticsearch and CouchDB backends at this time:

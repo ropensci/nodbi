@@ -2,7 +2,9 @@
 #'
 #' @inheritParams docdb_create
 #'
-#' @param query (character) A JSON query string, see examples
+#' @param query (character) A JSON query string, see examples.
+#'  Can use multiple comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
+#'  with at most one logic operator ('$and' if not specified, or '$or').
 #'
 #' @param ... Optionally, `fields` a JSON string of fields to
 #' be returned from anywhere in the tree (dot paths notation).
@@ -24,6 +26,7 @@
 #' src <- src_sqlite()
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_query(src, "mtcars", query = '{"mpg":21}')
+#' docdb_query(src, "mtcars", query = '{"mpg":21, "gear": {"$lte": 4}}')
 #' docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
 #' docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
 #' # complex query, not supported for Elasticsearch and CouchDB backends at this time:
@@ -559,7 +562,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   if (!is.null(params$limit)) n <- params$limit
 
   ## handle fields
-  # all following is to emulate mongodb behaviour, which includes avoiding
+  # the following is to emulate mongodb behaviour, which includes avoiding
   # path collisions with overlapping fields; see https://docs.mongodb.com/
   # manual/release-notes/4.4-compatibility/#path-collision-restrictions
   fields <- "{}"
@@ -595,7 +598,6 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   ))
 
   # https://duckdb.org/docs/extensions/json#json-extraction-functions
-  # https://duckdb.org/docs/extensions/json#json-aggregate-functions
 
   ## construct sql query statement
   # head of sql
@@ -620,19 +622,28 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
       ") AS json FROM \"", key, "\" ")
   }
 
-  # capture marginal case which is not yet implemented
-  if (length(querySql) == 2L &&
-      sum(grepl("[.]", sapply(querySql, "[[", 1))) == 1L &&
-      attr(querySql, "op") == "OR") {
-    stop("Cannot use $or, can only use $and with query when one element has a dot path ",
-         "but the other element does not", call. = FALSE)
-  }
+  # dispatch querSql list elements depending on query:
+  # - $and: any dot terms go into jqrSubsetFunction, rest in sqlQueryStatement
+  # - $or and any element with dot: all go into jqrSubsetFunction
+  tmp <- lapply(querySql, function(i) {
 
-  # sql where for identifying documents
-  if (any(querySql != "")) {
+    if ((any(sapply(querySql, function(ii) grepl("[.]", ii[1]))) &&
+        attr(querySql, "op") == "OR") ||
+        (grepl("[.]", i[1]))) {
+          c(i, "json")
+        } else if (length(i) == 2L) {
+          c(i, "sql")
+        } else {
+          ""
+        }
+  })
+  attr(tmp, "op") <- attr(querySql, "op")
+  querySql <- tmp
 
+  # sql WHERE for identifying documents
+  if (querySql[[1]][1] != "") {
     sqlQueryStatement <- unlist(lapply(
-      querySql[!grepl("[.]", sapply(querySql, "[[", 1))],
+      querySql[sapply(querySql, "[[", 3) == "sql"],
       function(x) {
         if (grepl("^ IN ", x[2])) x[2] <- paste0(
           "REGEXP '", gsub("\"", "", paste0(
@@ -651,9 +662,9 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
               # compare to extracted string but modify regexp to use string delimiters
               " THEN regexp_matches(json_extract_string(json, '$.", x[1], "'), ",
               sub("'\\^", "'(^|[\",\\\\[])",
-              sub("\\$'", "([\",\\\\]]|$)'",
-              sub("(REGEXP| =) ", "", gsub('"(.+)"', "'\\1'", x[2]))
-              )), ") ELSE regexp_matches(json_extract(json, '$.", x[1], "'), '",
+                  sub("\\$'", "([\",\\\\]]|$)'",
+                      sub("(REGEXP| =) ", "", gsub('"(.+)"', "'\\1'", x[2]))
+                  )), ") ELSE regexp_matches(json_extract(json, '$.", x[1], "'), '",
               sub("^REGEXP \"?(.+?)\"?$", "\\1", x[2]), "') END")),
             no = paste0(
               "CASE WHEN json_type(json, '$.", x[1], "') IN ('VARCHAR', 'DOUBLE', 'BIGINT', 'UBIGINT') ",
@@ -664,42 +675,45 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
         } else { # _id
           ifelse(
             test = grepl("^REGEXP ", x[2]),
-            yes = gsub("''+", "'", paste0("regexp_matches(_id, '", sub("^REGEXP \"?(.+?)\"?$", "\\1", x[2]), "') ")),
+            yes = gsub("''+", "'", paste0(
+              "regexp_matches(_id, '",
+              sub("^REGEXP \"?(.+?)\"?$", "\\1", x[2]), "') ")),
             no = paste0(" _id", gsub('"', "'", x[2]), " ")
           ) # ifelse
         } # _id or other field
-      })) # sapply unlist
+      }))} # lapply unlist if
+  #
+  if (exists("sqlQueryStatement") && sum(nchar(sqlQueryStatement))) {
+    statement <- paste0(
+      statement, "WHERE ",
+      paste0("( ", sqlQueryStatement, ")",
+             collapse = paste0(" ", attr(querySql, "op"), " ")))
+  }
+  statement <- paste0(statement, "; ")
 
-    if (sum(nchar(sqlQueryStatement))) {
-      statement <- paste0(
-        statement, "WHERE ",
-        paste0("(", sqlQueryStatement, ")",
-               collapse = paste0(" ", attr(querySql, "op"), " ")),
-        ";")
-    }
+  # handle query terms with json
+  jqrSubsetFunction <- ""
+  if (querySql[[1]][1] != "" &&
+      any(sapply(querySql, "[[", 3) == "json")) {
+    jqrSubsetFunction <- paste0(
+      'def flatted: [paths(scalars) as $path | { ($path | map(tostring) | ',
+      'join("#")): getpath($path) } ] | add; . | select( ',
 
-  } # sql identify rows / documents
-
-  # handle query terms in subfields
-  jqrSubsetFunction <- NULL
-  if (any(querySql != "") &&
-      any(grepl("[.]", sapply(querySql, "[[", 1)))) {
-
-    jqrSubsetFunction <- unlist(lapply(
-      querySql[grepl("[.]", sapply(querySql, "[[", 1))],
-      function(x) paste0(
-        ' . | select( [paths(scalars) as $path | { ($path | map(tostring) | ',
-        'join("#")): getpath($path) } ] | add | with_entries( select( .key | match( ',
-        gsub("[.]", "#[0-9]+#", x[1]), # target: '\"friends#[0-9]#name\"'
-        ' ))) | map(select(',
-        ifelse(
-          test = grepl("REGEXP", x[2]),
-          yes = paste0(". | test(", gsub("(REGEXP| =) ", "", x[2]), ")"),
-          no = gsub(" = ", ". == ", x[2])
-        ), ')) | any) ')
-    )) # lapply unlist
-
-  } # jqr
+      paste0("(", lapply(
+        querySql[sapply(querySql, "[[", 3) == "json"],
+        function(x) paste0(
+          ' flatted | with_entries( select( .key | match( "',
+          gsub("[.]", "#[0-9]+#", gsub("\"", "", x[1])),
+          '" ))) | map(select(',
+          ifelse(
+            test = grepl("REGEXP", x[2]),
+            yes = paste0(". | test(", gsub("(REGEXP| =) ", "", x[2]), ")))"),
+            no = paste0(". ", gsub(" = ", " == ", x[2]), "))")
+          ),
+          " | any )")),
+        collapse = paste0(" ", tolower(attr(querySql, "op")), " ")),
+      " )")
+  }
 
   # get and process data, return
   return(dbiGetProcessData(
@@ -721,6 +735,10 @@ dbiGetProcessData <- function(
   statement <- gsub("[\n\t ]+", " ", statement)
   # adapt user regexp's such as \\S
   statement <- gsub("\\\\", "\\", statement, fixed = TRUE)
+
+  # debug
+  # message("\nSQL:\n\n", statement, "\n")
+  # message("\nJQ:\n\n", jqrSubsetFunction, "\n")
 
   # temporary file and connection
   tfname <- tempfile()
@@ -752,9 +770,16 @@ dbiGetProcessData <- function(
   if (!is.null(jqrSubsetFunction)) {
 
     # compose jq string, target:
-    # ' . | select( [paths(scalars) as $path | { ($path | map(tostring) | join("#")): getpath($path) } ] | add |
-    # with_entries( select( .key | match( "friends#[0-9]#" ))) | map(select( . == 4)) | any) | tostring '
-    jqFields <- jqrSubsetFunction[[1]]
+    #
+    # def flatted: [paths(scalars) as $path | { ($path | map(tostring) |
+    # join("#")): getpath($path) } ] | add; . | select(
+    # ( flatted | with_entries( select( .key |
+    #   match( "friends#[0-9]+#id" )))
+    #   | map(select( . < 2)) | any )
+    # and
+    # ( flatted | with_entries( select( .key | match( "friends#[0-9]+#name" )))
+    #   | map(select( . == "Lacy Chen")) | any )
+    # )
 
     # get another file name
     tjname <- tempfile()
@@ -765,8 +790,7 @@ dbiGetProcessData <- function(
 
     # write data
     writeLines(
-      jqr::jq(file(tfname, encoding = "UTF-8"), jqFields),
-      # to create ndjson
+      jqr::jq(file(tfname, encoding = "UTF-8"), jqrSubsetFunction),
       con = tjnameCon,
       sep = "\n",
       useBytes = TRUE)
@@ -883,6 +907,7 @@ dbiGetProcessData <- function(
 #' @noRd
 json2fieldsSql <- function(x) {
 
+  # validate
   if (!jsonlite::validate(x)) stop("No json: ", x)
 
   # empty query
@@ -925,16 +950,13 @@ json2fieldsSql <- function(x) {
 
 
 # convert json query string to
-# string as part of sql WHERE
+# string as part for sql WHERE
 #' @keywords internal
 #' @noRd
 json2querySql <- function(x) {#, con
 
+  # validate
   if (!jsonlite::validate(x)) stop("No json: ", x)
-
-  # replaces
-  # - atomic expression { A : { $op :B } }
-  # - simple expressions
 
   # standard operation
   op <- "AND"
@@ -944,6 +966,12 @@ json2querySql <- function(x) {#, con
     out <- ""
     attr(out, "op") <- op
     return(out)
+  }
+
+  # stop if more than one operator
+  if (stringi::stri_count_regex(x, pattern = '[$]and|[$]or":') >= 2L) {
+   stop("Can use at most one operator ($or, $and), but two or more in 'query'",
+        call. = FALSE)
   }
 
   # minify for regexprs
@@ -1022,14 +1050,17 @@ json2querySql <- function(x) {#, con
 # json2querySql(x = '{"cut" : "Premium", "price" : { "$lt" : 1000 }, "_id": {"$ne": 4}, "_row": {"$regex": "Merc"} }')
 # json2querySql(x = '{ "$or": [ { "gear": { "$lt": 5 } }, { "cyl": 6 } ] }')
 # json2querySql(x = '{ "$or": [ { "gear": { "$in": [4,5] } }, { "cyl": 6 } ] }')
-# json2querySql(x = '{ "$or": [ { "name": { "$in": ["Lucy Chen","Amy"] } }, { "cyl": 6 } ] }')
+# json2querySql(x = '{ "$or": [ { "name": { "$in": ["Lucy Chen", "Amy"] } }, { "cyl": 6 } ] }')
+# json2querySql(x = '{ "name": { "$in": ["Lucy Chen", "Amy"] }, "cyl": 6 }')
 # json2querySql(x = '{"mpg": {"$lte": 18}, "gear": {"$gt": 3}}')
 # json2querySql(x = '{"mpg": {"$lte": 18}, "gear": 4}')
 # json2querySql(x = '{"mpg": {"$lte": 18}, {"gear": 4}}') # no json
+# json2querySql(x = '{"mpg": [{"$lte": 18}, {"gear": 4}]}')
 # json2querySql(x = '{"$or": [{"age": {"$gte": 23}}, {"friends.name": "Dona Bartlett"}]}')
 # json2querySql(x = "{}")
 # json2querySql(x = '{"_id": { "$regex": "^NCT[0-9]{7,8}"} }')
 # json2querySql(x = '{"gear": {"$in": [5,4]}}')
+# json2querySql(x = '{ "$or": [{ "$or": [ { "gear": { "$lt": 5 } }, { "cyl": 6 } ] }, {"gear": {"$in": [5,4]}}] }') # error
 
 # generate regular expressions for
 # fields so that fullkey matches
