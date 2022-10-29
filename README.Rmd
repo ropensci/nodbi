@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cranlogs.app) 
 [![cran version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2022-10-19. 
 
 Currently, `nodbi` supports the following database backends:
 
@@ -52,9 +52,7 @@ and for executing the following operations:
 - Update\*\*
 - Delete
 
-across all database backends. Limitations: \* Only `http(s)` and only for `docdb_create`. \*\*Only simple queries (e.g. equality for a single field) and updates are supported for Elasticsearch at the moment. Only root fields can be specified for CouchDB, whereas subitems can be specified in dot notation for Elasticsearch, MongoDB, SQLite, PostgreSQL and DuckDB. 
-
-For capabilities in terms of operations and parameter combinations across any of the database backends, see section [walk-through](#walk-through) below and see the main file for package testing, here: [core-nodbi.R](./tests/testthat/core-nodbi.R). See [benchmark](#benchmark) below for comparisons of database backends.
+across all database backends. Limitations: \* Only `http(s)` and only for `docdb_create`. \*\*For Elasticsearch, only simple queries (e.g. equality for a single field) and for CouchDB only root fields. For capabilities to query across any of the database backends, see section [walk-through](#walk-through) below and see the canonical testing: [core-nodbi.R](./tests/testthat/core-nodbi.R). See [benchmark](#benchmark) below for speed comparisons of database backends.
 
 ## Install
 
@@ -239,9 +237,10 @@ docdb_query(src, "my_container", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "m
 # *note*: such complex queries do not yet work with src_couchdb() or src_elasticsearch()
 # *note*: with src_duckdb(), cannot use $or, can only use $and so far 
 # in query where one element has a dot path but the other hasn't
-str(docdb_query(src, key = "my_container", query = '
- {"$or": [{"age": {"$gt": 21}}, 
- {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}', 
+str(docdb_query(
+  src, key = "my_container", 
+  query = '{"$or": [{"age": {"$gt": 21}}, 
+           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}', 
  fields = '{"age": 1, "friends.name": 1}'))
 # 'data.frame':	3 obs. of  2 variables:
 #  $ age    : int  23 30 22
@@ -335,7 +334,7 @@ testFunction <- function(src, key, value, query, fields) {
 # without any database optimisations
 rbenchmark::benchmark(
  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
- RSQLite = testFunction(src = srcSqlite, key, value, query, fields),
+ SQLite = testFunction(src = srcSqlite, key, value, query, fields),
  Elastic = testFunction(src = srcElastic, key, value, query, fields),
  CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
  PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
@@ -347,7 +346,7 @@ rbenchmark::benchmark(
 #         test replications elapsed
 # 4    CouchDB           10     945
 # 3    Elastic           10     151 # 10s to be subtracted
-# 2    RSQLite           10      48
+# 2     SQLite           10      48
 # 5 PostgreSQL           10      46
 # 6     DuckDB           10      43
 # 1    MongoDB           10      42

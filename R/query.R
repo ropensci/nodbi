@@ -888,13 +888,15 @@ dbiGetProcessData <- function(
   # early return
   if (identical(names(out), "_id") || nrow(out) == 1L) return(out)
 
-  # remove rows with all NAs except in _id
-  # apply requires more than 1 row data frame
-  allEmpty <- unname(unlist(apply(
-    out[, setdiff(names(out), "_id"), drop = FALSE], 1, function(r) {
-      r <- unlist(r)
-      all(is.na(r)) | all(is.null(r) | all(!length(r)))
-    })))
+  # remove rows with all NAs except in _id. iteration
+  # needed, apply cannot handle complex column content
+  allEmpty <- NULL
+  sdn <- setdiff(names(out), "_id")
+  for (r in seq_len(nrow(out))) {
+    allEmpty <- c(allEmpty, all(
+      # unlist conveniently drops NULL values
+      is.na(unlist(out[r, sdn, drop = TRUE], use.names = FALSE))))
+  }
 
   # return
   return(out[!allEmpty, , drop = FALSE])
