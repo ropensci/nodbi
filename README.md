@@ -112,7 +112,7 @@ install.packages('duckdb', repos = c('https://duckdb.r-universe.dev', 'https://c
 # connect
 src <- nodbi::src_duckdb(dbdir = ":memory:", ...)
 
-# do disconnect and shutdown DuckDB
+# remember to disconnect and shutdown DuckDB
 DBI::dbDisconnect(src$con, shutdown = TRUE)
 ```
 
@@ -126,7 +126,7 @@ already in the `src_*()` function. “Container” refers to a MongoDB
 collection. See <https://jeroen.github.io/mongolite/>.
 
 ``` r
-nodbi::src_mongo(
+src <- nodbi::src_mongo(
  collection = "my_container", db = "my_database",
  url = "mongodb://localhost", ...)
 ```
@@ -138,7 +138,7 @@ The functionality to process JSON is based on the SQLite extension
 “Container” refers to an SQLite table.
 
 ``` r
-nodbi::src_sqlite(dbname = ":memory:", ...)
+src <- nodbi::src_sqlite(dbname = ":memory:", ...)
 ```
 
 ### CouchDB
@@ -149,7 +149,7 @@ nodbi::src_sqlite(dbname = ":memory:", ...)
 JSON, in analogy to functions available for the other databases.
 
 ``` r
-nodbi::src_couchdb(
+src <- nodbi::src_couchdb(
  host = "127.0.0.1", port = 5984L, path = NULL,
  transport = "http", user = NULL, pwd = NULL, headers = NULL)
 ```
@@ -160,7 +160,7 @@ nodbi::src_couchdb(
 for container names. Opensearch can equally be used.
 
 ``` r
-nodbi::src_elastic(
+src <- nodbi::src_elastic(
  host = "127.0.0.1", port = 9200L, path = NULL,
  transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...)
 ```
@@ -172,7 +172,7 @@ variables in data frames returned by `docdb_get()` and `docdb_query()`
 can differ from the order in which they were in `docdb_create()`.
 
 ``` r
-nodbi::src_postgres(
+src <- nodbi::src_postgres(
  dbname = "my_database", host = "127.0.0.1", port = 5432L, ...)
 ```
 
@@ -256,14 +256,15 @@ docdb_query(src, "my_container", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "m
 # *note*: with src_duckdb(), cannot use $or, can only use $and so far 
 # in query where one element has a dot path but the other hasn't
 str(docdb_query(src, key = "my_container", query = '
- {"$and": [{"age": {"$gt": 21}}, 
+ {"$or": [{"age": {"$gt": 21}}, 
  {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}', 
  fields = '{"age": 1, "friends.name": 1}'))
-# 'data.frame': 2 obs. of  2 variables:
-#  $ age    : int  23 22
-#  $ friends:'data.frame':  2 obs. of  1 variable:
-#   ..$ name:List of 2
+# 'data.frame': 3 obs. of  2 variables:
+#  $ age    : int  23 30 22
+#  $ friends:'data.frame':  3 obs. of  1 variable:
+#   ..$ name:List of 3
 #   .. ..$ : chr  "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
+#   .. ..$ : chr  "Coleen Dunn" "Doris Phillips" "Concetta Turner"
 #   .. ..$ : chr  "Baird Keller" "Francesca Reese" "Dona Bartlett"
 
 # such queries can also be used for updating (patching) selected documents 
@@ -314,7 +315,7 @@ docdb_delete(src, "my_container")
 # [1] TRUE
 # 
 # shutdown
-DBI::dbDisconnect(src$con, shutdown = TRUE)
+DBI::dbDisconnect(src$con, shutdown = TRUE); rm(src)
 ```
 
 ## Benchmark
@@ -346,7 +347,7 @@ testFunction <- function(src, key, value, query, fields) {
  docdb_delete(src, key)
 }
 
-# 2022-10-22 with 2015 mobile hardware 
+# 2022-10-29 with 2015 mobile hardware 
 # without any database optimisations
 rbenchmark::benchmark(
  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
@@ -360,37 +361,38 @@ rbenchmark::benchmark(
 )
 # on 2015 mobile hardware as per above
 #         test replications elapsed
-# 4    CouchDB           10     937
-# 3    Elastic           10     153 # 10s to be subtracted
-# 5 PostgreSQL           10      45
-# 2    RSQLite           10      45
+# 4    CouchDB           10     945
+# 3    Elastic           10     151 # 10s to be subtracted
+# 2    RSQLite           10      48
+# 5 PostgreSQL           10      46
+# 6     DuckDB           10      43
 # 1    MongoDB           10      42
-# 6     DuckDB           10      41
 ```
 
 ## Testing
 
 ``` r
+# 2022-10-29
 testthat::test_local()
 # ✔ | F W S  OK | Context
-# ✔ |        89 | couchdb [89.1s]                                                 
-# ✔ |        91 | duckdb [2.7s]                                                   
-# ✔ |     1  61 | elastic [75.0s]                                                 
-# ────────────────────────────────────────────────────────────────────────────────
-# Skip (core-nodbi.R:160): docdb_query
+# ✔ |        90 | couchdb [93.5s]                                                         
+# ✔ |        97 | duckdb [3.9s]                                                           
+# ✔ |     1  61 | elastic [75.0s]                                                         
+# ────────────────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:164): docdb_query
 # Reason: queries need to be translated into elastic syntax
-# ────────────────────────────────────────────────────────────────────────────────
-# ✔ |        94 | mongodb [4.4s]                                                  
-# ✔ |        94 | postgres [6.8s]                                                 
-# ✔ |        93 | sqlite [4.1s]                                                   
+# ────────────────────────────────────────────────────────────────────────────────────────
+# ✔ |        97 | mongodb [4.3s]                                                          
+# ✔ |        97 | postgres [6.5s]                                                         
+# ✔ |        96 | sqlite [4.0s]                                                           
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════
-# Duration: 182.7 s
+# ══ Results ═════════════════════════════════════════════════════════════════════════════
+# Duration: 187.5 s
 # 
-# ── Skipped tests  ──────────────────────────────────────────────────────────────
+# ── Skipped tests  ──────────────────────────────────────────────────────────────────────
 # • queries need to be translated into elastic syntax (1)
 # 
-# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 522 ]
+# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 538 ]
 ```
 
 ## Notes
