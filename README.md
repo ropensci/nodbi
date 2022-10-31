@@ -17,7 +17,7 @@ version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2022-10-19.
+updated 2022-10-31.
 
 Currently, `nodbi` supports the following database backends:
 

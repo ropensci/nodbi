@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0.9000</span>
       </span>
     </div>
 
@@ -72,7 +72,7 @@
 <div class="page-header"><h1 id="nodbi">nodbi<a class="anchor" aria-label="anchor" href="#nodbi"></a>
 </h1></div>
 
-<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends.</p>
+<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2022-10-31.</p>
 <p>Currently, <code>nodbi</code> supports the following database backends:</p>
 <ul>
 <li>MongoDB</li>
@@ -99,8 +99,7 @@
 <li>Update**</li>
 <li>Delete</li>
 </ul>
-<p>across all database backends. Limitations: * Only <code>http(s)</code> and only for <code>docdb_create</code>. **Only simple queries (e.g. equality for a single field) and updates are supported for Elasticsearch at the moment. Only root fields can be specified for CouchDB, whereas subitems can be specified in dot notation for Elasticsearch, MongoDB, SQLite, PostgreSQL and DuckDB.</p>
-<p>For capabilities in terms of operations and parameter combinations across any of the database backends, see section <a href="#walk-through">walk-through</a> below and see the main file for package testing, here: <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>. See <a href="#benchmark">benchmark</a> below for comparisons of database backends.</p>
+<p>across all database backends. Limitations: * Only <code>http(s)</code> and only for <code>docdb_create</code>. **For Elasticsearch, only simple queries (e.g. equality for a single field) and for CouchDB only root fields. For capabilities to query across any of the database backends, see section <a href="#walk-through">walk-through</a> below and see the canonical testing: <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>. See <a href="#benchmark">benchmark</a> below for speed comparisons of database backends.</p>
 <div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
@@ -317,9 +316,10 @@
 <span><span class="co"># *note*: such complex queries do not yet work with src_couchdb() or src_elasticsearch()</span></span>
 <span><span class="co"># *note*: with src_duckdb(), cannot use $or, can only use $and so far </span></span>
 <span><span class="co"># in query where one element has a dot path but the other hasn't</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span>, query <span class="op">=</span> <span class="st">'</span></span>
-<span><span class="st"> {"$or": [{"age": {"$gt": 21}}, </span></span>
-<span><span class="st"> {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}'</span>, </span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span></span>
+<span>  <span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span>, </span>
+<span>  query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$gt": 21}}, </span></span>
+<span><span class="st">           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}'</span>, </span>
 <span> fields <span class="op">=</span> <span class="st">'{"age": 1, "friends.name": 1}'</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># 'data.frame': 3 obs. of  2 variables:</span></span>
 <span><span class="co">#  $ age    : int  23 30 22</span></span>
@@ -413,7 +413,7 @@
 <span><span class="co"># without any database optimisations</span></span>
 <span><span class="fu">rbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rbenchmark/man/benchmark.html" class="external-link">benchmark</a></span><span class="op">(</span></span>
 <span> MongoDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcMongo</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
-<span> RSQLite <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcSqlite</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
+<span> SQLite <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcSqlite</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
 <span> Elastic <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcElastic</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
 <span> CouchDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcCouchdb</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
 <span> PostgreSQL <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcPostgres</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
@@ -425,7 +425,7 @@
 <span><span class="co">#         test replications elapsed</span></span>
 <span><span class="co"># 4    CouchDB           10     945</span></span>
 <span><span class="co"># 3    Elastic           10     151 # 10s to be subtracted</span></span>
-<span><span class="co"># 2    RSQLite           10      48</span></span>
+<span><span class="co"># 2     SQLite           10      48</span></span>
 <span><span class="co"># 5 PostgreSQL           10      46</span></span>
 <span><span class="co"># 6     DuckDB           10      43</span></span>
 <span><span class="co"># 1    MongoDB           10      42</span></span></code></pre></div>
