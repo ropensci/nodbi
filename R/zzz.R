@@ -56,3 +56,84 @@ dbWithTransaction <- function(conn, statement) {
   )
 
 }
+
+# manage clsoing database connection(s)
+closeNodbiConnections <- function(e) {
+
+  # message("nodbi running closeNodbiConnections()")
+
+  # search environment for docdb_src connections
+  objIsNodbiConnection <- sapply(
+    ls(e), function(i)
+      any(class(eval(parse(text = i))) == "docdb_src"),
+    USE.NAMES = TRUE
+  )
+  if (!length(objIsNodbiConnection)) return(invisible(NULL))
+  objIsNodbiConnection <- objIsNodbiConnection[objIsNodbiConnection]
+
+  # disconnect
+  nodbiDisconnect <- function(objName) {
+
+    # get duckdb driver information
+    ddbdrv <- attr(eval(parse(text = objName))$con, "driver")
+
+    #
+    if (DBI::dbIsValid(eval(parse(text = objName))$con) ||
+        # duckdb needs to be shutdown
+        (!is.null(ddbdrv) && DBI::dbIsValid(ddbdrv))) {
+
+      # disconnect and shutdown if needed
+      res <- try(suppressWarnings(
+        DBI::dbDisconnect(
+          eval(parse(text = objName))$con,
+          # duckdb needs to be shut down
+          shutdown = TRUE)),
+        silent = TRUE)
+
+      # inform user
+      if (!inherits(res, "try-error") && res)
+        message("nodbi: docdb_src '", objName, "' disconnected, shut down. ")
+
+    }
+  }
+
+  # iterate over connections
+  for (i in seq_along(objIsNodbiConnection)) {
+
+    # get name of object
+    objName <- names(objIsNodbiConnection[i])
+
+    # run disconnect
+    switch(
+      class(eval(parse(text = objName)))[1],
+      "src_duckdb" = nodbiDisconnect(objName),
+      "src_sqlite" = nodbiDisconnect(objName),
+      "src_postgres" = nodbiDisconnect(objName),
+      NULL
+    )
+
+  }
+}
+
+# set up generic handler before database is accessed
+# this is triggered e.g. by session restart
+.onLoad <- function(libname, pkgname) {
+
+  reg.finalizer(
+    e = globalenv(),
+    f = closeNodbiConnections,
+    onexit = TRUE
+  )
+
+  # message("nodbi .onLoad reg.finalizer registered")
+
+}
+
+# a session restart does not trigger this
+.onUnload <- function(libpath) {
+
+  # message("nodbi running .onUnload()")
+
+  closeNodbiConnections(e = globalenv())
+
+}

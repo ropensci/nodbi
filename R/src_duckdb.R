@@ -25,6 +25,14 @@ src_duckdb <- function(
     ...
     )
 
+  # ensure disconnect
+  reg.finalizer(
+    e = globalenv(),
+    f = closeNodbiConnections,
+    onexit = TRUE
+  )
+  # message("nodbi src_duckdb reg.finalizer registered")
+
   # potential security concern with
   # storing the full connection string
   structure(list(con = con,

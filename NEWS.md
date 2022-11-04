@@ -2,7 +2,7 @@ nodbi 0.9.0.9000
 ================
 
 ### Changes
-* new development version
+* added closing connections to SQL database backends upon session restart
 
 nodbi 0.9.0
 ================

@@ -52,6 +52,14 @@ src_sqlite <- function(dbname = ":memory:",
   # set timeout for concurrency to 10s
   DBI::dbExecute(con, "PRAGMA busy_timeout = 10000;")
 
+  # ensure disconnect
+  reg.finalizer(
+    e = globalenv(),
+    f = closeNodbiConnections,
+    onexit = TRUE
+  )
+  # message("nodbi src_sqlite reg.finalizer registered")
+
   # return standard nodbi structure
   structure(list(con = con,
                  dbname = dbname,

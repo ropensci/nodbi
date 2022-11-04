@@ -67,6 +67,14 @@ src_postgres <- function(dbname = "test",
          "', but this is needed for nodbi::docdb_update()")
   }
 
+  # ensure disconnect
+  reg.finalizer(
+    e = globalenv(),
+    f = closeNodbiConnections,
+    onexit = TRUE
+  )
+  # message("nodbi src_postgres reg.finalizer registered")
+
   # return standard nodbi structure
   structure(list(con = con,
                  dbname = dbname,
