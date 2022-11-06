@@ -9,11 +9,6 @@ nodbi 0.9.0
 
 ### Changes
 * adding support for duckdb (R package version 0.6.0 or higher) as database backend
-
-nodbi 0.8.1.9000
-================
-
-### Changes
 * suppressed warnings when checking if a string points to a file
 
 nodbi 0.8.1
@@ -37,12 +32,6 @@ nodbi 0.7.1
 ### BUG FIXES
 * fixed `docdb_query` to account for change in SQLite 3.38.3 adding quotation of labels (closes issue #44), test added
 * made `docdb_query` work for PostgreSQL when a string used with the `$in` operator has a comma(s), test added
-
-nodbi 0.7.0.9000
-================
-
-### Changes
-* new development version
 
 nodbi 0.7.0
 ===========
