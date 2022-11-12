@@ -3,6 +3,7 @@ nodbi 0.9.0.9000
 
 ### Changes
 * added closing connections to SQL database backends upon session restart
+* capture marginal case of no rows in docdb_query()
 
 nodbi 0.9.0
 ================

@@ -886,7 +886,7 @@ dbiGetProcessData <- function(
   out <- out[, seq_len(ncol(out))[!sapply(out, function(r) all(is.na(r)))], drop = FALSE]
 
   # early return
-  if (identical(names(out), "_id") || nrow(out) == 1L) return(out)
+  if (identical(names(out), "_id") || nrow(out) <= 1L) return(out)
 
   # remove rows with all NAs except in _id. iteration
   # needed, apply cannot handle complex column content
@@ -897,6 +897,7 @@ dbiGetProcessData <- function(
       # unlist conveniently drops NULL values
       is.na(unlist(out[r, sdn, drop = TRUE], use.names = FALSE))))
   }
+  if (!length(allEmpty)) allEmpty <- TRUE
 
   # return
   return(out[!allEmpty, , drop = FALSE])
