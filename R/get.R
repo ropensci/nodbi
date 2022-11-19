@@ -61,6 +61,11 @@ docdb_get.src_elastic <- function(src, key, limit = "10000", ...) {
   docids <- elastic::Search(
     src$con, key, source = FALSE,
     size = limit, ...)[["hits"]][["hits"]]
+
+  # early exit
+  if(!length(docids)) return(NULL)
+
+  # get ids
   docids <- sapply(docids, "[[", "_id", USE.NAMES = FALSE, simplify = TRUE)
   docids <- sort(docids)
 
@@ -166,8 +171,9 @@ sqlGet <- function(src, key, limit = NULL, statement, ...) {
 
   # get data, write to file in ndjson format
   writeLines(
-    # eliminate rows without any json
-    stats::na.omit(
+    paste0(
+      # protect against empty query result
+      "",
       DBI::dbGetQuery(
         conn = src$con,
         statement = statement,
@@ -178,7 +184,6 @@ sqlGet <- function(src, key, limit = NULL, statement, ...) {
   close(tfnameCon)
 
   # stream in ndjson records
-  return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE)) # # friends.id friends.name
-  # return(jsonify::from_ndjson(tfname, simplify = TRUE)) # tags.1 tags.2 tags.3 tags.4 friends.id friends.name
+  return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE))
 
 }

@@ -4,7 +4,7 @@
 \alias{src_duckdb}
 \title{Setup a DuckDB database connection}
 \usage{
-src_duckdb(drv = duckdb::duckdb(), dbdir = ":memory:", ...)
+src_duckdb(drv = duckdb::duckdb(), dbdir = attr(drv, "dbdir"), ...)
 }
 \arguments{
 \item{drv}{Object returned by \code{duckdb()}}

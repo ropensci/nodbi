@@ -16,6 +16,13 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
     rm(src, key, tmp)
   }, silent = TRUE), add = TRUE)
 
+  # no data
+  expect_equal(docdb_create(src = src, key = key, value = data.frame()), 0L)
+  tdf <- docdb_get(src = src, key = key)
+  expect_true(is.null(tdf) || !nrow(tdf))
+  if (!inherits(src, "src_mongo")) expect_true(docdb_delete(src = src, key = key))
+  expect_false(docdb_delete(src = src, key = key))
+
   # testDf
   expect_equal(docdb_create(src = src, key = key, value = testDf), nrow(testDf))
   expect_message(docdb_create(src = src, key = key, value = testDf[0, ]), "already exists")
@@ -230,5 +237,82 @@ test_that("docdb_update, docdb_query", {
 
   # clean up
   expect_true(docdb_delete(src = src, key = key))
+
+})
+
+#### transactions ####
+test_that("parallel writes", {
+
+  # check what's up
+  tmp <- dbSrcKey()
+  src <- tmp$testSrc
+  cls <- class(src)[1]
+
+  if (any(cls == c("src_sqlite", "src_postgres", "src_duckdb"))) {
+    DBI::dbDisconnect(src$con, shutdown = TRUE)
+  }
+  expect_true(TRUE)
+
+  ## sqlite
+  if (cls == "src_sqlite") {
+
+    tf <- tempfile(fileext = ".sqlite")
+    key <- createKey()
+    #
+    #
+    rp1 <- callr::r_bg(function(tf, key) {
+      src <- nodbi::src_sqlite(dbname = tf, key = key)
+      nodbi::docdb_create(src = src, key = key, value = iris)
+    }, args = list(tf, key))
+    rp2 <- callr::r_bg(function(tf, key) {
+      src <- nodbi::src_sqlite(dbname = tf, key = key)
+      nodbi::docdb_create(src = src, key = key, value = iris)
+    }, args = list(tf, key))
+    #
+    rp1$wait(); rp2$wait()
+    #
+    expect_equal(rp1$get_result() + rp2$get_result(), 2 * nrow(iris))
+    src <- src_sqlite(dbname = tf, key = key)
+    expect_equal(dim(docdb_get(src = src, key = key)), c(300L, 6L))
+    #
+    #
+    expect_true(docdb_delete(src = src, key = key))
+    DBI::dbDisconnect(src$con, shutdown = TRUE)
+    unlink(tf)
+
+  }
+
+  ## postgresql
+  if (cls == "src_postgres") {
+
+    key <- createKey()
+    #
+    #
+    rp1 <- callr::r_bg(function(key) {
+      src <- nodbi::src_postgres()
+      nodbi::docdb_create(src = src, key = key, value = iris)
+    }, args = list(key))
+    rp2 <- callr::r_bg(function(key) {
+      src <- nodbi::src_postgres()
+      nodbi::docdb_create(src = src, key = key, value = iris)
+    }, args = list(key))
+    #
+    rp1$wait(); rp2$wait()
+    #
+    expect_equal(rp1$get_result() + rp2$get_result(), 2 * nrow(iris))
+    src <- nodbi::src_postgres()
+    expect_equal(dim(docdb_get(src = src, key = key)), c(300L, 6L))
+    #
+    #
+    expect_true(docdb_delete(src = src, key = key))
+    DBI::dbDisconnect(src$con, shutdown = TRUE)
+
+  }
+
+  ## duckdb
+  #
+  # https://duckdb.org/docs/api/r.html
+  # Read-only mode is required if multiple R processes
+  # want to access the same database file at the same time.
 
 })

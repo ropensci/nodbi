@@ -338,16 +338,25 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
     # standard for a nodbi json table in sqlite
     # standard: columns _id and json
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0("CREATE TABLE \"", key, "\"",
-                         " ( _id TEXT PRIMARY_KEY NOT NULL,",
-                         "  json JSON);"))
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0("CREATE UNIQUE INDEX ",
-                         "\"", key, "_index\" ON ",
-                         "\"", key, "\" ( _id );"))
+    out <- try(
+      DBI::dbWithTransaction(
+        conn = src$con,
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0("CREATE TABLE \"", key, "\"",
+                               " ( _id TEXT PRIMARY_KEY NOT NULL,",
+                               "  json JSON);"))
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0("CREATE UNIQUE INDEX ",
+                               "\"", key, "_index\" ON ",
+                               "\"", key, "\" ( _id );"))
+        }), silent = TRUE)
+
+    if (inherits(out, "try-error") &&
+        !grepl(" already exists", out)) stop(out)
+
   } else {
     existsMessage(key)
   }
@@ -433,15 +442,14 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
   # insert data
   result <- try(
-    dbWithTransaction(
-      src$con, {
-        DBI::dbAppendTable(
-          conn = src$con,
-          name = key,
-          # canonical value: a data frame
-          # with 2 columns, _id and json
-          value = value)
-      }),
+    # dbAppendTable() uses transactions
+    # since RSQLite 2.2.2 (2021-01-04)
+    RSQLite::dbAppendTable(
+      conn = src$con,
+      name = key,
+      # canonical value: a data frame
+      # with 2 columns, _id and json
+      value = value),
     silent = TRUE)
 
   # prepare returns
@@ -466,17 +474,24 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
     # standard for a nodbi json table in PostgreSQL
     # standard: columns _id and json
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0("CREATE TABLE \"", key, "\"",
-                         " ( _id TEXT PRIMARY KEY,",
-                         "  json JSONB);"))
+    out <- try({
+      # dbiWithTransaction does not work
+      DBI::dbExecute(
+        conn = src$con,
+        statement = paste0("CREATE TABLE \"", key, "\"",
+                           " ( _id TEXT PRIMARY KEY,",
+                           "  json JSONB);"))
+      DBI::dbExecute(
+        conn = src$con,
+        statement = paste0("CREATE UNIQUE INDEX ",
+                           "\"", key, "_index\" ON ",
+                           "\"", key, "\" ( _id );"))
 
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0("CREATE UNIQUE INDEX ",
-                         "\"", key, "_index\" ON ",
-                         "\"", key, "\" ( _id );"))
+    }, silent = TRUE)
+
+    if (inherits(out, "try-error") &&
+        !grepl(" already exists", out)) stop(out)
+
   } else {
     existsMessage(key)
   }
@@ -563,7 +578,8 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
   # insert data
   result <- try(
     DBI::dbWithTransaction(
-      src$con, {
+      conn = src$con,
+      code = {
         DBI::dbAppendTable(
           conn = src$con,
           name = key,
@@ -593,28 +609,39 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
     # standard for a nodbi json table in duckdb
     # standard: columns _id and json
-    # dbWithTransaction(
-    #   src$con, {
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0(
-        "CREATE TABLE \"", key, "\"",
-        " ( _id TEXT PRIMARY KEY NOT NULL,",
-        "  json JSON);"))
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0(
-        "CREATE UNIQUE INDEX ",
-        "\"", key, "_index\" ON ",
-        "\"", key, "\" ( _id );"))
-    # })
+    out <- try(
+      DBI::dbWithTransaction(
+        conn = src$con,
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0("CREATE TABLE \"", key, "\"",
+                               " ( _id TEXT PRIMARY KEY NOT NULL,",
+                               "  json JSON);"))
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0("CREATE UNIQUE INDEX ",
+                               "\"", key, "_index\" ON ",
+                               "\"", key, "\" ( _id );"))
+        }), silent = TRUE)
+
+    if (inherits(out, "try-error") &&
+        !grepl(" already exists", out)) stop(out)
+
   } else {
     existsMessage(key)
   }
 
+  # https://duckdb.org/docs/api/r.html
+  # Read-only mode is required if multiple R processes
+  # want to access the same database file at the same time.
+
+  # https://duckdb.org/docs/api/r.html#efficient-transfer
+  # https://duckdb.org/docs/extensions/json#json-creation-functions
+
   # alternatives:
-  # - write out as ndjson and import (move up), low memory, but speed?
-  # - convert to df and AppendTable, memory, speed?
+  # - write out as ndjson and import
+  # - convert to df and AppendTable
   # => test
 
   # if value is not a file name, convert value
@@ -715,18 +742,19 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
   # import from ndjson file
   result <- try(
     suppressWarnings(
-      # dbWithTransaction(
-      # src$con, {
-      DBI::dbExecute(
+      DBI::dbWithTransaction(
         conn = src$con,
-        statement = paste0(
-          "INSERT INTO \"", key, "\"",
-          " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
-          " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
-          " json_merge_patch(json, '{\"_id\": null}') AS json ",
-          " FROM read_ndjson_objects('",
-          value, "');"))
-      # })
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0(
+              "INSERT INTO \"", key, "\"",
+              " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
+              " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
+              " json_merge_patch(json, '{\"_id\": null}') AS json ",
+              " FROM read_ndjson_objects('",
+              value, "');"))
+        })
     ),
     silent = TRUE)
 

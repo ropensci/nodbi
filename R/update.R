@@ -274,11 +274,13 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # update data
   result <- try(
-    DBI::dbExecute(
+    DBI::dbWithTransaction(
       conn = src$con,
-      statement = statement
-    ),
-    silent = TRUE)
+      code = {
+        DBI::dbExecute(
+          conn = src$con,
+          statement = statement
+        )}), silent = TRUE)
 
   # return
   return(result)

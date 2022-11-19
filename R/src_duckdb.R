@@ -16,7 +16,7 @@
 #' }
 src_duckdb <- function(
     drv = duckdb::duckdb(),
-    dbdir = ':memory:',
+    dbdir = attr(drv, "dbdir"),
     ...) {
 
   con <- duckdb::dbConnect(
@@ -31,7 +31,6 @@ src_duckdb <- function(
     f = closeNodbiConnections,
     onexit = TRUE
   )
-  # message("nodbi src_duckdb reg.finalizer registered")
 
   # potential security concern with
   # storing the full connection string

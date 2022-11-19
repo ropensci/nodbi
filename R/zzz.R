@@ -17,46 +17,6 @@ assert <- function(x, y) {
   }
 }
 
-# used with sqlite
-dbWithTransaction <- function(conn, statement) {
-
-  rollback <- function(e) {
-    call <- DBI::dbExecute(conn, "ROLLBACK")
-    if (identical(call, FALSE)) {
-      stop(
-        paste0(
-          "Failed to rollback transaction. ",
-          "Tried to roll back because an error occurred: ",
-          conditionMessage(e)
-        ),
-        call. = FALSE
-      )
-    }
-    if (inherits(e, "error")) {
-      stop(e)
-    }
-  }
-
-  call <- DBI::dbExecute(conn, "BEGIN IMMEDIATE")
-  if (identical(call, FALSE)) {
-    stop("Failed to begin transaction", call. = FALSE)
-  }
-
-  tryCatch({
-    res <- force(statement)
-    call <- DBI::dbExecute(conn, "COMMIT")
-    if (identical(call, FALSE)) {
-      stop("Failed to commit transaction", call. = FALSE)
-    }
-    res
-  },
-  db_abort = rollback,
-  error = rollback,
-  interrupt = rollback
-  )
-
-}
-
 # manage clsoing database connection(s)
 closeNodbiConnections <- function(e) {
 
@@ -92,7 +52,7 @@ closeNodbiConnections <- function(e) {
 
       # inform user
       if (!inherits(res, "try-error") && res)
-        message("nodbi: docdb_src '", objName, "' disconnected, shut down. ")
+        message("nodbi: docdb_src '", objName, "' disconnected and shut down. ")
 
     }
   }
@@ -125,14 +85,10 @@ closeNodbiConnections <- function(e) {
     onexit = TRUE
   )
 
-  # message("nodbi .onLoad reg.finalizer registered")
-
 }
 
 # a session restart does not trigger this
 .onUnload <- function(libpath) {
-
-  # message("nodbi running .onUnload()")
 
   closeNodbiConnections(e = globalenv())
 

@@ -53,9 +53,8 @@ docdb_exists.src_mongo <- function(src, key, ...) {
 
 #' @export
 docdb_exists.src_sqlite <- function(src, key, ...) {
-  return(any(key == DBI::dbListTables(src$con, ...)))
+  return(any(key == RSQLite::dbListTables(src$con, ...)))
 }
-
 
 #' @export
 docdb_exists.src_postgres <- function(src, key, ...) {

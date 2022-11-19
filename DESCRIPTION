@@ -41,7 +41,8 @@ Suggests:
     duckdb (>= 0.6.0),
     RPostgres,
     testthat,
-    withr
+    withr,
+    callr
 Additional_repositories: https://duckdb.r-universe.dev
 RoxygenNote: 7.2.2
 X-schema.org-applicationCategory: Databases

@@ -171,7 +171,8 @@ sqlDelete <- function(src, key, ...) {
     return(docdb_exists(src, key) &&
       as.logical(
         DBI::dbWithTransaction(
-          src$con, {
+          conn = src$con,
+          code = {
             DBI::dbExecute(
               conn = src$con,
               statement = statement)
@@ -183,7 +184,8 @@ sqlDelete <- function(src, key, ...) {
       # remove table
       as.logical(
         DBI::dbWithTransaction(
-          src$con, {
+          conn = src$con,
+          code = {
             DBI::dbRemoveTable(
               conn = src$con,
               name = key)
