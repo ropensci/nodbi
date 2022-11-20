@@ -1,13 +1,13 @@
-# helper functions
+# nodbi helper functions
 
-# used with redis, couchdb, elastic
+# used with couchdb, elastic
 doc_wrap <- function(..., indent = 0, width = getOption("width")) {
   x <- paste0(..., collapse = "")
   wrapped <- strwrap(x, indent = indent, exdent = indent + 5L, width = width)
   paste0(wrapped, collapse = "\n")
 }
 
-# used across
+# used across nodbi
 assert <- function(x, y) {
   if (!is.null(x)) {
     if (!any(class(x) %in% y)) {
@@ -17,10 +17,11 @@ assert <- function(x, y) {
   }
 }
 
-# manage clsoing database connection(s)
+# close database connection(s)
 closeNodbiConnections <- function(e) {
 
-  # message("nodbi running closeNodbiConnections()")
+  # this function is called by .onLoad, .onUnload, and
+  # from reg.finalizer in src_{sqlite,postgres,duckdb}
 
   # search environment for docdb_src connections
   objIsNodbiConnection <- sapply(
@@ -31,22 +32,23 @@ closeNodbiConnections <- function(e) {
   if (!length(objIsNodbiConnection)) return(invisible(NULL))
   objIsNodbiConnection <- objIsNodbiConnection[objIsNodbiConnection]
 
-  # disconnect
+  # disconnect helper function
   nodbiDisconnect <- function(objName) {
 
     # get duckdb driver information
     ddbdrv <- attr(eval(parse(text = objName))$con, "driver")
 
-    #
+    # close valid, and also invalid connections such as
+    # needed for DuckDB where then driver is not null
     if (DBI::dbIsValid(eval(parse(text = objName))$con) ||
-        # duckdb needs to be shutdown
         (!is.null(ddbdrv) && DBI::dbIsValid(ddbdrv))) {
 
       # disconnect and shutdown if needed
       res <- try(suppressWarnings(
         DBI::dbDisconnect(
           eval(parse(text = objName))$con,
-          # duckdb needs to be shut down
+          # duckdb needs to be shut down; parameter
+          # does not adversely affect other backends
           shutdown = TRUE)),
         silent = TRUE)
 
@@ -60,22 +62,23 @@ closeNodbiConnections <- function(e) {
   # iterate over connections
   for (i in seq_along(objIsNodbiConnection)) {
 
-    # get name of object
+    # get name of connection object
     objName <- names(objIsNodbiConnection[i])
 
     # run disconnect
     switch(
+      # class is e.g., src_duckdb docdb_src
       class(eval(parse(text = objName)))[1],
       "src_duckdb" = nodbiDisconnect(objName),
       "src_sqlite" = nodbiDisconnect(objName),
       "src_postgres" = nodbiDisconnect(objName),
       NULL
     )
-
   }
+
 }
 
-# set up generic handler before database is accessed
+# set up handler before database is accessed
 # this is triggered e.g. by session restart
 .onLoad <- function(libname, pkgname) {
 

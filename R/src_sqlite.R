@@ -58,7 +58,6 @@ src_sqlite <- function(dbname = ":memory:",
     f = closeNodbiConnections,
     onexit = TRUE
   )
-  # message("nodbi src_sqlite reg.finalizer registered")
 
   # return standard nodbi structure
   structure(list(con = con,

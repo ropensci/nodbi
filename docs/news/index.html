@@ -51,21 +51,17 @@
 <h2 class="page-header" data-toc-text="0.9.0.9000" id="nodbi-0909000">nodbi 0.9.0.9000<a class="anchor" aria-label="anchor" href="#nodbi-0909000"></a></h2>
 <div class="section level4">
 <h4 id="changes-0-9-0-9000">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-0-9000"></a></h4>
-<ul><li>new development version</li>
+<ul><li>corrected closing connections to SQL database backends upon session restart</li>
+<li>improved provisions for parallel write access and corresponding tests</li>
+<li>capture marginal case of no rows in docdb_query()</li>
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.9.0" id="nodbi-090">nodbi 0.9.0<a class="anchor" aria-label="anchor" href="#nodbi-090"></a></h2>
+<h2 class="page-header" data-toc-text="0.9.0" id="nodbi-090">nodbi 0.9.0<small>2022-10-31</small><a class="anchor" aria-label="anchor" href="#nodbi-090"></a></h2>
 <div class="section level4">
 <h4 id="changes-0-9-0">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-0"></a></h4>
 <ul><li>adding support for duckdb (R package version 0.6.0 or higher) as database backend</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="page-header" data-toc-text="0.8.1.9000" id="nodbi-0819000">nodbi 0.8.1.9000<a class="anchor" aria-label="anchor" href="#nodbi-0819000"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-8-1-9000">Changes<a class="anchor" aria-label="anchor" href="#changes-0-8-1-9000"></a></h4>
-<ul><li>suppressed warnings when checking if a string points to a file</li>
+<li>suppressed warnings when checking if a string points to a file</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -92,13 +88,6 @@
 <h4 id="bug-fixes-0-7-1">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-1"></a></h4>
 <ul><li>fixed <code>docdb_query</code> to account for change in SQLite 3.38.3 adding quotation of labels (closes issue <a href="https://github.com/ropensci/nodbi/issues/44" class="external-link">#44</a>), test added</li>
 <li>made <code>docdb_query</code> work for PostgreSQL when a string used with the <code>$in</code> operator has a comma(s), test added</li>
-</ul></div>
-</div>
-    <div class="section level2">
-<h2 class="page-header" data-toc-text="0.7.0.9000" id="nodbi-0709000">nodbi 0.7.0.9000<a class="anchor" aria-label="anchor" href="#nodbi-0709000"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-7-0-9000">Changes<a class="anchor" aria-label="anchor" href="#changes-0-7-0-9000"></a></h4>
-<ul><li>new development version</li>
 </ul></div>
 </div>
     <div class="section level2">

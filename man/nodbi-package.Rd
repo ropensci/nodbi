@@ -3,7 +3,6 @@
 \docType{package}
 \name{nodbi-package}
 \alias{nodbi-package}
-\alias{nodbi}
 \title{Document database connector}
 \description{
 Simplified document database access and manipulation,

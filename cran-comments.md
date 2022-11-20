@@ -1,6 +1,6 @@
 ## Test environments
 
-* Local: macOS 21.6.0, R 4.1.2; with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB databases
+* Local: macOS 21.6.0, R 4.3.0; with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB databases
 * Github Actions: Ubuntu 20.04; R release and R devel
 * win-builder: R Under development (unstable) (2022-10-11 r83083 ucrt), x86_64-w64-mingw32 (64-bit)
 * R-hub: Windows Server 2022, R-devel, 64 bit; Ubuntu Linux 20.04.1 LTS, R-release, GCC; Fedora Linux, R-devel, clang, gfortran
@@ -19,9 +19,9 @@ Availability using Additional_repositories specification:
 
 ### Changes
 
- * now can also use DuckDB as new backend storage
- * DuckDB 0.6.0 or higher is needed, so far only in repository as per note
- * DESCRIPTION has in Suggests: duckdb (>= 0.6.0)
+ * corrected closing connections to SQL database backends upon session restart
+ * improved provisions for parallel write access and corresponding tests
+ * capture marginal case of no rows in docdb_query()
 
 ## revdepcheck results
 
