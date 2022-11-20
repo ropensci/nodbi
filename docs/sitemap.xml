@@ -28,6 +28,12 @@
     <loc>/pull_request_template.html</loc>
   </url>
   <url>
+    <loc>/reference/contacts.html</loc>
+  </url>
+  <url>
+    <loc>/reference/diamonds.html</loc>
+  </url>
+  <url>
     <loc>/reference/docdb_create.html</loc>
   </url>
   <url>
@@ -52,10 +58,13 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/mapdata.html</loc>
+  </url>
+  <url>
     <loc>/reference/nodbi-package.html</loc>
   </url>
   <url>
-    <loc>/reference/nodbi-src.html</loc>
+    <loc>/reference/src.html</loc>
   </url>
   <url>
     <loc>/reference/src_couchdb.html</loc>

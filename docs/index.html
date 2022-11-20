@@ -409,9 +409,9 @@
 <span> <span class="fu"><a href="reference/docdb_delete.html">docdb_delete</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="co"># 2022-10-29 with 2015 mobile hardware </span></span>
+<span><span class="co"># 2022-11-20 with 2015 mobile hardware </span></span>
 <span><span class="co"># without any database optimisations</span></span>
-<span><span class="fu">rbenchmark</span><span class="fu">::</span><span class="fu">benchmark</span><span class="op">(</span></span>
+<span><span class="fu">rbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rbenchmark/man/benchmark.html" class="external-link">benchmark</a></span><span class="op">(</span></span>
 <span> MongoDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcMongo</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
 <span> SQLite <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcSqlite</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
 <span> Elastic <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcElastic</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
@@ -423,38 +423,38 @@
 <span><span class="op">)</span></span>
 <span><span class="co"># on 2015 mobile hardware as per above</span></span>
 <span><span class="co">#         test replications elapsed</span></span>
-<span><span class="co"># 4    CouchDB           10     945</span></span>
-<span><span class="co"># 3    Elastic           10     151 # 10s to be subtracted</span></span>
-<span><span class="co"># 2     SQLite           10      48</span></span>
+<span><span class="co"># 4    CouchDB           10     940</span></span>
+<span><span class="co"># 3    Elastic           10     150 # 10s to be subtracted</span></span>
 <span><span class="co"># 5 PostgreSQL           10      46</span></span>
-<span><span class="co"># 6     DuckDB           10      43</span></span>
-<span><span class="co"># 1    MongoDB           10      42</span></span></code></pre></div>
+<span><span class="co"># 6     DuckDB           10      44</span></span>
+<span><span class="co"># 2     SQLite           10      43</span></span>
+<span><span class="co"># 1    MongoDB           10      41</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
 </h2>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 2022-10-29</span></span>
+<code class="sourceCode R"><span><span class="co"># 2022-11-20</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># ✔ | F W S  OK | Context</span></span>
-<span><span class="co"># ✔ |        90 | couchdb [93.5s]                                                         </span></span>
-<span><span class="co"># ✔ |        97 | duckdb [3.9s]                                                           </span></span>
-<span><span class="co"># ✔ |     1  61 | elastic [75.0s]                                                         </span></span>
-<span><span class="co"># ────────────────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co"># Skip (core-nodbi.R:164): docdb_query</span></span>
+<span><span class="co"># ✔ |        95 | couchdb [105.4s]                                                                      </span></span>
+<span><span class="co"># ✔ |       102 | duckdb [4.5s]                                                                         </span></span>
+<span><span class="co"># ✔ |     1  66 | elastic [83.2s]                                                                       </span></span>
+<span><span class="co"># ──────────────────────────────────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co"># Skip (core-nodbi.R:171): docdb_query</span></span>
 <span><span class="co"># Reason: queries need to be translated into elastic syntax</span></span>
-<span><span class="co"># ────────────────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co"># ✔ |        97 | mongodb [4.3s]                                                          </span></span>
-<span><span class="co"># ✔ |        97 | postgres [6.5s]                                                         </span></span>
-<span><span class="co"># ✔ |        96 | sqlite [4.0s]                                                           </span></span>
+<span><span class="co"># ──────────────────────────────────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co"># ✔ |       101 | mongodb [4.3s]                                                                        </span></span>
+<span><span class="co"># ✔ |       105 | postgres [8.0s]                                                                       </span></span>
+<span><span class="co"># ✔ |       104 | sqlite [6.3s]                                                                         </span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ══ Results ═════════════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co"># Duration: 187.5 s</span></span>
+<span><span class="co"># ══ Results ═══════════════════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co"># Duration: 212.3 s</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ── Skipped tests  ──────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co"># ── Skipped tests  ────────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co"># • queries need to be translated into elastic syntax (1)</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 1 | PASS 538 ]</span></span></code></pre></div>
+<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 1 | PASS 573 ]</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>

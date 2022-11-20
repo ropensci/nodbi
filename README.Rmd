@@ -330,7 +330,7 @@ testFunction <- function(src, key, value, query, fields) {
  docdb_delete(src, key)
 }
 
-# 2022-10-29 with 2015 mobile hardware 
+# 2022-11-20 with 2015 mobile hardware 
 # without any database optimisations
 rbenchmark::benchmark(
  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
@@ -344,38 +344,38 @@ rbenchmark::benchmark(
 )
 # on 2015 mobile hardware as per above
 #         test replications elapsed
-# 4    CouchDB           10     945
-# 3    Elastic           10     151 # 10s to be subtracted
-# 2     SQLite           10      48
+# 4    CouchDB           10     940
+# 3    Elastic           10     150 # 10s to be subtracted
 # 5 PostgreSQL           10      46
-# 6     DuckDB           10      43
-# 1    MongoDB           10      42
+# 6     DuckDB           10      44
+# 2     SQLite           10      43
+# 1    MongoDB           10      41
 ```
 
 ## Testing
 
 ```{r}
-# 2022-10-29
+# 2022-11-20
 testthat::test_local()
 # ✔ | F W S  OK | Context
-# ✔ |        90 | couchdb [93.5s]                                                         
-# ✔ |        97 | duckdb [3.9s]                                                           
-# ✔ |     1  61 | elastic [75.0s]                                                         
-# ────────────────────────────────────────────────────────────────────────────────────────
-# Skip (core-nodbi.R:164): docdb_query
+# ✔ |        95 | couchdb [105.4s]                                                                      
+# ✔ |       102 | duckdb [4.5s]                                                                         
+# ✔ |     1  66 | elastic [83.2s]                                                                       
+# ──────────────────────────────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:171): docdb_query
 # Reason: queries need to be translated into elastic syntax
-# ────────────────────────────────────────────────────────────────────────────────────────
-# ✔ |        97 | mongodb [4.3s]                                                          
-# ✔ |        97 | postgres [6.5s]                                                         
-# ✔ |        96 | sqlite [4.0s]                                                           
+# ──────────────────────────────────────────────────────────────────────────────────────────────────────
+# ✔ |       101 | mongodb [4.3s]                                                                        
+# ✔ |       105 | postgres [8.0s]                                                                       
+# ✔ |       104 | sqlite [6.3s]                                                                         
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════
-# Duration: 187.5 s
+# ══ Results ═══════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 212.3 s
 # 
-# ── Skipped tests  ──────────────────────────────────────────────────────────────────────
+# ── Skipped tests  ────────────────────────────────────────────────────────────────────────────────────
 # • queries need to be translated into elastic syntax (1)
 # 
-# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 538 ]
+# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 573 ]
 ```
 
 

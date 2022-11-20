@@ -59,8 +59,7 @@ NULL
 #' @source from \pkg{ggplot2}
 #' @name diamonds
 #' @docType data
-#' @keywords data
-#' @noRd
+#' @keywords datasets
 NULL
 
 
@@ -69,10 +68,7 @@ NULL
 #' @format A JSON string with ragged, nested contact details
 #' @name contacts
 #' @docType data
-#' @keywords data
-#' @export
-#' @noRd
-#'
+#' @keywords datasets
 contacts <- '
 [
   {
@@ -239,13 +235,10 @@ contacts <- '
 
 #' mapdata JSON data set
 #'
-#' @format A JSON string with ragged, nested map
+#' @format A JSON string with ragged, nested travel details
 #' @name mapdata
 #' @docType data
-#' @keywords data
-#' @noRd
-#' @export
-#'
+#' @keywords datasets
 mapdata <- '
   [{"destination_addresses": [
     "Miami, FL, USA",

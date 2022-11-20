@@ -1,7 +1,6 @@
 #' Setup database connections
 #'
-#' @name nodbi-src
-#' @details There is a `src_*()` function to setup a connection to each
+#' There is a `src_*()` function to setup a connection to each
 #' of the database backends. The backends may have specific parameters
 #' in the respective function `src_*()`, but all other `nodbi` functions
 #' are independent of the backend (e.g., see [docdb_query()]).
@@ -32,4 +31,5 @@
 #' - RPostgres - \url{https://rpostgres.r-dbi.org/}
 #' - duckdb - \url{https://duckdb.r-universe.dev/ui#package:duckdb}
 #'
+#' @name src
 NULL
