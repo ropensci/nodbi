@@ -32,6 +32,17 @@ src_duckdb <- function(
     onexit = TRUE
   )
 
+  # test and advise
+  tst <- try(
+    dbGetQuery(con, "SELECT json_valid('{\"a\": [\"b\", null]}');"),
+    silent = TRUE)
+  if (inherits(tst, "try-error") || !tst[[1]]) {
+    warning(
+      "DuckDB extension JSON not available. Run ",
+      "dbExecute(<connection>, 'INSTALL json; LOAD json;') or ",
+      "install.packages('duckdb', repos = 'https://duckdb.r-universe.dev')")
+  }
+
   # potential security concern with
   # storing the full connection string
   structure(list(con = con,
