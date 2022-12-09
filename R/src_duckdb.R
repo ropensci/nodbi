@@ -34,13 +34,19 @@ src_duckdb <- function(
 
   # test and advise
   tst <- try(
-    dbGetQuery(con, "SELECT json_valid('{\"a\": [\"b\", null]}');"),
+    DBI::dbGetQuery(con, "SELECT json_valid('{\"a\": [\"b\", null]}');"),
     silent = TRUE)
   if (inherits(tst, "try-error") || !tst[[1]]) {
-    warning(
-      "DuckDB extension JSON not available. Run ",
-      "dbExecute(<connection>, 'INSTALL json; LOAD json;') or ",
-      "install.packages('duckdb', repos = 'https://duckdb.r-universe.dev')")
+    tst <- try(
+      DBI::dbExecute(con, "LOAD json;"),
+      silent = TRUE)
+    if (inherits(tst, "try-error") || (tst[[1]] != 0L)) {
+      stop(
+        "DuckDB extension JSON not loadable. To install it, run ",
+        "DBI::dbExecute(duckdb::dbConnect(duckdb::duckdb()), 'INSTALL json;') or ",
+        "install.packages('duckdb', repos = 'https://duckdb.r-universe.dev')",
+        call. = FALSE)
+    }
   }
 
   # potential security concern with
