@@ -69,6 +69,7 @@ NULL
 #' @name contacts
 #' @docType data
 #' @keywords datasets
+#' @export
 contacts <- '
 [
   {
@@ -239,6 +240,7 @@ contacts <- '
 #' @name mapdata
 #' @docType data
 #' @keywords datasets
+#' @export
 mapdata <- '
   [{"destination_addresses": [
     "Miami, FL, USA",
