@@ -74,19 +74,13 @@ a table name for SQLite and for PostgreSQL)</p></dd>
 <dt>query</dt>
 <dd><p>(character) A JSON query string, see examples.
 Can use multiple comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
-with at most one logic operator ('$and' if not specified, or '$or').</p></dd>
+with at most one logic operator ('$and' if not specified, or '$or'),
+see examples.</p></dd>
 
 
 <dt>...</dt>
 <dd><p>Optionally, <code>fields</code> a JSON string of fields to
-be returned from anywhere in the tree (dot paths notation).</p>
-<p>Main functions used per database:</p><ul><li><p>MongoDB: find() in <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
-<li><p>SQLite: SQL query using <code>json_tree()</code></p></li>
-<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/Search.html" class="external-link">elastic::Search()</a></code></p></li>
-<li><p>CouchDB: <code><a href="https://rdrr.io/pkg/sofa/man/db_query.html" class="external-link">sofa::db_query()</a></code></p></li>
-<li><p>PostgreSQL: SQL query using built-in <code>jsonb_build_object()</code></p></li>
-<li><p>DuckDB: SQL using built-in <code>json_extract()</code></p></li>
-</ul></dd>
+be returned from anywhere in the tree (dot paths notation), see examples.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -96,6 +90,17 @@ be returned from anywhere in the tree (dot paths notation).</p>
 <p>Data frame with requested data, may have nested
 lists in columns</p>
     </div>
+    <div id="note">
+    <h2>Note</h2>
+    <p>A dot in <code>query</code> or <code>fields</code> is interpreted as a dot poth;
+it is not supported to have a dot in the key / name of a field.</p>
+<p>Main functions used per database:</p><ul><li><p>MongoDB: find() in <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
+<li><p>SQLite: SQL query using <code>json_tree()</code></p></li>
+<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/Search.html" class="external-link">elastic::Search()</a></code></p></li>
+<li><p>CouchDB: <code><a href="https://rdrr.io/pkg/sofa/man/db_query.html" class="external-link">sofa::db_query()</a></code></p></li>
+<li><p>PostgreSQL: SQL query using built-in <code>jsonb_build_object()</code></p></li>
+<li><p>DuckDB: SQL using built-in <code>json_extract()</code></p></li>
+</ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>

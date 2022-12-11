@@ -18,10 +18,22 @@ a table name for SQLite and for PostgreSQL)}
 
 \item{query}{(character) A JSON query string, see examples.
 Can use multiple comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
-with at most one logic operator ('$and' if not specified, or '$or').}
+with at most one logic operator ('$and' if not specified, or '$or'),
+see examples.}
 
 \item{...}{Optionally, \code{fields} a JSON string of fields to
-be returned from anywhere in the tree (dot paths notation).
+be returned from anywhere in the tree (dot paths notation), see examples.}
+}
+\value{
+Data frame with requested data, may have nested
+lists in columns
+}
+\description{
+Get documents with a filtering query
+}
+\note{
+A dot in \code{query} or \code{fields} is interpreted as a dot poth;
+it is not supported to have a dot in the key / name of a field.
 
 Main functions used per database:
 \itemize{
@@ -31,14 +43,7 @@ Main functions used per database:
 \item CouchDB: \code{\link[sofa:db_query]{sofa::db_query()}}
 \item PostgreSQL: SQL query using built-in \code{jsonb_build_object()}
 \item DuckDB: SQL using built-in \code{json_extract()}
-}}
 }
-\value{
-Data frame with requested data, may have nested
-lists in columns
-}
-\description{
-Get documents with a filtering query
 }
 \examples{
 \dontrun{

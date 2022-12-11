@@ -4,10 +4,14 @@
 #'
 #' @param query (character) A JSON query string, see examples.
 #'  Can use multiple comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
-#'  with at most one logic operator ('$and' if not specified, or '$or').
+#'  with at most one logic operator ('$and' if not specified, or '$or'),
+#'  see examples.
 #'
 #' @param ... Optionally, `fields` a JSON string of fields to
-#' be returned from anywhere in the tree (dot paths notation).
+#' be returned from anywhere in the tree (dot paths notation), see examples.
+#'
+#' @note A dot in `query` or `fields` is interpreted as a dot poth;
+#' it is not supported to have a dot in the key / name of a field.
 #'
 #' Main functions used per database:
 #' - MongoDB: find() in [mongolite::mongo()]
