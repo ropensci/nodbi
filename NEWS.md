@@ -3,6 +3,7 @@ nodbi 0.9.1.9000
 
 ### Changes
 * added warning if DuckDB's JSON extension is not available; see also issue #45
+* minor simplification of docdb_exists() for src_mongo()
 
 nodbi 0.9.1
 ================

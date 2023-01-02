@@ -44,7 +44,7 @@ Suggests:
     withr,
     callr
 Additional_repositories: https://duckdb.r-universe.dev
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org
