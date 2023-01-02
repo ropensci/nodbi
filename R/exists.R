@@ -44,10 +44,9 @@ docdb_exists.src_elastic <- function(src, key, ...) {
 #' @export
 docdb_exists.src_mongo <- function(src, key, ...) {
   # need to check if any document exists
-  result <- try(docdb_query(
+  result <- docdb_query(
     src = src, key = key, query = '{}',
-    fields = '{"_id": 1}', limit = 1L),
-    silent = TRUE, ...)
+    fields = '{"_id": 1}', limit = 1L)
   return(nrow(result) > 0L)
 }
 
