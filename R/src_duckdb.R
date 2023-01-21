@@ -33,20 +33,22 @@ src_duckdb <- function(
   )
 
   # test and advise
-  tst <- try(
-    DBI::dbGetQuery(con, "SELECT json_valid('{\"a\": [\"b\", null]}');"),
-    silent = TRUE)
-  if (inherits(tst, "try-error") || !tst[[1]]) {
-    tst <- try(
-      DBI::dbExecute(con, "LOAD json;"),
-      silent = TRUE)
-    if (inherits(tst, "try-error") || (tst[[1]] != 0L)) {
-      stop(
-        "DuckDB extension JSON not loadable. To install it, run ",
-        "DBI::dbExecute(duckdb::dbConnect(duckdb::duckdb()), 'INSTALL json;') or ",
-        "install.packages('duckdb', repos = 'https://duckdb.r-universe.dev')",
-        call. = FALSE)
-    }
+  xtmsg <- function() {
+    try(DBI::dbDisconnect(con, shutdown = TRUE), silent = TRUE)
+    stop(
+    "DuckDB extension JSON not loadable. To install it, run ",
+    "DBI::dbExecute(duckdb::dbConnect(duckdb::duckdb()), 'INSTALL json;') or ",
+    "install.packages('duckdb', repos = 'https://duckdb.r-universe.dev')",
+    call. = FALSE)
+  }
+  #
+  tmp <- DBI::dbGetQuery(con, 'SELECT * FROM duckdb_extensions();')
+  if (inherits(tmp, "try-error") || !nrow(tmp)) xtmsg()
+  if (nrow(tmp)) tmp <- tmp[tmp[["extension_name"]] == "json", , drop = TRUE]
+  if (!tmp$installed) xtmsg()
+  if (!tmp$loaded) {
+    if (inherits(try(DBI::dbExecute(con, "LOAD json;"),
+      silent = TRUE), "try-error"))  xtmsg()
   }
 
   # potential security concern with

@@ -113,6 +113,6 @@ skip_if_no_duckdb <- function() {
   if (inherits(try(
     duckdb::dbDisconnect(src_duckdb()$con, shutdown = TRUE),
     silent = TRUE), "try-error")) {
-    skip("duckdb is not available")
+    skip("duckdb or its JSON extension is not available")
   }
 }
