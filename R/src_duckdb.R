@@ -67,10 +67,13 @@ print.src_duckdb <- function(x, ...) {
   size <- switch(dbdir,
     ":memory:" = utils::object.size(x),
     file.size(dbdir))
+  dbver <- try(DBI::dbGetQuery(x$con, "PRAGMA version;")[[
+    "library_version"]], silent = TRUE)
+  if (inherits(dbver, "try-error")) dbver <- "unknonwn"
 
   cat(sprintf(
-    "src: duckdb\nDatabase: %s\nSize: %s MB\n",
-    dbdir, round(as.integer(size / 1000^6))
+    "src: duckdb\nDatabase: %s\nSize: %s MB\nVersion: %s",
+    dbdir, round(as.integer(size / 1000^6)), dbver
   ))
 
 }
