@@ -111,7 +111,7 @@ it is not supported to have a dot in the key / name of a field.</p>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"mtcars"</span>, query <span class="op">=</span> <span class="st">'{"mpg":21, "gear": {"$lte": 4}}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"mtcars"</span>, query <span class="op">=</span> <span class="st">'{"mpg":21}'</span>, fields <span class="op">=</span> <span class="st">'{"mpg":1, "cyl":1}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"mtcars"</span>, query <span class="op">=</span> <span class="st">'{"_id": {"$regex": "^.+0.*$"}}'</span>, fields <span class="op">=</span> <span class="st">'{"gear": 1}'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># complex query, not supported for Elasticsearch and CouchDB backends at this time:</span></span></span>
+<span class="r-in"><span><span class="co"># complex query, not supported for src_elastic and src_couchdb backends at this time:</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"mtcars"</span>, query <span class="op">=</span> <span class="st">'{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>

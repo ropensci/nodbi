@@ -178,6 +178,9 @@ src <- src_duckdb()
 src <- src_elastic()
 src <- src_couchdb()
 
+# check if container already exists
+docdb_exists(src, key = "my_container")
+
 # load data (here data frame, alternatively list or JSON)
 # into the container "my_container" specified in "key" parameter
 docdb_create(src, key = "my_container", value = mtcars)
@@ -232,11 +235,7 @@ docdb_query(src, "my_container", '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "m
 # 4 1.8  34
 
 # query some subitem fields from some documents
-# (only simple queries so far implemented for Elasticsearch)
-# (only root, not subitems so far implemented for CouchDB)
 # *note*: such complex queries do not yet work with src_couchdb() or src_elasticsearch()
-# *note*: with src_duckdb(), cannot use $or, can only use $and so far 
-# in query where one element has a dot path but the other hasn't
 str(docdb_query(
   src, key = "my_container", 
   query = '{"$or": [{"age": {"$gt": 21}}, 

@@ -33,7 +33,7 @@
 #' docdb_query(src, "mtcars", query = '{"mpg":21, "gear": {"$lte": 4}}')
 #' docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
 #' docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
-#' # complex query, not supported for Elasticsearch and CouchDB backends at this time:
+#' # complex query, not supported for src_elastic and src_couchdb backends at this time:
 #' docdb_query(src, "mtcars", query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}')
 #' }
 docdb_query <- function(src, key, query, ...) {
