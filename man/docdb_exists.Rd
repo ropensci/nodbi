@@ -18,7 +18,7 @@ a table name for SQLite and for PostgreSQL)}
 
 \item{...}{Passed to functions:
 \itemize{
-\item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
+\item MongoDB: count() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
 \item RSQLite: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 \item Elasticsearch: \code{\link[elastic:indices]{elastic::index_exists()}}
 \item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}

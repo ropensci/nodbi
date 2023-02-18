@@ -3,7 +3,7 @@
 #' @inheritParams docdb_create
 #'
 #' @param ... Passed to functions:
-#' - MongoDB: find() in [mongolite::mongo()]
+#' - MongoDB: count() in [mongolite::mongo()]
 #' - RSQLite: [DBI::dbListTables()]
 #' - Elasticsearch: [elastic::index_exists()]
 #' - CouchDB: [sofa::db_info()]
@@ -43,11 +43,7 @@ docdb_exists.src_elastic <- function(src, key, ...) {
 
 #' @export
 docdb_exists.src_mongo <- function(src, key, ...) {
-  # need to check if any document exists
-  result <- docdb_query(
-    src = src, key = key, query = '{}',
-    fields = '{"_id": 1}', limit = 1L)
-  return(nrow(result) > 0L)
+  return(src$con$count() > 0L)
 }
 
 #' @export
