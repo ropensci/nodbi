@@ -8,7 +8,11 @@ elasticSleep <- 1L # seconds
 # Changing language has no effect when envvar LANG='C'
 Sys.unsetenv("LANG")
 
-
+# for interactive testing:
+# devtools::load_all()
+# source("tests/testthat/helper.R")
+# go to "tests/testthat/test-*.R"
+# go to "tests/testthat/core-nodbi.R"
 
 #### data for tests ####
 

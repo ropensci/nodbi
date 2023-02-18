@@ -129,10 +129,15 @@ test_that("docdb_query", {
   expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
   if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
 
+  # testJson2
+  expect_equal(docdb_create(src = src, key = key, value = testJson2), 2L)
+  if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
+
   if (!inherits(src, "src_elastic")) expect_error(docdb_query(src = src, key = key, query = '{"$or": [{"$or": {"gear": 4}}, {"cyl": 6}]}'))
 
-  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{}')), c(5L, 11L))
-  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{}')), c(5L, 11L))
+  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{}')), c(7L, 15L))
+  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{}')), c(7L, 15L))
+
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"email": 1, "_id": 1}')), c(5L, 2L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"_id":"5cd67853f841025e65ce0ce2"}', fields = '{"email": 1}')), c(1L, 1L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": {"$regex": "lacychen@conjurica.com"}}')), c(1L, 11L))
@@ -140,6 +145,7 @@ test_that("docdb_query", {
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$ne": "Lacy Chen"}}')), c(4L, 11L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$regex": "^[a-zA-Z]{3,4} "}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
 
+  # couchdb cannot access nested fields
   if (!inherits(src, "src_couchdb") & !inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"$and": [{"email": {"$regex": "ac"}}, {"friends.name": "Dona Bartlett"}]}')), c(1L, 11L))
   if (!inherits(src, "src_couchdb") & !inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"$and": [{"_id": {"$regex": "53"}}, {"friends.name": "Dona Bartlett"}]}')), c(1L, 11L))
   if (!inherits(src, "src_couchdb") & !inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"$and": [{"_id": {"$regex": "53"}}, {"friends.name": {"$regex": "Ba|La"}}]}')), c(2L, 11L))
@@ -156,7 +162,7 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "friends": 1}')), c(2L, 2L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "friends.id": 1}')), c(2L, 2L)) # full friends field for couchdb, elasticsearch
   expect_true(nrow(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 1}')) == 2L)
-  expect_true(ncol(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 1}')) <= 3L)
+  expect_true(ncol(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 0}')) == 2L)
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": "lacychen@conjurica.com"}')), c(1L, 11L))
 
   # anomaly that is very difficult to correct, nothing returned for non-existing field by RSQLite
