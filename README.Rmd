@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cranlogs.app) 
 [![cran version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org/package=nodbi)
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2022-10-31. 
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-02-18. 
 
 Currently, `nodbi` supports the following database backends:
 
@@ -330,7 +330,7 @@ testFunction <- function(src, key, value, query, fields) {
  docdb_delete(src, key)
 }
 
-# 2022-11-20 with 2015 mobile hardware 
+# 2023-02-18 with 2015 mobile hardware 
 # without any database optimisations
 rbenchmark::benchmark(
  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
@@ -342,40 +342,39 @@ rbenchmark::benchmark(
  replications = 10L,
  columns = c('test', 'replications', 'elapsed')
 )
-# on 2015 mobile hardware as per above
 #         test replications elapsed
-# 4    CouchDB           10     940
-# 3    Elastic           10     150 # 10s to be subtracted
-# 5 PostgreSQL           10      46
-# 6     DuckDB           10      44
-# 2     SQLite           10      43
-# 1    MongoDB           10      41
+# 4    CouchDB           10     944
+# 3    Elastic           10     167  # 10s to be subtracted
+# 5 PostgreSQL           10      51
+# 6     DuckDB           10      49
+# 2     SQLite           10      49
+# 1    MongoDB           10      46
 ```
 
 ## Testing
 
 ```{r}
-# 2022-11-20
+# 2023-02-18
 testthat::test_local()
 # ✔ | F W S  OK | Context
-# ✔ |        95 | couchdb [105.4s]                                                                      
-# ✔ |       102 | duckdb [4.5s]                                                                         
-# ✔ |     1  66 | elastic [83.2s]                                                                       
-# ──────────────────────────────────────────────────────────────────────────────────────────────────────
-# Skip (core-nodbi.R:171): docdb_query
+# ✔ |        96 | couchdb [103.3s]                                              
+# ✔ |       103 | duckdb [7.0s]                                                 
+# ✔ |     1  67 | elastic [86.0s]                                               
+# ──────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:177): docdb_query
 # Reason: queries need to be translated into elastic syntax
-# ──────────────────────────────────────────────────────────────────────────────────────────────────────
-# ✔ |       101 | mongodb [4.3s]                                                                        
-# ✔ |       105 | postgres [8.0s]                                                                       
-# ✔ |       104 | sqlite [6.3s]                                                                         
+# ──────────────────────────────────────────────────────────────────────────────
+# ✔ |       102 | mongodb [4.5s]                                                
+# ✔ |       106 | postgres [10.1s]                                              
+# ✔ |       105 | sqlite [6.8s]                                                 
 # 
-# ══ Results ═══════════════════════════════════════════════════════════════════════════════════════════
-# Duration: 212.3 s
+# ══ Results ═══════════════════════════════════════════════════════════════════
+# Duration: 218.4 s
 # 
-# ── Skipped tests  ────────────────────────────────────────────────────────────────────────────────────
+# ── Skipped tests  ────────────────────────────────────────────────────────────
 # • queries need to be translated into elastic syntax (1)
 # 
-# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 573 ]
+# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 579 ]
 ```
 
 
