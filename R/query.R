@@ -214,23 +214,40 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   if (!length(params[["sort"]])) params[["sort"]] <- '{"_id": 1}'
   if (!length(params[["fields"]])) params[["fields"]] <- '{}'
 
+  # if regexp query lacks options, add them in
+  if (grepl('"[$]regex" *: *"[^,$:}]+?" *}', query)) query <-
+    sub('("[$]regex" *: *"[^,$:}]+?" *)', '\\1, "$options": ""', query)
+
+  # make sure fields in query exist in records
+  # purpose: match with sqlite, postgres, duckdb
+  if (query != '{}') {
+    m <- stringi::stri_match_all_regex(query, '"([-@._\\w]+?)":')[[1]][, 2, drop = TRUE]
+    addQuery <- paste0("{", paste0('"', m, '":{"$exists":true}'), "}", collapse = ",")
+    query <- paste0('{"$and":[', sub("", "", query), ",", addQuery, ']}')
+    # jsonlite::validate(query)
+  }
+
   # separate fields to keep and to remove
   if (length(params[["fields"]])) {
+
     tmpFields <- params[["fields"]]
     params[["fields"]] <- '{}'
+
     m <- stringi::stri_match_all_regex(tmpFields, '"([-@._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
     if (!is.na(m[1])) fields <- m
     if (!is.na(m[1]) && length(fields)) params[["fields"]] <-
       paste0('{', paste0('"', fields, '":1', collapse = ','), '}', collapse = '')
     fields <- NULL
+
     m <- stringi::stri_match_all_regex(tmpFields, '"([-@._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]
     if (!is.na(m[1])) tmpFields <- m
     if (!is.na(m[1]) && length(tmpFields)) fields <- tmpFields
-  }
 
-  # if regexp query lacks options, add them in
-  if (grepl('"[$]regex" *: *"[^,$:}]+?" *}', query)) query <-
-    sub('("[$]regex" *: *"[^,$:}]+?" *)', '\\1, "$options": ""', query)
+    # make sure sought fields exist but only if no query is specified
+    # purpose: match with sqlite, postgres, duckdb
+    if (query == '{}') query <- gsub(":1", ':{"$exists":true}', params[["fields"]])
+
+  }
 
   # get data
   out <- do.call(
