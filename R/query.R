@@ -671,7 +671,10 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
                   )), ") ELSE regexp_matches(json_extract(json, '$.", x[1], "'), '",
               sub("^REGEXP \"?(.+?)\"?$", "\\1", x[2]), "') END")),
             no = paste0(
-              "CASE WHEN json_type(json, '$.", x[1], "') IN ('VARCHAR', 'DOUBLE', 'BIGINT', 'UBIGINT') ",
+              # duckdb 0.7.0 adding coalesce to capture json_type
+              # returning NA or NULL if the path cannot be found
+              "CASE WHEN coalesce(json_type(json, '$.", x[1], "'), '') ",
+              "     IN ('VARCHAR', 'DOUBLE', 'BIGINT', 'UBIGINT', '') ",
               " THEN json_extract_string(json, '$.", x[1], "') ", gsub('"', "'", x[2]),
               " ELSE json_extract(json, '$.", x[1], "') ", gsub('"', "'", x[2]),
               " END")

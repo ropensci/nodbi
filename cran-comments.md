@@ -17,9 +17,12 @@ Availability using Additional_repositories specification:
 
 ### Bug fixes
 
- * corrected closing connections to SQL database backends upon session restart
- * improved provisions for parallel write access and corresponding tests
- * capture marginal case of no rows in docdb_query()
+* src_duckdb(): handle when json_type returns NULL for non-existing path (2023-02-18)
+
+### Changes
+
+* added warning if DuckDB's JSON extension is not available; see also issue #45
+* minor simplification of docdb_exists() for src_mongo()
 
 ## revdepcheck results
 
