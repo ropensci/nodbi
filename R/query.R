@@ -360,7 +360,9 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
     statement <- paste0(
       "SELECT '{\"_id\":\"' || _id || '\",' || group_concat('\"' ||
        LTRIM(REPLACE(fullkey, '\"', ''), '$.') || '\":' ||
-       IIF(type = 'text', '\"', '') || value || IIF(type = 'text', '\"', ''))
+       IIF(type = 'text', '\"', '') ||
+       IIF(type = 'text', REPLACE(value, '\"', '\\\"'), value) ||
+       IIF(type = 'text', '\"', ''))
        || '}' AS json FROM \"", key, "\", json_tree(\"", key, "\".json)")
   }
 
