@@ -3,10 +3,11 @@ nodbi 0.9.1.9000
 
 ### BUG FIXES
 * src_duckdb(): handle when json_type returns NULL for non-existing path (2023-02-18)
+* src_sqlite(): handle when text includes double quotation marks (2023-03-25)
 
 ### Changes
-* added warning if DuckDB's JSON extension is not available; see also issue #45
-* minor simplification of docdb_exists() for src_mongo()
+* added warning if DuckDB's JSON extension is not available; improve instructions; see also issue #45
+* minor simplification of docdb_exists() for src_mongo(), and of docdb_query() for SQL databases
 
 nodbi 0.9.1
 ================
