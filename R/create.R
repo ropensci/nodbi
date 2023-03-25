@@ -3,16 +3,18 @@
 #' A message is emitted if the container `key` already exists.
 #'
 #' @section Identifiers:
-#' Any _id's in `value` will be used as _id's and primary index
-#' in the database. If there are no _id's in `value`,
+#' If `value` is a data.frame has a column `_id`,
+#' or is a JSON string having a key `_id` at root level,
+#' or is a list having an item `_id` at its top level,
+#' this will be used as _id's and primary index
+#' in the database. If there are no such _id's in `value`,
 #' row names (if any exist) will be used as _id's,
-#' or random _id's will be created (using
+#' otherwise random _id's will be created (using
 #' [uuid::UUIDgenerate()] with \code{use.time = TRUE} for
-#' SQLite und PostgreSQL, and DuckDB's built-in `uuid()`).
+#' SQLite und PostgreSQL, or using DuckDB's built-in `uuid()`).
 #'
-#' A warning is emitted if a document(s) with _id's already
-#' exist in `value` and that document in `value` is not newly
-#' created in the database; use [docdb_update()] to update
+#' A warning is emitted for document(s) in `value` the same _id's
+#' already exists in the database; use [docdb_update()] to update
 #' such document(s).
 #'
 #' @param src Source object, result of call to any of functions

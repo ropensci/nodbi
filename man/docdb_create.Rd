@@ -37,16 +37,18 @@ A message is emitted if the container \code{key} already exists.
 }
 \section{Identifiers}{
 
-Any _id's in \code{value} will be used as _id's and primary index
-in the database. If there are no _id's in \code{value},
+If \code{value} is a data.frame has a column \verb{_id},
+or is a JSON string having a key \verb{_id} at root level,
+or is a list having an item \verb{_id} at its top level,
+this will be used as _id's and primary index
+in the database. If there are no such _id's in \code{value},
 row names (if any exist) will be used as _id's,
-or random _id's will be created (using
+otherwise random _id's will be created (using
 \code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE} for
-SQLite und PostgreSQL, and DuckDB's built-in \code{uuid()}).
+SQLite und PostgreSQL, or using DuckDB's built-in \code{uuid()}).
 
-A warning is emitted if a document(s) with _id's already
-exist in \code{value} and that document in \code{value} is not newly
-created in the database; use \code{\link[=docdb_update]{docdb_update()}} to update
+A warning is emitted for document(s) in \code{value} the same _id's
+already exists in the database; use \code{\link[=docdb_update]{docdb_update()}} to update
 such document(s).
 }
 
