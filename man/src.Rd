@@ -37,6 +37,6 @@ Documentation of R packages used by \code{nodbi} for the databases:
 \item elastic - \url{https://CRAN.R-project.org/package=elastic}
 \item sofa - \url{https://CRAN.R-project.org/package=sofa}
 \item RPostgres - \url{https://rpostgres.r-dbi.org/}
-\item duckdb - \url{https://duckdb.r-universe.dev/ui#package:duckdb}
+\item duckdb - \url{http://duckdb.r-universe.dev/ui/#package:duckdb}
 }
 }

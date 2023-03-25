@@ -29,7 +29,7 @@
 #' - elastic - \url{https://CRAN.R-project.org/package=elastic}
 #' - sofa - \url{https://CRAN.R-project.org/package=sofa}
 #' - RPostgres - \url{https://rpostgres.r-dbi.org/}
-#' - duckdb - \url{https://duckdb.r-universe.dev/ui#package:duckdb}
+#' - duckdb - \url{http://duckdb.r-universe.dev/ui/#package:duckdb}
 #'
 #' @name src
 NULL
