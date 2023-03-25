@@ -785,8 +785,7 @@ dbiGetProcessData <- function(
   ## get data, write to file in ndjson format ("\n")
   writeLines(
     paste0(
-      # protect against empty query result
-      "",
+      "", # protect against empty query result
       # eliminate rows without any json
       stats::na.omit(
         DBI::dbGetQuery(
@@ -818,18 +817,16 @@ dbiGetProcessData <- function(
 
     # get another file name
     tjname <- tempfile()
-    tjnameCon <- file(tjname, open = "wt", encoding = "native.enc")
     # register to remove file after used for streaming
-    on.exit(try(close(tjnameCon), silent = TRUE), add = TRUE)
     on.exit(unlink(tjname), add = TRUE)
 
     # write data
-    writeLines(
-      jqr::jq(file(tfname, encoding = "UTF-8"), jqrSubsetFunction),
-      con = tjnameCon,
-      sep = "\n",
-      useBytes = TRUE)
-    close(tjnameCon)
+    jqr::jq(
+      file(tfname, encoding = "UTF-8"),
+      jqrSubsetFunction,
+      flags = jqr::jq_flags(pretty = FALSE),
+      out = tjname
+    )
 
     # early exit
     if (!file.size(tjname)) return(NULL)
@@ -874,19 +871,16 @@ dbiGetProcessData <- function(
 
     # get another file name
     tjname <- tempfile()
-    tjnameCon <- file(tjname, open = "wt", encoding = "native.enc")
     # register to remove file after used for streaming
-    on.exit(try(close(tjnameCon), silent = TRUE), add = TRUE)
     on.exit(unlink(tjname), add = TRUE)
 
     # write data
-    writeLines(
-      jqr::jq(file(tfname, encoding = "UTF-8"), jqFields),
-      # to create ndjson
-      con = tjnameCon,
-      sep = "\n",
-      useBytes = TRUE)
-    close(tjnameCon)
+    jqr::jq(
+      file(tfname, encoding = "UTF-8"),
+      jqFields,
+      flags = jqr::jq_flags(pretty = FALSE),
+      out = tjname
+    )
 
     # early exit
     if (!file.size(tjname)) return(NULL)
