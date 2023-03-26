@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.2</span>
       </span>
     </div>
 
@@ -96,15 +96,17 @@ or the file name or URL of NDJSON documents</p></dd>
     <h2>Identifiers</h2>
     
 
-<p>Any _id's in <code>value</code> will be used as _id's and primary index
-in the database. If there are no _id's in <code>value</code>,
+<p>If <code>value</code> is a data.frame has a column <code>_id</code>,
+or is a JSON string having a key <code>_id</code> at root level,
+or is a list having an item <code>_id</code> at its top level,
+this will be used as _id's and primary index
+in the database. If there are no such _id's in <code>value</code>,
 row names (if any exist) will be used as _id's,
-or random _id's will be created (using
+otherwise random _id's will be created (using
 <code><a href="https://rdrr.io/pkg/uuid/man/UUIDgenerate.html" class="external-link">uuid::UUIDgenerate()</a></code> with <code>use.time = TRUE</code> for
-SQLite und PostgreSQL, and DuckDB's built-in <code>uuid()</code>).</p>
-<p>A warning is emitted if a document(s) with _id's already
-exist in <code>value</code> and that document in <code>value</code> is not newly
-created in the database; use <code><a href="docdb_update.html">docdb_update()</a></code> to update
+SQLite und PostgreSQL, or using DuckDB's built-in <code>uuid()</code>).</p>
+<p>A warning is emitted for document(s) in <code>value</code> the same _id's
+already exists in the database; use <code><a href="docdb_update.html">docdb_update()</a></code> to update
 such document(s).</p>
     </div>
 
