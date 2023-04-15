@@ -785,7 +785,7 @@ existsMessage <- function(k) {
 #' @noRd
 isUrl <- function(x) {
   # check if x is may be an url
-  if (!is.atomic(x) || !inherits(x, "character")) return(FALSE)
+  if (length(x) != 1L || !is.atomic(x) || !inherits(x, "character")) return(FALSE)
   return(grepl("^https?://", x))
 }
 
@@ -793,7 +793,7 @@ isUrl <- function(x) {
 #' @noRd
 isFile <- function(x) {
   # check if x is the name of a readable file
-  if (!is.atomic(x) || !inherits(x, "character")) return(FALSE)
+  if (length(x) != 1L || !is.atomic(x) || !inherits(x, "character")) return(FALSE)
   out <- try(
     suppressWarnings(
       file.access(x, mode = 4)) == 0L,
