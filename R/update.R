@@ -198,7 +198,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
   if (length(value) == 1 && is.atomic(value) &&
       is.character(value) && jsonify::validate_json(value)) {
     # check format
-    if (all(jqr::jq(value, " .[] | type ") == '"array"')) stop(
+    if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
     )
     # check if top level is an array
@@ -347,7 +347,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   if (length(value) == 1 && is.atomic(value) &&
       is.character(value) && jsonify::validate_json(value)) {
     # check format
-    if (all(jqr::jq(value, " .[] | type ") == '"array"')) stop(
+    if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
     )
     # check if top level is an array

@@ -258,6 +258,10 @@ test_that("docdb_update", {
   expect_equal(docdb_update(src = src, key = key, value = '[{"_id":"Valiant", "vs": 77},{"_id":"Fiat 128", "vs": 78}]', query = ''), 2L)
   expect_equal(docdb_update(src = src, key = key, value = c('{"_id":"Valiant", "vs": 78}','{"_id":"Fiat 128", "vs": 79}'), query = ''), 2L)
   #
+  expect_equal(docdb_update(src = src, key = key, value = '{"q":[{"t":1,"r":"C"},{"s":1,"r":"D"}]}', query = '{"_id":"Fiat 128"}'), 1L)
+  tmp <- docdb_query(src = src, key = key, query = '{"_id":"Fiat 128"}', fields = '{"q":1}')[["q"]][[1]]
+  expect_equal(tmp[, c("t", "r", "s")], jsonlite::fromJSON('[{"t":1,"r":"C"},{"s":1,"r":"D"}]'))
+  #
   # not supported
   expect_equal(docdb_update(src = src, key = key, value = list("_id" = c("Valiant", "Fiat 128"), "gear" = 8:9), query = ''), 0L)
   expect_error(docdb_update(src = src, key = key, value = '{"_id":["Valiant","Fiat 128"], "vs": [77,77]}', query = ''), "array of documents")
