@@ -36,12 +36,20 @@ or the file name or URL of NDJSON documents}
 (integer) Number of successfully updated documents
 }
 \description{
-Documents identified by the query are updated
-by patching their JSON with \code{value}.
-This is native with MongoDB and SQLite and is
-emulated for Elasticsearch and CouchDB using
-SQLite/JSON1, and uses a plpgsql function for
-PostgreSQL.
+Documents are updated by patching their JSON with
+\code{value}.
+}
+\details{
+Documents are identified by the \code{value} or
+by _id's in \code{value}, where the latter takes
+precedence in case both are specified.
+
+\code{value} can have multiple documents and _id's,
+which then are used for iterative updating.
+
+This is native with MongoDB, SQLite and DuckDB.
+It uses a plpgsql function added to PostgreSQL.
+For Elasticsearch and CouchDB, jq is used.
 }
 \examples{
 \dontrun{
@@ -49,6 +57,7 @@ src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_update(src, "mtcars", value = mtcars[3, 4:5], query = '{"gear": 3}')
 docdb_update(src, "mtcars", value = '{"carb":999}', query = '{"gear": 5}')
+docdb_update(src, "mtcars", value = '{"_id":"Fiat 128", carb":999}', query = '')
 docdb_get(src, "mtcars")
 }
 }

@@ -1,11 +1,18 @@
 #' Update documents
 #'
-#' Documents identified by the query are updated
-#' by patching their JSON with \code{value}.
-#' This is native with MongoDB and SQLite and is
-#' emulated for Elasticsearch and CouchDB using
-#' SQLite/JSON1, and uses a plpgsql function for
-#' PostgreSQL.
+#' Documents are updated by patching their JSON with
+#' \code{value}.
+#'
+#' Documents are identified by the \code{value} or
+#' by _id's in \code{value}, where the latter takes
+#' precedence in case both are specified.
+#'
+#' \code{value} can have multiple documents and _id's,
+#' which then are used for iterative updating.
+#'
+#' This is native with MongoDB, SQLite and DuckDB.
+#' It uses a plpgsql function added to PostgreSQL.
+#' For Elasticsearch and CouchDB, jq is used.
 #'
 #' @inheritParams docdb_create
 #'
@@ -28,6 +35,7 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_update(src, "mtcars", value = mtcars[3, 4:5], query = '{"gear": 3}')
 #' docdb_update(src, "mtcars", value = '{"carb":999}', query = '{"gear": 5}')
+#' docdb_update(src, "mtcars", value = '{"_id":"Fiat 128", carb":999}', query = '')
 #' docdb_get(src, "mtcars")
 #' }
 docdb_update <- function(src, key, value, query, ...) {
@@ -98,6 +106,8 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
   # early return if not found
   if (!length(ids)) return(0L)
 
+  # process value, target is data frame
+
   # json to data frame
   if (all(class(value) %in% "character")) {
     value <- jsonlite::fromJSON(value)
@@ -134,8 +144,8 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
     }
   }
 
-  # Error: no 'docs_bulk_update' method for class list
-  # therefore using data frame only for update
+  # Error: no 'docs_bulk_update' method for list
+  # therefore using only data frame for update
   result <- elastic::docs_bulk_update(
     conn = src$con,
     index = key,
@@ -177,33 +187,105 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # process value, target is json string
 
+  # check other inputs
+  if (isFile(value)) {
+    value <- jqr::jq(file(value), flags = jqr::jq_flags(pretty = FALSE))
+  } else if (isUrl(value)) {
+    value <- jqr::jq(url(value), flags = jqr::jq_flags(pretty = FALSE))
+  }
+
+  # handle potential json string input
+  if (length(value) == 1 && is.atomic(value) &&
+      is.character(value) && jsonify::validate_json(value)) {
+    # check format
+    if (all(jqr::jq(value, " .[] | type ") == '"array"')) stop(
+      "Require JSON string that is an array of documents, not a set of fields that are arrays."
+    )
+    # check if top level is an array
+    chk <- jqr::jq(value, " type ")
+    if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
+  }
+
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
-    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+    # if value contains id's, split rows into documents of a vector
+    if (any(names(value) == "_id")) {
+      value <- jsonify::to_json(value, by = "row", unbox = TRUE)
+      value <- jqr::jq(value, ' .[] ')
+    } else {
+      # otherwise keep as single document
+      value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+    }
   }
+
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonify::to_json(value, unbox = TRUE)
+    value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
+    # check if top level is an array
+    chk <- jqr::jq(value, " type ")
+    if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
   }
 
-  # turn into json set
-  value <- paste0('{"$set":', value, "}")
+  # get doc ids to update
+  # bulk update: if ids are in value, query is ignored
+  ids <- try(jqr::jq(value, ' ._id '), silent = TRUE)
+  if (inherits(ids, "try-error")) ids <- NULL
+  ids <- gsub("\"", "", as.character(ids))
+  ids <- ids[ids != "null"]
+  if (length(ids)) {
+    if (query != "") warning(
+      "Ignoring the specified 'query' parameter, using _id's ",
+      "found in 'value' to identify documents to be updated")
+    value <- jqr::jq(value, ' del(._id) ')
+    ids <- paste0('{"_id":"', ids, '"}') # TODO check
+  } else {
+    if (length(value) > 1L) {
+      # find documents to be updated for each document in value
+      ids <- paste0('{"_id":"', suppressWarnings(
+        src$con$find(query = query, fields = '{"_id":1}', ...))[["_id"]], '"}')
+    } else {
+      # keep original query if only a single document is in value
+      ids <- query
+    }
+  }
 
-  # do update
-  result <- try(
-    suppressWarnings(
-      src$con$update(
-        query = query,
-        update = value,
-        upsert = FALSE,
-        multiple = TRUE,
-        ...))[c("matchedCount", "upsertedCount")],
-    silent = TRUE)
-  result <- unlist(result)
+  # check
+  if (length(value) > 1L && (length(value) != length(ids))) stop(
+    "Unequal number of documents identified (", (length(ids)),
+    ") and of documents in 'value' (", length(value), ")"
+  )
+
+  # turn into json set
+  value <- vapply(
+    X = value,
+    function(i) {paste0('{"$set":', i, "}")},
+    FUN.VALUE = character(1L),
+    USE.NAMES = FALSE)
+
+  # iterate over data
+  result <- 0L
+  for (i in seq_along(value)) {
+
+    # do update
+    res <- try(
+      suppressWarnings(
+        src$con$update(
+          query = ids[i],
+          update = value[i],
+          upsert = FALSE,
+          multiple = TRUE,
+          ...))[c("matchedCount", "upsertedCount")],
+      silent = TRUE)
+
+    # accumulate
+    result <- c(result, res)
+
+  }
 
   # generate user info
+  result <- unlist(result)
   if (inherits(result, "try-error") ||
-      any(grepl("error", result))) {
+      any(grepl("error", result, ignore.case = TRUE))) {
     error <- result[grepl("rror", result)]
     error <- trimws(sub(".+E[0-9]+(.*?):.+", "\\1", error))
     warning(
@@ -212,7 +294,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     result <- result[!grepl("rror", result)]
     result <- min(0, as.integer(result))
   }
-  return(max(result))
+  return(sum(result))
 
 }
 
@@ -253,34 +335,95 @@ return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction
 #' @noRd
 sqlUpdate <- function(src, key, value, query, updFunction) {
 
+  # check other inputs
+  # note value can now be a vector
+  if (isFile(value)) {
+    value <- jqr::jq(file(value), flags = jqr::jq_flags(pretty = FALSE))
+  } else if (isUrl(value)) {
+    value <- jqr::jq(url(value), flags = jqr::jq_flags(pretty = FALSE))
+  }
+
+  # handle potential json string input
+  if (length(value) == 1 && is.atomic(value) &&
+      is.character(value) && jsonify::validate_json(value)) {
+    # check format
+    if (all(jqr::jq(value, " .[] | type ") == '"array"')) stop(
+      "Require JSON string that is an array of documents, not a set of fields that are arrays."
+    )
+    # check if top level is an array
+    chk <- jqr::jq(value, " type ")
+    if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
+  }
+
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
-    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+    # if value contains id's, split rows into documents of a vector
+    if (any(names(value) == "_id")) {
+      value <- jsonify::to_json(value, by = "row", unbox = TRUE)
+      value <- jqr::jq(value, ' .[] ')
+    } else {
+      # otherwise keep as single document
+      value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+    }
   }
+
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonify::to_json(value, unbox = TRUE)
+    value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
+    # check if top level is an array
+    chk <- jqr::jq(value, " type ")
+    if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
   }
 
-  # get docs to update
-  ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
+  # get doc ids to update
+  # bulk update: if ids are in value, query is ignored
+  ids <- try(jqr::jq(value, ' ._id '), silent = TRUE)
+  if (inherits(ids, "try-error")) ids <- NULL
+  ids <- gsub("\"", "", as.character(ids))
+  ids <- ids[ids != "null"]
+  if (length(ids)) {
+    if (query != "") warning(
+      "Ignoring the specified 'query' parameter, using _id's ",
+      "found in 'value' to identify documents to be updated")
+    value <- jqr::jq(value, ' del(._id) ') # TODO
+  } else {
+    ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
+  }
 
-  # compose statement
-  statement <- paste0(
-    'UPDATE "', key, '" SET json = ', updFunction, '(json,\'',
-    value, '\') WHERE _id IN (',
-    paste0("'", ids, "'", collapse = ","), ');'
+  # check
+  if (!length(ids)) return(0L)
+  if (length(value) > 1L && (length(value) != length(ids))) stop(
+    "Unequal number of documents identified (", (length(ids)),
+    ") and of documents in 'value' (", length(value), ")"
   )
 
-  # update data
-  result <- try(
-    DBI::dbWithTransaction(
-      conn = src$con,
-      code = {
-        DBI::dbExecute(
-          conn = src$con,
-          statement = statement
-        )}), silent = TRUE)
+  # default case, update with one set:
+  # replace ids vector with atomic ids string
+  if (length(value) == 1L) ids <- sub(
+    "'(.+)'", "\\1", paste0(
+      "'", ids, "'", collapse = ","))
+
+  # iterate over data
+  result <- 0L
+  for (i in seq_along(value)) {
+
+    # compose statement
+    statement <- paste0(
+      'UPDATE "', key, '" SET json = ', updFunction, '(json,\'',
+      value[i], '\') WHERE _id IN (\'', ids[i], '\');'
+    )
+
+    # update data
+    result <- result + try(
+      DBI::dbWithTransaction(
+        conn = src$con,
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = statement
+          )}), silent = TRUE)
+
+  } # for
 
   # return
   return(result)
