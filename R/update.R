@@ -101,7 +101,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
 docdb_update.src_elastic <- function(src, key, value, query, ...) {
 
   # get _id's
-  ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[[1]]
+  ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
 
   # early return if not found
   if (!length(ids)) return(0L)
@@ -385,7 +385,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     if (query != "") warning(
       "Ignoring the specified 'query' parameter, using _id's ",
       "found in 'value' to identify documents to be updated")
-    value <- jqr::jq(value, ' del(._id) ') # TODO
+    value <- jqr::jq(value, ' del(._id) ')
   } else {
     ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
   }
