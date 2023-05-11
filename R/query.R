@@ -727,7 +727,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   statement <- paste0(statement, "; ")
 
   # handle query terms with json
-  jqrSubsetFunction <- ""
+  jqrSubsetFunction <- NULL
   if (querySql[[1]][1] != "" &&
       any(sapply(querySql, "[[", 3) == "json")) {
     jqrSubsetFunction <- paste0(
