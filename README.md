@@ -17,7 +17,7 @@ version](https://www.r-pkg.org/badges/version/nodbi)](https://cran.r-project.org
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2023-02-18.
+updated 2023-05-12.
 
 Currently, `nodbi` supports the following database backends:
 
@@ -331,11 +331,15 @@ key <- "test"
 query <- '{"clarity": "SI1"}'
 fields <- '{"cut": 1, "_id": 1, "clarity": "1"}'
 value <- '{"clarity": "XYZ", "new": ["ABC", "DEF"]}'
-data <- as.data.frame(diamonds)[1:8000, ]
+data <- as.data.frame(diamonds)[1:2000, ]
+url <- "http://httpbin.org/stream/56"
+ndjs <- tempfile()
+jsonlite::stream_out(jsonlite::fromJSON(contacts), con = file(ndjs))
 
 testFunction <- function(src, key, value, query, fields) {
  docdb_create(src, key, data)
- docdb_create(src, key, "http://httpbin.org/stream/89")
+ docdb_create(src, key, url)
+ docdb_create(src, key, ndjs)
  # Elasticsearch needs a delay to process the data
  if (inherits(src, "src_elastic")) Sys.sleep(1)
  head(docdb_get(src, key))
@@ -344,7 +348,7 @@ testFunction <- function(src, key, value, query, fields) {
  docdb_delete(src, key)
 }
 
-# 2023-02-18 with 2015 mobile hardware 
+# 2023-05-12 with 2015 mobile hardware 
 # without any database optimisations
 rbenchmark::benchmark(
  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
@@ -357,12 +361,12 @@ rbenchmark::benchmark(
  columns = c('test', 'replications', 'elapsed')
 )
 #         test replications elapsed
-# 4    CouchDB           10     944
-# 3    Elastic           10     167  # 10s to be subtracted
-# 5 PostgreSQL           10      51
-# 6     DuckDB           10      49
-# 2     SQLite           10      49
-# 1    MongoDB           10      46
+# 4    CouchDB           10     253
+# 3    Elastic           10      59 # 10s to be subtracted
+# 2     SQLite           10      13
+# 1    MongoDB           10      13
+# 5 PostgreSQL           10      12
+# 6     DuckDB           10      12
 ```
 
 ## Testing

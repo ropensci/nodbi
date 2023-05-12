@@ -108,8 +108,6 @@ docdb_delete.src_elastic <- function(src, key, ...) {
 #' @export
 docdb_delete.src_mongo <- function(src, key, ...) {
 
-  chkSrcMongo(src, key)
-
   params <- list(...)
   if (!is.null(params$query) &&
       jsonlite::validate(params$query)) {

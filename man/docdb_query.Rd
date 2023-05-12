@@ -38,7 +38,7 @@ it is not supported to have a dot in the key / name of a field.
 Main functions used per database:
 \itemize{
 \item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item SQLite: SQL query using \code{json_tree()}
+\item SQLite: SQL query using built-in \code{json_tree()}
 \item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
 \item CouchDB: \code{\link[sofa:db_query]{sofa::db_query()}}
 \item PostgreSQL: SQL query using built-in \code{jsonb_build_object()}

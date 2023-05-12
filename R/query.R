@@ -15,7 +15,7 @@
 #'
 #' Main functions used per database:
 #' - MongoDB: find() in [mongolite::mongo()]
-#' - SQLite: SQL query using `json_tree()`
+#' - SQLite: SQL query using built-in `json_tree()`
 #' - Elasticsearch: [elastic::Search()]
 #' - CouchDB: [sofa::db_query()]
 #' - PostgreSQL: SQL query using built-in `jsonb_build_object()`

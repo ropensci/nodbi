@@ -1,3 +1,9 @@
+nodbi 0.9.3.9000
+================
+
+### BUG FIXES
+* fix initialisation in docdb_query with src_duckdb
+
 nodbi 0.9.3
 ================
 
