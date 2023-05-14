@@ -32,7 +32,7 @@
 #'
 #' @param ... Passed to functions:
 #' - CouchDB: [sofa::db_bulk_create()]
-#' - Elasticsearch: [elastic::docs_bulk]
+#' - Elasticsearch: [elastic::docs_bulk()]
 #' - MongoDB: [mongolite::mongo()]
 #' - SQLite: ignored
 #' - PostgreSQL: ignored

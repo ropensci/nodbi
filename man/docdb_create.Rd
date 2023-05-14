@@ -23,7 +23,7 @@ or the file name or URL of NDJSON documents}
 \item{...}{Passed to functions:
 \itemize{
 \item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
-\item Elasticsearch: \link[elastic:docs_bulk]{elastic::docs_bulk}
+\item Elasticsearch: \code{\link[elastic:docs_bulk]{elastic::docs_bulk()}}
 \item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
 \item SQLite: ignored
 \item PostgreSQL: ignored

@@ -4,7 +4,7 @@ Description: Simplified document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.9.3.9000
+Version: 0.9.4
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -43,7 +43,6 @@ Suggests:
     testthat,
     withr,
     callr
-Additional_repositories: https://duckdb.r-universe.dev
 RoxygenNote: 7.2.3
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
