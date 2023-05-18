@@ -61,21 +61,26 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   # early return if not found
   if (!length(input)) return(0L)
 
-  # data frame to json
-  input <- jsonify::to_ndjson(input)
+  # original set data frame to json
+  # ndjson <- jsonify::to_ndjson(input)
+  jsonlite::stream_out(input, con = textConnection(
+    object = "ndjson", open = "w", local = TRUE), verbose = FALSE)
 
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
-    value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+    # value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+    row.names(value) <- NULL
+    value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
   }
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonify::to_json(value, unbox = TRUE)
+    # value <- jsonify::to_json(value, unbox = TRUE)
+    value <- jsonlite::toJSON(value, auto_unbox = TRUE)
   }
 
   # merge json with value
   value <- jqr::jq(paste0(
-    "[",  jqr::jq(textConnection(input)),
+    "[",  jqr::jq(textConnection(ndjson)),
     ",", value, "]"), ' reduce .[] as $item ({}; . * $item) ')
 
   # jqr output to list
@@ -196,7 +201,10 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) && jsonify::validate_json(value)) {
+      is.character(value) &&
+      # jsonify::validate_json(value)
+      jsonlite::validate(value)
+      ) {
     # check format
     if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
@@ -209,18 +217,22 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
     # if value contains id's, split rows into documents of a vector
+    row.names(value) <- NULL
     if (any(names(value) == "_id")) {
-      value <- jsonify::to_json(value, by = "row", unbox = TRUE)
+      # value <- jsonify::to_json(value, by = "row", unbox = TRUE)
+      value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
       value <- jqr::jq(value, ' .[] ')
     } else {
       # otherwise keep as single document
-      value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+      # value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+      value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
     }
   }
 
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
+    # value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
+    value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
@@ -345,7 +357,9 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) && jsonify::validate_json(value)) {
+      is.character(value) &&
+      # jsonify::validate_json(value)
+      jsonlite::validate(value)) {
     # check format
     if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
@@ -358,18 +372,22 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
     # if value contains id's, split rows into documents of a vector
+    row.names(value) <- NULL
     if (any(names(value) == "_id")) {
-      value <- jsonify::to_json(value, by = "row", unbox = TRUE)
+      # value <- jsonify::to_json(value, by = "row", unbox = TRUE)
+      value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
       value <- jqr::jq(value, ' .[] ')
     } else {
       # otherwise keep as single document
-      value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+      # value <- jsonify::to_json(value, by = "col", unbox = TRUE)
+      value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
     }
   }
 
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
+    # value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
+    value <- jsonlite::toJSON(value, auto_unbox = TRUE)
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
