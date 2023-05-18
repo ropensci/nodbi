@@ -533,7 +533,11 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
                   collapse = " || "),
                 no = paste0(
                   "@.",
-                  gsub("[.]", "\".\"", x[1]),
+                  ifelse(
+                    test = grepl("'", x[1]),
+                    yes = gsub("'", "", x[1]),
+                    no = gsub("[.]", "\".\"", x[1])
+                  ),
                   # special handling of regular expression
                   ifelse(
                     test = grepl("REGEXP", x[2]),
@@ -626,7 +630,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   # add query from subfields to include subfields
   rootFields <- unique(c(rootFields, unlist(sapply(
     querySql[grepl("[.]", sapply(querySql, "[[", 1))],
-    function(i) sub("\"?(.+?)[.].+", "\\1", i[1])))
+    function(i) sub("^\"?([^']+?)[.].+$", "\\1", i[1])))
   ))
 
   # https://duckdb.org/docs/extensions/json#json-extraction-functions
@@ -659,11 +663,12 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   # - $or and any element with dot: all go into jqrSubsetFunction
   tmp <- lapply(querySql, function(i) {
 
-    if ((any(sapply(querySql, function(ii) grepl("[.]", ii[1]))) &&
-        attr(querySql, "op") == "OR") ||
-        (grepl("[.]", i[1]))) {
+    if (#(any(sapply(querySql, function(ii) grepl("[.]", ii[1]))) &&
+        (attr(querySql, "op") == "OR") ||
+        (grepl("^[^'].+[.].+[^']$", gsub("[\"]", "", i[1])))) {
           c(i, "json")
         } else if (length(i) == 2L) {
+          i[1] <- gsub("[']", "", i[1])
           c(i, "sql")
         } else {
           ""
@@ -985,7 +990,7 @@ json2fieldsSql <- function(x) {
 # string as part for sql WHERE
 #' @keywords internal
 #' @noRd
-json2querySql <- function(x) {#, con
+json2querySql <- function(x) {
 
   # validate
   if (!jsonlite::validate(x)) stop("No json: ", x)
@@ -1102,6 +1107,9 @@ fieldsSql2fullKey <- function(x) {
 
   # check e.g. if only fields = '{"_id": 1}'
   if (!length(x)) return("")
+
+  # remove single quotes used for preventing dot interpretation
+  x <- gsub("[']", "", x)
 
   # remove array indices from fields
   x <- gsub("\\[[-#0-9]+\\][.]", ".", x)
