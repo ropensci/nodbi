@@ -244,12 +244,15 @@ test_that("docdb_update", {
 
   # tests5 bulk updates
   if (inherits(src, "src_elastic") | inherits(src, "src_couchdb")) skip("bulk updates not yet implemented")
-  if (internet()) expect_equal(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/15", query = '{"gear": 3}'), 15L) # query finds 15 documents
   expect_equal(docdb_update(src = src, key = key, value = '{"vs": 99}', query = '{"gear": 5}'), 5L)
   expect_equal(docdb_update(src = src, key = key, value = '{"_id":"Valiant", "vs": 99}', query = ''), 1L)
   #
-  if (internet()) expect_equal(sort(names(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"args":0}'))),
-               sort(c("_id","mpg","cyl","disp","hp","drat","wt","qsec","vs","am","gear","carb","url","headers","origin","id")))
+  if (internet()) {
+    expect_equal(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/15", query = '{"gear": 3}'), 15L) # query finds 15 documents
+    expect_equal(sort(names(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"args":0}'))),
+                 sort(c("_id","mpg","cyl","disp","hp","drat","wt","qsec","vs","am","gear","carb","url","headers","origin","id")))
+  }
+  #
   expect_equal(sort(docdb_query(src = src, key = key, query = '{"vs": 99}', fields = '{"gear":1}')[["gear"]]), c(3,5,5,5,5,5))
   #
   expect_equal(docdb_update(src = src, key = key, value = list("_id" = "Valiant", "gear" = 8), query = ''), 1L)

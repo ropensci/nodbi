@@ -79,7 +79,6 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
         row.names(value) <- NULL
       }
     }
-    # value <- jsonify::from_json(jsonify::to_json(value, unbox = TRUE), simplify = FALSE)
     row.names(value) <- NULL
     value <- jsonlite::fromJSON(jsonlite::toJSON(value, auto_unbox = TRUE), simplifyVector = FALSE)
   } # if data.frame
@@ -96,7 +95,6 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
       }
     } else {
       # read json string
-      # value <- jsonify::from_json(value, simplify = FALSE)
       value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
     }
   }
@@ -181,7 +179,6 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
         value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
       }
     } else {
-      # value <- jsonify::from_json(value, simplify = FALSE)
       value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
     }
   }
@@ -265,7 +262,6 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
     # since mongolite does not accept valid JSON strings
     # that come as an one-element array, convert to list
     if (inherits(value, "character")) {
-      # value <- jsonify::from_json(value, simplify = FALSE)
       value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
     }
 
@@ -287,7 +283,6 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       if (!nrow(value)) return(0L)
       # convert to ndjson which is the format in which errors are raised
       # if names (keys) had problematic characters such as . or $
-      # value <- strsplit(jsonify::to_ndjson(value, unbox = TRUE), split = "\n")[[1]]
       row.names(value) <- NULL
       jsonlite::stream_out(
         value, con = textConnection("ndjson", open = "w", local = TRUE),
@@ -305,7 +300,6 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
           "_id" = uuid::UUIDgenerate(use.time = TRUE), i))
       }
       # split into vector of ndjson records
-      # value <- jsonify::to_ndjson(value, unbox = TRUE)
       row.names(value) <- NULL
       jsonlite::stream_out(
         jsonlite::fromJSON(jsonlite::toJSON(value, auto_unbox = TRUE)),
@@ -442,12 +436,6 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     if (ncol(value) > 2L || (ncol(value) == 2L &&
        !all(sort(names(value)) == c("_id", "json")))) {
       # convert if there is no json column yet
-      # value[["json"]] <- strsplit(
-      #   jsonify::to_ndjson(
-      #     value[, -match("_id", names(value)), drop = FALSE],
-      #     unbox = TRUE),
-      #   split = "\n"
-      # )[[1]]
       row.names(value) <- NULL
       jsonlite::stream_out(
         value[, -match("_id", names(value)), drop = FALSE],
@@ -583,12 +571,6 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     if (ncol(value) > 2L || (ncol(value) == 2L &&
        !all(sort(names(value)) == c("_id", "json")))) {
       # convert if there is no json column yet
-      # value[["json"]] <- strsplit(
-      #   jsonify::to_ndjson(
-      #     value[, -match("_id", names(value)), drop = FALSE],
-      #     unbox = TRUE),
-      #   split = "\n"
-      # )[[1]]
       row.names(value) <- NULL
       jsonlite::stream_out(
         value[, -match("_id", names(value)), drop = FALSE],
@@ -687,12 +669,9 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
     # if json in character vector
     if ((all(class(value) %in% "character")) &&
-        (length(value)  == 1L) &&
-        # jsonify::validate_json(value)
-        jsonlite::validate(value)
+        (length(value)  == 1L) && jsonlite::validate(value)
         ) {
       # convert to list
-      # value <- jsonify::from_json(value, simplify = FALSE)
       value <- jsonlite::fromJSON(value, simplifyVector = TRUE)
     }
 
@@ -715,7 +694,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
     # handle ready-made data frames
     if (inherits(value, "data.frame") &&
         identical(names(value),"json") &&
-        all(vapply(value[["json"]], jsonlite::validate, # jsonify::validate_json,
+        all(vapply(value[["json"]], jsonlite::validate,
                    logical(1L), USE.NAMES = FALSE))) {
 
       if (!nrow(value)) return(0L)
@@ -731,7 +710,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
       # handle ready-made data frames with _id's
       if (inherits(value, "data.frame") &&
           identical(names(value), c("_id", "json")) &&
-          all(vapply(value[["json"]], jsonlite::validate, # jsonify::validate_json,
+          all(vapply(value[["json"]], jsonlite::validate,
                      logical(1L), USE.NAMES = FALSE))) {
 
         if (!nrow(value)) return(0L)
@@ -751,14 +730,6 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
         if (!length(value) || # testing list
             (is.character(value) && !nchar(value)) ||
             (is.data.frame(value)) && !nrow(value)) return(0L)
-
-        # all else: write out
-        # writeLines(
-        #   # time consuming
-        #   text = jsonify::to_ndjson(value, unbox = TRUE),
-        #   con = tfnameCon,
-        #   sep = "\n",
-        #   useBytes = TRUE)
 
         jsonlite::stream_out(
           jsonlite::fromJSON(jsonlite::toJSON(value, auto_unbox = TRUE)),

@@ -62,19 +62,16 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   if (!length(input)) return(0L)
 
   # original set data frame to json
-  # ndjson <- jsonify::to_ndjson(input)
   jsonlite::stream_out(input, con = textConnection(
     object = "ndjson", open = "w", local = TRUE), verbose = FALSE)
 
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
-    # value <- jsonify::to_json(value, by = "col", unbox = TRUE)
     row.names(value) <- NULL
     value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
   }
   # list to json
   if (all(class(value) %in% "list")) {
-    # value <- jsonify::to_json(value, unbox = TRUE)
     value <- jsonlite::toJSON(value, auto_unbox = TRUE)
   }
 
@@ -201,9 +198,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) &&
-      # jsonify::validate_json(value)
-      jsonlite::validate(value)
+      is.character(value) && jsonlite::validate(value)
       ) {
     # check format
     if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
@@ -219,19 +214,16 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     # if value contains id's, split rows into documents of a vector
     row.names(value) <- NULL
     if (any(names(value) == "_id")) {
-      # value <- jsonify::to_json(value, by = "row", unbox = TRUE)
       value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
       value <- jqr::jq(value, ' .[] ')
     } else {
       # otherwise keep as single document
-      # value <- jsonify::to_json(value, by = "col", unbox = TRUE)
       value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
     }
   }
 
   # list to json
   if (all(class(value) %in% "list")) {
-    # value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
     value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
@@ -249,7 +241,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
       "Ignoring the specified 'query' parameter, using _id's ",
       "found in 'value' to identify documents to be updated")
     value <- jqr::jq(value, ' del(._id) ')
-    ids <- paste0('{"_id":"', ids, '"}') # TODO check
+    ids <- paste0('{"_id":"', ids, '"}')
   } else {
     if (length(value) > 1L) {
       # find documents to be updated for each document in value
@@ -357,9 +349,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) &&
-      # jsonify::validate_json(value)
-      jsonlite::validate(value)) {
+      is.character(value) && jsonlite::validate(value)) {
     # check format
     if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
@@ -374,19 +364,16 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     # if value contains id's, split rows into documents of a vector
     row.names(value) <- NULL
     if (any(names(value) == "_id")) {
-      # value <- jsonify::to_json(value, by = "row", unbox = TRUE)
       value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
       value <- jqr::jq(value, ' .[] ')
     } else {
       # otherwise keep as single document
-      # value <- jsonify::to_json(value, by = "col", unbox = TRUE)
       value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
     }
   }
 
   # list to json
   if (all(class(value) %in% "list")) {
-    # value <- jsonify::to_json(value, unbox = TRUE) # by not relevant for lists
     value <- jsonlite::toJSON(value, auto_unbox = TRUE)
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
