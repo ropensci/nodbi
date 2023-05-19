@@ -2,7 +2,7 @@ nodbi 0.9.4.9000
 ================
 
 ### Changes
-* removed jsonify dependency
+* removed jsonify dependency, gained speed 
 
 nodbi 0.9.4
 ================

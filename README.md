@@ -322,34 +322,33 @@ library("nodbi")
 
 srcMongo <- src_mongo()
 srcSqlite <- src_sqlite()
-srcElastic <- src_elastic()
-srcCouchdb <- src_couchdb(user = Sys.getenv("COUCHDB_TEST_USER"), pwd = Sys.getenv("COUCHDB_TEST_PWD"))
 srcPostgres <- src_postgres()
 srcDuckdb <- src_duckdb()
+srcElastic <- src_elastic()
+srcCouchdb <- src_couchdb(
+  user = Sys.getenv("COUCHDB_TEST_USER"), 
+  pwd = Sys.getenv("COUCHDB_TEST_PWD"))
 
 key <- "test"
 query <- '{"clarity": "SI1"}'
 fields <- '{"cut": 1, "_id": 1, "clarity": "1"}'
 value <- '{"clarity": "XYZ", "new": ["ABC", "DEF"]}'
 data <- as.data.frame(diamonds)[1:2000, ]
-url <- "http://httpbin.org/stream/56"
 ndjs <- tempfile()
-jsonlite::stream_out(jsonlite::fromJSON(contacts), con = file(ndjs))
+jsonlite::stream_out(iris, con = file(ndjs), verbose = FALSE)
 
 testFunction <- function(src, key, value, query, fields) {
- docdb_create(src, key, data)
- docdb_create(src, key, url)
- docdb_create(src, key, ndjs)
+ on.exit(docdb_delete(src, key))
+ suppressMessages(docdb_create(src, key, data))
+ suppressMessages(docdb_create(src, key, ndjs))
  # Elasticsearch needs a delay to process the data
  if (inherits(src, "src_elastic")) Sys.sleep(1)
  head(docdb_get(src, key))
  docdb_query(src, key, query = query, fields = fields)
  docdb_update(src, key, value = value, query = query)
- docdb_delete(src, key)
 }
 
-# 2023-05-12 with 2015 mobile hardware 
-# without any database optimisations
+# 2023-05-18 with 2015 mobile hardware, no database optimisations
 rbenchmark::benchmark(
  MongoDB = testFunction(src = srcMongo, key, value, query, fields),
  SQLite = testFunction(src = srcSqlite, key, value, query, fields),
@@ -361,38 +360,46 @@ rbenchmark::benchmark(
  columns = c('test', 'replications', 'elapsed')
 )
 #         test replications elapsed
-# 4    CouchDB           10     253
-# 3    Elastic           10      59 # 10s to be subtracted
-# 2     SQLite           10      13
-# 1    MongoDB           10      13
-# 5 PostgreSQL           10      12
-# 6     DuckDB           10      12
+# 4    CouchDB           10   265.0
+# 3    Elastic           10    55.6  # 10s to be subtracted
+# 5 PostgreSQL           10     4.3
+# 6     DuckDB           10     3.9
+# 2     SQLite           10     3.7
+# 1    MongoDB           10     3.5
 ```
 
 ## Testing
 
 ``` r
-# 2023-02-18
+# 2023-05-18 timing not much relevant
 testthat::test_local()
 # ✔ | F W S  OK | Context
-# ✔ |        96 | couchdb [103.3s]                                              
-# ✔ |       103 | duckdb [7.0s]                                                 
-# ✔ |     1  67 | elastic [86.0s]                                               
-# ──────────────────────────────────────────────────────────────────────────────
-# Skip (core-nodbi.R:177): docdb_query
+# ✔ |     1  95 | couchdb [104.3s]                                                                      
+# ──────────────────────────────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:246:3): docdb_update
+# Reason: bulk updates not yet implemented
+# ──────────────────────────────────────────────────────────────────────────────────────────────────────
+# ✔ |       122 | duckdb [11.4s]                                                                        
+# ✔ |     2  66 | elastic [96.6s]                                                                       
+# ──────────────────────────────────────────────────────────────────────────────────────────────────────
+# Skip (core-nodbi.R:178:3): docdb_query
 # Reason: queries need to be translated into elastic syntax
-# ──────────────────────────────────────────────────────────────────────────────
-# ✔ |       102 | mongodb [4.5s]                                                
-# ✔ |       106 | postgres [10.1s]                                              
-# ✔ |       105 | sqlite [6.8s]                                                 
 # 
-# ══ Results ═══════════════════════════════════════════════════════════════════
-# Duration: 218.4 s
+# Skip (core-nodbi.R:246:3): docdb_update
+# Reason: bulk updates not yet implemented
+# ──────────────────────────────────────────────────────────────────────────────────────────────────────
+# ✔ |       121 | mongodb [9.2s]                                                                        
+# ✔ |       125 | postgres [50.2s]                                                                      
+# ✔ |       124 | sqlite [43.0s]                                                                        
 # 
-# ── Skipped tests  ────────────────────────────────────────────────────────────
+# ══ Results ═══════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 315.6 s
+# 
+# ── Skipped tests  ────────────────────────────────────────────────────────────────────────────────────
+# • bulk updates not yet implemented (2)
 # • queries need to be translated into elastic syntax (1)
 # 
-# [ FAIL 0 | WARN 0 | SKIP 1 | PASS 579 ]
+# [ FAIL 0 | WARN 0 | SKIP 3 | PASS 653 ]
 ```
 
 ## Notes
