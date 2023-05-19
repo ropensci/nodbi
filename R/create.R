@@ -284,6 +284,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       # convert to ndjson which is the format in which errors are raised
       # if names (keys) had problematic characters such as . or $
       row.names(value) <- NULL
+      ndjson <- NULL
       jsonlite::stream_out(
         value, con = textConnection("ndjson", open = "w", local = TRUE),
         verbose = FALSE, auto_unbox = TRUE)
@@ -301,6 +302,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       }
       # split into vector of ndjson records
       row.names(value) <- NULL
+      ndjson <- NULL
       jsonlite::stream_out(
         jsonlite::fromJSON(jsonlite::toJSON(value, auto_unbox = TRUE)),
         con = textConnection("ndjson", open = "w", local = TRUE),
@@ -437,6 +439,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
        !all(sort(names(value)) == c("_id", "json")))) {
       # convert if there is no json column yet
       row.names(value) <- NULL
+      ndjson <- NULL
       jsonlite::stream_out(
         value[, -match("_id", names(value)), drop = FALSE],
         con = textConnection("ndjson", open = "w", local = TRUE),
@@ -572,6 +575,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
        !all(sort(names(value)) == c("_id", "json")))) {
       # convert if there is no json column yet
       row.names(value) <- NULL
+      ndjson <- NULL
       jsonlite::stream_out(
         value[, -match("_id", names(value)), drop = FALSE],
         con = textConnection("ndjson", open = "w", local = TRUE),

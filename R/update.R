@@ -62,6 +62,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   if (!length(input)) return(0L)
 
   # original set data frame to json
+  ndjson <- NULL
   jsonlite::stream_out(input, con = textConnection(
     object = "ndjson", open = "w", local = TRUE), verbose = FALSE)
 

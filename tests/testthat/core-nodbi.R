@@ -104,11 +104,13 @@ test_that("docdb_create (ndjson)", {
   expect_equal(suppressWarnings(docdb_create(src = src, key = key, value = tF)), 0L)
   expect_equal(docdb_create(src = src, key = key, value = tF2), nrow(diamonds))
 
-  if (internet()) expect_equal(docdb_create(src = src, key = key, value = "http://httpbin.org/stream/98"), 98L)
-
   # clean up
   expect_true(docdb_delete(src = src, key = key))
   expect_false(docdb_delete(src = src, key = key))
+
+  # test
+  skip_if_offline("no internet")
+  expect_equal(docdb_create(src = src, key = key, value = "http://httpbin.org/stream/98"), 98L)
 
 })
 
@@ -246,13 +248,6 @@ test_that("docdb_update", {
   if (inherits(src, "src_elastic") | inherits(src, "src_couchdb")) skip("bulk updates not yet implemented")
   expect_equal(docdb_update(src = src, key = key, value = '{"vs": 99}', query = '{"gear": 5}'), 5L)
   expect_equal(docdb_update(src = src, key = key, value = '{"_id":"Valiant", "vs": 99}', query = ''), 1L)
-  #
-  if (internet()) {
-    expect_equal(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/15", query = '{"gear": 3}'), 15L) # query finds 15 documents
-    expect_equal(sort(names(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"args":0}'))),
-                 sort(c("_id","mpg","cyl","disp","hp","drat","wt","qsec","vs","am","gear","carb","url","headers","origin","id")))
-  }
-  #
   expect_equal(sort(docdb_query(src = src, key = key, query = '{"vs": 99}', fields = '{"gear":1}')[["gear"]]), c(3,5,5,5,5,5))
   #
   expect_equal(docdb_update(src = src, key = key, value = list("_id" = "Valiant", "gear" = 8), query = ''), 1L)
@@ -270,14 +265,15 @@ test_that("docdb_update", {
   expect_equal(docdb_update(src = src, key = key, value = list("_id" = c("Valiant", "Fiat 128"), "gear" = 8:9), query = ''), 0L)
   expect_error(docdb_update(src = src, key = key, value = '{"_id":["Valiant","Fiat 128"], "vs": [77,77]}', query = ''), "array of documents")
   expect_warning(docdb_update(src = src, key = key, value = '{"_id":"Valiant", "vs": 79}', query = '{"_id": "a"}'), "gnoring.*query")
-  if (internet()) expect_error(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/3", query = '{"gear": 4}'), "Unequal number")
-  #
   expect_equal(docdb_query(src = src, key = key, query = '{"gear":3}', fields = '{"hp":1}')[["hp"]][c(1,14)], list(c(110,110), c(110,110)))
   expect_equal(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"vs":1}')[["vs"]], 79L)
-
-  # clean up
-  expect_true(docdb_delete(src = src, key = key))
-
+  #
+  skip_if_offline("no internet")
+  expect_error(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/3", query = '{"gear": 4}'), "Unequal number")
+  expect_equal(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/15", query = '{"gear": 3}'), 15L) # query finds 15 documents
+  expect_equal(sort(names(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"args":0}'))),
+               sort(c("_id","mpg","cyl","disp","hp","drat","wt","qsec","vs","am","gear","carb","url","headers","origin","id")))
+  #
 })
 
 #### transactions ####

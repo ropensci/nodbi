@@ -21,23 +21,22 @@ testDf2 <- iris  # no rownames
 # factors cannot be expected to be maintained
 testDf2[["Species"]] <- as.character(testDf2[["Species"]])
 
+ndjson <- NULL
+#
 jsonlite::stream_out(
   jsonlite::fromJSON(contacts),
   con = textConnection("ndjson", open = "w", local = TRUE),
   verbose = FALSE, auto_unbox = TRUE)
-
+#
 testDf3 <- data.frame(
-  # json = strsplit(jsonify::to_ndjson(jsonify::from_json(contacts)), split = "\n")[[1]],
   `json` = ndjson,
   stringsAsFactors = FALSE)
-
+#
 testDf4 <- data.frame(
   `_id` = uuid::UUIDgenerate(n = nrow(testDf3)),
-  # `json` = strsplit(jsonify::to_ndjson(jsonify::from_json(contacts)), split = "\n")[[1]],
   `json` = ndjson,
   stringsAsFactors = FALSE,
   check.names = FALSE)
-
 
 testJson <- contacts # has _id's
 testJson2 <- mapdata # no _id's
@@ -125,12 +124,3 @@ skip_if_no_duckdb <- function() {
     skip("duckdb or its JSON extension is not available")
   }
 }
-
-internet <- function() {
-  tmp <- try(
-    httr::HEAD("https://httpbin.org/anything", httr::timeout(2L)),
-    silent = TRUE
-  )
-  if (!inherits(tmp, "try-error")) TRUE else FALSE
-}
-
