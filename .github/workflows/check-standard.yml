@@ -1,0 +1,107 @@
+# 2023-06-18
+# https://github.com/r-lib/actions/tree/v2/examples
+# https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: R-CMD-check
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      COUCHDB_TEST_USER: ${{ secrets.COUCHDB_TEST_USER }}
+      COUCHDB_TEST_PWD: ${{ secrets.COUCHDB_TEST_PWD }}
+
+    steps:
+
+      # nodbi on linux:
+
+      - name: MongoDB
+        if: runner.os == 'Linux'
+        uses: supercharge/mongodb-github-action@1.3.0
+        with:
+          mongodb-version: 4.4
+
+      - name: Prepare ElasticSearch
+        if: runner.os == 'Linux'
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+
+      - name: Start ElasticSearch
+        if: runner.os == 'Linux'
+        uses: getong/elasticsearch-action@v1.2
+        with:
+          elasticsearch version: '7.6.1'
+          host port: 9200
+          container port: 9200
+          host node port: 9300
+          node port: 9300
+          discovery type: 'single-node'
+
+      - name: CouchDB
+        if: runner.os == 'Linux'
+        uses: iamssen/couchdb-github-action@master
+        with:
+          couchdb-version: '3.1'
+
+      - name: Install development libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y libjq-dev
+
+      # generic workflow:
+
+      - uses: actions/checkout@v3
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      # nodbi:
+
+      - name: Install dependencies
+        run: |
+          utils::install.packages(c("rcmdcheck", "sofa", "elastic", "mongolite", "DBI", "duckdb", "RSQLite"))
+          library(duckdb)
+          drv <- duckdb()
+          con <- dbConnect(drv)
+          dbExecute(con, 'INSTALL json;')
+          dbDisconnect(con)
+          duckdb_shutdown(drv)
+        shell: Rscript {0}
+
+      # generic workflow:
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true

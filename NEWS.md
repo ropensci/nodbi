@@ -1,3 +1,12 @@
+nodbi 0.9.5.9000
+================
+
+### Changes
+* switched from v1 to v2 GitHub r-lib/action for R CMD check
+
+### BUG FIXES
+* corrected minimum R version
+
 nodbi 0.9.5
 ================
 

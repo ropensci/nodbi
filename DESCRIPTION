@@ -4,7 +4,7 @@ Description: Simplified document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.9.5
+Version: 0.9.5.9000
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -23,7 +23,7 @@ LazyData: true
 URL: https://docs.ropensci.org/nodbi/, https://github.com/ropensci/nodbi
 BugReports: https://github.com/ropensci/nodbi/issues
 Roxygen: list(markdown = TRUE)
-Depends: R (>= 2.10)
+Depends: R (>= 3.4.0)
 Encoding: UTF-8
 Language: en-US
 Imports:
