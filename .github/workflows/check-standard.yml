@@ -91,7 +91,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          utils::install.packages(c("rcmdcheck", "sofa", "elastic", "mongolite", "DBI", "duckdb", "RSQLite"))
+          utils::install.packages(c("rcmdcheck", "sofa", "elastic", "mongolite", "DBI", "duckdb", "RSQLite", "webfakes"))
           library(duckdb)
           drv <- duckdb()
           con <- dbConnect(drv)

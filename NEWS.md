@@ -5,7 +5,9 @@ nodbi 0.9.5.9000
 * switched from v1 to v2 GitHub r-lib/action for R CMD check
 
 ### BUG FIXES
+* corrected marginal case in docdb_query.src_duckdb()
 * corrected minimum R version
+* replaced in testing httpbin with webfakes
 
 nodbi 0.9.5
 ================

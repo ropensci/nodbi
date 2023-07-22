@@ -109,8 +109,8 @@ test_that("docdb_create (ndjson)", {
   expect_false(docdb_delete(src = src, key = key))
 
   # test
-  skip_if_offline("no internet")
-  expect_equal(docdb_create(src = src, key = key, value = "http://httpbin.org/stream/98"), 98L)
+  skip_if(is.null(httpbin), "package webfakes missing")
+  expect_equal(docdb_create(src = src, key = key, value = httpbin$url("/stream/98")), 98L)
 
 })
 
@@ -268,10 +268,10 @@ test_that("docdb_update", {
   expect_equal(docdb_query(src = src, key = key, query = '{"gear":3}', fields = '{"hp":1}')[["hp"]][c(1,14)], list(c(110,110), c(110,110)))
   expect_equal(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"vs":1}')[["vs"]], 79L)
   #
-  skip_if_offline("no internet")
-  expect_error(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/3", query = '{"gear": 4}'), "Unequal number")
-  expect_equal(docdb_update(src = src, key = key, value = "http://httpbin.org/stream/15", query = '{"gear": 3}'), 15L) # query finds 15 documents
-  expect_equal(sort(names(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"args":0}'))),
+  skip_if(is.null(httpbin), "package webfakes missing")
+  expect_error(docdb_update(src = src, key = key, value = httpbin$url("/stream/3"), query = '{"gear": 4}'), "Unequal number")
+  expect_equal(docdb_update(src = src, key = key, value = httpbin$url("/stream/14"), query = '{"gear": 3}'), 14L) # query finds 15 documents
+  expect_equal(sort(names(docdb_query(src = src, key = key, query = '{"_id":"Hornet 4 Drive"}', fields = '{"args":0}'))),
                sort(c("_id","mpg","cyl","disp","hp","drat","wt","qsec","vs","am","gear","carb","url","headers","origin","id")))
   #
 })

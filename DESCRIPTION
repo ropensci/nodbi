@@ -41,7 +41,8 @@ Suggests:
     RPostgres,
     testthat,
     withr,
-    callr
+    callr,
+    webfakes
 RoxygenNote: 7.2.3
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
