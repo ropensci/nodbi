@@ -635,8 +635,35 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
   # https://duckdb.org/docs/extensions/json#json-extraction-functions
 
-  ## construct sql query statement
-  # head of sql
+  ## construct sql and jq statements
+
+  # dispatch querSql list elements depending on query:
+  # - $and: any dot terms go into jqrSubsetFunction, rest in sqlQueryStatement
+  # - $or and any element with dot: all go into jqrSubsetFunction
+  tmp <- lapply(querySql, function(i) {
+
+    if ((attr(querySql, "op") == "OR") ||
+        (grepl("^[^'].+[.].+[^']$", gsub("[\"]", "", i[1])))) {
+      c(i, "json")
+    } else if (length(i) == 2L) {
+      i[1] <- gsub("[']", "", i[1])
+      c(i, "sql")
+    } else {
+      ""
+    }
+  })
+  attr(tmp, "op") <- attr(querySql, "op")
+  querySql <- tmp
+
+  # identify fields other than _id for jq statement
+  if (max(sapply(querySql, length)) == 3) {
+    nonidFs <- sapply(querySql, "[[", 1)[sapply(querySql, "[[", 3) == "json"]
+    nonidFs <- gsub('"', '', nonidFs)
+  } else {
+    nonidFs <- NULL
+  }
+
+  # sql SELECT
   # -1- no fields specified, get full documents
   if (length(fields) == 1L && fields == "") {
     statement <- paste0(
@@ -645,37 +672,29 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   }
   # -2- only _id is specified
   if (length(fields) == 1L && fields == "_id") {
-    statement <- paste0(
-      "SELECT '{\"_id\": \"' || _id || '\"}' AS json FROM \"", key, "\" ")
+    # include other fields as relevant for any jq statement
+    if (!length(nonidFs)) {
+      statement <- paste0("SELECT '{\"_id\": \"' || _id || '\"}' AS json FROM \"", key, "\" ")
+    } else {
+      statement <- paste0(
+        "SELECT json_object('_id', _id, ",
+        paste0("'", nonidFs, "', json_extract(json, '$.", nonidFs, "')", collapse = ", "),
+        ") AS json FROM \"", key, "\" ")
+    }
   }
   # -3- other fields specified
   if (length(fields[fields != "_id" & fields != ""]) >= 1L) {
-    nonidFs <- c(rootFields[rootFields != "_id" & rootFields != ""],
-                 sapply(subFields, "[[", 1))
+    # include other fields as requested or relevant for any jq statement
+    nonidFs <- unique(unlist(c(
+      nonidFs,
+      rootFields[rootFields != "_id" & rootFields != ""],
+      sapply(subFields, "[[", 1)
+    )))
     statement <- paste0(
       "SELECT json_object('_id', _id, ",
       paste0("'", nonidFs, "', json_extract(json, '$.", nonidFs, "')", collapse = ", "),
       ") AS json FROM \"", key, "\" ")
   }
-
-  # dispatch querSql list elements depending on query:
-  # - $and: any dot terms go into jqrSubsetFunction, rest in sqlQueryStatement
-  # - $or and any element with dot: all go into jqrSubsetFunction
-  tmp <- lapply(querySql, function(i) {
-
-    if (#(any(sapply(querySql, function(ii) grepl("[.]", ii[1]))) &&
-        (attr(querySql, "op") == "OR") ||
-        (grepl("^[^'].+[.].+[^']$", gsub("[\"]", "", i[1])))) {
-          c(i, "json")
-        } else if (length(i) == 2L) {
-          i[1] <- gsub("[']", "", i[1])
-          c(i, "sql")
-        } else {
-          ""
-        }
-  })
-  attr(tmp, "op") <- attr(querySql, "op")
-  querySql <- tmp
 
   # sql WHERE for identifying documents
   if (querySql[[1]][1] != "") {
@@ -1079,6 +1098,9 @@ json2querySql <- function(x) {
 
   # add logical operation
   attr(out, "op") <- op
+
+  # debug
+  # print(out)
 
   # return
   return(out)
