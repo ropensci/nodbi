@@ -18,7 +18,7 @@ value."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/math
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5.9000</span>
       </span>
     </div>
 
@@ -67,20 +67,23 @@ or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
 
 
 <dt>key</dt>
-<dd><p>(character) A key as name of the container
-(corresponds to parameter <code>collection</code> for MongoDB,
+<dd><p>(character) The name of the container in the
+database backend
+(corresponds to <code>collection</code> for MongoDB,
 <code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch and to
-a table name for SQLite and for PostgreSQL)</p></dd>
+a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>value</dt>
 <dd><p>The data to be created in the database:
-a single data.frame, a JSON string or a list;
-or the file name or URL of NDJSON documents</p></dd>
+a single data.frame, a JSON string, a list,
+or a file name or URL that points to NDJSON documents</p></dd>
 
 
 <dt>query</dt>
-<dd><p>(character) A JSON query string, see examples</p></dd>
+<dd><p>(character) A JSON query string to
+identify the documents that should be updated
+(patched) with <code>value</code>, see examples</p></dd>
 
 
 <dt>...</dt>
@@ -101,7 +104,7 @@ or the file name or URL of NDJSON documents</p></dd>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Documents are identified by the <code>value</code> or
+    <p>Documents are identified by the <code>query</code> or
 by _id's in <code>value</code>, where the latter takes
 precedence in case both are specified.</p>
 <p><code>value</code> can have multiple documents and _id's,

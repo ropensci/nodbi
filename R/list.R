@@ -13,9 +13,10 @@
 #' @return (vector) of names of containers that can be
 #' used as parameter `key` with other functions such as
 #' [docdb_create()].
-#' Parameter `key` corresponds to `collection` for MongoDB,
-#' `dbname` for CouchDB, `index` for Elasticsearch and
-#' a table name for SQLite and PostgreSQL
+#' Parameter `key` corresponds to corresponds to
+#' `collection` for MongoDB, `dbname` for CouchDB,
+#' `index` for Elasticsearch and to a table name for
+#' DuckDb, SQLite and PostgreSQL
 #'
 #' @export
 #'

@@ -11,15 +11,16 @@ docdb_get(src, key, limit = NULL, ...)
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
 or \code{\link[=src_postgres]{src_postgres()}}}
 
-\item{key}{(character) A key as name of the container
-(corresponds to parameter \code{collection} for MongoDB,
+\item{key}{(character) The name of the container in the
+database backend
+(corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite and for PostgreSQL)}
+a table name for DuckDb, SQLite and PostgreSQL)}
 
 \item{limit}{(integer) Maximum number of documents
-to return (defaults 10,000 for Elasticsearch and
-all for MongoDB, SQLite, CouchDB, PostgreSQL, and
-DuckDB}
+to return. If not set, defaults to 10,000 for
+Elasticsearch and all documents for MongoDB,
+SQLite, CouchDB, PostgreSQL, and DuckDB.}
 
 \item{...}{Passed on to functions:
 \itemize{

@@ -25,9 +25,10 @@ or \code{\link[=src_postgres]{src_postgres()}}}
 (vector) of names of containers that can be
 used as parameter \code{key} with other functions such as
 \code{\link[=docdb_create]{docdb_create()}}.
-Parameter \code{key} corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and
-a table name for SQLite and PostgreSQL
+Parameter \code{key} corresponds to corresponds to
+\code{collection} for MongoDB, \code{dbname} for CouchDB,
+\code{index} for Elasticsearch and to a table name for
+DuckDb, SQLite and PostgreSQL
 }
 \description{
 List containers in database

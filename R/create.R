@@ -21,14 +21,15 @@
 #' [src_mongo()], [src_sqlite()], [src_elastic()], [src_couchdb()]
 #' or [src_postgres()]
 #'
-#' @param key (character) A key as name of the container
-#' (corresponds to parameter `collection` for MongoDB,
+#' @param key (character) The name of the container in the
+#' database backend
+#' (corresponds to `collection` for MongoDB,
 #' `dbname` for CouchDB, `index` for Elasticsearch and to
-#' a table name for SQLite and for PostgreSQL)
+#' a table name for DuckDb, SQLite and PostgreSQL)
 #'
 #' @param value The data to be created in the database:
-#' a single data.frame, a JSON string or a list;
-#' or the file name or URL of NDJSON documents
+#' a single data.frame, a JSON string, a list,
+#' or a file name or URL that points to NDJSON documents
 #'
 #' @param ... Passed to functions:
 #' - CouchDB: [sofa::db_bulk_create()]
@@ -36,6 +37,7 @@
 #' - MongoDB: [mongolite::mongo()]
 #' - SQLite: ignored
 #' - PostgreSQL: ignored
+#' - DuckDB: ignored
 #'
 #' @return (integer) Number of successfully created documents
 #'
@@ -654,11 +656,6 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
   # https://duckdb.org/docs/api/r.html#efficient-transfer
   # https://duckdb.org/docs/extensions/json#json-creation-functions
-
-  # alternatives:
-  # - write out as ndjson and import
-  # - convert to df and AppendTable
-  # => test
 
   # if value is not a file name, convert value
   # into ndjson and keep filename in value

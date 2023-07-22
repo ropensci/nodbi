@@ -11,10 +11,11 @@ docdb_exists(src, key, ...)
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
 or \code{\link[=src_postgres]{src_postgres()}}}
 
-\item{key}{(character) A key as name of the container
-(corresponds to parameter \code{collection} for MongoDB,
+\item{key}{(character) The name of the container in the
+database backend
+(corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite and for PostgreSQL)}
+a table name for DuckDb, SQLite and PostgreSQL)}
 
 \item{...}{Passed to functions:
 \itemize{

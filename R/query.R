@@ -7,10 +7,11 @@
 #'  with at most one logic operator ('$and' if not specified, or '$or'),
 #'  see examples.
 #'
-#' @param ... Optionally, `fields` a JSON string of fields to
-#' be returned from anywhere in the tree (dot paths notation), see examples.
+#' @param ... (character) Optionally, specify `fields` as a JSON string of
+#' fields to be returned from anywhere in the tree (dot paths notation),
+#' see examples.
 #'
-#' @note A dot in `query` or `fields` is interpreted as a dot poth;
+#' @note A dot in `query` or `fields` is interpreted as a dot path;
 #' it is not supported to have a dot in the key / name of a field.
 #'
 #' Main functions used per database:
@@ -31,7 +32,7 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_query(src, "mtcars", query = '{"mpg":21}')
 #' docdb_query(src, "mtcars", query = '{"mpg":21, "gear": {"$lte": 4}}')
-#' docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"mpg":1, "cyl":1}')
+#' docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"_id":0, "mpg":1, "cyl":1}')
 #' docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
 #' # complex query, not supported for src_elastic and src_couchdb backends at this time:
 #' docdb_query(src, "mtcars", query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}')

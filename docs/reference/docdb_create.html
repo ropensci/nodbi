@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5.9000</span>
       </span>
     </div>
 
@@ -65,16 +65,17 @@ or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
 
 
 <dt>key</dt>
-<dd><p>(character) A key as name of the container
-(corresponds to parameter <code>collection</code> for MongoDB,
+<dd><p>(character) The name of the container in the
+database backend
+(corresponds to <code>collection</code> for MongoDB,
 <code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch and to
-a table name for SQLite and for PostgreSQL)</p></dd>
+a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>value</dt>
 <dd><p>The data to be created in the database:
-a single data.frame, a JSON string or a list;
-or the file name or URL of NDJSON documents</p></dd>
+a single data.frame, a JSON string, a list,
+or a file name or URL that points to NDJSON documents</p></dd>
 
 
 <dt>...</dt>
@@ -83,6 +84,7 @@ or the file name or URL of NDJSON documents</p></dd>
 <li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
 <li><p>SQLite: ignored</p></li>
 <li><p>PostgreSQL: ignored</p></li>
+<li><p>DuckDB: ignored</p></li>
 </ul></dd>
 
 </dl></div>

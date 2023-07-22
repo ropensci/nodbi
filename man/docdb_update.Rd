@@ -11,16 +11,19 @@ docdb_update(src, key, value, query, ...)
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
 or \code{\link[=src_postgres]{src_postgres()}}}
 
-\item{key}{(character) A key as name of the container
-(corresponds to parameter \code{collection} for MongoDB,
+\item{key}{(character) The name of the container in the
+database backend
+(corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite and for PostgreSQL)}
+a table name for DuckDb, SQLite and PostgreSQL)}
 
 \item{value}{The data to be created in the database:
-a single data.frame, a JSON string or a list;
-or the file name or URL of NDJSON documents}
+a single data.frame, a JSON string, a list,
+or a file name or URL that points to NDJSON documents}
 
-\item{query}{(character) A JSON query string, see examples}
+\item{query}{(character) A JSON query string to
+identify the documents that should be updated
+(patched) with \code{value}, see examples}
 
 \item{...}{Passed on to functions:
 \itemize{
@@ -40,7 +43,7 @@ Documents are updated by patching their JSON with
 \code{value}.
 }
 \details{
-Documents are identified by the \code{value} or
+Documents are identified by the \code{query} or
 by _id's in \code{value}, where the latter takes
 precedence in case both are specified.
 

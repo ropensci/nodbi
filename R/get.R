@@ -3,9 +3,9 @@
 #' @inheritParams docdb_create
 #'
 #' @param limit (integer) Maximum number of documents
-#'  to return (defaults 10,000 for Elasticsearch and
-#'  all for MongoDB, SQLite, CouchDB, PostgreSQL, and
-#'  DuckDB
+#'  to return. If not set, defaults to 10,000 for
+#'  Elasticsearch and all documents for MongoDB,
+#'  SQLite, CouchDB, PostgreSQL, and DuckDB.
 #'
 #' @param ... Passed on to functions:
 #' - MongoDB: find() in [mongolite::mongo()]
@@ -63,7 +63,7 @@ docdb_get.src_elastic <- function(src, key, limit = "10000", ...) {
     size = limit, ...)[["hits"]][["hits"]]
 
   # early exit
-  if(!length(docids)) return(NULL)
+  if (!length(docids)) return(NULL)
 
   # get ids
   docids <- sapply(docids, "[[", "_id", USE.NAMES = FALSE, simplify = TRUE)

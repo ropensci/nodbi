@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5.9000</span>
       </span>
     </div>
 
@@ -72,51 +72,57 @@
 <div class="page-header"><h1 id="nodbi">nodbi<a class="anchor" aria-label="anchor" href="#nodbi"></a>
 </h1></div>
 <p><a href="https://cran.r-project.org/package=nodbi" class="external-link"><img src="https://cranchecks.info/badges/worst/nodbi" alt="CRAN"></a> <a href="https://www.repostatus.org/#active" class="external-link"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed."></a> <a href="https://cranchecks.info/pkgs/nodbi" class="external-link"><img src="https://cranchecks.info/badges/worst/nodbi" alt="cran checks"></a> <a href="https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://codecov.io/gh/ropensci/nodbi" class="external-link"><img src="https://codecov.io/gh/ropensci/nodbi/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://github.com/r-hub/cranlogs.app" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/nodbi" alt="rstudio mirror downloads"></a> <a href="https://cran.r-project.org/package=nodbi" class="external-link"><img src="https://www.r-pkg.org/badges/version/nodbi" alt="cran version"></a></p>
-<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-05-12.</p>
-<p>Currently, <code>nodbi</code> supports the following database backends:</p>
-<ul>
-<li>MongoDB</li>
-<li>SQLite</li>
-<li>Elasticsearch</li>
-<li>CouchDB</li>
-<li>PostgreSQL (since nodbi v0.6.0)</li>
-<li>DuckDB (since nodbi v0.9.0)</li>
-</ul>
-<p>for an <code>R</code> object of any of these data types:</p>
-<ul>
-<li>data.frame</li>
-<li>list</li>
-<li>JSON string</li>
-<li>a file name or URL with NDJSON records*</li>
-</ul>
-<p>and for executing the following operations:</p>
-<ul>
-<li>List</li>
-<li>Exists</li>
-<li>Create</li>
-<li>Get</li>
-<li>Query**</li>
-<li>Update**</li>
-<li>Delete</li>
-</ul>
-<p>across all database backends. Limitations: * Only <code>http(s)</code> and only for <code>docdb_create</code>. **For Elasticsearch, only simple queries (e.g. equality for a single field) and for CouchDB only root fields. For capabilities to query across any of the database backends, see section <a href="#walk-through">walk-through</a> below and see the canonical testing: <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>. See <a href="#benchmark">benchmark</a> below for speed comparisons of database backends.</p>
-<div class="section level2">
-<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
-</h2>
-<p>CRAN version</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nodbi"</span><span class="op">)</span></span></code></pre></div>
-<p>Development version</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ropensci/nodbi"</span><span class="op">)</span></span></code></pre></div>
-<p>Load package from library</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://docs.ropensci.org/nodbi/" class="external-link">"nodbi"</a></span><span class="op">)</span></span></code></pre></div>
-</div>
+<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-07-22.</p>
+<table class="table">
+<colgroup>
+<col width="43%">
+<col width="39%">
+<col width="17%">
+</colgroup>
+<thead><tr class="header">
+<th>Currently, <code>nodbi</code> supports as database backends</th>
+<th>for an <code>R</code> object of any of these data types</th>
+<th>for the operations</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>MongoDB</td>
+<td>data.frame</td>
+<td>List, Exists</td>
+</tr>
+<tr class="even">
+<td>SQLite</td>
+<td>list</td>
+<td>Create</td>
+</tr>
+<tr class="odd">
+<td>PostgreSQL</td>
+<td>JSON string</td>
+<td>Get</td>
+</tr>
+<tr class="even">
+<td>DuckDB</td>
+<td>file name of NDJSON records</td>
+<td>Query*</td>
+</tr>
+<tr class="odd">
+<td>Elasticsearch</td>
+<td>URL of NDJSON records</td>
+<td>Update*</td>
+</tr>
+<tr class="even">
+<td>CouchDB</td>
+<td></td>
+<td>Delete</td>
+</tr>
+</tbody>
+</table>
+<p>Limitations: *For Elasticsearch, only simple queries (e.g. equality for a single field) and for CouchDB only root fields.</p>
+<p>For a speed comparisons of database backends, see <a href="#benchmark">benchmark</a> below.</p>
 <div class="section level2">
 <h2 id="api-overview">API overview<a class="anchor" aria-label="anchor" href="#api-overview"></a>
 </h2>
-<p>Parameters for <code>docdb_*()</code> functions are the same across all database backends. See <a href="#walk-through">walk-through</a> below.</p>
+<p>Parameters for <code>docdb_*()</code> functions are the same across all database backends. See <a href="#walk-through">walk-through</a> below and the canonical testing in <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>. “Container” is used as term to indicate where conceptually the backend holds the data, see <a href="#database-connections">Database connections</a> below. The <code>key</code> parameter holds the name of a container.</p>
 <table class="table">
 <colgroup>
 <col width="52%">
@@ -129,7 +135,7 @@
 <tbody>
 <tr class="odd">
 <td>Create database connection (see below)</td>
-<td><code>src &lt;- nodbi::src_{mongo, sqlite, couchdb, elastic}(&lt;see below for parameters&gt;)</code></td>
+<td><code>src &lt;- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(&lt;see below for parameters&gt;)</code></td>
 </tr>
 <tr class="even">
 <td>Load <code>my_data</code> (a data frame, a list, a JSON string, or a file name or url with NDJSON records) into database, container <code>my_container</code>
@@ -170,29 +176,35 @@
 <td><code>nodbi::docdb_delete(src = src, key = "my_container")</code></td>
 </tr>
 <tr class="odd">
-<td>Close and remove database connection</td>
+<td>Close and remove database connection manually (when restarting R, connections are closed and removed automatically by <code>nodbi</code>)</td>
 <td><code>rm(src)</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
+<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
+</h2>
+<p>CRAN version</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nodbi"</span><span class="op">)</span></span></code></pre></div>
+<p>Development version</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ropensci/nodbi"</span><span class="op">)</span></span></code></pre></div>
+<p>Load package from library</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://docs.ropensci.org/nodbi/" class="external-link">"nodbi"</a></span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="database-connections">Database connections<a class="anchor" aria-label="anchor" href="#database-connections"></a>
 </h2>
-<p>Overview on parameters and aspects that are specific to the database backend. These are only needed once: for <code>src_*()</code> to create a connection object. The connection object is subsequently used with <code>docdb_*</code> functions.</p>
+<p>Overview on parameters and aspects that are specific to the database backend. These are only needed once: for <code>src_*()</code> to create a connection object. The connection object is subsequently used with <code>docdb_*</code> functions. “Container” refers to where conceptually the backend holds the data.</p>
 <div class="section level3">
 <h3 id="duckdb">DuckDB<a class="anchor" aria-label="anchor" href="#duckdb"></a>
 </h3>
+<p>See also <a href="https://CRAN.R-project.org/package=duckdb" class="external-link uri">https://CRAN.R-project.org/package=duckdb</a> and <a href="https://duckdb.org/docs/extensions/json" class="external-link uri">https://duckdb.org/docs/extensions/json</a>. “Container” refers to a DuckDB table.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install with</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'duckdb'</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'https://duckdb.r-universe.dev'</span>, <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># connect</span></span>
-<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span>dbdir <span class="op">=</span> <span class="st">":memory:"</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># remember to disconnect and shutdown DuckDB</span></span>
-<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">src</span><span class="op">$</span><span class="va">con</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>See also <a href="https://CRAN.R-project.org/package=duckdb" class="external-link uri">https://CRAN.R-project.org/package=duckdb</a> and <a href="https://duckdb.org/docs/extensions/json" class="external-link uri">https://duckdb.org/docs/extensions/json</a>.</p>
+<code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span>dbdir <span class="op">=</span> <span class="st">":memory:"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="mongodb">MongoDB<a class="anchor" aria-label="anchor" href="#mongodb"></a>
@@ -200,13 +212,13 @@
 <p>MongoDB but none of the other databases require to specify the container already in the <code>src_*()</code> function. “Container” refers to a MongoDB collection. See <a href="https://jeroen.github.io/mongolite/" class="external-link uri">https://jeroen.github.io/mongolite/</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span></span>
-<span> collection <span class="op">=</span> <span class="st">"my_container"</span>, db <span class="op">=</span> <span class="st">"my_database"</span>,</span>
-<span> url <span class="op">=</span> <span class="st">"mongodb://localhost"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span>  collection <span class="op">=</span> <span class="st">"my_container"</span>, db <span class="op">=</span> <span class="st">"my_database"</span>,</span>
+<span>  url <span class="op">=</span> <span class="st">"mongodb://localhost"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="sqlite">SQLite<a class="anchor" aria-label="anchor" href="#sqlite"></a>
 </h3>
-<p>The functionality to process JSON is based on the SQLite extension <a href="https://www.sqlite.org/json1.html" class="external-link">JSON1</a>, available in RSQLite. “Container” refers to an SQLite table.</p>
+<p>See <a href="https://www.sqlite.org/json1.html" class="external-link">JSON1</a>, available in RSQLite. “Container” refers to an SQLite table.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span>dbname <span class="op">=</span> <span class="st">":memory:"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -216,17 +228,17 @@
 <p>“Container” refers to a CouchDB database. Function <code>docdb_update.src_couchdb</code> uses <a href="https://cran.r-project.org/package=jqr" class="external-link">jqr</a> to implement patching JSON, in analogy to functions available for the other databases.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span></span>
-<span> host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">5984L</span>, path <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span> transport <span class="op">=</span> <span class="st">"http"</span>, user <span class="op">=</span> <span class="cn">NULL</span>, pwd <span class="op">=</span> <span class="cn">NULL</span>, headers <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span>  host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">5984L</span>, path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  transport <span class="op">=</span> <span class="st">"http"</span>, user <span class="op">=</span> <span class="cn">NULL</span>, pwd <span class="op">=</span> <span class="cn">NULL</span>, headers <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="elasticsearch">Elasticsearch<a class="anchor" aria-label="anchor" href="#elasticsearch"></a>
 </h3>
-<p>“Container” refers to an Elasticsearch index. Only lowercase is accepted for container names. Opensearch can equally be used.</p>
+<p>“Container” refers to an Elasticsearch index. Only lowercase is accepted for container names (parameter <code>key</code>). Opensearch can equally be used.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span></span>
-<span> host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">9200L</span>, path <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span> transport_schema <span class="op">=</span> <span class="st">"http"</span>, user <span class="op">=</span> <span class="cn">NULL</span>, pwd <span class="op">=</span> <span class="cn">NULL</span>, force <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span>  host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">9200L</span>, path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  transport_schema <span class="op">=</span> <span class="st">"http"</span>, user <span class="op">=</span> <span class="cn">NULL</span>, pwd <span class="op">=</span> <span class="cn">NULL</span>, force <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="postgresql">PostgreSQL<a class="anchor" aria-label="anchor" href="#postgresql"></a>
@@ -234,7 +246,7 @@
 <p>“Container” refers to an PostgreSQL table. With PostgreSQL, the order of variables in data frames returned by <code><a href="reference/docdb_get.html">docdb_get()</a></code> and <code><a href="reference/docdb_query.html">docdb_query()</a></code> can differ from the order in which they were in <code><a href="reference/docdb_create.html">docdb_create()</a></code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span></span>
-<span> dbname <span class="op">=</span> <span class="st">"my_database"</span>, host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">5432L</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span>  dbname <span class="op">=</span> <span class="st">"my_database"</span>, host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">5432L</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -245,81 +257,90 @@
 <code class="sourceCode R"><span><span class="co"># load nodbi</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/nodbi/" class="external-link">nodbi</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># connect database backend; this</span></span>
-<span><span class="co"># example fully works with any of</span></span>
-<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#</span></span>
+<span><span class="co"># name of container</span></span>
+<span><span class="va">key</span> <span class="op">&lt;-</span> <span class="st">"my_container"</span></span>
+<span></span>
+<span><span class="co"># connect database backend</span></span>
+<span><span class="co"># </span></span>
 <span><span class="co"># parts of the example do not yet work with </span></span>
 <span><span class="co"># these database backends, see *notes* below</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># this example fully works with any of</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span>collection <span class="op">=</span> <span class="va">key</span><span class="op">)</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># check if container already exists</span></span>
-<span><span class="fu"><a href="reference/docdb_exists.html">docdb_exists</a></span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_exists.html">docdb_exists</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span></span>
+<span><span class="co"># [1] FALSE</span></span>
 <span></span>
 <span><span class="co"># load data (here data frame, alternatively list or JSON)</span></span>
 <span><span class="co"># into the container "my_container" specified in "key" parameter</span></span>
-<span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span>, value <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="co"># [1] 32</span></span>
 <span></span>
 <span><span class="co"># load additionally 98 NDJSON records</span></span>
-<span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span>, <span class="st">"http://httpbin.org/stream/98"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="st">"https://httpbin.org/stream/98"</span><span class="op">)</span></span>
 <span><span class="co"># Note: container 'my_container' already exists</span></span>
 <span><span class="co"># [1] 98</span></span>
 <span></span>
 <span><span class="co"># load additionally contacts JSON data, from package nodbi</span></span>
-<span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span>, <span class="va">contacts</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">contacts</span><span class="op">)</span></span>
 <span><span class="co"># Note: container 'my_container' already exists</span></span>
 <span><span class="co"># [1] 5</span></span>
 <span></span>
 <span><span class="co"># get all documents, irrespective of schema</span></span>
-<span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># A tibble: 135 × 27</span></span>
-<span><span class="co">#    `_id`       isActive balance   age eyeColor name  email about registered tags   friends url  </span></span>
-<span><span class="co">#    &lt;chr&gt;       &lt;lgl&gt;    &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;list&gt; &lt;list&gt;  &lt;chr&gt;</span></span>
-<span><span class="co">#  1 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… &lt;chr&gt;  &lt;df&gt;    NA   </span></span>
-<span><span class="co">#  2 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… &lt;chr&gt;  &lt;df&gt;    NA   </span></span>
-<span><span class="co">#  3 5cd6785325… TRUE     $1,161…    22 brown    Pace… pace… Eius… 2018-08-1… &lt;chr&gt;  &lt;df&gt;    NA   </span></span>
-<span><span class="co">#  4 5cd6785335… FALSE    $2,579…    30 brown    Will… will… Null… 2018-02-1… &lt;chr&gt;  &lt;df&gt;    NA   </span></span>
-<span><span class="co">#  5 5cd67853f8… FALSE    $3,808…    23 green    Lacy… lacy… Sunt… 2014-08-0… &lt;chr&gt;  &lt;df&gt;    NA   </span></span>
-<span><span class="co">#  6 6529d28a-c… NA       NA         NA NA       NA    NA    NA    NA         &lt;NULL&gt; &lt;NULL&gt;  http…</span></span>
-<span><span class="co">#  7 6529d2a8-c… NA       NA         NA NA       NA    NA    NA    NA         &lt;NULL&gt; &lt;NULL&gt;  http…</span></span>
-<span><span class="co">#  8 6529d2b2-c… NA       NA         NA NA       NA    NA    NA    NA         &lt;NULL&gt; &lt;NULL&gt;  http…</span></span>
-<span><span class="co">#  9 6529d2c6-c… NA       NA         NA NA       NA    NA    NA    NA         &lt;NULL&gt; &lt;NULL&gt;  http…</span></span>
-<span><span class="co"># 10 6529d2d0-c… NA       NA         NA NA       NA    NA    NA    NA         &lt;NULL&gt; &lt;NULL&gt;  http…</span></span>
-<span><span class="co"># # … with 125 more rows, and 15 more variables: args &lt;named list&gt;, headers &lt;df[,4]&gt;,</span></span>
-<span><span class="co"># #   origin &lt;chr&gt;, id &lt;int&gt;, mpg &lt;dbl&gt;, cyl &lt;dbl&gt;, disp &lt;dbl&gt;, hp &lt;dbl&gt;, drat &lt;dbl&gt;, wt &lt;dbl&gt;,</span></span>
-<span><span class="co"># #   qsec &lt;dbl&gt;, vs &lt;dbl&gt;, am &lt;dbl&gt;, gear &lt;dbl&gt;, carb &lt;dbl&gt;</span></span>
+<span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># # A tibble: 135 × 27</span></span>
+<span><span class="co">#    `_id`      url   args  headers$Host origin    id isActive balance   age eyeColor name  email</span></span>
+<span><span class="co">#    &lt;chr&gt;      &lt;chr&gt; &lt;df[&gt; &lt;chr&gt;        &lt;chr&gt;  &lt;int&gt; &lt;lgl&gt;    &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;</span></span>
+<span><span class="co">#  1 006c91d9-… http…       httpbin.org  83.13…    87 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  2 00bfd508-… http…       httpbin.org  83.13…    17 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  3 04f17695-… http…       httpbin.org  83.13…    53 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  4 05d0f2be-… http…       httpbin.org  83.13…    80 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  5 06b6b86d-… http…       httpbin.org  83.13…    55 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  6 0760c273-… http…       httpbin.org  83.13…    11 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  7 08de6593-… http…       httpbin.org  83.13…    47 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  8 0b1cb164-… http…       httpbin.org  83.13…    63 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co">#  9 0bafc40e-… http…       httpbin.org  83.13…    60 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co"># 10 11ba908b-… http…       httpbin.org  83.13…    74 NA       NA         NA NA       NA    NA   </span></span>
+<span><span class="co"># # ℹ 125 more rows</span></span>
+<span><span class="co"># # ℹ 18 more variables: headers$`X-Amzn-Trace-Id` &lt;chr&gt;, $`User-Agent` &lt;chr&gt;, $Accept &lt;chr&gt;,</span></span>
+<span><span class="co"># #   about &lt;chr&gt;, registered &lt;chr&gt;, tags &lt;list&gt;, friends &lt;list&gt;, mpg &lt;dbl&gt;, cyl &lt;int&gt;,</span></span>
+<span><span class="co"># #   disp &lt;dbl&gt;, hp &lt;int&gt;, drat &lt;dbl&gt;, wt &lt;dbl&gt;, qsec &lt;dbl&gt;, vs &lt;int&gt;, am &lt;int&gt;, gear &lt;int&gt;,</span></span>
+<span><span class="co"># #   carb &lt;int&gt;</span></span>
+<span></span>
 <span></span>
 <span><span class="co"># query some documents</span></span>
 <span><span class="co"># *note*: such complex queries do not yet work with src_elasticsearch()</span></span>
-<span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span>, query <span class="op">=</span> <span class="st">'{"mpg": {"$gte": 30}}'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"mpg": {"$gte": 30}}'</span><span class="op">)</span></span>
 <span><span class="co">#              _id mpg cyl disp  hp drat  wt qsec vs am gear carb</span></span>
 <span><span class="co"># 1       Fiat 128  32   4   79  66  4.1 2.2   19  1  1    4    1</span></span>
 <span><span class="co"># 2    Honda Civic  30   4   76  52  4.9 1.6   19  1  1    4    2</span></span>
-<span><span class="co"># 3   Lotus Europa  30   4   95 113  3.8 1.5   17  1  1    5    2</span></span>
-<span><span class="co"># 4 Toyota Corolla  34   4   71  65  4.2 1.8   20  1  1    4    1</span></span>
+<span><span class="co"># 3 Toyota Corolla  34   4   71  65  4.2 1.8   20  1  1    4    1</span></span>
+<span><span class="co"># 4   Lotus Europa  30   4   95 113  3.8 1.5   17  1  1    5    2</span></span>
 <span></span>
 <span><span class="co"># query some fields from some documents; 'query' is a mandatory </span></span>
 <span><span class="co"># parameter and is used here in its position in the signature</span></span>
 <span><span class="co"># *note*: such complex queries do not yet work with src_elasticsearch()</span></span>
-<span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span>, <span class="st">'{"mpg": {"$gte": 30}}'</span>, fields <span class="op">=</span> <span class="st">'{"wt": 1, "mpg": 1}'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="st">'{"mpg": {"$gte": 30}}'</span>, fields <span class="op">=</span> <span class="st">'{"wt": 1, "mpg": 1}'</span><span class="op">)</span></span>
 <span><span class="co">#    wt mpg</span></span>
 <span><span class="co"># 1 2.2  32</span></span>
 <span><span class="co"># 2 1.6  30</span></span>
-<span><span class="co"># 3 1.5  30</span></span>
-<span><span class="co"># 4 1.8  34</span></span>
+<span><span class="co"># 3 1.8  34</span></span>
+<span><span class="co"># 4 1.5  30</span></span>
 <span></span>
 <span><span class="co"># query some subitem fields from some documents</span></span>
-<span><span class="co"># *note*: such complex queries do not yet work with src_couchdb() or src_elasticsearch()</span></span>
+<span><span class="co"># *note*: such complex queries do not yet work with</span></span>
+<span><span class="co">#         src_couchdb() or src_elasticsearch()</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span></span>
-<span>  <span class="va">src</span>, key <span class="op">=</span> <span class="st">"my_container"</span>, </span>
+<span>  <span class="va">src</span>, <span class="va">key</span>, </span>
 <span>  query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$gt": 21}}, </span></span>
 <span><span class="st">           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}'</span>, </span>
-<span> fields <span class="op">=</span> <span class="st">'{"age": 1, "friends.name": 1}'</span><span class="op">)</span><span class="op">)</span></span>
+<span>  fields <span class="op">=</span> <span class="st">'{"age": 1, "friends.name": 1}'</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># 'data.frame': 3 obs. of  2 variables:</span></span>
 <span><span class="co">#  $ age    : int  23 30 22</span></span>
 <span><span class="co">#  $ friends:'data.frame':  3 obs. of  1 variable:</span></span>
@@ -330,49 +351,46 @@
 <span></span>
 <span><span class="co"># such queries can also be used for updating (patching) selected documents </span></span>
 <span><span class="co"># with a new 'value'(s) from a JSON string, a data frame or a list</span></span>
-<span><span class="fu"><a href="reference/docdb_update.html">docdb_update</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span>, value <span class="op">=</span> <span class="st">'{"vs": 9, "xy": [1, 2]}'</span>, query <span class="op">=</span> <span class="st">'{"carb": 3}'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_update.html">docdb_update</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="st">'{"vs": 9, "xy": [1, 2]}'</span>, query <span class="op">=</span> <span class="st">'{"carb": 3}'</span><span class="op">)</span></span>
 <span><span class="co"># [1] 3</span></span>
 <span><span class="co"># *note*: such queries do not yet work with src_elasticsearch()</span></span>
-<span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span>, <span class="st">'{"carb": {"$in": [1,3]}}'</span>, fields <span class="op">=</span> <span class="st">'{"vs": 1}'</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co"># [1] 1 1 1 1 9 9 9 1 1 1</span></span>
-<span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span><span class="op">)</span><span class="op">[</span> , <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">27</span>, <span class="fl">28</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#                  _id carb   xy</span></span>
-<span><span class="co"># ...</span></span>
-<span><span class="co"># 126        Merc 280C    4 NULL</span></span>
-<span><span class="co"># 127       Merc 450SE    3 1, 2</span></span>
-<span><span class="co"># 128       Merc 450SL    3 1, 2</span></span>
-<span><span class="co"># 129      Merc 450SLC    3 1, 2</span></span>
-<span><span class="co"># 130 Pontiac Firebird    2 NULL</span></span>
-<span><span class="co"># ...</span></span>
+<span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="st">'{"carb": {"$in": [1,3]}}'</span>, fields <span class="op">=</span> <span class="st">'{"vs": 1}'</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co"># [1] 1 1 1 9 9 9 1 1 1 1</span></span>
+<span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">43</span>, <span class="fl">93</span>, <span class="fl">100</span>, <span class="fl">101</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"_id"</span>, <span class="st">"xy"</span>, <span class="st">"url"</span>, <span class="st">"email"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#                                      _id   xy                           url                  email</span></span>
+<span><span class="co"># 43              5cd6785325ce3a94dfc54096 NULL                          &lt;NA&gt; pacebell@conjurica.com</span></span>
+<span><span class="co"># 93                            Merc 450SL 1, 2                          &lt;NA&gt;                   &lt;NA&gt;</span></span>
+<span><span class="co"># 100                           Volvo 142E NULL                          &lt;NA&gt;                   &lt;NA&gt;</span></span>
+<span><span class="co"># 101 a12f9901-4edf-4cdd-b3e6-3a9a7ca48c9d NULL https://httpbin.org/stream/98                   &lt;NA&gt;</span></span>
 <span></span>
 <span><span class="co"># use with dplyr</span></span>
 <span><span class="co"># *note* that dplyr includes a (deprecated) function src_sqlite</span></span>
 <span><span class="co"># which would mask nodbi's src_sqlite, so it is excluded here</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span>, exclude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"src_sqlite"</span>, <span class="st">"src_postgres"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># </span></span>
-<span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">gear</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mean_mpg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">gear</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mean_mpg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># # A tibble: 4 × 2</span></span>
 <span><span class="co">#    gear mean_mpg</span></span>
-<span><span class="co">#   &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#   &lt;int&gt;    &lt;dbl&gt;</span></span>
 <span><span class="co"># 1     3     16.1</span></span>
 <span><span class="co"># 2     4     24.5</span></span>
 <span><span class="co"># 3     5     21.4</span></span>
-<span><span class="co"># 4    NA     NA</span></span>
+<span><span class="co"># 4    NA     NA </span></span>
 <span></span>
 <span><span class="co"># delete documents; query is optional parameter and has to be </span></span>
 <span><span class="co"># specified for deleting documents instead of deleting the container</span></span>
 <span><span class="co"># *note*: such complex queries do not yet work with src_couchdb() or src_elasticsearch()</span></span>
-<span><span class="co"># *note*: with src_duckdb(), cannot use $or, can only use $and so far </span></span>
-<span><span class="co"># in query where one element has a dot path but the other hasn't</span></span>
-<span><span class="fu"><a href="reference/docdb_delete.html">docdb_delete</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span>, query <span class="op">=</span> <span class="st">'{"$or": {"gear": 5, "age": {"$gte": 22}}}'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$lte": 20}}, {"age": {"$gte": 25}}]}'</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># [1] 3 11</span></span>
+<span><span class="fu"><a href="reference/docdb_delete.html">docdb_delete</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$lte": 20}}, {"age": {"$gte": 25}}]}'</span><span class="op">)</span></span>
 <span><span class="co"># TRUE</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># [1] 127</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># [1] 132</span></span>
 <span></span>
 <span><span class="co"># delete container from database</span></span>
-<span><span class="fu"><a href="reference/docdb_delete.html">docdb_delete</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"my_container"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/docdb_delete.html">docdb_delete</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span></span>
 <span><span class="co"># [1] TRUE</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># shutdown</span></span>
@@ -386,77 +404,74 @@
 <span></span>
 <span><span class="va">srcMongo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcSqlite</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">srcElastic</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">srcCouchdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span>user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_USER"</span><span class="op">)</span>, pwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_PWD"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">srcPostgres</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcDuckdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">srcElastic</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">srcCouchdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span></span>
+<span>  user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_USER"</span><span class="op">)</span>, </span>
+<span>  pwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_PWD"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">key</span> <span class="op">&lt;-</span> <span class="st">"test"</span></span>
 <span><span class="va">query</span> <span class="op">&lt;-</span> <span class="st">'{"clarity": "SI1"}'</span></span>
 <span><span class="va">fields</span> <span class="op">&lt;-</span> <span class="st">'{"cut": 1, "_id": 1, "clarity": "1"}'</span></span>
 <span><span class="va">value</span> <span class="op">&lt;-</span> <span class="st">'{"clarity": "XYZ", "new": ["ABC", "DEF"]}'</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">diamonds</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2000</span>, <span class="op">]</span></span>
-<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"http://httpbin.org/stream/56"</span></span>
 <span><span class="va">ndjs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/stream_in.html" class="external-link">stream_out</a></span><span class="op">(</span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">contacts</span><span class="op">)</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">file</a></span><span class="op">(</span><span class="va">ndjs</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/stream_in.html" class="external-link">stream_out</a></span><span class="op">(</span><span class="va">iris</span>, con <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">file</a></span><span class="op">(</span><span class="va">ndjs</span><span class="op">)</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">testFunction</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span> <span class="op">{</span></span>
-<span> <span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">data</span><span class="op">)</span></span>
-<span> <span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">url</span><span class="op">)</span></span>
-<span> <span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">ndjs</span><span class="op">)</span></span>
-<span> <span class="co"># Elasticsearch needs a delay to process the data</span></span>
-<span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"src_elastic"</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
-<span> <span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="va">query</span>, fields <span class="op">=</span> <span class="va">fields</span><span class="op">)</span></span>
-<span> <span class="fu"><a href="reference/docdb_update.html">docdb_update</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="va">value</span>, query <span class="op">=</span> <span class="va">query</span><span class="op">)</span></span>
-<span> <span class="fu"><a href="reference/docdb_delete.html">docdb_delete</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_delete.html">docdb_delete</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">ndjs</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="co"># Elasticsearch needs a delay to process the data</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"src_elastic"</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="va">query</span>, fields <span class="op">=</span> <span class="va">fields</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="reference/docdb_update.html">docdb_update</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="va">value</span>, query <span class="op">=</span> <span class="va">query</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="co"># 2023-05-12 with 2015 mobile hardware </span></span>
-<span><span class="co"># without any database optimisations</span></span>
+<span><span class="co"># 2023-07-22 with 2015 mobile hardware, databases via homebrew</span></span>
 <span><span class="fu">rbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rbenchmark/man/benchmark.html" class="external-link">benchmark</a></span><span class="op">(</span></span>
-<span> MongoDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcMongo</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
-<span> SQLite <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcSqlite</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
-<span> Elastic <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcElastic</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
-<span> CouchDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcCouchdb</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
-<span> PostgreSQL <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcPostgres</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
-<span> DuckDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcDuckdb</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
-<span> replications <span class="op">=</span> <span class="fl">10L</span>,</span>
-<span> columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'test'</span>, <span class="st">'replications'</span>, <span class="st">'elapsed'</span><span class="op">)</span></span>
+<span>  MongoDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcMongo</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
+<span>  SQLite <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcSqlite</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
+<span>  Elastic <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcElastic</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
+<span>  CouchDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcCouchdb</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
+<span>  PostgreSQL <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcPostgres</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
+<span>  DuckDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcDuckdb</span>, <span class="va">key</span>, <span class="va">value</span>, <span class="va">query</span>, <span class="va">fields</span><span class="op">)</span>,</span>
+<span>  replications <span class="op">=</span> <span class="fl">10L</span>,</span>
+<span>  columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'test'</span>, <span class="st">'replications'</span>, <span class="st">'elapsed'</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#         test replications elapsed</span></span>
-<span><span class="co"># 4    CouchDB           10     253</span></span>
-<span><span class="co"># 3    Elastic           10      59 # 10s to be subtracted</span></span>
-<span><span class="co"># 2     SQLite           10      13</span></span>
-<span><span class="co"># 1    MongoDB           10      13</span></span>
-<span><span class="co"># 5 PostgreSQL           10      12</span></span>
-<span><span class="co"># 6     DuckDB           10      12</span></span></code></pre></div>
+<span><span class="co"># 4    CouchDB           10   265.4</span></span>
+<span><span class="co"># 6     DuckDB           10     3.5</span></span>
+<span><span class="co"># 3    Elastic           10    55.1 # 10s to be subtracted</span></span>
+<span><span class="co"># 1    MongoDB           10     3.1</span></span>
+<span><span class="co"># 5 PostgreSQL           10     4.1</span></span>
+<span><span class="co"># 2     SQLite           10     3.4</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
 </h2>
+<p>Every database backend is subjected to identical tests, see <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 2023-02-18</span></span>
+<code class="sourceCode R"><span><span class="co"># 2023-07-22</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># ✔ | F W S  OK | Context</span></span>
-<span><span class="co"># ✔ |        96 | couchdb [103.3s]                                              </span></span>
-<span><span class="co"># ✔ |       103 | duckdb [7.0s]                                                 </span></span>
-<span><span class="co"># ✔ |     1  67 | elastic [86.0s]                                               </span></span>
-<span><span class="co"># ──────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co"># Skip (core-nodbi.R:177): docdb_query</span></span>
-<span><span class="co"># Reason: queries need to be translated into elastic syntax</span></span>
-<span><span class="co"># ──────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co"># ✔ |       102 | mongodb [4.5s]                                                </span></span>
-<span><span class="co"># ✔ |       106 | postgres [10.1s]                                              </span></span>
-<span><span class="co"># ✔ |       105 | sqlite [6.8s]                                                 </span></span>
+<span><span class="co"># ✔ |     1  95 | couchdb [87.7s]                                                                </span></span>
+<span><span class="co"># ✔ |       121 | duckdb [5.3s]                                                                  </span></span>
+<span><span class="co"># ✔ |     2  66 | elastic [78.5s]                                                                </span></span>
+<span><span class="co"># ✔ |       120 | mongodb [6.5s]                                                                 </span></span>
+<span><span class="co"># ✔ |       124 | postgres [35.0s]                                                               </span></span>
+<span><span class="co"># ✔ |       123 | sqlite [33.7s]                                                                 </span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ══ Results ═══════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co"># Duration: 218.4 s</span></span>
+<span><span class="co"># ══ Results ════════════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co"># Duration: 247.0 s</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ── Skipped tests  ────────────────────────────────────────────────────────────</span></span>
-<span><span class="co"># • queries need to be translated into elastic syntax (1)</span></span>
+<span><span class="co"># ── Skipped tests (3) ──────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co"># • bulk updates not yet implemented (2): core-nodbi.R:248:3, core-nodbi.R:248:3</span></span>
+<span><span class="co"># • queries need to be translated into elastic syntax (1): core-nodbi.R:180:3</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 1 | PASS 579 ]</span></span></code></pre></div>
+<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 3 | PASS 649 ]</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>

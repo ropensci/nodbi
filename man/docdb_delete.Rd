@@ -11,28 +11,30 @@ docdb_delete(src, key, ...)
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
 or \code{\link[=src_postgres]{src_postgres()}}}
 
-\item{key}{(character) A key as name of the container
-(corresponds to parameter \code{collection} for MongoDB,
+\item{key}{(character) The name of the container in the
+database backend
+(corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for SQLite and for PostgreSQL)}
+a table name for DuckDb, SQLite and PostgreSQL)}
 
-\item{...}{optional \code{query} parameter with a JSON query as per
-\code{\link[mongolite:mongo]{mongolite::mongo()}} and as working in \code{\link[=docdb_query]{docdb_query()}} to identify
-documents to be deleted. The default is to delete the container
+\item{...}{(character) Optionally, specify \code{query} parameter with
+a JSON query as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
+If not specified, the default is to delete the container.
+
 \code{key}.
 Other parameters are passed on to functions:
 \itemize{
-\item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item SQLite: ignored
-\item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
-\item CouchDB: \code{\link[sofa:db_alldocs]{sofa::db_alldocs()}}
-\item PostgreSQL: ignored
-\item DuckDB: ignored
+\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}, $remove() or $drop()
+\item SQLite: \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}} or SQL DELETE
+\item Elasticsearch: \code{\link[elastic:indices]{elastic::index_delete()}} or \code{\link[elastic:docs_delete]{elastic::docs_delete()}}
+\item CouchDB: \code{\link[sofa:db_delete]{sofa::db_delete()}} or \code{\link[sofa:doc_delete]{sofa::doc_delete()}}
+\item PostgreSQL: \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}} or SQL DELETE
+\item DuckDB: \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}} or SQL DELETE
 }}
 }
 \value{
 (logical) success of operation. Typically \code{TRUE} if document
-or collection existed and \code{FALSE} is document did not exist or
+or collection existed, and \code{FALSE} if document did not exist or
 collection did not exist or delete was not successful.
 }
 \description{

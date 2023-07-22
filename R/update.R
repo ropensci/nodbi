@@ -3,7 +3,7 @@
 #' Documents are updated by patching their JSON with
 #' \code{value}.
 #'
-#' Documents are identified by the \code{value} or
+#' Documents are identified by the \code{query} or
 #' by _id's in \code{value}, where the latter takes
 #' precedence in case both are specified.
 #'
@@ -16,7 +16,9 @@
 #'
 #' @inheritParams docdb_create
 #'
-#' @param query (character) A JSON query string, see examples
+#' @param query (character) A JSON query string to
+#' identify the documents that should be updated
+#' (patched) with \code{value}, see examples
 #'
 #' @param ... Passed on to functions:
 #' - CouchDB: [sofa::db_bulk_create()]
@@ -330,7 +332,7 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
   # see https://duckdb.org/docs/extensions/json#json-creation-functions
   updFunction <- "json_merge_patch"
 
-return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
+  return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
 
 }
 
