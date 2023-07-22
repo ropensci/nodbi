@@ -8,7 +8,7 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 [![cran
 checks](https://cranchecks.info/badges/worst/nodbi)](https://cranchecks.info/pkgs/nodbi)
 [![R-CMD-check](https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check)
-[![codecov](https://codecov.io/gh/ropensci/nodbi/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/nodbi)
+[![codecov](https://codecov.io/gh/rfhb/nodbi/branch/master/graph/badge.svg)](https://app.codecov.io/gh/rfhb/nodbi)
 [![rstudio mirror
 downloads](http://cranlogs.r-pkg.org/badges/nodbi)](https://github.com/r-hub/cranlogs.app)
 [![cran
