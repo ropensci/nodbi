@@ -184,6 +184,6 @@ sqlGet <- function(src, key, limit = NULL, statement, ...) {
   close(tfnameCon)
 
   # stream in ndjson records
-  return(jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE))
+  return(jsonlite::stream_in(file(tfname), verbose = FALSE))
 
 }

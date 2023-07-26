@@ -847,7 +847,7 @@ dbiGetProcessData <- function(
 
     # write data
     jqr::jq(
-      file(tfname, encoding = "UTF-8"),
+      file(tfname),
       jqrSubsetFunction,
       flags = jqr::jq_flags(pretty = FALSE),
       out = tjname
@@ -901,7 +901,7 @@ dbiGetProcessData <- function(
 
     # write data
     jqr::jq(
-      file(tfname, encoding = "UTF-8"),
+      file(tfname),
       jqFields,
       flags = jqr::jq_flags(pretty = FALSE),
       out = tjname
@@ -916,7 +916,7 @@ dbiGetProcessData <- function(
   } # if subFields
 
   # stream_in automatically opens and later closes (and destroys) connection
-  out <- jsonlite::stream_in(file(tfname, encoding = "UTF-8"), verbose = FALSE)
+  out <- jsonlite::stream_in(file(tfname), verbose = FALSE)
 
   # exclude any root fields with name:0 or that were not specified
   if (length(params[["fields"]])) {
