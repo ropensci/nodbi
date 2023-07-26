@@ -62,7 +62,9 @@ testFile2 <- function(..., env = parent.frame()) {
 }
 
 if (require("webfakes", quietly = TRUE)) {
+  app <- webfakes::new_app()
   httpbin <- webfakes::local_app_process(webfakes::httpbin_app())
+  httpbin$start()
 } else {
   httpbin <- NULL
 }
