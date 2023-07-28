@@ -4,22 +4,22 @@
     <loc>/404.html</loc>
   </url>
   <url>
-    <loc>/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
     <loc>/authors.html</loc>
+  </url>
+  <url>
+    <loc>/CONTRIBUTING.html</loc>
   </url>
   <url>
     <loc>/index.html</loc>
   </url>
   <url>
     <loc>/issue_template.html</loc>
+  </url>
+  <url>
+    <loc>/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>/LICENSE.html</loc>
   </url>
   <url>
     <loc>/news/index.html</loc>

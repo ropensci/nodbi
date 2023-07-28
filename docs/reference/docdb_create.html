@@ -61,7 +61,7 @@
     <dl><dt>src</dt>
 <dd><p>Source object, result of call to any of functions
 <code><a href="src_mongo.html">src_mongo()</a></code>, <code><a href="src_sqlite.html">src_sqlite()</a></code>, <code><a href="src_elastic.html">src_elastic()</a></code>, <code><a href="src_couchdb.html">src_couchdb()</a></code>
-or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
+<code><a href="src_duckdb.html">src_duckdb()</a></code> or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
 
 
 <dt>key</dt>
@@ -98,26 +98,28 @@ or a file name or URL that points to NDJSON documents</p></dd>
     <h2>Identifiers</h2>
     
 
-<p>If <code>value</code> is a data.frame has a column <code>_id</code>,
+<p>If <code>value</code> is a data.frame that has a column <code>_id</code>,
 or is a JSON string having a key <code>_id</code> at root level,
 or is a list having an item <code>_id</code> at its top level,
-this will be used as _id's and primary index
-in the database. If there are no such _id's in <code>value</code>,
-row names (if any exist) will be used as _id's,
-otherwise random _id's will be created (using
+this will be used as <code>_id</code>'s and primary index
+in the database. If there are no such <code>_id</code>'s in <code>value</code>,
+row names (if any exist) of <code>value</code> will be used as <code>_id</code>'s,
+otherwise random <code>_id</code>'s will be created (using
 <code><a href="https://rdrr.io/pkg/uuid/man/UUIDgenerate.html" class="external-link">uuid::UUIDgenerate()</a></code> with <code>use.time = TRUE</code> for
 SQLite und PostgreSQL, or using DuckDB's built-in <code>uuid()</code>).</p>
-<p>A warning is emitted for document(s) in <code>value</code> the same _id's
-already exists in the database; use <code><a href="docdb_update.html">docdb_update()</a></code> to update
-such document(s).</p>
+<p>A warning is emitted for document(s) in <code>value</code> when the same
+<code>_id</code>'s already exists in the collection <code>key</code>;
+use <code><a href="docdb_update.html">docdb_update()</a></code> to update such document(s).</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">docdb_create</span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"diamonds_small"</span>,</span></span>
-<span class="r-in"><span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">diamonds</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3000L</span>,<span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">docdb_create</span><span class="op">(</span><span class="va">src</span>,</span></span>
+<span class="r-in"><span>  key <span class="op">=</span> <span class="st">"diamonds_small"</span>,</span></span>
+<span class="r-in"><span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">diamonds</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3000L</span>, <span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"diamonds_small"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_create</span><span class="op">(</span><span class="va">src</span>, key <span class="op">=</span> <span class="st">"contacts"</span>, value <span class="op">=</span> <span class="va">contacts</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"contacts"</span><span class="op">)</span><span class="op">[[</span><span class="st">"friends"</span><span class="op">]</span><span class="op">]</span></span></span>

@@ -61,7 +61,7 @@
     <dl><dt>src</dt>
 <dd><p>Source object, result of call to any of functions
 <code><a href="src_mongo.html">src_mongo()</a></code>, <code><a href="src_sqlite.html">src_sqlite()</a></code>, <code><a href="src_elastic.html">src_elastic()</a></code>, <code><a href="src_couchdb.html">src_couchdb()</a></code>
-or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
+<code><a href="src_duckdb.html">src_duckdb()</a></code> or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
 
 
 <dt>key</dt>
@@ -87,7 +87,9 @@ a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
     
 
 <p>(logical) <code>TRUE</code> or <code>FALSE</code> to indicate
-existence of container <code>key</code> in database</p>
+existence of container <code>key</code> in database.
+Note this does not mean that the container
+holds any documents.</p>
     </div>
 
     <div id="ref-examples">

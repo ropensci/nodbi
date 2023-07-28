@@ -61,14 +61,14 @@
     <dl><dt>src</dt>
 <dd><p>Source object, result of call to any of functions
 <code><a href="src_mongo.html">src_mongo()</a></code>, <code><a href="src_sqlite.html">src_sqlite()</a></code>, <code><a href="src_elastic.html">src_elastic()</a></code>, <code><a href="src_couchdb.html">src_couchdb()</a></code>
-or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
+<code><a href="src_duckdb.html">src_duckdb()</a></code> or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
 
 
 <dt>...</dt>
 <dd><p>Passed to functions:</p><ul><li><p>MongoDB: ignored</p></li>
 <li><p>SQLite: <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">DBI::dbListTables()</a></code></p></li>
-<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/alias.html" class="external-link">elastic::aliases_get()</a></code></p></li>
-<li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_info.html" class="external-link">sofa::db_info()</a></code></p></li>
+<li><p>Elasticsearch: ignored</p></li>
+<li><p>CouchDB: ignored</p></li>
 <li><p>PostgreSQL: <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">DBI::dbListTables()</a></code></p></li>
 <li><p>DuckDB: <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">DBI::dbListTables()</a></code></p></li>
 </ul></dd>
@@ -80,11 +80,7 @@ or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
 
 <p>(vector) of names of containers that can be
 used as parameter <code>key</code> with other functions such as
-<code><a href="docdb_create.html">docdb_create()</a></code>.
-Parameter <code>key</code> corresponds to corresponds to
-<code>collection</code> for MongoDB, <code>dbname</code> for CouchDB,
-<code>index</code> for Elasticsearch and to a table name for
-DuckDb, SQLite and PostgreSQL</p>
+<code><a href="docdb_create.html">docdb_create()</a></code>.</p>
     </div>
 
     <div id="ref-examples">

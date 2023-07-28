@@ -61,7 +61,7 @@
     <dl><dt>src</dt>
 <dd><p>Source object, result of call to any of functions
 <code><a href="src_mongo.html">src_mongo()</a></code>, <code><a href="src_sqlite.html">src_sqlite()</a></code>, <code><a href="src_elastic.html">src_elastic()</a></code>, <code><a href="src_couchdb.html">src_couchdb()</a></code>
-or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
+<code><a href="src_duckdb.html">src_duckdb()</a></code> or <code><a href="src_postgres.html">src_postgres()</a></code></p></dd>
 
 
 <dt>key</dt>
@@ -73,16 +73,15 @@ a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>...</dt>
-<dd><p>(character) Optionally, specify <code>query</code> parameter with
+<dd><p>Optionally, specify <code>query</code> parameter with
 a JSON query as per <code><a href="docdb_query.html">docdb_query()</a></code> to identify documents to be deleted.
-If not specified, the default is to delete the container.</p>
-<p><code>key</code>.
-Other parameters are passed on to functions:</p><ul><li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code>, $remove() or $drop()</p></li>
-<li><p>SQLite: <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code> or SQL DELETE</p></li>
-<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/indices.html" class="external-link">elastic::index_delete()</a></code> or <code><a href="https://docs.ropensci.org/elastic/reference/docs_delete.html" class="external-link">elastic::docs_delete()</a></code></p></li>
+If not specified, the default is to delete the container <code>key</code>.</p>
+<p>Other parameters are passed on to functions:</p><ul><li><p>MongoDB: ignored</p></li>
+<li><p>SQLite: ignored</p></li>
+<li><p>Elasticsearch: ignored</p></li>
 <li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_delete.html" class="external-link">sofa::db_delete()</a></code> or <code><a href="https://docs.ropensci.org/sofa/reference/doc_delete.html" class="external-link">sofa::doc_delete()</a></code></p></li>
-<li><p>PostgreSQL: <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code> or SQL DELETE</p></li>
-<li><p>DuckDB: <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code> or SQL DELETE</p></li>
+<li><p>PostgreSQL: ignored</p></li>
+<li><p>DuckDB: ignored</p></li>
 </ul></dd>
 
 </dl></div>
@@ -90,9 +89,9 @@ Other parameters are passed on to functions:</p><ul><li><p>MongoDB: <code><a hre
     <h2>Value</h2>
     
 
-<p>(logical) success of operation. Typically <code>TRUE</code> if document
-or collection existed, and <code>FALSE</code> if document did not exist or
-collection did not exist or delete was not successful.</p>
+<p>(logical) success of operation. Typically <code>TRUE</code> if
+document(s) or collection existed, and <code>FALSE</code> if document(s)
+did not exist or collection did not exist or delete was not successful.</p>
     </div>
 
     <div id="ref-examples">
