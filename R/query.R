@@ -738,7 +738,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
             yes = gsub("''+", "'", paste0(
               "regexp_matches(_id, '",
               sub("^REGEXP \"?(.+?)\"?$", "\\1", x[2]), "') ")),
-            no = paste0(" _id", gsub('"', "'", x[2]), " ")
+            no = paste0(" _id ", gsub('"', "'", x[2]), " ")
           ) # ifelse
         } # _id or other field
       }))} # lapply unlist if
@@ -943,10 +943,11 @@ dbiGetProcessData <- function(
   if (identical(names(out), "_id") || nrow(out) <= 1L) return(out)
 
   # remove *rows* with all NAs except in _id
-  nc <- length(setdiff(names(out), "_id"))
+  naout <- is.na(out)
+  nc <- length(setdiff(attr(naout, "dimnames")[[2]], "_id"))
 
   # return
-  return(out[rowSums(is.na(out)) != nc, , drop = FALSE])
+  return(out[rowSums(naout) < nc, , drop = FALSE])
 
 }
 
