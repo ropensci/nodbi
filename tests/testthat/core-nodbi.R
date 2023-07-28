@@ -171,7 +171,7 @@ test_that("docdb_query", {
   # anomaly that is very difficult to correct, nothing returned for non-existing field by RSQLite
   if (!inherits(src, "src_sqlite")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "doesnotexist": 1}')), c(2L, 1L))
 
-    # couchdb cannot search in array
+  # couchdb cannot search in array
   if (!inherits(src, "src_elastic") & !inherits(src, "src_couchdb")) expect_equal(dim(
     docdb_query(src = src, key = key, query = '{"tags": {"$regex": "^[a-z]{3,4}$"}}', fields = '{"name": 1, "age": 1}')), c(3L, 2L))
   expect_true(docdb_delete(src = src, key = key))
