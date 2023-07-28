@@ -119,48 +119,40 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
 #' @export
 docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
 
-  statement <- paste0(
-    "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json, '{') ",
-    "AS json FROM \"", key, "\" ",
-    # canonical sorting in nodbi
-    "ORDER BY _id ASC;")
-
-  return(sqlGet(src = src, key = key, limit = limit, statement = statement, ...))
+  getFunction <- "json"
+  return(sqlGet(src = src, key = key, limit = limit, getFunction = getFunction, ...))
 }
 
 #' @export
 docdb_get.src_postgres <- function(src, key, limit = NULL, ...) {
 
-  statement <- paste0(
-    "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json::TEXT, '{') ",
-    "AS json FROM \"", key, "\" ",
-    # canonical sorting in nodbi
-    "ORDER BY _id ASC;")
-
-  return(sqlGet(src = src, key = key, limit = limit, statement = statement, ...))
+  getFunction <- "json::TEXT"
+  return(sqlGet(src = src, key = key, limit = limit, getFunction = getFunction, ...))
 }
 
 #' @export
 docdb_get.src_duckdb <- function(src, key, limit = NULL, ...) {
 
-  statement <- paste0(
-    "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(json, '{') ",
-    "AS json FROM \"", key, "\" ",
-    # canonical sorting in nodbi
-    "ORDER BY _id ASC;")
-
-  return(sqlGet(src = src, key = key, limit = limit, statement = statement, ...))
+  getFunction <- "json"
+  return(sqlGet(src = src, key = key, limit = limit, getFunction = getFunction, ...))
 }
 
 ## helpers --------------------------------------
 
 #' @keywords internal
 #' @noRd
-sqlGet <- function(src, key, limit = NULL, statement, ...) {
+sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
 
   # set limit if not null
   n <- -1L
   if (!is.null(limit)) n <- limit
+
+  # compose query statment
+  statement <- paste0(
+    "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(", getFunction, ", '{') ",
+    "AS json FROM \"", key, "\" WHERE json != '{}' ",
+    # canonical sorting in nodbi
+    "ORDER BY _id ASC;")
 
   # temporary file for streaming
   tfname <- tempfile()
@@ -174,10 +166,12 @@ sqlGet <- function(src, key, limit = NULL, statement, ...) {
     paste0(
       # protect against empty query result
       "",
-      DBI::dbGetQuery(
+     # eliminate rows without any json
+      stats::na.omit(
+        DBI::dbGetQuery(
         conn = src$con,
         statement = statement,
-        n = n)[["json"]]),
+        n = n)[["json"]])),
     con = tfnameCon,
     sep = "\n",
     useBytes = TRUE)
