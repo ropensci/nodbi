@@ -9,7 +9,7 @@ docdb_update(src, key, value, query, ...)
 \arguments{
 \item{src}{Source object, result of call to any of functions
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
-or \code{\link[=src_postgres]{src_postgres()}}}
+\code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
 database backend
@@ -23,12 +23,15 @@ or a file name or URL that points to NDJSON documents}
 
 \item{query}{(character) A JSON query string to
 identify the documents that should be updated
-(patched) with \code{value}, see examples}
+(patched) with \code{value},
+Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
+with at most one logic operator ('$and' if not specified, or '$or'),
+see examples below and in \code{\link[=docdb_query]{docdb_query()}}.}
 
 \item{...}{Passed on to functions:
 \itemize{
 \item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
-\item Elasticsearch: \link[elastic:docs_bulk_update]{elastic::docs_bulk_update}
+\item Elasticsearch: \code{\link[elastic:docs_bulk_update]{elastic::docs_bulk_update()}}
 \item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
 \item SQLite: ignored
 \item PostgreSQL: ignored
@@ -41,18 +44,16 @@ identify the documents that should be updated
 \description{
 Documents are updated by patching their JSON with
 \code{value}.
+Documents are identified by the \code{query} or
+by \verb{_id}'s in \code{value}, where the latter takes
+precedence.
+\code{value} can have multiple documents and \verb{_id}'s,
+which then are used for iterative updating.
 }
 \details{
-Documents are identified by the \code{query} or
-by _id's in \code{value}, where the latter takes
-precedence in case both are specified.
-
-\code{value} can have multiple documents and _id's,
-which then are used for iterative updating.
-
-This is native with MongoDB, SQLite and DuckDB.
-It uses a plpgsql function added to PostgreSQL.
-For Elasticsearch and CouchDB, jq is used.
+Uses native functions with MongoDB, SQLite and DuckDB,
+a \code{plpgsql} function added to PostgreSQL, and \link{jqr} for
+Elasticsearch and CouchDB.
 }
 \examples{
 \dontrun{
@@ -60,7 +61,7 @@ src <- src_sqlite()
 docdb_create(src, "mtcars", mtcars)
 docdb_update(src, "mtcars", value = mtcars[3, 4:5], query = '{"gear": 3}')
 docdb_update(src, "mtcars", value = '{"carb":999}', query = '{"gear": 5}')
-docdb_update(src, "mtcars", value = '{"_id":"Fiat 128", carb":999}', query = '')
+docdb_update(src, "mtcars", value = '{"_id":"Fiat 128", "carb":888}', query = '{}')
 docdb_get(src, "mtcars")
 }
 }

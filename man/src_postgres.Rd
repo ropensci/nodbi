@@ -19,6 +19,9 @@ see \code{\link[RPostgres:Postgres]{RPostgres::Postgres()}}}
 \item{...}{additional named parameters passed
 on to \code{\link[RPostgres:Postgres]{RPostgres::Postgres()}}}
 }
+\value{
+A \code{nodbi} source object
+}
 \description{
 Setup a PostgreSQL database connection
 }

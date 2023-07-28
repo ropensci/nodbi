@@ -2,22 +2,21 @@
 #'
 #' @inheritParams docdb_create
 #'
-#' @param ... (character) Optionally, specify \code{query} parameter with
+#' @param ... Optionally, specify \code{query} parameter with
 #' a JSON query as per [docdb_query()] to identify documents to be deleted.
-#' If not specified, the default is to delete the container.
+#' If not specified, the default is to delete the container \code{key}.
 #'
-#' \code{key}.
 #' Other parameters are passed on to functions:
-#' - MongoDB: [mongolite::mongo()], $remove() or $drop()
-#' - SQLite: [DBI::dbRemoveTable()] or SQL DELETE
-#' - Elasticsearch: [elastic::index_delete()] or [elastic::docs_delete()]
+#' - MongoDB: ignored
+#' - SQLite: ignored
+#' - Elasticsearch: ignored
 #' - CouchDB: [sofa::db_delete()] or [sofa::doc_delete()]
-#' - PostgreSQL: [DBI::dbRemoveTable()] or SQL DELETE
-#' - DuckDB: [DBI::dbRemoveTable()] or SQL DELETE
+#' - PostgreSQL: ignored
+#' - DuckDB: ignored
 #'
-#' @return (logical) success of operation. Typically \code{TRUE} if document
-#' or collection existed, and \code{FALSE} if document did not exist or
-#' collection did not exist or delete was not successful.
+#' @return (logical) success of operation. Typically \code{TRUE} if
+#' document(s) or collection existed, and \code{FALSE} if document(s)
+#' did not exist or collection did not exist or delete was not successful.
 #'
 #' @export
 #'

@@ -1,28 +1,29 @@
 #' Update documents
 #'
 #' Documents are updated by patching their JSON with
-#' \code{value}.
-#'
+#' \code{value}. 
 #' Documents are identified by the \code{query} or
-#' by _id's in \code{value}, where the latter takes
-#' precedence in case both are specified.
-#'
-#' \code{value} can have multiple documents and _id's,
+#' by `_id`'s in \code{value}, where the latter takes
+#' precedence.
+#' \code{value} can have multiple documents and `_id`'s,
 #' which then are used for iterative updating.
 #'
-#' This is native with MongoDB, SQLite and DuckDB.
-#' It uses a plpgsql function added to PostgreSQL.
-#' For Elasticsearch and CouchDB, jq is used.
+#' Uses native functions with MongoDB, SQLite and DuckDB,
+#' a `plpgsql` function added to PostgreSQL, and [jqr] for 
+#' Elasticsearch and CouchDB.
 #'
 #' @inheritParams docdb_create
 #'
 #' @param query (character) A JSON query string to
 #' identify the documents that should be updated
-#' (patched) with \code{value}, see examples
+#' (patched) with \code{value}, 
+#'  Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
+#'  with at most one logic operator ('$and' if not specified, or '$or'),
+#'  see examples below and in [docdb_query()].
 #'
 #' @param ... Passed on to functions:
 #' - CouchDB: [sofa::db_bulk_create()]
-#' - Elasticsearch: [elastic::docs_bulk_update]
+#' - Elasticsearch: [elastic::docs_bulk_update()]
 #' - MongoDB: [mongolite::mongo()]
 #' - SQLite: ignored
 #' - PostgreSQL: ignored
@@ -37,7 +38,7 @@
 #' docdb_create(src, "mtcars", mtcars)
 #' docdb_update(src, "mtcars", value = mtcars[3, 4:5], query = '{"gear": 3}')
 #' docdb_update(src, "mtcars", value = '{"carb":999}', query = '{"gear": 5}')
-#' docdb_update(src, "mtcars", value = '{"_id":"Fiat 128", carb":999}', query = '')
+#' docdb_update(src, "mtcars", value = '{"_id":"Fiat 128", "carb":888}', query = '{}')
 #' docdb_get(src, "mtcars")
 #' }
 docdb_update <- function(src, key, value, query, ...) {

@@ -11,7 +11,9 @@
 #' - DuckDB: [DBI::dbListTables()]
 #'
 #' @return (logical) `TRUE` or `FALSE` to indicate
-#'  existence of container \code{key} in database
+#'  existence of container \code{key} in database.
+#'  Note this does not mean that the container
+#'  holds any documents.
 #'
 #' @export
 #'

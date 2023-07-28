@@ -2,14 +2,14 @@
 % Please edit documentation in R/query.R
 \name{docdb_query}
 \alias{docdb_query}
-\title{Get documents with a filtering query}
+\title{Get documents or parts with filtering query}
 \usage{
 docdb_query(src, key, query, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
-or \code{\link[=src_postgres]{src_postgres()}}}
+\code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
 database backend
@@ -18,24 +18,24 @@ database backend
 a table name for DuckDb, SQLite and PostgreSQL)}
 
 \item{query}{(character) A JSON query string, see examples.
-Can use multiple comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
+Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
 with at most one logic operator ('$and' if not specified, or '$or'),
 see examples.}
 
-\item{...}{(character) Optionally, specify \code{fields} as a JSON string of
-fields to be returned from anywhere in the tree (dot paths notation),
-see examples.}
+\item{...}{Optionally, specify \code{fields} as a JSON string of
+fields to be returned from anywhere in the tree, see examples.}
 }
 \value{
-Data frame with requested data, may have nested
-lists in columns
+Data frame with requested documents, may have nested
+lists in columns. If \code{query = "{}"} and fields are not
+specified, consider using \code{\link[=docdb_get]{docdb_get()}}.
 }
 \description{
-Get documents with a filtering query
+Get documents or parts with filtering query
 }
 \note{
 A dot in \code{query} or \code{fields} is interpreted as a dot path;
-it is not supported to have a dot in the key / name of a field.
+it is not supported to have a dot within the key / name of a field.
 
 Main functions used per database:
 \itemize{

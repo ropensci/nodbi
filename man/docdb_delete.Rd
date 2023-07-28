@@ -9,7 +9,7 @@ docdb_delete(src, key, ...)
 \arguments{
 \item{src}{Source object, result of call to any of functions
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
-or \code{\link[=src_postgres]{src_postgres()}}}
+\code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
 database backend
@@ -17,25 +17,24 @@ database backend
 \code{dbname} for CouchDB, \code{index} for Elasticsearch and to
 a table name for DuckDb, SQLite and PostgreSQL)}
 
-\item{...}{(character) Optionally, specify \code{query} parameter with
+\item{...}{Optionally, specify \code{query} parameter with
 a JSON query as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
-If not specified, the default is to delete the container.
+If not specified, the default is to delete the container \code{key}.
 
-\code{key}.
 Other parameters are passed on to functions:
 \itemize{
-\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}, $remove() or $drop()
-\item SQLite: \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}} or SQL DELETE
-\item Elasticsearch: \code{\link[elastic:indices]{elastic::index_delete()}} or \code{\link[elastic:docs_delete]{elastic::docs_delete()}}
+\item MongoDB: ignored
+\item SQLite: ignored
+\item Elasticsearch: ignored
 \item CouchDB: \code{\link[sofa:db_delete]{sofa::db_delete()}} or \code{\link[sofa:doc_delete]{sofa::doc_delete()}}
-\item PostgreSQL: \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}} or SQL DELETE
-\item DuckDB: \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}} or SQL DELETE
+\item PostgreSQL: ignored
+\item DuckDB: ignored
 }}
 }
 \value{
-(logical) success of operation. Typically \code{TRUE} if document
-or collection existed, and \code{FALSE} if document did not exist or
-collection did not exist or delete was not successful.
+(logical) success of operation. Typically \code{TRUE} if
+document(s) or collection existed, and \code{FALSE} if document(s)
+did not exist or collection did not exist or delete was not successful.
 }
 \description{
 Delete documents or container

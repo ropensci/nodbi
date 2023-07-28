@@ -39,7 +39,7 @@ src_redis <- function() {
 #' @noRd
 NULL
 
-#' diamonds data set
+#' Data set 'diamonds'
 #'
 #' @format A data frame with 53940 rows and 10 variables:
 #'
@@ -63,7 +63,7 @@ NULL
 NULL
 
 
-#' contacts JSON data set
+#' Data set 'contacts'
 #'
 #' @format A JSON string with ragged, nested contact details
 #' @name contacts
@@ -234,7 +234,7 @@ contacts <- '
 '
 
 
-#' mapdata JSON data set
+#' Data set 'mapdata'
 #'
 #' @format A JSON string with ragged, nested travel details
 #' @name mapdata

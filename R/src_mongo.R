@@ -14,6 +14,8 @@
 #' @details Uses \pkg{monoglite} under the hood; uses [mongolite::mongo()] for
 #' connecting
 #'
+#' @return A `nodbi` source object 
+#' 
 #' @examples \dontrun{
 #' con <- src_mongo()
 #' print(con)

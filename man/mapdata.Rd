@@ -3,7 +3,7 @@
 \docType{data}
 \name{mapdata}
 \alias{mapdata}
-\title{mapdata JSON data set}
+\title{Data set 'mapdata'}
 \format{
 A JSON string with ragged, nested travel details
 }
@@ -11,6 +11,6 @@ A JSON string with ragged, nested travel details
 mapdata
 }
 \description{
-mapdata JSON data set
+Data set 'mapdata'
 }
 \keyword{datasets}

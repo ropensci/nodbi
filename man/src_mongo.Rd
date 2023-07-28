@@ -16,6 +16,9 @@ string URI format, see to \code{\link[mongolite:mongo]{mongolite::mongo()}}}
 
 \item{...}{Additional named parameters passed on to \code{\link[mongolite:mongo]{mongolite::mongo()}}}
 }
+\value{
+A \code{nodbi} source object
+}
 \description{
 Setup a MongoDB database connection
 }

@@ -25,6 +25,8 @@
 #' @details uses \pkg{elastic} under the hood; uses [elastic::connect()] for
 #' connecting
 #'
+#' @return A `nodbi` source object 
+#' 
 #' @examples \dontrun{
 #' src_elastic()
 #' }

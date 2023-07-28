@@ -31,6 +31,9 @@ of the url, e.g., bar in http://foo.com/bar. Default: NULL, ignored}
 
 \item{headers}{(list) list of named headers}
 }
+\value{
+A \code{nodbi} source object
+}
 \description{
 Setup a CouchDB database connection
 }

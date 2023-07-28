@@ -15,6 +15,9 @@ data is kept in RAM}
 
 \item{...}{Additional named parameters passed on to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
+\value{
+A \code{nodbi} source object
+}
 \description{
 Setup a DuckDB database connection
 }

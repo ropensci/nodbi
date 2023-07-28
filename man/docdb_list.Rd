@@ -9,14 +9,14 @@ docdb_list(src, ...)
 \arguments{
 \item{src}{Source object, result of call to any of functions
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
-or \code{\link[=src_postgres]{src_postgres()}}}
+\code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{...}{Passed to functions:
 \itemize{
 \item MongoDB: ignored
 \item SQLite: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
-\item Elasticsearch: \code{\link[elastic:alias]{elastic::aliases_get()}}
-\item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
+\item Elasticsearch: ignored
+\item CouchDB: ignored
 \item PostgreSQL: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 \item DuckDB: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
 }}
@@ -25,10 +25,6 @@ or \code{\link[=src_postgres]{src_postgres()}}}
 (vector) of names of containers that can be
 used as parameter \code{key} with other functions such as
 \code{\link[=docdb_create]{docdb_create()}}.
-Parameter \code{key} corresponds to corresponds to
-\code{collection} for MongoDB, \code{dbname} for CouchDB,
-\code{index} for Elasticsearch and to a table name for
-DuckDb, SQLite and PostgreSQL
 }
 \description{
 List containers in database

@@ -16,6 +16,8 @@
 #'
 #' @details uses \pkg{RPostgres} under the hood
 #'
+#' @return A `nodbi` source object 
+#' 
 #' @examples \dontrun{
 #' con <- src_postgres()
 #' print(con)

@@ -10,6 +10,8 @@
 #'
 #' @details uses \pkg{RSQLite} under the hood
 #'
+#' @return A `nodbi` source object 
+#' 
 #' @examples \dontrun{
 #' con <- src_sqlite()
 #' print(con)

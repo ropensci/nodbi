@@ -10,6 +10,8 @@
 #'
 #' @details Uses [duckdb::duckdb()] under the hood
 #'
+#' @return A `nodbi` source object 
+#' 
 #' @examples \dontrun{
 #' con <- src_duckdb()
 #' print(con)

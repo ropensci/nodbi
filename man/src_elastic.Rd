@@ -36,6 +36,9 @@ specify, but ignored for now.}
 
 \item{...}{Further args passed on to \code{\link[elastic:connect]{elastic::connect()}}}
 }
+\value{
+A \code{nodbi} source object
+}
 \description{
 Setup an Elasticsearch database connection
 }

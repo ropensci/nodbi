@@ -14,6 +14,9 @@ see \code{\link[RSQLite:SQLite]{RSQLite::SQLite()}}}
 \item{...}{additional named parameters passed
 on to \code{\link[RSQLite:SQLite]{RSQLite::SQLite()}}}
 }
+\value{
+A \code{nodbi} source object
+}
 \description{
 Setup a RSQLite database connection
 }

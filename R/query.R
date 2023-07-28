@@ -1,18 +1,17 @@
-#' Get documents with a filtering query
+#' Get documents or parts with filtering query
 #'
 #' @inheritParams docdb_create
 #'
 #' @param query (character) A JSON query string, see examples.
-#'  Can use multiple comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
+#'  Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
 #'  with at most one logic operator ('$and' if not specified, or '$or'),
 #'  see examples.
 #'
-#' @param ... (character) Optionally, specify `fields` as a JSON string of
-#' fields to be returned from anywhere in the tree (dot paths notation),
-#' see examples.
+#' @param ... Optionally, specify `fields` as a JSON string of
+#' fields to be returned from anywhere in the tree, see examples.
 #'
 #' @note A dot in `query` or `fields` is interpreted as a dot path;
-#' it is not supported to have a dot in the key / name of a field.
+#' it is not supported to have a dot within the key / name of a field.
 #'
 #' Main functions used per database:
 #' - MongoDB: find() in [mongolite::mongo()]
@@ -22,8 +21,9 @@
 #' - PostgreSQL: SQL query using built-in `jsonb_build_object()`
 #' - DuckDB: SQL using built-in `json_extract()`
 #'
-#' @return Data frame with requested data, may have nested
-#'  lists in columns
+#' @return Data frame with requested documents, may have nested
+#'  lists in columns. If \code{query = "{}"} and fields are not
+#'  specified, consider using [docdb_get()].
 #'
 #' @export
 #'

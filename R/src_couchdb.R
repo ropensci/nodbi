@@ -19,6 +19,8 @@
 #' @details uses \pkg{sofa} under the hood; uses [sofa::Cushion()] for
 #' connecting
 #'
+#' @return A `nodbi` source object 
+#' 
 #' @export
 #'
 #' @examples \dontrun{

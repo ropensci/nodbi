@@ -9,7 +9,7 @@ docdb_create(src, key, value, ...)
 \arguments{
 \item{src}{Source object, result of call to any of functions
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
-or \code{\link[=src_postgres]{src_postgres()}}}
+\code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
 database backend
@@ -39,26 +39,28 @@ A message is emitted if the container \code{key} already exists.
 }
 \section{Identifiers}{
 
-If \code{value} is a data.frame has a column \verb{_id},
+If \code{value} is a data.frame that has a column \verb{_id},
 or is a JSON string having a key \verb{_id} at root level,
 or is a list having an item \verb{_id} at its top level,
-this will be used as _id's and primary index
-in the database. If there are no such _id's in \code{value},
-row names (if any exist) will be used as _id's,
-otherwise random _id's will be created (using
+this will be used as \verb{_id}'s and primary index
+in the database. If there are no such \verb{_id}'s in \code{value},
+row names (if any exist) of \code{value} will be used as \verb{_id}'s,
+otherwise random \verb{_id}'s will be created (using
 \code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE} for
 SQLite und PostgreSQL, or using DuckDB's built-in \code{uuid()}).
 
-A warning is emitted for document(s) in \code{value} the same _id's
-already exists in the database; use \code{\link[=docdb_update]{docdb_update()}} to update
-such document(s).
+A warning is emitted for document(s) in \code{value} when the same
+\verb{_id}'s already exists in the collection \code{key};
+use \code{\link[=docdb_update]{docdb_update()}} to update such document(s).
 }
 
 \examples{
 \dontrun{
 src <- src_sqlite()
-docdb_create(src, key = "diamonds_small",
-  value = as.data.frame(diamonds[1:3000L,]))
+docdb_create(src,
+  key = "diamonds_small",
+  value = as.data.frame(diamonds[1:3000L, ])
+)
 head(docdb_get(src, "diamonds_small"))
 docdb_create(src, key = "contacts", value = contacts)
 docdb_get(src, "contacts")[["friends"]]

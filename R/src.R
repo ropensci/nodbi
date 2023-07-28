@@ -28,8 +28,8 @@
 #' - RSQLite - \url{https://CRAN.R-project.org/package=RSQLite}
 #' - elastic - \url{https://CRAN.R-project.org/package=elastic}
 #' - sofa - \url{https://CRAN.R-project.org/package=sofa}
-#' - RPostgres - \url{https://rpostgres.r-dbi.org/}
-#' - duckdb - \url{http://duckdb.r-universe.dev/ui/#package:duckdb}
+#' - RPostgres - \url{https://CRAN.R-project.org/package=RPostgres}
+#' - duckdb - \url{https://CRAN.R-project.org/package=duckdb}
 #'
 #' @name src
 NULL

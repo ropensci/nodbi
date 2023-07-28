@@ -5,18 +5,14 @@
 #' @param ... Passed to functions:
 #' - MongoDB: ignored
 #' - SQLite: [DBI::dbListTables()]
-#' - Elasticsearch: [elastic::aliases_get()]
-#' - CouchDB: [sofa::db_info()]
+#' - Elasticsearch: ignored
+#' - CouchDB: ignored
 #' - PostgreSQL: [DBI::dbListTables()]
 #' - DuckDB: [DBI::dbListTables()]
 #'
 #' @return (vector) of names of containers that can be
 #' used as parameter `key` with other functions such as
 #' [docdb_create()].
-#' Parameter `key` corresponds to corresponds to
-#' `collection` for MongoDB, `dbname` for CouchDB,
-#' `index` for Elasticsearch and to a table name for
-#' DuckDb, SQLite and PostgreSQL
 #'
 #' @export
 #'

@@ -3,23 +3,23 @@
 #' A message is emitted if the container `key` already exists.
 #'
 #' @section Identifiers:
-#' If `value` is a data.frame has a column `_id`,
+#' If `value` is a data.frame that has a column `_id`,
 #' or is a JSON string having a key `_id` at root level,
 #' or is a list having an item `_id` at its top level,
-#' this will be used as _id's and primary index
-#' in the database. If there are no such _id's in `value`,
-#' row names (if any exist) will be used as _id's,
-#' otherwise random _id's will be created (using
+#' this will be used as `_id`'s and primary index
+#' in the database. If there are no such `_id`'s in `value`,
+#' row names (if any exist) of `value` will be used as `_id`'s,
+#' otherwise random `_id`'s will be created (using
 #' [uuid::UUIDgenerate()] with \code{use.time = TRUE} for
 #' SQLite und PostgreSQL, or using DuckDB's built-in `uuid()`).
 #'
-#' A warning is emitted for document(s) in `value` the same _id's
-#' already exists in the database; use [docdb_update()] to update
-#' such document(s).
+#' A warning is emitted for document(s) in `value` when the same
+#' `_id`'s already exists in the collection `key`; 
+#' use [docdb_update()] to update such document(s).
 #'
 #' @param src Source object, result of call to any of functions
 #' [src_mongo()], [src_sqlite()], [src_elastic()], [src_couchdb()]
-#' or [src_postgres()]
+#' [src_duckdb()] or [src_postgres()]
 #'
 #' @param key (character) The name of the container in the
 #' database backend
@@ -45,8 +45,10 @@
 #'
 #' @examples \dontrun{
 #' src <- src_sqlite()
-#' docdb_create(src, key = "diamonds_small",
-#'   value = as.data.frame(diamonds[1:3000L,]))
+#' docdb_create(src,
+#'   key = "diamonds_small",
+#'   value = as.data.frame(diamonds[1:3000L, ])
+#' )
 #' head(docdb_get(src, "diamonds_small"))
 #' docdb_create(src, key = "contacts", value = contacts)
 #' docdb_get(src, "contacts")[["friends"]]
@@ -310,10 +312,6 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
         con = textConnection("ndjson", open = "w", local = TRUE),
         verbose = FALSE, auto_unbox = TRUE)
       value <- ndjson
-      # if (any(grepl("\\}\n\\{", value))) {
-      #   value <- strsplit(value, split = "[}]\n[{]")[[1]]
-      #   value <- sub("^([^{])", "{\\1", sub("([^}])$", "\\1}", value))
-      # }
     }
 
     # insert data.frame or JSON
