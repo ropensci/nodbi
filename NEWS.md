@@ -7,8 +7,9 @@ nodbi 0.9.5.9000
 ### BUG FIXES
 * corrected marginal case in docdb_query.src_duckdb()
 * corrected minimum R version
-* replaced in testing httpbin with webfakes
+* replaced for testing httpbin with webfakes
 * removed explicit UTF-8 encoding reference
+* speed up in docdb_query()
 
 nodbi 0.9.5
 ================

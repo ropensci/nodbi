@@ -872,7 +872,7 @@ dbiGetProcessData <- function(
     # compose jq string, target:
     # {"_id", "friends": {"id": [."friends" | (if type != "array" then [.] else .[] end) | ."id"] }}
     # "{\"_id\", \"friends\": {\"id\":  [.\"friends\" | (if type != \"array\" then [.][] else .[] end) | .\"id\"]}}"
-    jqFields <- paste0('"', rootFields, '"', collapse = ", ")
+    jqFields <- ifelse(!length(rootFields), "", paste0('"', rootFields, '"', collapse = ", "))
     if (jqFields != "") jqFields <- paste0(jqFields, ", ", collapse = "")
     jqFields <- paste0('{', paste0(c(jqFields, paste0(
       sapply(
@@ -935,26 +935,19 @@ dbiGetProcessData <- function(
     #
   }
 
-  # to emulate mongo behaviour eliminate columns with nulls
+  # to emulate mongo behaviour eliminate *columns* of all nulls
   # note jsonlite::stream_in turns null values into NAs
   out <- out[, seq_len(ncol(out))[!sapply(out, function(r) all(is.na(r)))], drop = FALSE]
 
   # early return
   if (identical(names(out), "_id") || nrow(out) <= 1L) return(out)
 
-  # remove rows with all NAs except in _id. iteration
-  # needed, apply cannot handle complex column content
-  allEmpty <- NULL
-  sdn <- setdiff(names(out), "_id")
-  for (r in seq_len(nrow(out))) {
-    allEmpty <- c(allEmpty, all(
-      # unlist conveniently drops NULL values
-      is.na(unlist(out[r, sdn, drop = TRUE], use.names = FALSE))))
-  }
-  if (!length(allEmpty)) allEmpty <- TRUE
+  # remove *rows* with all NAs except in _id
+  nc <- length(setdiff(names(out), "_id"))
 
   # return
-  return(out[!allEmpty, , drop = FALSE])
+  return(out[rowSums(is.na(out)) != nc, , drop = FALSE])
+
 }
 
 
@@ -998,7 +991,7 @@ json2fieldsSql <- function(x) {
   if (!length(x)) x <- ""
 
   # return
-  x
+  return(x)
 
 }
 # json2fieldsSql(x = '{"cut" : "1", "price": 1 }') # "cut" not returned because 1 is string
