@@ -43,11 +43,17 @@ A \code{nodbi} source object
 Setup an Elasticsearch database connection
 }
 \details{
-uses \pkg{elastic} under the hood; uses \code{\link[elastic:connect]{elastic::connect()}} for
-connecting
+Uses \pkg{elastic} as backend. \pkg{nodbi} creates or uses
+an Elasticsearch index, in which \code{nodbi} creates JSON documents.
+Any root-level \verb{_id} is extracted from the document(s) and used as
+document ID \verb{_id}, otherwise a UUID is created as document ID \verb{_id}.
+Only lowercase is accepted for container names (in parameter \code{key}).
+Opensearch can equally be used.
+For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}
 }
 \examples{
 \dontrun{
-src_elastic()
+con <- src_elastic()
+print(con)
 }
 }

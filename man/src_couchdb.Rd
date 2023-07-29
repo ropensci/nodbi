@@ -38,11 +38,15 @@ A \code{nodbi} source object
 Setup a CouchDB database connection
 }
 \details{
-uses \pkg{sofa} under the hood; uses \code{\link[sofa:Cushion]{sofa::Cushion()}} for
-connecting
+Uses \pkg{sofa} as backend. \pkg{nodbi} creates or uses
+a CouchDB database with JSON documents. If documents do not have
+root-level \verb{_id}'s, UUID's are created as \verb{_id}'s. Function
+\code{\link[=docdb_update]{docdb_update()}} uses \code{\link[jqr:jqr]{jqr::jqr()}} to implement patching JSON.
+For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}.
 }
 \examples{
 \dontrun{
-src_couchdb()
+con <- src_couchdb()
+print(con)
 }
 }

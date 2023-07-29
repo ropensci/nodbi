@@ -51,9 +51,9 @@ precedence.
 which then are used for iterative updating.
 }
 \details{
-Uses native functions with MongoDB, SQLite and DuckDB,
-a \code{plpgsql} function added to PostgreSQL, and \link{jqr} for
-Elasticsearch and CouchDB.
+Uses native functions with MongoDB, SQLite, DuckDB
+and Elasticsearch; a \code{plpgsql} function added to
+PostgreSQL; and \link{jqr} for CouchDB.
 }
 \examples{
 \dontrun{

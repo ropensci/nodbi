@@ -23,8 +23,12 @@ A \code{nodbi} source object
 Setup a MongoDB database connection
 }
 \details{
-Uses \pkg{monoglite} under the hood; uses \code{\link[mongolite:mongo]{mongolite::mongo()}} for
-connecting
+Uses \pkg{monoglite} as backend. \pkg{nodbi} creates or uses
+a MongoDB collection, in which \code{nodbi} creates JSON documents.
+If documents do not have root-level \verb{_id}'s, UUID's are created as \verb{_id}'s.
+MongoDB but none of the other databases require to specify the container
+already in the \code{src_mongo()} function.
+For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}
 }
 \examples{
 \dontrun{

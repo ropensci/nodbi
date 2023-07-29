@@ -16,15 +16,19 @@
 #'
 #' @param headers (list) list of named headers
 #'
-#' @details uses \pkg{sofa} under the hood; uses [sofa::Cushion()] for
-#' connecting
+#' @details Uses \pkg{sofa} as backend. \pkg{nodbi} creates or uses
+#' a CouchDB database with JSON documents. If documents do not have
+#' root-level `_id`'s, UUID's are created as `_id`'s. Function
+#' [docdb_update()] uses [jqr::jqr()] to implement patching JSON.
+#' For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>.
 #'
-#' @return A `nodbi` source object 
-#' 
+#' @return A `nodbi` source object
+#'
 #' @export
 #'
 #' @examples \dontrun{
-#' src_couchdb()
+#' con <- src_couchdb()
+#' print(con)
 #' }
 src_couchdb <- function(host = "127.0.0.1", port = 5984, path = NULL,
                         transport = "http", user = NULL, pwd = NULL,

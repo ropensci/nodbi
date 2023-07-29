@@ -14,10 +14,24 @@
 #' @param ... additional named parameters passed
 #'  on to [RPostgres::Postgres()]
 #'
-#' @details uses \pkg{RPostgres} under the hood
+#' @details Uses \pkg{RPostgres} as backend. \pkg{nodbi} creates or uses
+#' a PostgreSQL table, with columns `_id` and `json` created and used
+#' by package `nodbi`, applying SQL functions as per
+#' <https://www.postgresql.org/docs/current/functions-json.html>
+#' to the `json` column.
+#' Each row in the table represents a `JSON` document.
+#' Any root-level `_id` is extracted from the document(s) and used
+#' for column `_id`, otherwise a UUID is created as `_id`.
+#' The table is indexed on `_id`. A custom `plpgsql` function
+#' [jsonb_merge_patch()](https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60)
+#' is used for `docdb_update()`.
+#' The order of variables in data frames returned by `docdb_get()`
+#' and `docdb_query()` can differ from their order the input to
+#' `docdb_create()`.
+#' For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>
 #'
-#' @return A `nodbi` source object 
-#' 
+#' @return A `nodbi` source object
+#'
 #' @examples \dontrun{
 #' con <- src_postgres()
 #' print(con)

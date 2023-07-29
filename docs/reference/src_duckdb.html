@@ -80,7 +80,15 @@ data is kept in RAM</p></dd>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Uses <code><a href="https://rdrr.io/pkg/duckdb/man/duckdb.html" class="external-link">duckdb::duckdb()</a></code> under the hood</p>
+    <p>Uses <code><a href="https://rdrr.io/pkg/duckdb/man/duckdb.html" class="external-link">duckdb::duckdb()</a></code> as backend. <span class="pkg">nodbi</span> creates or
+uses a DuckDB table, with columns <code>_id</code> and <code>json</code> created and used
+by package <code>nodbi</code>, applying SQL functions as per
+<a href="https://duckdb.org/docs/extensions/json" class="external-link">https://duckdb.org/docs/extensions/json</a> to the <code>json</code> column.
+Each row in the table represents a <code>JSON</code> document.
+Any root-level <code>_id</code> is extracted from the document(s) and used for
+column <code>_id</code>, otherwise a UUID is created as <code>_id</code>.
+The table is indexed on <code>_id</code>.
+For a benchmark, see <a href="https://github.com/ropensci/nodbi#benchmark" class="external-link">https://github.com/ropensci/nodbi#benchmark</a>.</p>
     </div>
 
     <div id="ref-examples">

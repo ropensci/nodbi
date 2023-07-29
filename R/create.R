@@ -14,7 +14,7 @@
 #' SQLite und PostgreSQL, or using DuckDB's built-in `uuid()`).
 #'
 #' A warning is emitted for document(s) in `value` when the same
-#' `_id`'s already exists in the collection `key`; 
+#' `_id`'s already exists in the collection `key`;
 #' use [docdb_update()] to update such document(s).
 #'
 #' @param src Source object, result of call to any of functions
@@ -200,8 +200,6 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   }
 
   # create using rownames as _id's
-  # note: uses doc_as_upsert, which
-  # is set to TRUE for all records
   result <- elastic::docs_bulk(
     conn = src$con,
     x = value,

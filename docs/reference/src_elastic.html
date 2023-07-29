@@ -111,14 +111,20 @@ specify, but ignored for now.</p></dd>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>uses <span class="pkg">elastic</span> under the hood; uses <code><a href="https://docs.ropensci.org/elastic/reference/connect.html" class="external-link">elastic::connect()</a></code> for
-connecting</p>
+    <p>Uses <span class="pkg">elastic</span> as backend. <span class="pkg">nodbi</span> creates or uses
+an Elasticsearch index, in which <code>nodbi</code> creates JSON documents.
+Any root-level <code>_id</code> is extracted from the document(s) and used as
+document ID <code>_id</code>, otherwise a UUID is created as document ID <code>_id</code>.
+Only lowercase is accepted for container names (in parameter <code>key</code>).
+Opensearch can equally be used.
+For a benchmark, see <a href="https://github.com/ropensci/nodbi#benchmark" class="external-link">https://github.com/ropensci/nodbi#benchmark</a></p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="fu">src_elastic</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">src_elastic</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

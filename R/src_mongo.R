@@ -11,11 +11,15 @@
 #'
 #' @param ... Additional named parameters passed on to [mongolite::mongo()]
 #'
-#' @details Uses \pkg{monoglite} under the hood; uses [mongolite::mongo()] for
-#' connecting
+#' @details Uses \pkg{monoglite} as backend. \pkg{nodbi} creates or uses
+#' a MongoDB collection, in which `nodbi` creates JSON documents.
+#' If documents do not have root-level `_id`'s, UUID's are created as `_id`'s.
+#' MongoDB but none of the other databases require to specify the container
+#' already in the `src_mongo()` function.
+#' For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>
 #'
-#' @return A `nodbi` source object 
-#' 
+#' @return A `nodbi` source object
+#'
 #' @examples \dontrun{
 #' con <- src_mongo()
 #' print(con)

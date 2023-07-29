@@ -104,14 +104,18 @@ of the url, e.g., bar in http://foo.com/bar. Default: NULL, ignored</p></dd>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>uses <span class="pkg">sofa</span> under the hood; uses <code><a href="https://docs.ropensci.org/sofa/reference/Cushion.html" class="external-link">sofa::Cushion()</a></code> for
-connecting</p>
+    <p>Uses <span class="pkg">sofa</span> as backend. <span class="pkg">nodbi</span> creates or uses
+a CouchDB database with JSON documents. If documents do not have
+root-level <code>_id</code>'s, UUID's are created as <code>_id</code>'s. Function
+<code><a href="docdb_update.html">docdb_update()</a></code> uses <code><a href="https://docs.ropensci.org/jqr/reference/jqr.html" class="external-link">jqr::jqr()</a></code> to implement patching JSON.
+For a benchmark, see <a href="https://github.com/ropensci/nodbi#benchmark" class="external-link">https://github.com/ropensci/nodbi#benchmark</a>.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="fu">src_couchdb</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">src_couchdb</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

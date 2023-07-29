@@ -75,11 +75,11 @@ library("nodbi")
 
 ## Database connections {#database-connections}
 
-Overview on parameters and aspects that are specific to the database backend. These are only needed once: for `src_*()` to create a connection object. The connection object is subsequently used with `docdb_*` functions. "Container" refers to where conceptually the backend holds the data. 
+Overview on parameters and aspects that are specific to the database backend. These are only needed once: for `src_*()` to create a connection object. The connection object is subsequently used with `docdb_*` functions. "Container" refers to where conceptually the backend holds the data. Data types are mapped from JSON to R objects by [jsonlite](https://CRAN.R-project.org/package=jsonlite). 
 
 ### DuckDB
 
-See also <https://CRAN.R-project.org/package=duckdb> and <https://duckdb.org/docs/extensions/json>. "Container" refers to a DuckDB table.
+See also <https://CRAN.R-project.org/package=duckdb>. "Container" refers to a DuckDB table, with columns `_id` and `json` created and used by package `nodbi`, applying SQL functions as per <https://duckdb.org/docs/extensions/json> to the `json` column. Each row in the table represents a `JSON` document. Any root-level `_id` is extracted from the document(s) and used for column `_id`, otherwise a UUID is created as `_id`. The table is indexed on `_id`. 
 
 ```{r}
 src <- nodbi::src_duckdb(dbdir = ":memory:", ...)
@@ -87,7 +87,7 @@ src <- nodbi::src_duckdb(dbdir = ":memory:", ...)
 
 ### MongoDB
 
-MongoDB but none of the other databases require to specify the container already in the `src_*()` function. "Container" refers to a MongoDB collection. See <https://jeroen.github.io/mongolite/>.
+"Container" refers to a MongoDB collection, in which `nodbi` creates JSON documents. If documents do not have root-level `_id`'s, UUID's are created as `_id`'s. MongoDB but none of the other databases require to specify the container already in the `src_*()` function. See also <https://jeroen.github.io/mongolite/>. 
 
 ```{r}
 src <- nodbi::src_mongo(
@@ -97,7 +97,7 @@ src <- nodbi::src_mongo(
 
 ### SQLite
 
-See [JSON1](https://www.sqlite.org/json1.html), available in RSQLite. "Container" refers to an SQLite table.
+"Container" refers to an SQLite table, with columns `_id` and `json` created and used by package `nodbi`, applying SQL functions as per <https://www.sqlite.org/json1.html> to the `json` column. Each row in the table represents a `JSON` document. Any root-level `_id` is extracted from the document(s) and used for column `_id`, otherwise a UUID is created as `_id`. The table is indexed on `_id`. See also <https://CRAN.R-project.org/package=RSQLite>. 
 
 ```{r}
 src <- nodbi::src_sqlite(dbname = ":memory:", ...)
@@ -105,7 +105,7 @@ src <- nodbi::src_sqlite(dbname = ":memory:", ...)
 
 ### CouchDB
 
-"Container" refers to a CouchDB database. Function `docdb_update.src_couchdb` uses [jqr](https://cran.r-project.org/package=jqr) to implement patching JSON, in analogy to functions available for the other databases.
+"Container" refers to a CouchDB database, in which `nodbi` creates JSON documents. If documents do not have root-level `_id`'s, UUID's are created as `_id`'s. With CouchDB, function `docdb_update()` uses [jqr](https://cran.r-project.org/package=jqr) to implement patching JSON, in analogy to functions available for the other databases. See also <https://CRAN.R-project.org/package=sofa>. 
 
 ```{r}
 src <- nodbi::src_couchdb(
@@ -115,7 +115,7 @@ src <- nodbi::src_couchdb(
 
 ### Elasticsearch
 
-"Container" refers to an Elasticsearch index. Only lowercase is accepted for container names (parameter `key`). Opensearch can equally be used.
+"Container" refers to an Elasticsearch index, in which `nodbi` creates JSON documents. Any root-level `_id` is extracted from the document(s) and used as document ID `_id`, otherwise a UUID is created as document ID `_id`. Only lowercase is accepted for container names (in parameter `key`). Opensearch can equally be used. See also <https://CRAN.R-project.org/package=elastic>. 
 
 ```{r}
 src <- nodbi::src_elastic(
@@ -125,7 +125,7 @@ src <- nodbi::src_elastic(
 
 ### PostgreSQL
 
-"Container" refers to an PostgreSQL table. With PostgreSQL, the order of variables in data frames returned by `docdb_get()` and `docdb_query()` can differ from the order in which they were in `docdb_create()`.
+"Container" refers to a PostgreSQL table, with columns `_id` and `json` created and used by package `nodbi`, applying SQL functions as per <https://www.postgresql.org/docs/current/functions-json.html> to the `json` column. Each row in the table represents a `JSON` document. Any root-level `_id` is extracted from the document(s) and used for column `_id`, otherwise a UUID is created as `_id`. The table is indexed on `_id`. With PostgreSQL, a custom `plpgsql` function [jsonb_merge_patch()](https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60) is used for `docdb_update()`. The order of variables in data frames returned by `docdb_get()` and `docdb_query()` can differ from their order the input to `docdb_create()`. See also <https://CRAN.R-project.org/package=RPostgreSQL>. 
 
 ```{r}
 src <- nodbi::src_postgres(

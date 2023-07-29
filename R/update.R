@@ -1,22 +1,22 @@
 #' Update documents
 #'
 #' Documents are updated by patching their JSON with
-#' \code{value}. 
+#' \code{value}.
 #' Documents are identified by the \code{query} or
 #' by `_id`'s in \code{value}, where the latter takes
 #' precedence.
 #' \code{value} can have multiple documents and `_id`'s,
 #' which then are used for iterative updating.
 #'
-#' Uses native functions with MongoDB, SQLite and DuckDB,
-#' a `plpgsql` function added to PostgreSQL, and [jqr] for 
-#' Elasticsearch and CouchDB.
+#' Uses native functions with MongoDB, SQLite, DuckDB
+#' and Elasticsearch; a `plpgsql` function added to
+#' PostgreSQL; and [jqr] for CouchDB.
 #'
 #' @inheritParams docdb_create
 #'
 #' @param query (character) A JSON query string to
 #' identify the documents that should be updated
-#' (patched) with \code{value}, 
+#' (patched) with \code{value},
 #'  Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
 #'  with at most one logic operator ('$and' if not specified, or '$or'),
 #'  see examples below and in [docdb_query()].

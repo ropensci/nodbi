@@ -198,18 +198,18 @@
 <div class="section level2">
 <h2 id="database-connections">Database connections<a class="anchor" aria-label="anchor" href="#database-connections"></a>
 </h2>
-<p>Overview on parameters and aspects that are specific to the database backend. These are only needed once: for <code>src_*()</code> to create a connection object. The connection object is subsequently used with <code>docdb_*</code> functions. “Container” refers to where conceptually the backend holds the data.</p>
+<p>Overview on parameters and aspects that are specific to the database backend. These are only needed once: for <code>src_*()</code> to create a connection object. The connection object is subsequently used with <code>docdb_*</code> functions. “Container” refers to where conceptually the backend holds the data. Data types are mapped from JSON to R objects by <a href="https://CRAN.R-project.org/package=jsonlite" class="external-link">jsonlite</a>.</p>
 <div class="section level3">
 <h3 id="duckdb">DuckDB<a class="anchor" aria-label="anchor" href="#duckdb"></a>
 </h3>
-<p>See also <a href="https://CRAN.R-project.org/package=duckdb" class="external-link uri">https://CRAN.R-project.org/package=duckdb</a> and <a href="https://duckdb.org/docs/extensions/json" class="external-link uri">https://duckdb.org/docs/extensions/json</a>. “Container” refers to a DuckDB table.</p>
+<p>See also <a href="https://CRAN.R-project.org/package=duckdb" class="external-link uri">https://CRAN.R-project.org/package=duckdb</a>. “Container” refers to a DuckDB table, with columns <code>_id</code> and <code>json</code> created and used by package <code>nodbi</code>, applying SQL functions as per <a href="https://duckdb.org/docs/extensions/json" class="external-link uri">https://duckdb.org/docs/extensions/json</a> to the <code>json</code> column. Each row in the table represents a <code>JSON</code> document. Any root-level <code>_id</code> is extracted from the document(s) and used for column <code>_id</code>, otherwise a UUID is created as <code>_id</code>. The table is indexed on <code>_id</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span>dbdir <span class="op">=</span> <span class="st">":memory:"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="mongodb">MongoDB<a class="anchor" aria-label="anchor" href="#mongodb"></a>
 </h3>
-<p>MongoDB but none of the other databases require to specify the container already in the <code>src_*()</code> function. “Container” refers to a MongoDB collection. See <a href="https://jeroen.github.io/mongolite/" class="external-link uri">https://jeroen.github.io/mongolite/</a>.</p>
+<p>“Container” refers to a MongoDB collection, in which <code>nodbi</code> creates JSON documents. If documents do not have root-level <code>_id</code>’s, UUID’s are created as <code>_id</code>’s. MongoDB but none of the other databases require to specify the container already in the <code>src_*()</code> function. See also <a href="https://jeroen.github.io/mongolite/" class="external-link uri">https://jeroen.github.io/mongolite/</a>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span></span>
 <span>  collection <span class="op">=</span> <span class="st">"my_container"</span>, db <span class="op">=</span> <span class="st">"my_database"</span>,</span>
@@ -218,14 +218,14 @@
 <div class="section level3">
 <h3 id="sqlite">SQLite<a class="anchor" aria-label="anchor" href="#sqlite"></a>
 </h3>
-<p>See <a href="https://www.sqlite.org/json1.html" class="external-link">JSON1</a>, available in RSQLite. “Container” refers to an SQLite table.</p>
+<p>“Container” refers to an SQLite table, with columns <code>_id</code> and <code>json</code> created and used by package <code>nodbi</code>, applying SQL functions as per <a href="https://www.sqlite.org/json1.html" class="external-link uri">https://www.sqlite.org/json1.html</a> to the <code>json</code> column. Each row in the table represents a <code>JSON</code> document. Any root-level <code>_id</code> is extracted from the document(s) and used for column <code>_id</code>, otherwise a UUID is created as <code>_id</code>. The table is indexed on <code>_id</code>. See also <a href="https://CRAN.R-project.org/package=RSQLite" class="external-link uri">https://CRAN.R-project.org/package=RSQLite</a>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span>dbname <span class="op">=</span> <span class="st">":memory:"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="couchdb">CouchDB<a class="anchor" aria-label="anchor" href="#couchdb"></a>
 </h3>
-<p>“Container” refers to a CouchDB database. Function <code>docdb_update.src_couchdb</code> uses <a href="https://cran.r-project.org/package=jqr" class="external-link">jqr</a> to implement patching JSON, in analogy to functions available for the other databases.</p>
+<p>“Container” refers to a CouchDB database, in which <code>nodbi</code> creates JSON documents. If documents do not have root-level <code>_id</code>’s, UUID’s are created as <code>_id</code>’s. With CouchDB, function <code><a href="reference/docdb_update.html">docdb_update()</a></code> uses <a href="https://cran.r-project.org/package=jqr" class="external-link">jqr</a> to implement patching JSON, in analogy to functions available for the other databases. See also <a href="https://CRAN.R-project.org/package=sofa" class="external-link uri">https://CRAN.R-project.org/package=sofa</a>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span></span>
 <span>  host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">5984L</span>, path <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -234,7 +234,7 @@
 <div class="section level3">
 <h3 id="elasticsearch">Elasticsearch<a class="anchor" aria-label="anchor" href="#elasticsearch"></a>
 </h3>
-<p>“Container” refers to an Elasticsearch index. Only lowercase is accepted for container names (parameter <code>key</code>). Opensearch can equally be used.</p>
+<p>“Container” refers to an Elasticsearch index, in which <code>nodbi</code> creates JSON documents. Any root-level <code>_id</code> is extracted from the document(s) and used as document ID <code>_id</code>, otherwise a UUID is created as document ID <code>_id</code>. Only lowercase is accepted for container names (in parameter <code>key</code>). Opensearch can equally be used. See also <a href="https://CRAN.R-project.org/package=elastic" class="external-link uri">https://CRAN.R-project.org/package=elastic</a>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span></span>
 <span>  host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">9200L</span>, path <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -243,7 +243,7 @@
 <div class="section level3">
 <h3 id="postgresql">PostgreSQL<a class="anchor" aria-label="anchor" href="#postgresql"></a>
 </h3>
-<p>“Container” refers to an PostgreSQL table. With PostgreSQL, the order of variables in data frames returned by <code><a href="reference/docdb_get.html">docdb_get()</a></code> and <code><a href="reference/docdb_query.html">docdb_query()</a></code> can differ from the order in which they were in <code><a href="reference/docdb_create.html">docdb_create()</a></code>.</p>
+<p>“Container” refers to a PostgreSQL table, with columns <code>_id</code> and <code>json</code> created and used by package <code>nodbi</code>, applying SQL functions as per <a href="https://www.postgresql.org/docs/current/functions-json.html" class="external-link uri">https://www.postgresql.org/docs/current/functions-json.html</a> to the <code>json</code> column. Each row in the table represents a <code>JSON</code> document. Any root-level <code>_id</code> is extracted from the document(s) and used for column <code>_id</code>, otherwise a UUID is created as <code>_id</code>. The table is indexed on <code>_id</code>. With PostgreSQL, a custom <code>plpgsql</code> function <a href="https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60" class="external-link">jsonb_merge_patch()</a> is used for <code><a href="reference/docdb_update.html">docdb_update()</a></code>. The order of variables in data frames returned by <code><a href="reference/docdb_get.html">docdb_get()</a></code> and <code><a href="reference/docdb_query.html">docdb_query()</a></code> can differ from their order the input to <code><a href="reference/docdb_create.html">docdb_create()</a></code>. See also <a href="https://CRAN.R-project.org/package=RPostgreSQL" class="external-link uri">https://CRAN.R-project.org/package=RPostgreSQL</a>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span></span>
 <span>  dbname <span class="op">=</span> <span class="st">"my_database"</span>, host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">5432L</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>

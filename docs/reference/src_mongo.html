@@ -83,8 +83,12 @@ string URI format, see to <code><a href="https://rdrr.io/pkg/mongolite/man/mongo
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Uses <span class="pkg">monoglite</span> under the hood; uses <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code> for
-connecting</p>
+    <p>Uses <span class="pkg">monoglite</span> as backend. <span class="pkg">nodbi</span> creates or uses
+a MongoDB collection, in which <code>nodbi</code> creates JSON documents.
+If documents do not have root-level <code>_id</code>'s, UUID's are created as <code>_id</code>'s.
+MongoDB but none of the other databases require to specify the container
+already in the <code>src_mongo()</code> function.
+For a benchmark, see <a href="https://github.com/ropensci/nodbi#benchmark" class="external-link">https://github.com/ropensci/nodbi#benchmark</a></p>
     </div>
 
     <div id="ref-examples">

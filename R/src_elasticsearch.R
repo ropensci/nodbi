@@ -22,13 +22,19 @@
 #'
 #' @param ...	Further args passed on to [elastic::connect()]
 #'
-#' @details uses \pkg{elastic} under the hood; uses [elastic::connect()] for
-#' connecting
+#' @details Uses \pkg{elastic} as backend. \pkg{nodbi} creates or uses
+#' an Elasticsearch index, in which `nodbi` creates JSON documents.
+#' Any root-level `_id` is extracted from the document(s) and used as
+#' document ID `_id`, otherwise a UUID is created as document ID `_id`.
+#' Only lowercase is accepted for container names (in parameter `key`).
+#' Opensearch can equally be used.
+#' For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>
 #'
-#' @return A `nodbi` source object 
-#' 
+#' @return A `nodbi` source object
+#'
 #' @examples \dontrun{
-#' src_elastic()
+#' con <- src_elastic()
+#' print(con)
 #' }
 src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
   transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...) {

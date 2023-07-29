@@ -8,10 +8,18 @@
 #'
 #' @param ... Additional named parameters passed on to [DBI::dbConnect()]
 #'
-#' @details Uses [duckdb::duckdb()] under the hood
+#' @details Uses [duckdb::duckdb()] as backend. \pkg{nodbi} creates or
+#' uses a DuckDB table, with columns `_id` and `json` created and used
+#' by package `nodbi`, applying SQL functions as per
+#' <https://duckdb.org/docs/extensions/json> to the `json` column.
+#' Each row in the table represents a `JSON` document.
+#' Any root-level `_id` is extracted from the document(s) and used for
+#' column `_id`, otherwise a UUID is created as `_id`.
+#' The table is indexed on `_id`.
+#' For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>.
 #'
-#' @return A `nodbi` source object 
-#' 
+#' @return A `nodbi` source object
+#'
 #' @examples \dontrun{
 #' con <- src_duckdb()
 #' print(con)

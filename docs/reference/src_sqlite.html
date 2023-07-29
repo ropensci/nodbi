@@ -77,7 +77,15 @@ on to <code><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="ext
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>uses <span class="pkg">RSQLite</span> under the hood</p>
+    <p>Uses <span class="pkg">RSQLite</span> as backend. <span class="pkg">nodbi</span> creates or uses
+an SQLite table, with columns <code>_id</code> and <code>json</code> created and used by
+package <code>nodbi</code>, applying SQL functions as per
+<a href="https://www.sqlite.org/json1.html" class="external-link">https://www.sqlite.org/json1.html</a> to the <code>json</code> column.
+Each row in the table represents a <code>JSON</code> document.
+Any root-level <code>_id</code> is extracted from the document(s) and used for
+column <code>_id</code>, otherwise a UUID is created as <code>_id</code>.
+The table is indexed on <code>_id</code>.
+For a benchmark, see <a href="https://github.com/ropensci/nodbi#benchmark" class="external-link">https://github.com/ropensci/nodbi#benchmark</a></p>
     </div>
 
     <div id="ref-examples">

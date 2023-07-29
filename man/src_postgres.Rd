@@ -26,7 +26,21 @@ A \code{nodbi} source object
 Setup a PostgreSQL database connection
 }
 \details{
-uses \pkg{RPostgres} under the hood
+Uses \pkg{RPostgres} as backend. \pkg{nodbi} creates or uses
+a PostgreSQL table, with columns \verb{_id} and \code{json} created and used
+by package \code{nodbi}, applying SQL functions as per
+\url{https://www.postgresql.org/docs/current/functions-json.html}
+to the \code{json} column.
+Each row in the table represents a \code{JSON} document.
+Any root-level \verb{_id} is extracted from the document(s) and used
+for column \verb{_id}, otherwise a UUID is created as \verb{_id}.
+The table is indexed on \verb{_id}. A custom \code{plpgsql} function
+\href{https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60}{jsonb_merge_patch()}
+is used for \code{docdb_update()}.
+The order of variables in data frames returned by \code{docdb_get()}
+and \code{docdb_query()} can differ from their order the input to
+\code{docdb_create()}.
+For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}
 }
 \examples{
 \dontrun{
