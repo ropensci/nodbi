@@ -35,6 +35,12 @@ jobs:
 
       # nodbi on linux:
 
+      - name: PostgreSQL
+        uses: ankane/setup-postgres@v1
+        with:
+          postgres-version: 14
+          database: test
+
       - name: MongoDB
         if: runner.os == 'Linux'
         uses: supercharge/mongodb-github-action@1.3.0
@@ -84,8 +90,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
-          needs: check
+          extra-packages: rcmdcheck, covr, sofa, elastic, mongolite, DBI, duckdb, RSQLite, webfakes
+          needs: check, coverage
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -94,9 +100,8 @@ jobs:
 
       # nodbi:
 
-      - name: Install dependencies
+      - name: Install duckdb extension library
         run: |
-          utils::install.packages(c("rcmdcheck", "sofa", "elastic", "mongolite", "DBI", "duckdb", "RSQLite", "webfakes"))
           library(duckdb)
           drv <- duckdb()
           con <- dbConnect(drv)
@@ -120,4 +125,3 @@ jobs:
         shell: Rscript {0}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-

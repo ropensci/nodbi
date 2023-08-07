@@ -4,11 +4,11 @@
   "identifier": "nodbi",
   "description": "Simplified document database access and manipulation, providing a common API across supported 'NoSQL' databases 'Elasticsearch', 'CouchDB', 'MongoDB' as well as 'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.",
   "name": "nodbi: 'NoSQL' Database Connector",
-  "relatedLink": ["https://docs.ropensci.org/nodbi/", "https://CRAN.R-project.org/package=nodbi"],
+  "relatedLink": "https://docs.ropensci.org/nodbi/",
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -168,6 +168,19 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=callr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "webfakes",
+      "name": "webfakes",
+      "version": ">= 1.2.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=webfakes"
     }
   ],
   "softwareRequirements": {
@@ -175,7 +188,7 @@
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
-      "version": ">= 2.10"
+      "version": ">= 3.4.0"
     },
     "2": {
       "@type": "SoftwareApplication",
@@ -242,9 +255,8 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "521.359KB",
+  "fileSize": "528.521KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
-  "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://codecov.io/gh/ropensci/nodbi"],
-  "developmentStatus": "https://www.repostatus.org/#active"
+  "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"]
 }

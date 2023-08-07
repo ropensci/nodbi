@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
       </span>
     </div>
 
@@ -48,87 +48,92 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.9.5.9000" id="nodbi-0959000">nodbi 0.9.5.9000<a class="anchor" aria-label="anchor" href="#nodbi-0959000"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-9-5-9000">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-5-9000"></a></h4>
-<ul><li>switched from v1 to v2 GitHub r-lib/action for R CMD check</li>
-</ul></div>
-<div class="section level4">
-<h4 id="bug-fixes-0-9-5-9000">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-5-9000"></a></h4>
-<ul><li>corrected marginal case in docdb_query.src_duckdb()</li>
+<h2 class="page-header" data-toc-text="0.9.6" id="nodbi-096">nodbi 0.9.6<a class="anchor" aria-label="anchor" href="#nodbi-096"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-9-6">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-6"></a></h3>
+<ul><li>corrected marginal case in <code>docdb_query.src_duckdb()</code>
+</li>
 <li>corrected minimum R version</li>
-<li>replaced for testing httpbin with webfakes</li>
+<li>replaced in tests <code>httpbin</code> with <code>webfakes</code>
+</li>
 <li>removed explicit UTF-8 encoding reference</li>
-<li>speed up in docdb_query()</li>
+<li>speed up in <code><a href="../reference/docdb_query.html">docdb_query()</a></code>
+</li>
+<li>switched to v2 GitHub r-lib/action for R CMD check</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.5" id="nodbi-095">nodbi 0.9.5<small>2023-05-26</small><a class="anchor" aria-label="anchor" href="#nodbi-095"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-9-5">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-5"></a></h4>
+<div class="section level3">
+<h3 id="changes-0-9-5">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-5"></a></h3>
 <ul><li>replaced a dependency, gained speed</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.4" id="nodbi-094">nodbi 0.9.4<small>2023-05-14</small><a class="anchor" aria-label="anchor" href="#nodbi-094"></a></h2>
-<div class="section level4">
-<h4 id="bug-fixes-0-9-4">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-4"></a></h4>
-<ul><li>fix initialisation in docdb_query with src_duckdb</li>
+<div class="section level3">
+<h3 id="bug-fixes-0-9-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-4"></a></h3>
+<ul><li>fix initialisation in <code><a href="../reference/docdb_query.html">docdb_query()</a></code> with <code><a href="../reference/src_duckdb.html">src_duckdb()</a></code>
+</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.3" id="nodbi-093">nodbi 0.9.3<small>2023-04-23</small><a class="anchor" aria-label="anchor" href="#nodbi-093"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-9-3">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-3"></a></h4>
-<ul><li>docdb_update() now can do bulk updates when _id’s are in ‘value’ (for SQLite, DuckDB, PostgreSQL, MongoDB; not yet for CouchDB and Elastic)</li>
+<div class="section level3">
+<h3 id="changes-0-9-3">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-3"></a></h3>
+<ul><li>
+<code><a href="../reference/docdb_update.html">docdb_update()</a></code> now can do bulk updates when _id’s are in <code>value</code> (for SQLite, DuckDB, PostgreSQL, MongoDB; not yet for CouchDB and Elastic)</li>
 </ul></div>
-<div class="section level4">
-<h4 id="bug-fixes-0-9-3">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-3"></a></h4>
+<div class="section level3">
+<h3 id="bug-fixes-0-9-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-3"></a></h3>
 <ul><li>fix tests for value parameter to be a file or an url</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.2" id="nodbi-092">nodbi 0.9.2<small>2023-03-26</small><a class="anchor" aria-label="anchor" href="#nodbi-092"></a></h2>
-<div class="section level4">
-<h4 id="bug-fixes-0-9-2">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-2"></a></h4>
-<ul><li>src_duckdb(): handle when json_type returns NULL for non-existing path (2023-02-18)</li>
-<li>src_sqlite(): handle when text includes double quotation marks (2023-03-25)</li>
+<div class="section level3">
+<h3 id="bug-fixes-0-9-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-2"></a></h3>
+<ul><li>
+<code><a href="../reference/src_duckdb.html">src_duckdb()</a></code> handles when json_type returns NULL for non-existing path</li>
+<li>
+<code><a href="../reference/src_sqlite.html">src_sqlite()</a></code> handles when text includes double quotation marks</li>
 </ul></div>
-<div class="section level4">
-<h4 id="changes-0-9-2">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-2"></a></h4>
+<div class="section level3">
+<h3 id="changes-0-9-2">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-2"></a></h3>
 <ul><li>added warning if DuckDB’s JSON extension is not available; improve instructions; see also issue <a href="https://github.com/ropensci/nodbi/issues/45" class="external-link">#45</a></li>
-<li>minor simplification of docdb_exists() for src_mongo(), and of docdb_query() for SQL databases</li>
+<li>minor simplification of <code><a href="../reference/docdb_exists.html">docdb_exists()</a></code> for <code><a href="../reference/src_mongo.html">src_mongo()</a></code>, and of <code><a href="../reference/docdb_query.html">docdb_query()</a></code> for SQL databases</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.1" id="nodbi-091">nodbi 0.9.1<small>2022-11-20</small><a class="anchor" aria-label="anchor" href="#nodbi-091"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-9-1">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-1"></a></h4>
+<div class="section level3">
+<h3 id="changes-0-9-1">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-1"></a></h3>
 <ul><li>corrected closing connections to SQL database backends upon session restart</li>
 <li>improved provisions for parallel write access and corresponding tests</li>
-<li>capture marginal case of no rows in docdb_query()</li>
+<li>capture marginal case of no rows in <code><a href="../reference/docdb_query.html">docdb_query()</a></code>
+</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.0" id="nodbi-090">nodbi 0.9.0<small>2022-10-31</small><a class="anchor" aria-label="anchor" href="#nodbi-090"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-9-0">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-0"></a></h4>
+<div class="section level3">
+<h3 id="changes-0-9-0">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-0"></a></h3>
 <ul><li>adding support for duckdb (R package version 0.6.0 or higher) as database backend</li>
 <li>suppressed warnings when checking if a string points to a file</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.8.1" id="nodbi-081">nodbi 0.8.1<small>2022-07-01</small><a class="anchor" aria-label="anchor" href="#nodbi-081"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-8-1">Changes<a class="anchor" aria-label="anchor" href="#changes-0-8-1"></a></h4>
-<ul><li>replaced isa() as not available with R version 3.x</li>
+<div class="section level3">
+<h3 id="changes-0-8-1">Changes<a class="anchor" aria-label="anchor" href="#changes-0-8-1"></a></h3>
+<ul><li>replaced <code><a href="https://rdrr.io/r/base/class.html" class="external-link">isa()</a></code> as not available with R version 3.x</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.8.0" id="nodbi-080">nodbi 0.8.0<small>2022-06-12</small><a class="anchor" aria-label="anchor" href="#nodbi-080"></a></h2>
-<div class="section level4">
-<h4 id="changes-0-8-0">Changes<a class="anchor" aria-label="anchor" href="#changes-0-8-0"></a></h4>
-<ul><li>refactored <code>docdb_update.src_couchdb</code> to use <code>jqr</code>
+<div class="section level3">
+<h3 id="changes-0-8-0">Changes<a class="anchor" aria-label="anchor" href="#changes-0-8-0"></a></h3>
+<ul><li>refactored <code>docdb_update.src_couchdb()</code> to use <code>jqr</code>
 </li>
 <li>adapted <code>docdb_create</code> to accept <code>jsonlite</code>, <code>jsonify</code>, <code>jqr</code> JSON</li>
 <li>added details to README</li>
@@ -137,91 +142,82 @@
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.7.1" id="nodbi-071">nodbi 0.7.1<small>2022-05-04</small><a class="anchor" aria-label="anchor" href="#nodbi-071"></a></h2>
-<div class="section level4">
-<h4 id="bug-fixes-0-7-1">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-1"></a></h4>
-<ul><li>fixed <code>docdb_query</code> to account for change in SQLite 3.38.3 adding quotation of labels (closes issue <a href="https://github.com/ropensci/nodbi/issues/44" class="external-link">#44</a>), test added</li>
-<li>made <code>docdb_query</code> work for PostgreSQL when a string used with the <code>$in</code> operator has a comma(s), test added</li>
+<div class="section level3">
+<h3 id="bug-fixes-0-7-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-1"></a></h3>
+<ul><li>fixed <code><a href="../reference/docdb_query.html">docdb_query()</a></code> to account for change in SQLite 3.38.3 adding quotation of labels (closes issue <a href="https://github.com/ropensci/nodbi/issues/44" class="external-link">#44</a>), test added</li>
+<li>made <code><a href="../reference/docdb_query.html">docdb_query()</a></code> work for PostgreSQL when a string used with the <code>$in</code> operator has a comma(s), test added</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.7.0" id="nodbi-070">nodbi 0.7.0<small>2022-01-04</small><a class="anchor" aria-label="anchor" href="#nodbi-070"></a></h2>
-<div class="section level4">
-<h4 id="improvements-0-7-0">IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#improvements-0-7-0"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-7-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-7-0"></a></h3>
 <ul><li>
-<code>docdb_create</code> now supports file names and http urls as argument <code>value</code> for importing data</li>
+<code><a href="../reference/docdb_create.html">docdb_create()</a></code> now supports file names and http urls as argument <code>value</code> for importing data</li>
 <li>
-<code>docdb_create</code> (and thus <code>docdb_update</code>) now supports quantifiers (e.g., ‘[a-z]{2,3}’) in regular expressions</li>
+<code><a href="../reference/docdb_create.html">docdb_create()</a></code> (and thus <code><a href="../reference/docdb_update.html">docdb_update()</a></code>) now supports quantifiers (e.g., ‘[a-z]{2,3}’) in regular expressions</li>
 </ul></div>
-<div class="section level4">
-<h4 id="bug-fixes-0-7-0">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0"></a></h4>
-<ul><li>for SQLite, return <code>FALSE</code> like other backends when using <code>docdb_delete</code> for a non-existing container (table, in the case of SQLite)</li>
+<div class="section level3">
+<h3 id="bug-fixes-0-7-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-0"></a></h3>
+<ul><li>for SQLite, return <code>FALSE</code> like other backends when using <code><a href="../reference/docdb_delete.html">docdb_delete()</a></code> for a non-existing container (table, in the case of SQLite)</li>
 <li>better handle special characters and encodings under Windows</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.0" id="nodbi-060">nodbi 0.6.0<small>2021-12-01</small><a class="anchor" aria-label="anchor" href="#nodbi-060"></a></h2>
-<div class="section level4">
-<h4 id="improvements-0-6-0">IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#improvements-0-6-0"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-6-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-6-0"></a></h3>
 <ul><li>full support for PostgreSQL (using jsonb)</li>
 </ul></div>
-<div class="section level4">
-<h4 id="bug-fixes-0-6-0">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-0"></a></h4>
+<div class="section level3">
+<h3 id="bug-fixes-0-6-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-0"></a></h3>
 <ul><li>for SQLite add closing file references also on exit</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.1" id="nodbi-051">nodbi 0.5.1<small>2021-11-26</small><a class="anchor" aria-label="anchor" href="#nodbi-051"></a></h2>
-<div class="section level4">
-<h4 id="bug-fixes-0-5-1">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h4>
+<div class="section level3">
+<h3 id="bug-fixes-0-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
 <ul><li>for SQLite under Windows ensure handling of special characters (avoiding encoding conversions with file operations that stream out / in NDJSON)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.0" id="nodbi-050">nodbi 0.5.0<small>2021-11-21</small><a class="anchor" aria-label="anchor" href="#nodbi-050"></a></h2>
-<div class="section level4">
-<h4 id="improvements-0-5-0">IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#improvements-0-5-0"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-5-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-5-0"></a></h3>
 <ul><li>identical API for <code>docdb_*()</code> functions so that <code>query</code> and <code>fields</code> parameters can be used across database backends</li>
 <li>identical return values across database backends</li>
-</ul></div>
-<div class="section level4">
-<h4 id="under-the-hood-0-5-0">UNDER THE HOOD<a class="anchor" aria-label="anchor" href="#under-the-hood-0-5-0"></a></h4>
-<ul><li>re-factored recently added functions for RSQLite</li>
+<li>re-factored recently added functions for RSQLite</li>
 <li>re-factored most functions to provide identical API</li>
 <li>performance (timing and memory use) profiled and optimised as far as possible</li>
-</ul></div>
-<div class="section level4">
-<h4 id="other-changes-0-5-0">OTHER CHANGES<a class="anchor" aria-label="anchor" href="#other-changes-0-5-0"></a></h4>
-<ul><li>testing now uses the same test file across databases</li>
+<li>testing now uses the same test file across databases</li>
 <li>currently, no more support for redis (no way was found to query and update specific documents in a container)</li>
 <li>
 <code><a href="../reference/docdb_list.html">docdb_list()</a></code> added as function to list container in database</li>
 </ul></div>
-<div class="section level4">
-<h4 id="notes-0-5-0">NOTES<a class="anchor" aria-label="anchor" href="#notes-0-5-0"></a></h4>
+<div class="section level3">
+<h3 id="notes-0-5-0">Notes<a class="anchor" aria-label="anchor" href="#notes-0-5-0"></a></h3>
 <ul><li>Support for complex queries not yet implemented for Elasticsearch</li>
 <li>Only root fields (no subitems) returned by Elasticsearch and CouchDB</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.4" id="nodbi-044">nodbi 0.4.4<a class="anchor" aria-label="anchor" href="#nodbi-044"></a></h2>
-<div class="section level4">
-<h4 id="minor-improvements-0-4-4">MINOR IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#minor-improvements-0-4-4"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-4-4">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-4-4"></a></h3>
 <ul><li>made remaining <code>docdb_*()</code> functions return a logical indicating the success of the function (<code>docdb_create</code>, <code>docdb_delete</code>), or a data frame (<code>docdb_get</code>, <code>docdb_query</code>), or the number of documents affected by the function (<code>docdb_update</code>)</li>
+<li>change testing approach</li>
 </ul></div>
-<div class="section level4">
-<h4 id="bug-fixes-0-4-4">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-4"></a></h4>
+<div class="section level3">
+<h3 id="bug-fixes-0-4-4">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-4"></a></h3>
 <ul><li>
 <code><a href="../reference/docdb_get.html">docdb_get()</a></code> to not return ’_id’ field for <code>src_{sqlite,mongo}</code> since already used for row names</li>
-</ul></div>
-<div class="section level4">
-<h4 id="other-0-4-4">OTHER<a class="anchor" aria-label="anchor" href="#other-0-4-4"></a></h4>
-<ul><li>change testing approach</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.3" id="nodbi-043">nodbi 0.4.3<small>2021-07-23</small><a class="anchor" aria-label="anchor" href="#nodbi-043"></a></h2>
-<div class="section level4">
-<h4 id="minor-improvements-0-4-3">MINOR IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#minor-improvements-0-4-3"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-4-3">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-4-3"></a></h3>
 <ul><li>
 <code>docdb_query.src_sqlite()</code> now handles JSON objects, returning nested lists (<a href="https://github.com/ropensci/nodbi/issues/40" class="external-link">#40</a>)</li>
 <li>
@@ -229,27 +225,27 @@
 <li>
 <code>docdb_update.src_mongo()</code> now returns the number of upserted or matched documents, irrespective of whether they were updated or not</li>
 </ul></div>
-<div class="section level4">
-<h4 id="bug-fixes-0-4-3">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-3"></a></h4>
+<div class="section level3">
+<h3 id="bug-fixes-0-4-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-3"></a></h3>
 <ul><li>
 <code><a href="../reference/docdb_get.html">docdb_get()</a></code> to not return ’_id’ field for <code>src_{sqlite,mongo}</code> since already used for row names</li>
 </ul></div>
-<div class="section level4">
-<h4 id="other-0-4-3">OTHER<a class="anchor" aria-label="anchor" href="#other-0-4-3"></a></h4>
+<div class="section level3">
+<h3 id="other-0-4-3">Other<a class="anchor" aria-label="anchor" href="#other-0-4-3"></a></h3>
 <ul><li>change of maintainer agreed</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.2" id="nodbi-042">nodbi 0.4.2<small>2021-01-14</small><a class="anchor" aria-label="anchor" href="#nodbi-042"></a></h2>
-<div class="section level4">
-<h4 id="bug-fixes-0-4-2">BUG FIXES<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-2"></a></h4>
+<div class="section level3">
+<h3 id="bug-fixes-0-4-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-2"></a></h3>
 <ul><li>fix for <code><a href="../reference/src_couchdb.html">src_couchdb()</a></code>: we were not setting user and password correctly internally, was causing issues in CouchDB v3 (<a href="https://github.com/ropensci/nodbi/issues/35" class="external-link">#35</a>) thanks to <a href="https://github.com/drtagkim" class="external-link">@drtagkim</a> for the pull request</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.0" id="nodbi-040">nodbi 0.4.0<small>2019-11-11</small><a class="anchor" aria-label="anchor" href="#nodbi-040"></a></h2>
-<div class="section level4">
-<h4 id="minor-improvements-0-4-0">MINOR IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#minor-improvements-0-4-0"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-4-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-4-0"></a></h3>
 <ul><li>in <code><a href="../reference/docdb_query.html">docdb_query()</a></code> and <code><a href="../reference/docdb_get.html">docdb_get()</a></code>, for sqlite source, use a connection instead of a regular file path to avoid certain errors on Windows (<a href="https://github.com/ropensci/nodbi/issues/33" class="external-link">#33</a>) work by <a href="https://github.com/rfhb" class="external-link">@rfhb</a></li>
 <li>in <code><a href="../reference/docdb_query.html">docdb_query()</a></code> and <code><a href="../reference/docdb_create.html">docdb_create()</a></code> for sqlite source, fix to handle mixed values of different types (<a href="https://github.com/ropensci/nodbi/issues/34" class="external-link">#34</a>) work by <a href="https://github.com/rfhb" class="external-link">@rfhb</a></li>
 <li>some Sys.sleep’s added to Elasticserch eg’s to make sure data is available after creation, and before a data request</li>
@@ -257,42 +253,42 @@
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.0" id="nodbi-030">nodbi 0.3.0<small>2019-09-18</small><a class="anchor" aria-label="anchor" href="#nodbi-030"></a></h2>
-<div class="section level4">
-<h4 id="new-features-0-3-0">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h4>
+<div class="section level3">
+<h3 id="new-features-0-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h3>
 <ul><li>new author Ralf Herold, with contribution of new functions for working with SQLite/json1. new functions: <code>src_sqlite</code>, <code>print.src_sqlite</code>, <code>docdb_create.src_sqlite</code>, <code>docdb_delete.src_sqlite</code>, <code>docdb_exists.src_sqlite</code>, <code>docdb_get.src_sqlite</code>, <code>docdb_query.src_sqlite</code>, and <code>docdb_update.src_sqlite</code>. includes new dataset <code>contacts</code> (<a href="https://github.com/ropensci/nodbi/issues/25" class="external-link">#25</a>) (<a href="https://github.com/ropensci/nodbi/issues/27" class="external-link">#27</a>) (<a href="https://github.com/ropensci/nodbi/issues/28" class="external-link">#28</a>) (<a href="https://github.com/ropensci/nodbi/issues/29" class="external-link">#29</a>) (<a href="https://github.com/ropensci/nodbi/issues/30" class="external-link">#30</a>) (<a href="https://github.com/ropensci/nodbi/issues/31" class="external-link">#31</a>)</li>
 <li>
 <code>docdb_update</code> gains method for working with MongoDB, via (<a href="https://github.com/ropensci/nodbi/issues/27" class="external-link">#27</a>)</li>
 </ul></div>
-<div class="section level4">
-<h4 id="minor-improvements-0-3-0">MINOR IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#minor-improvements-0-3-0"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-3-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-3-0"></a></h3>
 <ul><li>added <code>.github</code> files in the source repository to facilitate contributions</li>
 <li>
 <code>src_mongo</code> changes, improved behavior, via (<a href="https://github.com/ropensci/nodbi/issues/27" class="external-link">#27</a>)</li>
 </ul></div>
-<div class="section level4">
-<h4 id="defunct-0-3-0">DEFUNCT<a class="anchor" aria-label="anchor" href="#defunct-0-3-0"></a></h4>
+<div class="section level3">
+<h3 id="defunct-0-3-0">Defunct<a class="anchor" aria-label="anchor" href="#defunct-0-3-0"></a></h3>
 <ul><li>
 <code>etcd</code> (via the <code>etseed</code> package) integration has been removed from this package as etcd doesn’t really fit the main goal of the pkg. functions now defunct are: <code>src_etcd</code>, <code>docdb_create.src_etcd</code>, <code>docdb_delete.src_etcd</code>, <code>docdb_exists.src_etcd</code>, <code>docdb_get.src_etcd</code>, and <code>print.src_etcd</code> (<a href="https://github.com/ropensci/nodbi/issues/26" class="external-link">#26</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.0" id="nodbi-020">nodbi 0.2.0<small>2019-04-13</small><a class="anchor" aria-label="anchor" href="#nodbi-020"></a></h2>
-<div class="section level4">
-<h4 id="new-features-0-2-0">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h4>
+<div class="section level3">
+<h3 id="new-features-0-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
 <ul><li>
 <code><a href="../reference/docdb_get.html">docdb_get()</a></code> gains <code>limit</code> parameter to do pagination, for CouchDB, Elasticsearch and MongoDB only (<a href="https://github.com/ropensci/nodbi/issues/17" class="external-link">#17</a>) (<a href="https://github.com/ropensci/nodbi/issues/23" class="external-link">#23</a>)</li>
 <li>gains function <code><a href="../reference/docdb_query.html">docdb_query()</a></code> to send queries to each backend (<a href="https://github.com/ropensci/nodbi/issues/18" class="external-link">#18</a>) (<a href="https://github.com/ropensci/nodbi/issues/22" class="external-link">#22</a>)</li>
 <li>gains function <code><a href="../reference/docdb_exists.html">docdb_exists()</a></code> to check if a database or equivalent exists (<a href="https://github.com/ropensci/nodbi/issues/21" class="external-link">#21</a>) (<a href="https://github.com/ropensci/nodbi/issues/22" class="external-link">#22</a>)</li>
 </ul></div>
-<div class="section level4">
-<h4 id="minor-improvements-0-2-0">MINOR IMPROVEMENTS<a class="anchor" aria-label="anchor" href="#minor-improvements-0-2-0"></a></h4>
+<div class="section level3">
+<h3 id="improvements-0-2-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-2-0"></a></h3>
 <ul><li>Updated package for new version of <code>elastic</code>, which has slightly different setup for connecting to the Elasticsearch instance (<a href="https://github.com/ropensci/nodbi/issues/20" class="external-link">#20</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="nodbi-010">nodbi 0.1.0<small>2018-08-01</small><a class="anchor" aria-label="anchor" href="#nodbi-010"></a></h2>
-<div class="section level4">
-<h4 id="new-features-0-1-0">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-0-1-0"></a></h4>
+<div class="section level3">
+<h3 id="new-features-0-1-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-1-0"></a></h3>
 <ul><li>released to CRAN</li>
 </ul></div>
 </div>

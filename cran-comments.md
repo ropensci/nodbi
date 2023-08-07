@@ -1,14 +1,12 @@
 ## Test environments
 
-* Local: macOS Darwin 21.6.0, R version 4.2.3 (2023-03-15); with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB databases (ok)
+* Local: macOS Darwin 21.6.0, R version 4.2.3 (2023-03-15); with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB (ok)
 
 * macOS builder: r-release-macosx-arm64|4.3.0|macosx|macOS 13.3.1 (22E261)|Mac mini|Apple M1||en_US.UTF-8|macOS 11.3|clang-1403.0.22.14.1|GNU Fortran (GCC) 12.2.0 (ok)
 
-* Win-builder: R Under development (unstable) (2023-05-24 r84463 ucrt) (ok)
+* Win-builder: R Under development (unstable) (2023-08-05 r84874 ucrt) (ok)
 
-* Github Actions: ubuntu-20.04 20230507.1 R version 4.3.0; ubuntu-20.04 20230507.1 R Under development (unstable) (2023-05-18 r84448) (ok)
-
-* R-hub: Windows Server 2022, R-devel, 64 bit (OK)
+* Github Actions: ubuntu-20.04 R version 4.3.1; ubuntu-20.04 R Under development (unstable) (ok)
 
 
 ## R CMD check results
@@ -18,9 +16,12 @@
 
 ## Submission reason
 
-### CHANGES
+### Bug fixes
 
-* replaced a dependency, gained speed
+* removed explicit UTF-8 encoding reference
+* corrected marginal case in `docdb_query.src_duckdb()`
+* corrected minimum R version
+* replaced in tests `httpbin` with `webfakes`
 
 
 ## revdepcheck results
