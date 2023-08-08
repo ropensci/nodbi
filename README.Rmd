@@ -48,7 +48,7 @@ Parameters for `docdb_*()` functions are the same across all database backends. 
 | Get all documents back into a data frame | `nodbi::docdb_get(src = src, key = "my_container")` |
 | Get documents selected with query (as MongoDB-compatible JSON) into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')` |
 | Get selected fields (in MongoDB compatible JSON) from documents selected by query | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
-| Update (patch) selected documents with new data in data frame, list, JSON string, a file name or url pointing to NDJSON records `my_data` | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
+| Update (patch) documents selected by query with new data `my_data` in data frame, list, JSON string, a file name or url pointing to NDJSON records | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
 | Check if container exists | `nodbi::docdb_exists(src = src, key = "my_container")` |
 | List all containers in database | `nodbi::docdb_list(src = src)` |
 | Delete document(s) in container | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')` |

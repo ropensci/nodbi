@@ -125,8 +125,8 @@
 <p>Parameters for <code>docdb_*()</code> functions are the same across all database backends. See <a href="#walk-through">walk-through</a> below and the canonical testing in <a href="./tests/testthat/core-nodbi.R">core-nodbi.R</a>. “Container” is used as term to indicate where conceptually the backend holds the data, see <a href="#database-connections">Database connections</a> below. The <code>key</code> parameter holds the name of a container.</p>
 <table class="table">
 <colgroup>
-<col width="52%">
-<col width="47%">
+<col width="54%">
+<col width="45%">
 </colgroup>
 <thead><tr class="header">
 <th>Purpose</th>
@@ -138,7 +138,7 @@
 <td><code>src &lt;- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(&lt;see below for parameters&gt;)</code></td>
 </tr>
 <tr class="even">
-<td>Load <code>my_data</code> (a data frame, a list, a JSON string, or a file name or url with NDJSON records) into database, container <code>my_container</code>
+<td>Load <code>my_data</code> (a data frame, a list, a JSON string, or a file name or url pointing to NDJSON records) into database, container <code>my_container</code>
 </td>
 <td><code>nodbi::docdb_create(src = src, key = "my_container", value = my_data)</code></td>
 </tr>
@@ -151,12 +151,11 @@
 <td><code>nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')</code></td>
 </tr>
 <tr class="odd">
-<td>Get selected fields (in MongoDB compatible JSON) from documents selected query</td>
+<td>Get selected fields (in MongoDB compatible JSON) from documents selected by query</td>
 <td><code>nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')</code></td>
 </tr>
 <tr class="even">
-<td>Update (patch) selected documents with new data in data frame, list or JSON string from <code>my_data</code>
-</td>
+<td>Update (patch) documents selected by query with new data <code>my_data</code> in data frame, list, JSON string, a file name or url pointing to NDJSON records</td>
 <td><code>nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')</code></td>
 </tr>
 <tr class="odd">
