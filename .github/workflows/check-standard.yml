@@ -91,11 +91,11 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache-version: 2
-          extra-packages: rcmdcheck, covr, sofa, elastic, mongolite, DBI, duckdb, RSQLite, webfakes
+          extra-packages: rcmdcheck, covr, sofa, elastic, mongolite, DBI, duckdb, RSQLite, webfakes, remotes, stringi, jsonlite, uuid, jqr, RPostgres, testthat, withr, callr
 
       # nodbi:
 
-      - name: Install duckdb extension library
+      - name: Install any other deps and duckdb extension library
         run: |
           remotes::install_github("ropensci/nodbi")
           remotes::install_deps(pkgdir = ".", dependencies = TRUE)
