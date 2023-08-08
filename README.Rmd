@@ -44,11 +44,11 @@ Parameters for `docdb_*()` functions are the same across all database backends. 
 | Purpose | Function call |
 |---------------------------------|---------------------------------------|
 | Create database connection (see below) | `src <- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(<see below for parameters>)` |
-| Load `my_data` (a data frame, a list, a JSON string, or a file name or url with NDJSON records) into database, container `my_container` | `nodbi::docdb_create(src = src, key = "my_container", value = my_data)` |
+| Load `my_data` (a data frame, a list, a JSON string, or a file name or url pointing to NDJSON records) into database, container `my_container` | `nodbi::docdb_create(src = src, key = "my_container", value = my_data)` |
 | Get all documents back into a data frame | `nodbi::docdb_get(src = src, key = "my_container")` |
 | Get documents selected with query (as MongoDB-compatible JSON) into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')` |
-| Get selected fields (in MongoDB compatible JSON) from documents selected query | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
-| Update (patch) selected documents with new data in data frame, list or JSON string from `my_data` | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
+| Get selected fields (in MongoDB compatible JSON) from documents selected by query | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}', fields = '{"name": 1, "_id": 0, "age": 1}')` |
+| Update (patch) selected documents with new data in data frame, list, JSON string, a file name or url pointing to NDJSON records `my_data` | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
 | Check if container exists | `nodbi::docdb_exists(src = src, key = "my_container")` |
 | List all containers in database | `nodbi::docdb_list(src = src)` |
 | Delete document(s) in container | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')` |

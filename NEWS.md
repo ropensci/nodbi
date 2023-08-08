@@ -1,3 +1,7 @@
+# nodbi 0.9.6.9000
+
+* new dev version
+
 # nodbi 0.9.6
 
 ## Bug fixes
