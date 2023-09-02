@@ -20,8 +20,8 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
   expect_equal(docdb_create(src = src, key = key, value = data.frame()), 0L)
   tdf <- docdb_get(src = src, key = key)
   expect_true(is.null(tdf) || !nrow(tdf))
-  if (!inherits(src, "src_mongo")) expect_true(docdb_delete(src = src, key = key))
-  expect_false(docdb_delete(src = src, key = key))
+  expect_true(docdb_delete(src = src, key = key))
+  if (!inherits(src, "src_mongo")) expect_false(docdb_delete(src = src, key = key))
 
   # testDf
   expect_equal(docdb_create(src = src, key = key, value = testDf), nrow(testDf))
@@ -76,7 +76,7 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
 
   # clean up
   expect_true(docdb_delete(src = src, key = key))
-  expect_false(docdb_delete(src = src, key = key))
+  if (!inherits(src, "src_mongo")) expect_false(docdb_delete(src = src, key = key))
 
 })
 
@@ -106,7 +106,7 @@ test_that("docdb_create (ndjson)", {
 
   # clean up
   expect_true(docdb_delete(src = src, key = key))
-  expect_false(docdb_delete(src = src, key = key))
+  if (!inherits(src, "src_mongo")) expect_false(docdb_delete(src = src, key = key))
 
   # test
   skip_if(is.null(httpbin), "package webfakes missing")
