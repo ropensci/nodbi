@@ -1,6 +1,7 @@
 # nodbi 0.9.6.9000
 
-* new dev version
+* changed `docdb_update()` to directly use ndjson from file for duckdb
+* corrected test exceptions for mongodb, updated GitHub Actions
 
 # nodbi 0.9.6
 

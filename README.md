@@ -11,7 +11,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2023-08-07.
+updated 2023-09-02.
 
 | Currently, `nodbi` supports as database backends | for an `R` object of any of these data types | for the operations |
 |--------------------------------------------------|----------------------------------------------|--------------------|
