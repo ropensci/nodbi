@@ -330,6 +330,27 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
 #' @export
 docdb_update.src_duckdb <- function(src, key, value, query, ...) {
 
+  # use file based approach
+  if (isFile(value) && (query == "" | query == "{}")) {
+
+    statement <- paste0(
+      'UPDATE "', key, '"
+       SET json = json_merge_patch(json, injson)
+       FROM (SELECT
+        json->>\'$._id\' AS in_id,
+        json_merge_patch(json, \'{\"_id\": null}\') AS injson
+        FROM read_ndjson_objects("', value, '")
+      ) WHERE "', key, '"._id = in_id;'
+    )
+
+    result <- DBI::dbExecute(
+      conn = src$con,
+      statement = statement
+    )
+
+    return(result)
+  }
+
   # see https://duckdb.org/docs/extensions/json#json-creation-functions
   updFunction <- "json_merge_patch"
 
@@ -391,7 +412,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   ids <- gsub("\"", "", as.character(ids))
   ids <- ids[ids != "null"]
   if (length(ids)) {
-    if (query != "") warning(
+    if (query != "" & query != "{}") warning(
       "Ignoring the specified 'query' parameter, using _id's ",
       "found in 'value' to identify documents to be updated")
     value <- jqr::jq(value, ' del(._id) ')

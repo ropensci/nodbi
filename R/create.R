@@ -747,19 +747,15 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
   # import from ndjson file
   result <- try(
     suppressWarnings(
-      DBI::dbWithTransaction(
+      DBI::dbExecute(
         conn = src$con,
-        code = {
-          DBI::dbExecute(
-            conn = src$con,
-            statement = paste0(
-              "INSERT INTO \"", key, "\"",
-              " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
-              " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
-              " json_merge_patch(json, '{\"_id\": null}') AS json ",
-              " FROM read_ndjson_objects('",
-              value, "');"))
-        })
+        statement = paste0(
+          "INSERT INTO \"", key, "\"",
+          " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
+          " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
+          " json_merge_patch(json, '{\"_id\": null}') AS json ",
+          " FROM read_ndjson_objects('",
+          value, "');"))
     ),
     silent = TRUE)
 
