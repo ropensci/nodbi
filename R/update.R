@@ -444,15 +444,29 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     )
 
     # update data
-    result <- result + try(
-      DBI::dbWithTransaction(
-        conn = src$con,
-        code = {
-          DBI::dbExecute(
-            conn = src$con,
-            statement = statement
-          )}), silent = TRUE)
-
+    if (inherits(src$con, "src_duckdb")) {
+      result <- result + try(
+        DBI::dbExecute(
+          conn = src$con,
+          statement = statement
+        ),
+        silent = TRUE
+      )
+    } else {
+      result <- result + try(
+        DBI::dbWithTransaction(
+          conn = src$con,
+          code = {
+            DBI::dbExecute(
+              conn = src$con,
+              statement = statement
+            )
+          }
+        ),
+        silent = TRUE
+      )
+    } # if
+    
   } # for
 
   # return
