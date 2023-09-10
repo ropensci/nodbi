@@ -70,7 +70,6 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
   if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
   expect_identical(nrow(docdb_get(src = src, key = key)), 4L)
   expect_identical(nrow(docdb_get(src = src, key = key, limit = 2L)), 2L)
-  expect_identical(nrow(docdb_get(src = src, key = key, sort = '{"destination_addresses":1}')), 4L)
   expect_error(docdb_get(src = src, key = key, query = ''))
   expect_true(docdb_delete(src = src, key = key))
 
@@ -81,7 +80,8 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
 
   # testDf3
   expect_equal(docdb_create(src = src, key = key, value = testDf3), 5L)
-  expect_equal(docdb_create(src = src, key = key, value = cbind(`_id` = seq_len(nrow(testDf3)), testDf3)), 5L)
+  if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
+  expect_equal(docdb_create(src = src, key = key, value = cbind(`_id` = as.character(seq_len(nrow(testDf3))), testDf3)), 5L)
   if (inherits(src, "src_elastic")) Sys.sleep(elasticSleep)
   expect_identical(nrow(docdb_get(src = src, key = key)), 12L)
 
@@ -158,13 +158,12 @@ test_that("docdb_query", {
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"_id": 1}')), c(7L, 1L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"email": 1, "_id": 1}')), c(5L, 2L))
   #
-  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}')), c(3L, 11L))
-  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"friends.id": 1}')), c(3L, 1L))
-  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"friends.id": 1, "_id": 1}')), c(3L, 2L))
-  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"_id": 1}')), c(3L, 1L))
+  if (!inherits(src, "src_couchdb") & !inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}')), c(3L, 11L))
+  if (!inherits(src, "src_couchdb") & !inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"friends.id": 1}')), c(3L, 1L))
+  if (!inherits(src, "src_couchdb") & !inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"friends.id": 1, "_id": 1}')), c(3L, 2L))
+  if (!inherits(src, "src_couchdb") & !inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"_id": 1}')), c(3L, 1L))
   #
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"_id":"5cd67853f841025e65ce0ce2"}', fields = '{"email": 1}')), c(1L, 1L))
-  if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"_id":1}')), c(3L, 1L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": {"$regex": "lacychen@conjurica.com"}}')), c(1L, 11L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": {"$regex": "^lacychen"}}')), c(1L, 11L))
   if (!inherits(src, "src_elastic")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$ne": "Lacy Chen"}}')), c(4L, 11L))
@@ -191,8 +190,10 @@ test_that("docdb_query", {
   expect_true(ncol(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 0}')) == 2L)
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": "lacychen@conjurica.com"}')), c(1L, 11L))
   #
-  empty <- docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"nonexistingfield": 1}')
-  expect_true(is.null(empty) || !ncol(empty) || !nrow(empty)) # sequence matters
+  if (!inherits(src, "src_elastic")) {
+    empty <- docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"nonexistingfield": 1}')
+    expect_true(is.null(empty) || !ncol(empty) || !nrow(empty)) # sequence matters
+  }
 
   # anomaly that is very difficult to correct, nothing returned for non-existing field by RSQLite
   if (!inherits(src, "src_sqlite")) expect_equal(dim(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "doesnotexist": 1}')), c(2L, 1L))

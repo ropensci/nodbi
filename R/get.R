@@ -46,7 +46,8 @@ docdb_get.src_couchdb <- function(src, key, limit = NULL, ...) {
       as = "json",
       include_docs = TRUE,
       # sorting may not work
-      descending = FALSE
+      descending = FALSE,
+      limit = limit
       # keep only data
     ))[["rows"]][["doc"]][
       # remove _rev column
@@ -101,7 +102,6 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
 
   # check params and use limit
   params <- list(...)
-  if (length(params[["sort"]])) params[["sort"]] <- NULL
   if (is.null(limit)) limit <- 0L
 
   # remove rownames

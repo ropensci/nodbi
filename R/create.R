@@ -183,7 +183,11 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
         value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
       }
     } else {
-      value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
+      if (length(value) == 1L) {
+        value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
+      } else {
+        value <- jsonlite::stream_in(textConnection(value), simplifyVector = FALSE, verbose = FALSE)
+      }
     }
   }
 

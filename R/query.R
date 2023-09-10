@@ -52,7 +52,13 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   # TODO refactor to use jqr in analogy to function dbiGetProcessData
 
   # make dotted parameters accessible
+  limit <- 9999999L
   params <- list(...)
+  if (!is.null(params[["limit"]])) {
+    limit <- params$limit
+    params$limit <- NULL
+  }
+
   # for fields, change from MongoDB to couchdb syntax
   tmpFields <- ""
   if (length(params[["fields"]])) {
@@ -83,9 +89,9 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   if (exists("fields", inherits = FALSE)) {
     query <- paste0(query, ", ", fields)
   }
-  # - add limit and sort
+  # - add limit
   query <- paste0(
-    '{', query, ', "limit": 999999}')
+    '{', query, ', "limit": ', limit, '}')
 
   # get data
   out <- jsonlite::fromJSON(
@@ -127,7 +133,7 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
   # make dotted parameters accessible
   params <- list(...)
   if (!is.null(params[["limit"]])) limit <- params$limit
-  if (is.null(params[["limit"]])) limit <- 10000
+  if (is.null(params[["limit"]])) limit <- 10000L
   # for fields, change from MongoDB to couchdb syntax
   if (length(params[["fields"]])) {
     #
@@ -138,7 +144,7 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
       if (any(grepl("[.]", fields))) message(
         "Note: return root field(s) because subfields cannot be accessed for: ",
         paste0(fields[grepl("[.]", fields)], collapse = ", "))
-      params[["source_includes"]] <- gsub("(.+?)[.].*", "\\1", fields)
+      params[["source_includes"]] <- unique(gsub("(.+?)[.].*", "\\1", fields))
     }
     #
     m <- stringi::stri_match_all_regex(params[["fields"]], '"([-@._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]
