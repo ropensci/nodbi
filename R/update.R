@@ -390,7 +390,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     row.names(value) <- NULL
     if (any(names(value) == "_id")) {
       value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
-      value <- jqr::jq(value, ' .[] ')
+      value <- jqr::jq(value, " .[] ")
     } else {
       # otherwise keep as single document
       value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
@@ -444,7 +444,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     )
 
     # update data
-    if (inherits(src$con, "src_duckdb")) {
+    if (inherits(src, "src_duckdb")) {
       result <- result + try(
         DBI::dbExecute(
           conn = src$con,
@@ -466,7 +466,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
         silent = TRUE
       )
     } # if
-    
+
   } # for
 
   # return

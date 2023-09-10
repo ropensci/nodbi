@@ -53,7 +53,6 @@ src_duckdb <- function(
   }
   #
   tmp <- DBI::dbGetQuery(con, 'SELECT * FROM duckdb_extensions();')
-  if (inherits(tmp, "try-error") || !nrow(tmp)) xtmsg()
   if (nrow(tmp)) tmp <- tmp[tmp[["extension_name"]] == "json", , drop = TRUE]
   if (!tmp$installed) xtmsg()
   if (!tmp$loaded) {
@@ -79,7 +78,7 @@ print.src_duckdb <- function(x, ...) {
     file.size(dbdir))
   dbver <- try(DBI::dbGetQuery(x$con, "PRAGMA version;")[[
     "library_version"]], silent = TRUE)
-  if (inherits(dbver, "try-error")) dbver <- "unknonwn"
+  if (inherits(dbver, "try-error")) dbver <- "unknown"
 
   cat(sprintf(
     "src: duckdb\nDatabase: %s\nSize: %s MB\nVersion: %s",
