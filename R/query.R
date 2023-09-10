@@ -677,6 +677,12 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     if (!length(nonidFs)) {
       statement <- paste0("SELECT '{\"_id\": \"' || _id || '\"}' AS json FROM \"", key, "\" ")
     } else {
+      # include other fields as requested or relevant for any jq statement
+      nonidFs <- unique(unlist(c(
+        nonidFs,
+        rootFields[rootFields != "_id" & rootFields != ""],
+        sapply(subFields, "[[", 1)
+      )))
       statement <- paste0(
         "SELECT json_object('_id', _id, ",
         paste0("'", nonidFs, "', json_extract(json, '$.", nonidFs, "')", collapse = ", "),
@@ -869,7 +875,7 @@ dbiGetProcessData <- function(
       message("Note: paths seem to (partially) overlap as specified in ",
               "'fields', last will be used: ", paste0(fields, collapse = ", "))}
 
-    # compose jq string, target:
+    # compose jq script, target:
     # {"_id", "friends": {"id": [."friends" | (if type != "array" then [.] else .[] end) | ."id"] }}
     # "{\"_id\", \"friends\": {\"id\":  [.\"friends\" | (if type != \"array\" then [.][] else .[] end) | .\"id\"]}}"
     jqFields <- ifelse(!length(rootFields), "", paste0('"', rootFields, '"', collapse = ", "))
@@ -923,8 +929,7 @@ dbiGetProcessData <- function(
     # any fields that were to be included
     rM <- NULL
     m <- stringi::stri_match_all_regex(params[["fields"]], '"([-@._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]
-    if (!is.na(m[1])) rM <- stats::na.omit(match(
-      unique(c(fields, rootFields, unlist(subFields))), names(out)))
+    if (!is.na(m[1])) rM <- stats::na.omit(match(findColumnNames(m, out), names(out)))
     if (length(rM)) out <- out[, rM, drop = FALSE]
     # any fields that were requested to not be included
     rM <- NULL
@@ -1139,4 +1144,42 @@ fieldsSql2fullKey <- function(x) {
 
   # return
   return(x)
+}
+
+
+# map fields and subfields to columns of out
+#' @keywords internal
+#' @noRd
+findColumnNames <- function(m, out) {
+
+  getListNames <- function(x, s = NULL) {
+    if (!is.list(x)) return(s)
+    nms <- names(x)
+    if (is.null(nms)) nms <- ""
+    Map(getListNames, x = x, s = Map(c, list(s), nms))
+  }
+
+  getItems <- function(l) {
+    lapply(l, function(i) if (is.list(i))
+      getItems(i) else unique(paste0(i[i != ""], collapse = ".")))
+  }
+
+  myDf <- getListNames(out[1, , drop = FALSE])
+  myDf <- getItems(myDf)
+
+  outDf <- data.frame(
+    "name" = names(myDf),
+    "value" = names(myDf))
+
+  for (i in seq_along(myDf)) {
+    subDf <- unlist(myDf[[i]], use.names = FALSE)
+    subDf <- data.frame(
+      "name" = names(myDf)[i],
+      "value" = subDf)
+    outDf <- rbind(outDf, subDf, make.row.names = FALSE)
+  }
+  outDf <- unique(outDf)
+
+  return(unique(outDf$name[outDf$value %in% m]))
+
 }
