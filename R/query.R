@@ -436,7 +436,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   ## special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    # get all fullkeys and types
+    # get keys in top-level JSON object
     fields <- DBI::dbGetQuery(
       conn = src$con,
       statement = paste0(
@@ -445,7 +445,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
       ))[, 1, drop = TRUE]
 
     # return field names
-    return(fields)
+    return(sort(fields))
   }
 
   ## add limit if not in params
@@ -583,12 +583,12 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     fields <- DBI::dbGetQuery(
       conn = src$con,
       statement = paste0(
-        "SELECT DISTINCT json_structure(json)",
+        "SELECT DISTINCT json_group_structure(json)",
         " FROM \"", key, "\";"
       ))[, 1, drop = TRUE]
 
     # mangle from json
-    fields <- unique(names(jsonlite::fromJSON(txt = fields)))
+    fields <- sort(unique(names(unlist(jsonlite::fromJSON(fields)))))
 
     # return field names
     return(fields)
