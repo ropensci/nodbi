@@ -1,7 +1,12 @@
 # nodbi 0.9.6.9000
 
 * changed `docdb_update()` to directly use ndjson from file for duckdb
-* corrected test exceptions for mongodb, updated GitHub Actions
+* regression error from not specifying top-level jq script
+* corrected and improve field selection in `docdb_query()`
+* corrected test exceptions for mongodb, updated GitHub Actions, expanded tests
+* changed `docdb_update()` to directly use ndjson from file for duckdb
+* cleaned up unnecessary code in `docdb_create()`
+* no more using transactions with `src_duckdb()`
 
 # nodbi 0.9.6
 
