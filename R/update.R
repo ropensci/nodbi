@@ -81,7 +81,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
 
   # merge json with value
   value <- jqr::jq(paste0(
-    "[",  jqr::jq(textConnection(ndjson)),
+    "[",  jqr::jq(textConnection(ndjson), "."),
     ",", value, "]"), ' reduce .[] as $item ({}; . * $item) ')
 
   # jqr output to list
@@ -195,9 +195,9 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # check other inputs
   if (isFile(value)) {
-    value <- jqr::jq(file(value), flags = jqr::jq_flags(pretty = FALSE))
+    value <- jqr::jq(file(value), ".", flags = jqr::jq_flags(pretty = FALSE))
   } else if (isUrl(value)) {
-    value <- jqr::jq(url(value), flags = jqr::jq_flags(pretty = FALSE))
+    value <- jqr::jq(url(value), ".", flags = jqr::jq_flags(pretty = FALSE))
   }
 
   # handle potential json string input
@@ -219,7 +219,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     row.names(value) <- NULL
     if (any(names(value) == "_id")) {
       value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE)
-      value <- jqr::jq(value, ' .[] ')
+      value <- jqr::jq(value, " .[] ")
     } else {
       # otherwise keep as single document
       value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE)
@@ -236,7 +236,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # get doc ids to update
   # bulk update: if ids are in value, query is ignored
-  ids <- try(jqr::jq(value, ' ._id '), silent = TRUE)
+  ids <- try(jqr::jq(value, " ._id "), silent = TRUE)
   if (inherits(ids, "try-error")) ids <- NULL
   ids <- gsub("\"", "", as.character(ids))
   ids <- ids[ids != "null"]
@@ -244,7 +244,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     if (query != "") warning(
       "Ignoring the specified 'query' parameter, using _id's ",
       "found in 'value' to identify documents to be updated")
-    value <- jqr::jq(value, ' del(._id) ')
+    value <- jqr::jq(value, " del(._id) ")
     ids <- paste0('{"_id":"', ids, '"}')
   } else {
     if (length(value) > 1L) {
@@ -367,9 +367,9 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   # check other inputs
   # note value can now be a vector
   if (isFile(value)) {
-    value <- jqr::jq(file(value), flags = jqr::jq_flags(pretty = FALSE))
+    value <- jqr::jq(file(value), ".", flags = jqr::jq_flags(pretty = FALSE))
   } else if (isUrl(value)) {
-    value <- jqr::jq(url(value), flags = jqr::jq_flags(pretty = FALSE))
+    value <- jqr::jq(url(value), ".", flags = jqr::jq_flags(pretty = FALSE))
   }
 
   # handle potential json string input
@@ -407,7 +407,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # get doc ids to update
   # bulk update: if ids are in value, query is ignored
-  ids <- try(jqr::jq(value, ' ._id '), silent = TRUE)
+  ids <- try(jqr::jq(value, " ._id "), silent = TRUE)
   if (inherits(ids, "try-error")) ids <- NULL
   ids <- gsub("\"", "", as.character(ids))
   ids <- ids[ids != "null"]
@@ -415,7 +415,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     if (query != "" & query != "{}") warning(
       "Ignoring the specified 'query' parameter, using _id's ",
       "found in 'value' to identify documents to be updated")
-    value <- jqr::jq(value, ' del(._id) ')
+    value <- jqr::jq(value, " del(._id) ")
   } else {
     ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
   }
