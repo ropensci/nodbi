@@ -1170,7 +1170,7 @@ findColumnNames <- function(m, out) {
       getItems(i) else unique(paste0(i[i != ""], collapse = ".")))
   }
 
-  myDf <- getListNames(out[1, , drop = FALSE])
+  myDf <- getListNames(out)
   myDf <- getItems(myDf)
 
   outDf <- data.frame(
