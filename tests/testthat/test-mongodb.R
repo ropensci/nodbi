@@ -8,13 +8,16 @@ test_that("Source", {
     testKey <- createKey()
     testSrc <- src_mongo(collection = testKey)
     return(list(testKey = testKey, testSrc = testSrc))
-    }
+  }
 
   # test database set up
   tmp <- dbSrcKey()
   expect_is(tmp$testSrc, "docdb_src")
   expect_is(tmp$testSrc, "src_mongo")
   expect_output(print(tmp$testSrc), "MongoDB")
+  expect_warning(
+    docdb_get(tmp$testSrc, key = uuid::UUIDgenerate()),
+    "differ.*using")
   rm(tmp)
 
   # run generic (database independent) tests
