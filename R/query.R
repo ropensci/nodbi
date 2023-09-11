@@ -1158,34 +1158,38 @@ fieldsSql2fullKey <- function(x) {
 #' @noRd
 findColumnNames <- function(m, out) {
 
-  getListNames <- function(x, s = NULL) {
-    if (!is.list(x)) return(s)
-    nms <- names(x)
-    if (is.null(nms)) nms <- ""
-    Map(getListNames, x = x, s = Map(c, list(s), nms))
+  assert(out, "data.frame")
+  
+  firstOfRun <- function(x) {
+    s <- sub("[0-9]+$", "", x)
+    i <- sub(".*([0-9]+)$", "\\1", x)
+    i <- suppressWarnings(as.integer(i))
+    rl <- rle(i)[["values"]]
+    return(s[is.na(rl) | rl == 1L])
   }
-
-  getItems <- function(l) {
-    lapply(l, function(i) if (is.list(i))
-      getItems(i) else unique(paste0(i[i != ""], collapse = ".")))
-  }
-
-  myDf <- getListNames(out)
-  myDf <- getItems(myDf)
-
-  outDf <- data.frame(
-    "name" = names(myDf),
-    "value" = names(myDf))
-
-  for (i in seq_along(myDf)) {
-    subDf <- unlist(myDf[[i]], use.names = FALSE)
-    subDf <- data.frame(
-      "name" = names(myDf)[i],
-      "value" = subDf)
-    outDf <- rbind(outDf, subDf, make.row.names = FALSE)
-  }
-  outDf <- unique(outDf)
-
-  return(unique(outDf$name[outDf$value %in% m]))
-
+  
+  topLevel <- setNames(names(out), names(out))
+  
+  namesRootSubitems <- lapply(
+    seq_len(ncol(out)),
+    function(s) {
+      lapply(
+        seq_along(names(out[s])),
+        function(i) {
+          u <- names(unlist(out[s][i], recursive = TRUE, use.names = TRUE))
+          u <- firstOfRun(u)
+          u <- u[!duplicated(u)]
+          setNames(u, rep(names(out[s])[i], length(u)))
+        }
+      )
+    }
+  )
+  
+  namesRootSubitems <- unlist(namesRootSubitems)
+  namesRootSubitems <- c(topLevel, namesRootSubitems)
+  namesRootSubitems <- namesRootSubitems[!duplicated(namesRootSubitems)]
+  
+  return(unique(names(namesRootSubitems[namesRootSubitems %in% m])))
+  
 }
+
