@@ -1159,37 +1159,34 @@ fieldsSql2fullKey <- function(x) {
 findColumnNames <- function(m, out) {
 
   assert(out, "data.frame")
-  
+
   firstOfRun <- function(x) {
     s <- sub("[0-9]+$", "", x)
-    i <- sub(".*([0-9]+)$", "\\1", x)
+    i <- sub(".*?([0-9]+)$", "\\1", x)
     i <- suppressWarnings(as.integer(i))
     rl <- rle(i)[["values"]]
     return(s[is.na(rl) | rl == 1L])
   }
-  
-  topLevel <- setNames(names(out), names(out))
-  
-  namesRootSubitems <- lapply(
+
+  namesSubItems <- lapply(
     seq_len(ncol(out)),
     function(s) {
       lapply(
         seq_along(names(out[s])),
         function(i) {
-          u <- names(unlist(out[s][i], recursive = TRUE, use.names = TRUE))
-          u <- firstOfRun(u)
+          u <- c(
+            names(out[s])[i],
+            firstOfRun(names(unlist(out[s][i], recursive = FALSE, use.names = TRUE))),
+            firstOfRun(names(unlist(out[s][i], recursive = TRUE, use.names = TRUE)))
+          )
           u <- u[!duplicated(u)]
-          setNames(u, rep(names(out[s])[i], length(u)))
+          stats::setNames(u, rep(names(out[s])[i], length(u)))
         }
-      )
-    }
-  )
-  
-  namesRootSubitems <- unlist(namesRootSubitems)
-  namesRootSubitems <- c(topLevel, namesRootSubitems)
-  namesRootSubitems <- namesRootSubitems[!duplicated(namesRootSubitems)]
-  
-  return(unique(names(namesRootSubitems[namesRootSubitems %in% m])))
-  
-}
+      )})
 
+  namesSubItems <- unlist(namesSubItems)
+  namesSubItems <- namesSubItems[!duplicated(namesSubItems)]
+
+  return(unique(names(namesSubItems[namesSubItems %in% m])))
+
+}
