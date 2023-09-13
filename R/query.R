@@ -1160,33 +1160,22 @@ findColumnNames <- function(m, out) {
 
   assert(out, "data.frame")
 
-  firstOfRun <- function(x) {
-    s <- sub("[0-9]+$", "", x)
-    i <- sub(".*?([0-9]+)$", "\\1", x)
-    i <- suppressWarnings(as.integer(i))
-    rl <- rle(i)[["values"]]
-    return(s[is.na(rl) | rl == 1L])
-  }
-
   namesSubItems <- lapply(
     seq_len(ncol(out)),
     function(s) {
-      lapply(
-        seq_along(names(out[s])),
-        function(i) {
-          u <- c(
-            names(out[s])[i],
-            firstOfRun(names(unlist(out[s][i], recursive = FALSE, use.names = TRUE))),
-            firstOfRun(names(unlist(out[s][i], recursive = TRUE, use.names = TRUE)))
-          )
-          u <- u[!duplicated(u)]
-          stats::setNames(u, rep(names(out[s])[i], length(u)))
-        }
-      )})
+      tmp <- jqr::jq(
+        jsonlite::toJSON(out[1, s, drop = FALSE]),
+        ' [ paths | map(select(type != "number")) | select(length > 0) | join(".") ] | unique | .[] ')
+      class(tmp) <- "character"
+      tmp <- gsub('"', "", tmp)
+      unique(c(names(out)[s], tmp))
+    }
+  )
 
-  namesSubItems <- unlist(namesSubItems)
-  namesSubItems <- namesSubItems[!duplicated(namesSubItems)]
+  namesOut <- sapply(seq_along(namesSubItems),
+                     function(i) if (any(m %in% namesSubItems[[i]])) i)
+  namesOut <- unlist(namesOut)
 
-  return(unique(names(namesSubItems[namesSubItems %in% m])))
+  return(names(out)[namesOut])
 
 }
