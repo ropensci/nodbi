@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/nodbi)](https://CRAN.R-project.org/package=nodbi)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-09-02.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-09-13.
 
 | Currently, `nodbi` supports as database backends | for an `R` object of any of these data types | for the operations |
 |------------------------|------------------------|------------------------|
@@ -315,7 +315,7 @@ testFunction <- function(src, key, value, query, fields) {
   docdb_update(src, key, value = value, query = query)
 }
 
-# 2023-07-28 with 2015 mobile hardware, databases via homebrew
+# 2023-09-13 with 2015 mobile hardware, databases via homebrew
 rbenchmark::benchmark(
   MongoDB = testFunction(src = srcMongo, key, value, query, fields),
   SQLite = testFunction(src = srcSqlite, key, value, query, fields),
@@ -327,12 +327,12 @@ rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 #         test replications elapsed
-# 4    CouchDB           10   247.0
-# 6     DuckDB           10     3.4
-# 3    Elastic           10    50.7 # 10s to be subtracted
-# 1    MongoDB           10     3.1
-# 5 PostgreSQL           10     3.9
-# 2     SQLite           10     3.3
+# 4    CouchDB           10   244.0
+# 3    Elastic           10    52.8 # 10s to be subtracted
+# 5 PostgreSQL           10     2.9
+# 2     SQLite           10     2.4
+# 6     DuckDB           10     2.3
+# 1    MongoDB           10     2.0
 ```
 
 ## Testing
@@ -340,24 +340,25 @@ rbenchmark::benchmark(
 Every database backend is subjected to identical tests, see [core-nodbi.R](./tests/testthat/core-nodbi.R). 
 
 ```{r}
-# 2023-07-28
+# 2023-09-13
 testthat::test_local()
 # ✔ | F W S  OK | Context
-# ✔ |     1  95 | couchdb [90.6s]                                                                 
-# ✔ |       121 | duckdb [5.3s]                                                                   
-# ✔ |     2  66 | elastic [82.7s]                                                                 
-# ✔ |       120 | mongodb [5.9s]                                                                  
-# ✔ |       124 | postgres [36.9s]                                                                
-# ✔ |       123 | sqlite [36.0s]                                                                  
+# ✔ |     2 107 | couchdb [78.8s]                                                                  
+# ✔ |       144 | duckdb [3.8s]                                                                    
+# ✔ |     3  72 | elastic [78.3s]                                                                  
+# ✔ |     1 137 | mongodb [4.0s]                                                                   
+# ✔ |       147 | postgres [31.7s]                                                                 
+# ✔ |       146 | sqlite [28.2s]                                                                   
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════════════
-# Duration: 257.6 s
+# ══ Results ══════════════════════════════════════════════════════════════════════════════════════
+# Duration: 225.3 s
 # 
-# ── Skipped tests (3) ───────────────────────────────────────────────────────────────────────────
-# • bulk updates not yet implemented (2): core-nodbi.R:248:3, core-nodbi.R:248:3
-# • queries need to be translated into elastic syntax (1): core-nodbi.R:180:3
+# ── Skipped tests (6) ────────────────────────────────────────────────────────────────────────────
+# • auto disconnect not relevant (3): core-nodbi.R:429:5, core-nodbi.R:429:5, core-nodbi.R:429:5
+# • bulk updates not yet implemented (2): core-nodbi.R:287:3, core-nodbi.R:287:3
+# • queries need to be translated into elastic syntax (1): core-nodbi.R:207:3
 # 
-# [ FAIL 0 | WARN 0 | SKIP 3 | PASS 649 ]
+# [ FAIL 0 | WARN 0 | SKIP 6 | PASS 753 ]
 ```
 
 ## Notes
