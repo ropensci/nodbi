@@ -315,7 +315,7 @@ testFunction <- function(src, key, value, query, fields) {
   docdb_update(src, key, value = value, query = query)
 }
 
-# 2023-09-13 with 2015 mobile hardware, databases via homebrew
+# 2023-09-17 with 2015 mobile hardware, databases via homebrew
 rbenchmark::benchmark(
   MongoDB = testFunction(src = srcMongo, key, value, query, fields),
   SQLite = testFunction(src = srcSqlite, key, value, query, fields),
@@ -327,12 +327,12 @@ rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 #         test replications elapsed
-# 4    CouchDB           10   244.0
-# 3    Elastic           10    52.8 # 10s to be subtracted
-# 5 PostgreSQL           10     2.9
-# 2     SQLite           10     2.4
-# 6     DuckDB           10     2.3
-# 1    MongoDB           10     2.0
+# 4    CouchDB           10   245.4
+# 3    Elastic           10    50.5 # 10s to be subtracted
+# 5 PostgreSQL           10     3.2
+# 6     DuckDB           10     2.4
+# 2     SQLite           10     2.3
+# 1    MongoDB           10     1.9
 ```
 
 ## Testing

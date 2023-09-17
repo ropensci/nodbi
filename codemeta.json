@@ -4,11 +4,11 @@
   "identifier": "nodbi",
   "description": "Simplified document database access and manipulation, providing a common API across supported 'NoSQL' databases 'Elasticsearch', 'CouchDB', 'MongoDB' as well as 'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.",
   "name": "nodbi: 'NoSQL' Database Connector",
-  "relatedLink": "https://docs.ropensci.org/nodbi/",
+  "relatedLink": ["https://docs.ropensci.org/nodbi/", "https://CRAN.R-project.org/package=nodbi"],
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -255,8 +255,9 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "528.521KB",
+  "fileSize": "533.833KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
-  "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"]
+  "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"],
+  "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#stable"
 }

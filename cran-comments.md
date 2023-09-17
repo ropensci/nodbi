@@ -2,9 +2,11 @@
 
 * Local: macOS Darwin 21.6.0, R version 4.2.3 (2023-03-15); with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB (ok)
 
-* macOS builder: r-release-macosx-arm64|4.3.0|macosx|macOS 13.3.1 (22E261)|Mac mini|Apple M1||en_US.UTF-8|macOS 11.3|clang-1403.0.22.14.1|GNU Fortran (GCC) 12.2.0 (ok)
+* macOS builder: r-release-macosx-arm64|4.3.0|macosx|macOS 13.3.1 (22E261)|Mac mini|Apple M1||en_US.UTF-8|macOS 11.3|clang-1403.0.22.14.1|GNU Fortran (GCC) 12.2.0  (ok)
 
-* Win-builder: R Under development (unstable) (2023-08-05 r84874 ucrt) (ok)
+* rhub builder: Windows Server 2022, R-devel, 64 bit; Ubuntu Linux 20.04.1 LTS, R-release, GCC; Fedora Linux, R-devel, clang, gfortran (ok)
+
+* Win-builder: R version 4.2.3 (2023-03-15 ucrt); R Under development (unstable) (2023-09-08 r85113 ucrt); R version 4.3.1 (2023-06-16 ucrt) (ok)
 
 * Github Actions: ubuntu-20.04 R version 4.3.1; ubuntu-20.04 R Under development (unstable) (ok)
 
@@ -18,10 +20,12 @@
 
 ### Bug fixes
 
-* removed explicit UTF-8 encoding reference
-* corrected marginal case in `docdb_query.src_duckdb()`
-* corrected minimum R version
-* replaced in tests `httpbin` with `webfakes`
+* regression error from not specifying top-level jq script
+* corrected test exceptions for mongodb, updated GitHub Actions
+* changed `docdb_update()` to directly use ndjson from file for duckdb
+* cleaned up unnecessary code in `docdb_create()`
+* corrected and improved field selection in `docdb_query()`
+* corrected test exceptions for mongodb, updated GitHub Actions, expanded tests
 
 
 ## revdepcheck results

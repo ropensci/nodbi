@@ -1,4 +1,4 @@
-# nodbi 0.9.6.9000
+# nodbi 0.9.7
 
 * changed `docdb_update()` to directly use ndjson from file for duckdb
 * regression error from not specifying top-level jq script
