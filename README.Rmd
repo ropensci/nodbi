@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/nodbi)](https://CRAN.R-project.org/package=nodbi)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-09-13.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-09-17.
 
 | Currently, `nodbi` supports as database backends | for an `R` object of any of these data types | for the operations |
 |------------------------|------------------------|------------------------|
