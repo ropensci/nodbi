@@ -163,15 +163,16 @@ sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
 
   # get data, write to file in ndjson format
   writeLines(
-    paste0(
-      # protect against empty query result
-      "",
-     # eliminate rows without any json
-      stats::na.omit(
-        DBI::dbGetQuery(
-        conn = src$con,
-        statement = statement,
-        n = n)[["json"]])),
+    stringi::stri_replace_all_fixed(
+      str = paste0(
+        "", # protect against empty query result
+        stats::na.omit(  # eliminate rows without json
+          DBI::dbGetQuery(
+            conn = src$con,
+            statement = statement,
+            n = n)[["json"]])),
+      pattern = "\n",
+      replacement = "\\n"),
     con = tfnameCon,
     sep = "\n",
     useBytes = TRUE)

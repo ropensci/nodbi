@@ -660,7 +660,8 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
       if (!nrow(value)) return(0L)
 
       writeLines(
-        text = value[["json"]],
+        text = stringi::stri_replace_all_fixed(
+          str = value[["json"]], pattern = "\n", replacement = "\\n"),
         con = tfnameCon,
         sep = "\n",
         useBytes = TRUE)
