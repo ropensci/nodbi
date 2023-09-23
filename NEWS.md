@@ -1,3 +1,7 @@
+# nodbi 0.9.8
+
+* escaping newline character within a JSON value, in `docdb_*()` functions
+
 # nodbi 0.9.7
 
 * changed `docdb_update()` to directly use ndjson from file for duckdb

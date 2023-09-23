@@ -20,12 +20,7 @@
 
 ### Bug fixes
 
-* regression error from not specifying top-level jq script
-* corrected test exceptions for mongodb, updated GitHub Actions
-* changed `docdb_update()` to directly use ndjson from file for duckdb
-* cleaned up unnecessary code in `docdb_create()`
-* corrected and improved field selection in `docdb_query()`
-* corrected test exceptions for mongodb, updated GitHub Actions, expanded tests
+* adding escaping newline character which some users had within a JSON value
 
 
 ## revdepcheck results

@@ -80,7 +80,7 @@ contacts <- '
     "eyeColor": "green",
     "name": "Lacy Chen",
     "email": "lacychen@conjurica.com",
-    "about": "Sunt consequat ad dolore. Exercitation nisi reprehenderit.",
+    "about": "Sunt consequat ad dolore.\\nExercitation nisi reprehenderit.",
     "registered": "2014-08-03T12:11:54 -02:00",
     "tags": [
       "nulla",

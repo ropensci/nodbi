@@ -10,15 +10,16 @@
 |collate  |en_GB.UTF-8                                |
 |ctype    |en_GB.UTF-8                                |
 |tz       |Europe/Berlin                              |
-|date     |2023-09-17                                 |
+|date     |2023-09-23                                 |
 |rstudio  |2023.06.2+561 Mountain Hydrangea (desktop) |
-|pandoc   |3.1.7 @ /usr/local/bin/ (via rmarkdown)    |
+|pandoc   |3.1.7 @ /usr/local/bin/pandoc              |
 
 # Dependencies
 
 |package |old   |new   |Δ  |
 |:-------|:-----|:-----|:--|
-|nodbi   |0.9.6 |0.9.7 |*  |
+|nodbi   |0.9.7 |0.9.8 |*  |
+|jqr     |NA    |1.3.0 |*  |
 
 # Revdeps
 
