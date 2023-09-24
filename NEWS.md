@@ -1,3 +1,7 @@
+# nodbi 0.9.8.9000
+
+* new deve version
+
 # nodbi 0.9.8
 
 * escaping newline character within a JSON value, in `docdb_*()` functions
