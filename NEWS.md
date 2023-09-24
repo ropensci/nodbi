@@ -1,20 +1,23 @@
 # nodbi 0.9.8.9000
 
-* new deve version
+* new dev version
 
 # nodbi 0.9.8
 
+## Bug fixes
 * escaping newline character within a JSON value, in `docdb_*()` functions
 
 # nodbi 0.9.7
 
-* changed `docdb_update()` to directly use ndjson from file for duckdb
-* regression error from not specifying top-level jq script
-* corrected and improve field selection in `docdb_query()`
-* corrected test exceptions for mongodb, updated GitHub Actions, expanded tests
+## Changes
 * changed `docdb_update()` to directly use ndjson from file for duckdb
 * cleaned up unnecessary code in `docdb_create()`
 * no more using transactions with `src_duckdb()`
+
+## Bug fixes
+* regression error from not specifying top-level jq script
+* corrected and improve field selection in `docdb_query()`
+* corrected test exceptions for mongodb, updated GitHub Actions, expanded tests
 
 # nodbi 0.9.6
 
