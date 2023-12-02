@@ -121,7 +121,13 @@ docdb_delete.src_mongo <- function(src, key, ...) {
       just_one = FALSE)
   } else {
     # delete collection with metadata
-    result <- src$con$drop()
+    before <- any(key == docdb_list(src = src)) &
+      docdb_exists(src = src, key = key)
+    if (!before) return(FALSE)
+    src$con$drop()
+    after <- any(key == docdb_list(src = src)) &
+      docdb_exists(src = src, key = key)
+    result <- before & !after
   }
   return(as.logical(result))
 }
