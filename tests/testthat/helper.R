@@ -2,7 +2,7 @@
 #### params for tests ####
 
 # delay needed
-elasticSleep <- 1L # seconds
+elasticSleep <- 2L # seconds
 
 # Warning (core-nodbi.R:176:3): docdb_update, docdb_query
 # Changing language has no effect when envvar LANG='C'
