@@ -1,6 +1,20 @@
-# nodbi 0.9.8.9000
+# nodbi 0.9.8.9001
 
-* new dev version
+## Changes
+
+* reimplementation of `docdb_query` to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB) 
+* `query` can now be complex (nested, various operators) and is digested with a Javascript helper
+* `fields` can now be nested fields (e.g., `friends.name`) and directly returns value lifted from the nested field 
+* `listfields` parameter newly implemented to return all dot paths for fields of all or selected documents in collection 
+* expanded use of `jqr` for mangling parameters, selecting documents, filtering fields and lifting nested field values
+* `docdb_query(src, key, query = {}, fields = {})` now delegates to `docdb_get(src, key)`
+* workaround for path collisions of MongoDB
+* some acceleration of `docdb_query`
+* factored out common code 
+* expanded testing
+* updated docs
+
+## Bug fixes
 
 # nodbi 0.9.8
 

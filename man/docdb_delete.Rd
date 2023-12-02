@@ -12,23 +12,22 @@ docdb_delete(src, key, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
 a table name for DuckDb, SQLite and PostgreSQL)}
 
-\item{...}{Optionally, specify \code{query} parameter with
-a JSON query as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
+\item{...}{Optionally, specify \code{query} parameter with a
+JSON query as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
 If not specified, the default is to delete the container \code{key}.
 
 Other parameters are passed on to functions:
 \itemize{
-\item MongoDB: ignored
-\item SQLite: ignored
-\item Elasticsearch: ignored
+\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}$remove
+\item SQLite: \code{\link[DBI:dbExecute]{DBI::dbExecute()}} or \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}
+\item Elasticsearch: \code{\link[elastic:docs_delete]{elastic::docs_delete()}} or \code{\link[elastic:indices]{elastic::index_delete()}}
 \item CouchDB: \code{\link[sofa:db_delete]{sofa::db_delete()}} or \code{\link[sofa:doc_delete]{sofa::doc_delete()}}
-\item PostgreSQL: ignored
-\item DuckDB: ignored
+\item PostgreSQL: \code{\link[DBI:dbExecute]{DBI::dbExecute()}} or \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}
+\item DuckDB: \code{\link[DBI:dbExecute]{DBI::dbExecute()}} or \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}
 }}
 }
 \value{

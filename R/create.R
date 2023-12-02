@@ -22,14 +22,13 @@
 #' [src_duckdb()] or [src_postgres()]
 #'
 #' @param key (character) The name of the container in the
-#' database backend
-#' (corresponds to `collection` for MongoDB,
-#' `dbname` for CouchDB, `index` for Elasticsearch and to
+#' database backend (corresponds to `collection` for MongoDB,
+#' `dbname` for CouchDB, `index` for Elasticsearch, and to
 #' a table name for DuckDb, SQLite and PostgreSQL)
 #'
 #' @param value The data to be created in the database:
-#' a single data.frame, a JSON string, a list,
-#' or a file name or URL that points to NDJSON documents
+#' a single data.frame, a JSON string, a list, or a
+#' file name or URL that points to NDJSON documents
 #'
 #' @param ... Passed to functions:
 #' - CouchDB: [sofa::db_bulk_create()]
@@ -84,7 +83,9 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
       }
     }
     row.names(value) <- NULL
-    value <- jsonlite::fromJSON(jsonlite::toJSON(value, auto_unbox = TRUE), simplifyVector = FALSE)
+    value <- jsonlite::fromJSON(
+      jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA),
+      simplifyVector = FALSE)
   } # if data.frame
 
   # convert JSON string to list
@@ -211,6 +212,7 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
     doc_ids = docids,
     es_ids = FALSE,
     quiet = TRUE,
+    query = list(refresh = TRUE),
     ...
   )
 
@@ -293,7 +295,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       ndjson <- NULL
       jsonlite::stream_out(
         value, con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE)
+        verbose = FALSE, auto_unbox = TRUE, digits = NA)
       value <- ndjson
     } # if data.frame
 
@@ -311,9 +313,10 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       row.names(value) <- NULL
       ndjson <- NULL
       jsonlite::stream_out(
-        jsonlite::fromJSON(jsonlite::toJSON(value, auto_unbox = TRUE)),
+        jsonlite::fromJSON(
+          jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
         con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE)
+        verbose = FALSE, auto_unbox = TRUE, digits = NA)
       value <- ndjson
     }
 
@@ -425,7 +428,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
       jsonlite::stream_out(
         value[, -match("_id", names(value)), drop = FALSE],
         con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE)
+        verbose = FALSE, auto_unbox = TRUE, digits = NA)
       value[["json"]] <- ndjson
       # remove original columns
       value <- value[, c("_id", "json"), drop = FALSE]
@@ -540,7 +543,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
       jsonlite::stream_out(
         value[, -match("_id", names(value)), drop = FALSE],
         con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE)
+        verbose = FALSE, auto_unbox = TRUE, digits = NA)
       value[["json"]] <- ndjson
       # remove original columns
       value <- value[, c("_id", "json"), drop = FALSE]
@@ -585,7 +588,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
   if (!docdb_exists(src, key, ...)) {
 
     # standard for a nodbi json table in duckdb
-    # standard: columns _id and json
+    # columns _id and json
     out <- try(
       DBI::dbWithTransaction(
         conn = src$con,
@@ -622,7 +625,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
     # temporary file and connection
     tfname <- tempfile()
-    tfnameCon <- file(tfname, open = "wt", encoding = "native.enc")
+    tfnameCon <- file(tfname, open = "wt")
     # register to close and remove file after used for streaming
     on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
     on.exit(unlink(tfname), add = TRUE)
@@ -693,7 +696,8 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
             (is.data.frame(value)) && !nrow(value)) return(0L)
 
         jsonlite::stream_out(
-          jsonlite::fromJSON(jsonlite::toJSON(value, auto_unbox = TRUE)),
+          jsonlite::fromJSON(
+            jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
           con = tfnameCon,
           verbose = FALSE,
           auto_unbox = TRUE)

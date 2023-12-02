@@ -12,14 +12,13 @@ docdb_update(src, key, value, query, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
 a table name for DuckDb, SQLite and PostgreSQL)}
 
 \item{value}{The data to be created in the database:
-a single data.frame, a JSON string, a list,
-or a file name or URL that points to NDJSON documents}
+a single data.frame, a JSON string, a list, or a
+file name or URL that points to NDJSON documents}
 
 \item{query}{(character) A JSON query string to
 identify the documents that should be updated
@@ -47,13 +46,14 @@ Documents are updated by patching their JSON with
 Documents are identified by the \code{query} or
 by \verb{_id}'s in \code{value}, where the latter takes
 precedence.
-\code{value} can have multiple documents and \verb{_id}'s,
-which then are used for iterative updating.
+\code{value} can have multiple documents and
+\verb{_id}'s, which then are used for iterative updating.
 }
 \details{
-Uses native functions with MongoDB, SQLite, DuckDB
-and Elasticsearch; a \code{plpgsql} function added to
-PostgreSQL; and \link{jqr} for CouchDB.
+Uses native functions with MongoDB, SQLite, and
+DuckDB; delete and create with Elasticsearch;
+a \code{plpgsql} function added to PostgreSQL;
+and \link{jqr} for CouchDB.
 }
 \examples{
 \dontrun{

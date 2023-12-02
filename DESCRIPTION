@@ -4,7 +4,7 @@ Description: Simplified document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.9.8.9000
+Version: 0.9.8.9001
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",

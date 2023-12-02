@@ -12,14 +12,13 @@ docdb_create(src, key, value, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
 a table name for DuckDb, SQLite and PostgreSQL)}
 
 \item{value}{The data to be created in the database:
-a single data.frame, a JSON string, a list,
-or a file name or URL that points to NDJSON documents}
+a single data.frame, a JSON string, a list, or a
+file name or URL that points to NDJSON documents}
 
 \item{...}{Passed to functions:
 \itemize{

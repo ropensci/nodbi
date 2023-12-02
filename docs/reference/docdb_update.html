@@ -4,8 +4,8 @@ value.
 Documents are identified by the query or
 by _id's in value, where the latter takes
 precedence.
-value can have multiple documents and _id's,
-which then are used for iterative updating."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
+value can have multiple documents and
+_id's, which then are used for iterative updating."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
@@ -23,7 +23,7 @@ which then are used for iterative updating."><!-- mathjax --><script src="https:
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.8.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.8.9001</span>
       </span>
     </div>
 
@@ -60,8 +60,8 @@ which then are used for iterative updating."><!-- mathjax --><script src="https:
 Documents are identified by the <code>query</code> or
 by <code>_id</code>'s in <code>value</code>, where the latter takes
 precedence.
-<code>value</code> can have multiple documents and <code>_id</code>'s,
-which then are used for iterative updating.</p>
+<code>value</code> can have multiple documents and
+<code>_id</code>'s, which then are used for iterative updating.</p>
     </div>
 
     <div id="ref-usage">
@@ -78,16 +78,15 @@ which then are used for iterative updating.</p>
 
 <dt>key</dt>
 <dd><p>(character) The name of the container in the
-database backend
-(corresponds to <code>collection</code> for MongoDB,
-<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch and to
+database backend (corresponds to <code>collection</code> for MongoDB,
+<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch, and to
 a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>value</dt>
 <dd><p>The data to be created in the database:
-a single data.frame, a JSON string, a list,
-or a file name or URL that points to NDJSON documents</p></dd>
+a single data.frame, a JSON string, a list, or a
+file name or URL that points to NDJSON documents</p></dd>
 
 
 <dt>query</dt>
@@ -117,9 +116,10 @@ see examples below and in <code><a href="docdb_query.html">docdb_query()</a></co
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Uses native functions with MongoDB, SQLite, DuckDB
-and Elasticsearch; a <code>plpgsql</code> function added to
-PostgreSQL; and jqr for CouchDB.</p>
+    <p>Uses native functions with MongoDB, SQLite, and
+DuckDB; delete and create with Elasticsearch;
+a <code>plpgsql</code> function added to PostgreSQL;
+and jqr for CouchDB.</p>
     </div>
 
     <div id="ref-examples">

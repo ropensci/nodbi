@@ -1,13 +1,36 @@
 # nodbi helper functions
 
-# used with couchdb, elastic
+
+
+# provide private environment,
+# e.g. for initTransformers()
+#
+.nodbi <- new.env()
+
+
+
+#' doc_wrap
+#'
+#' used with couchdb, elastic
+#'
+#' @keywords internal
+#' @noRd
+#'
 doc_wrap <- function(..., indent = 0, width = getOption("width")) {
   x <- paste0(..., collapse = "")
   wrapped <- strwrap(x, indent = indent, exdent = indent + 5L, width = width)
   paste0(wrapped, collapse = "\n")
 }
 
-# used across nodbi
+
+
+#' assert
+#'
+#' used across nodbi
+#'
+#' @keywords internal
+#' @noRd
+#'
 assert <- function(x, y) {
   if (!is.null(x)) {
     if (!any(class(x) %in% y)) {
@@ -17,7 +40,15 @@ assert <- function(x, y) {
   }
 }
 
-# close database connection(s)
+
+
+#' closeNodbiConnections
+#'
+#' ensure closing database connection(s)
+#'
+#' @keywords internal
+#' @noRd
+#'
 closeNodbiConnections <- function(e) {
 
   # this function is called by .onLoad, .onUnload, and
@@ -78,21 +109,353 @@ closeNodbiConnections <- function(e) {
 
 }
 
-# set up handler before database is accessed
-# this is triggered e.g. by session restart
+
+
+#' .onLoad
+#'
+#' set up handler before database is accessed
+#' this is triggered e.g. by session restart
+#'
+#' @keywords internal
+#' @noRd
+#'
 .onLoad <- function(libname, pkgname) {
 
+  # register closing our connections
   reg.finalizer(
     e = globalenv(),
     f = closeNodbiConnections,
     onexit = TRUE
   )
 
+  # load javascript
+  initTranformers()
+
 }
 
-# a session restart does not trigger this
+
+
+#' .onUnload
+#'
+#' a session restart does not trigger this
+#'
+#' @keywords internal
+#' @noRd
+#'
 .onUnload <- function(libpath) {
 
   closeNodbiConnections(e = globalenv())
 
+}
+
+
+
+#' initTranformers
+#'
+#' provide access to javascript functions and modules
+#' stored in inst/js or subdir js of installed package
+#'
+#' https://cran.r-project.org/web/packages/V8/vignettes/npm.html
+#'
+#' purpose of javascript: transform mongo-like query into SQL
+#'
+#' @importFrom V8 v8 JS
+#' @keywords internal
+#' @noRd
+#'
+initTranformers <- function() {
+
+  # early exit
+  if (length(.nodbi)) return(NULL)
+
+  # prepare V8, see ./inst/js/
+  ct <- V8::v8()
+
+  # get javascript
+  ct$source(system.file("js/bundle.js", package = "nodbi"))
+
+  # expects mdb to be db.user.find('{}')
+  ct$assign("mongo2sql", V8::JS("function(mdb) {out = injs.convertToSQL(mdb); return out;}"))
+
+  # assign into package private environment, see zzz.R
+  assign("ct", ct, envir = .nodbi)
+
+  # debug
+  if (options()[["verbose"]]) {
+    message("\nJS initiated\n")
+  }
+
+  # exit
+  invisible(NULL)
+
+}
+
+
+
+#' digestFields
+#'
+#' takes input from "fields" and returns:
+#' - longest common path for a minimum number of path elements
+#'   for use with SELECT and possibly WHERE
+#' - fields to be included
+#' - fields to be excluded
+#'
+#' @importFrom stringi stri_match_all_regex
+#' @keywords internal
+#' @noRd
+#'
+digestFields <- function(f = "", q = "") {
+
+
+  # translate q into SQL query syntax using mongo2sql
+  initTranformers()
+
+  # - used:
+  # $gt, $gte, $lt, $lte, $ne
+  # $nin, $in, $regex,
+  # $not, $and, $or, $nor
+
+  # - not used:
+  # $geoIntersects, $geoWithin,
+  # $mod, $exists, $size, $nearSphere, $near
+  # $text, $all, $where, $comment,
+  # $meta, $slice, $elemMatch
+
+  # stop if unused operators are in query
+  usedOps <- c("$options", "$eq", "$gt", "$gte", "$lt", "$lte",
+               "$ne", "$in", "$regex", "$and", "$or", "$nor")
+  qOps <- stringi::stri_extract_all_regex(q, "(\\$[a-z]+)")[[1]]
+  if (!all(is.na(qOps)) && !all(qOps %in% usedOps))  {
+    stop("nodbi only supports: ", paste0(usedOps[-1], collapse = " / "),
+         "; this was the query used: ", q)
+  }
+
+  sqlQ <- .nodbi$ct$call("mongo2sql", paste0("db.user.find(", q, ");"))
+
+  # query mangling
+
+  queryFields <- unique(na.omit(stringi::stri_match_all_regex(
+    sqlQ, '"([-@._\\w]+?)"')[[1]][, 2, drop = TRUE]))
+
+  queryRootFields <- gsub("[.].*", "", queryFields)
+
+  queryPaths <- character(0L)
+  queryCondition <- character(0L)
+
+  if (length(queryFields)) {
+
+    # SELECT * FROM user WHERE <extract this>;
+    queryCondition <- sub(".+? WHERE (.+);", "\\1", sqlQ)
+
+    # "a.b" to "a"."b"
+    queryCondition <- stringi::stri_replace_all_fixed(
+      queryCondition, queryFields, gsub("[.]", '"."', queryFields),
+      vectorize_all = FALSE
+    )
+    queryPaths <- gsub("[.]", '"."', queryFields)
+
+    # = to ==
+    queryCondition <- sub(" = ", " == ", queryCondition)
+
+  }
+
+  # fields mangling
+
+  includeFields <- unique(na.omit(stringi::stri_match_all_regex(
+    f, '"([-@._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]))
+
+  includeRootFields <- unique(gsub("[.].*", "", includeFields))
+  includeRootFields <- includeRootFields[includeRootFields != "_id"]
+
+  excludeFields <- unique(na.omit(stringi::stri_match_all_regex(
+    f, '"([-@._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]))
+
+  fieldStrings <- unique(c(includeFields, excludeFields))
+
+  # helper function to use a strsplit list and compare for
+  # each list item if the vector positions p are all equal
+  allEqualAtPos <- function(l, p) {
+
+    o <- unlist(sapply(l, function(i) if (length(i) >= p) i[p] else NULL))
+    if (is.null(o)) return(FALSE)
+    return(as.logical(table(o)[[1]] == length(l)))
+
+  }
+
+  # helper for each unique element of minimum path length,
+  # determine which in fieldStrings is the longest common path
+  longestCommon <- function(strVector, minLength = 2, itemSep = ".") {
+
+    strSplit <- strsplit(strVector, split = itemSep, fixed = TRUE)
+
+    minElements <- sapply(strSplit, function(i)
+      paste0(i[1:min(length(i), minLength)], collapse = itemSep))
+    minElements <- unique(minElements)
+
+    maxPaths <- lapply(minElements, function(i) {
+
+      elemSet <- strVector[grepl(paste0("^", i), strVector)]
+      elemSet <- strsplit(elemSet, split = itemSep, fixed = TRUE)
+
+      maxNumSeq <- seq(
+        from = min(minLength + 1L, max(sapply(elemSet, length))),
+        to = max(sapply(elemSet, length)))
+
+      maxPath <- sapply(maxNumSeq, function(i)
+        allEqualAtPos(elemSet, i), USE.NAMES = FALSE)
+
+      # return minElement if no longer path found
+      maxNum <- ifelse(any(maxPath), max(maxNumSeq[maxPath]), minLength)
+
+      elemSet[[1]][seq(from = 1L, to = min(length(elemSet[[1]]), maxNum))]
+
+    })
+
+    # concate to fields
+    sapply(maxPaths, function(i) paste0(unlist(i), collapse = itemSep))
+
+  }
+
+  # translate mongo query into jq script to filter and select:
+
+  # {"$or": [{"rows.elements.status": "OK"},
+  # {"$and": [{"age": {"$gt": 21}},
+  #           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}
+  #           {"_id": {"$in": ["5cd678531b423d5f04cfb0a1", "5cd678530df22d3625ed8375"]}]}]}
+  #
+  # ->
+  #
+  # def flatted: [paths(scalars) as $path | { ($path | map(tostring) | join("#")):
+  # getpath($path) } ] | add; . | flatted as $f | . | select(
+  #  ($f | with_entries( select( .key | match( "^rows#[0-9]+#elements#[0-9]+#status" ))) |
+  #        map(select( . == "OK" )) | any )
+  #  or
+  #  (
+  #   ($f | with_entries( select( .key | match( "^age" ))) | map(select(. > 20)) | any )
+  #  and
+  #   ($f | with_entries( select( .key | match( "^friends#[0-9]+#name" ))) |
+  #         map(select(. | test("^B[a-z]{3,9}.*"))) | any )
+  #  and
+  #   ($f | with_entries( select( .key | match( "^_id" ))) |
+  #    map(select( . | tostring | test("5|4") )) | any )
+  #  )
+  # )
+
+  queryJq <- gsub("'", '"', queryCondition)
+  # ugly but robust
+  for (i in queryPaths) {
+
+    # - handle IN since this uses brackets around argument
+    xtr <- stringi::stri_extract_all_regex(
+      queryJq, paste0("(\"", i, "\") IN (\\(.+?\\))"))[[1]]
+
+    if (!all(is.na(xtr))) {
+
+      xtr <- stringi::stri_replace_all_regex(
+        xtr, paste0("(\"", i, "\") IN \\((.+?)\\)"), "$2")[[1]]
+
+      # split on comma after number or double quote, avoid splitting on comma in string
+      xtr <- strsplit(gsub("([0-9\"]),", "\\1@", xtr), "@")[[1]]
+
+      # recompose
+      xtr <- paste0(" . == ", xtr, collapse = " or ")
+
+      # insert
+      queryJq <- stringi::stri_replace_all_regex(
+        queryJq,
+        paste0("(\"", i, "\") IN (\\(.+?\\))", # brackets for IN
+               "( AND | NOT | OR |\\)*$)"),
+        paste0(" (\\$f | with_entries(select( .key | match( \"^",
+               gsub('"[.]"', "#[0-9]+#", i),
+               "\" ))) | map(select(", xtr, ")) | any ) $3"),
+        vectorize_all = FALSE
+      )
+    }
+
+    # - default operator handling
+    queryJq <- stringi::stri_replace_all_regex(
+      queryJq,
+      paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)",
+             # no extra bracket here
+             "( AND | NOT | OR |\\)*$)"),
+      paste0(" (\\$f | with_entries(select( .key | match( \"^",
+             gsub('"[.]"', "#[0-9]+#", i),
+             "\" ))) | map(select(. $2 )) | any ) $3"),
+      vectorize_all = FALSE
+    )
+
+  }
+
+  queryJq <- gsub(" ==* ", " == ", queryJq) # important
+  queryJq <- gsub("REGEXP \"(.+?)\"", '| test("\\1")', queryJq)
+  queryJq <- gsub("( AND | NOT | OR )", "\\L\\1", queryJq, perl = TRUE)
+
+  queryJq <- paste0('
+     def flatted: [paths(scalars) as $path | { ($path | map(tostring) | join("#")):
+     getpath($path) } ] | add; . | flatted as $f | select(', queryJq, ')')
+
+
+  # output
+  return(list(
+    # vector of fields
+    longestFields = longestCommon(strVector = fieldStrings, minLength = 1),
+    longestQuery = longestCommon(strVector = queryFields, minLength = 1),
+    includeFields = includeFields,
+    includeRootFields = includeRootFields,
+    excludeFields = excludeFields,
+    queryRootFields = queryRootFields,
+    queryFields = queryFields,
+    queryPaths = queryPaths,
+    queryCondition = queryCondition,
+    queryJq = queryJq
+  ))
+
+}
+
+
+
+#' insObj
+#'
+#' replaces names of objects within sql quotes
+#' `/** **/` by contents of objects of that name
+#' found in the calling environment. Also adds
+#' brackets where found.
+#'
+#' @keywords internal
+#' @noRd
+#'
+insObj <- function(x) {
+
+  p <- parent.frame()
+
+  x <- gsub("\n+", " ", x)
+  x <- gsub("  +", " ", x)
+
+  allFound <- stringi::stri_extract_all_regex(x, "(/[*][*].*?[*][*]/)", simplify = FALSE)[[1]]
+  allFound <- unique(allFound)
+
+  for (oneFound in allFound) {
+
+    i <- stringi::stri_replace_all_fixed(oneFound, c("/**", "**/"), "", vectorize_all = FALSE)
+    i <- trimws(i)
+    b <- stringi::stri_extract_all_fixed(i, c("'", '"'), simplify = FALSE)
+    b <- unique(na.omit(unlist(b)))
+
+    i <- gsub("'|\"", "", i)
+    if (grepl("[$]", i)) { # handle list
+      ii <- sub(".+[$](.+)", "\\1", i)
+      c <- get(sub("(.+)[$].+", "\\1", i), envir = p)[[ii]]
+    } else {
+      c <- get(i, envir = p)
+    }
+
+    if (!is.null(c) && length(c)) {
+      if (length(c) > 1L) stop(call. = FALSE,
+                               "Objects should be atomic character vectors, this is not: ", i)
+      if (length(b)) c <- paste0(b, c, b, collapse = "")
+      x <- stringi::stri_replace_all_fixed(x, oneFound, c)
+    }
+  }
+
+  return(x)
 }

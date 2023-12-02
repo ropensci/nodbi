@@ -14,30 +14,7 @@
 #' @keywords package
 NULL
 
-#' This function is defunct.
-#' @rdname src_etcd-defunct
-#' @keywords internal
-#' @noRd
-src_etcd <- function() {
-  .Defunct(msg = "This function is defunct; etcd removed")
-}
 
-#' This function is defunct.
-#' @rdname src_redis-defunct
-#' @keywords internal
-#' @noRd
-src_redis <- function() {
-  .Defunct(msg = "This function is defunct; redis removed")
-}
-
-#' Defunct functions in nodbi
-#'
-#' - [src_etcd]: etcd removed, with all its S3 methods for `docdb_*`
-#' - [src_redis]: redis removed, with all its S3 methods for `docdb_*`
-#'
-#' @name nodbi-defunct
-#' @noRd
-NULL
 
 #' Data set 'diamonds'
 #'
