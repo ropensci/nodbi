@@ -82,7 +82,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   # merge json with value
   value <- jqr::jq(paste0(
     "[",  jqr::jq(textConnection(ndjson), "."),
-    ",", value, "]"), ' reduce .[] as $item ({}; . * $item) ')
+    ",", value, "]"), " reduce .[] as $item ({}; . * $item) ")
 
   # jqr output to list
   value <- jsonlite::stream_in(
@@ -139,7 +139,8 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
     if (nrow(indf) == 1L) {
       for (i in seq_len(length(ids))) {
         value <- rbind(value, indf)
-      }}
+      }
+    }
     #
     if (nrow(indf) > 1L) {
       # iterating over _id's
@@ -205,7 +206,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
       is.character(value) && jsonlite::validate(value)
       ) {
     # check format
-    if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
+    if (all(jqr::jq(value, " .[] | type ") == '"array"') && length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
     )
     # check if top level is an array
@@ -331,7 +332,7 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
 docdb_update.src_duckdb <- function(src, key, value, query, ...) {
 
   # use file based approach
-  if (isFile(value) && (query == "" | query == "{}")) {
+  if (isFile(value) && (query == "" || query == "{}")) {
 
     statement <- paste0(
       'UPDATE "', key, '"
@@ -376,7 +377,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   if (length(value) == 1 && is.atomic(value) &&
       is.character(value) && jsonlite::validate(value)) {
     # check format
-    if (all(jqr::jq(value, " .[] | type ") == '"array"') & length(jqr::jq(value, " .[] ")) > 1L) stop(
+    if (all(jqr::jq(value, " .[] | type ") == '"array"') && length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
     )
     # check if top level is an array
@@ -412,7 +413,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   ids <- gsub("\"", "", as.character(ids))
   ids <- ids[ids != "null"]
   if (length(ids)) {
-    if (query != "" & query != "{}") warning(
+    if (query != "" && query != "{}") warning(
       "Ignoring the specified 'query' parameter, using _id's ",
       "found in 'value' to identify documents to be updated")
     value <- jqr::jq(value, " del(._id) ")
@@ -473,5 +474,3 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   return(result)
 
 }
-
-

@@ -1,13 +1,36 @@
 # nodbi helper functions
 
-# used with couchdb, elastic
+
+
+# provide private environment,
+# e.g. for initTransformers()
+#
+.nodbi <- new.env()
+
+
+
+#' doc_wrap
+#'
+#' used with couchdb, elastic
+#'
+#' @keywords internal
+#' @noRd
+#'
 doc_wrap <- function(..., indent = 0, width = getOption("width")) {
   x <- paste0(..., collapse = "")
   wrapped <- strwrap(x, indent = indent, exdent = indent + 5L, width = width)
   paste0(wrapped, collapse = "\n")
 }
 
-# used across nodbi
+
+
+#' assert
+#'
+#' used across nodbi
+#'
+#' @keywords internal
+#' @noRd
+#'
 assert <- function(x, y) {
   if (!is.null(x)) {
     if (!any(class(x) %in% y)) {
@@ -17,7 +40,15 @@ assert <- function(x, y) {
   }
 }
 
-# close database connection(s)
+
+
+#' closeNodbiConnections
+#'
+#' ensure closing database connection(s)
+#'
+#' @keywords internal
+#' @noRd
+#'
 closeNodbiConnections <- function(e) {
 
   # this function is called by .onLoad, .onUnload, and
@@ -78,10 +109,19 @@ closeNodbiConnections <- function(e) {
 
 }
 
-# set up handler before database is accessed
-# this is triggered e.g. by session restart
+
+
+#' .onLoad
+#'
+#' set up handler before database is accessed
+#' this is triggered e.g. by session restart
+#'
+#' @keywords internal
+#' @noRd
+#'
 .onLoad <- function(libname, pkgname) {
 
+  # register closing our connections
   reg.finalizer(
     e = globalenv(),
     f = closeNodbiConnections,
@@ -90,9 +130,16 @@ closeNodbiConnections <- function(e) {
 
 }
 
-# a session restart does not trigger this
-.onUnload <- function(libpath) {
 
+
+#' .onUnload
+#'
+#' a session restart does not trigger this
+#' @keywords internal
+#' @noRd
+#'
+.onUnload <- function(libpath) {
   closeNodbiConnections(e = globalenv())
+}
 
 }

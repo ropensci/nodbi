@@ -353,7 +353,7 @@ testFunction <- function(src, key, value, query, fields) {
   docdb_update(src, key, value = value, query = query)
 }
 
-# 2023-09-23 with 2015 mobile hardware, databases via homebrew
+# 2023-11-27 with 2015 mobile hardware, databases via homebrew
 rbenchmark::benchmark(
   MongoDB = testFunction(src = srcMongo, key, value, query, fields),
   SQLite = testFunction(src = srcSqlite, key, value, query, fields),
@@ -365,12 +365,12 @@ rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 #         test replications elapsed
-# 4    CouchDB           10   303.5
-# 3    Elastic           10    69.9 # 10s to be subtracted
-# 5 PostgreSQL           10     3.9
-# 2     SQLite           10     3.4
-# 6     DuckDB           10     3.2
-# 1    MongoDB           10     2.5
+# 4    CouchDB           10   270.1
+# 3    Elastic           10    58.5  # 20s to be subtracted
+# 1    MongoDB           10    12.5
+# 5 PostgreSQL           10     2.9
+# 6     DuckDB           10     2.4
+# 2     SQLite           10     2.4
 ```
 
 ## Testing
@@ -379,25 +379,26 @@ Every database backend is subjected to identical tests, see
 [core-nodbi.R](./tests/testthat/core-nodbi.R).
 
 ``` r
-# 2023-09-23
+# 2023-11-27
 testthat::test_local()
-# ✔ | F W S  OK | Context
-# ✔ |     2 107 | couchdb [118.7s]                                                                  
-# ✔ |       144 | duckdb [5.2s]                                                                     
-# ✔ |     3  72 | elastic [104.2s]                                                                  
-# ✔ |     1 137 | mongodb [5.5s]                                                                    
-# ✔ |       147 | postgres [43.2s]                                                                  
-# ✔ |       146 | sqlite [41.7s]                                                                    
+# ✔ | F W  S  OK | Context
+# ✔ |      2 109 | couchdb [81.9s]                                                                
+# ✔ |        145 | duckdb [4.4s]                                                                  
+# ✔ |      3  74 | elastic [87.4s]                                                                
+# ✔ |      1 141 | mongodb [4.5s]                                                                 
+# ✔ |        146 | postgres [36.2s]                                                               
+# ✔ |        147 | sqlite [32.7s]                                                                 
 # 
-# ══ Results ═══════════════════════════════════════════════════════════════════════════════════════
-# Duration: 318.9 s
+# ══ Results ═════════════════════════════════════════════════════════════════════════════════════
+# Duration: 247.3 s
 # 
-# ── Skipped tests (6) ─────────────────────────────────────────────────────────────────────────────
-# • auto disconnect not relevant (3): core-nodbi.R:429:5, core-nodbi.R:429:5, core-nodbi.R:429:5
-# • bulk updates not yet implemented (2): core-nodbi.R:287:3, core-nodbi.R:287:3
-# • queries need to be translated into elastic syntax (1): core-nodbi.R:207:3
+# ── Skipped tests (6) ───────────────────────────────────────────────────────────────────────────
+# • auto disconnect not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,
+#   test-mongodb.R:24:3
+# • bulk updates not yet implemented (2): test-couchdb.R:26:3, test-elastic.R:21:3
+# • queries need to be translated into elastic syntax (1): test-elastic.R:21:3
 # 
-# [ FAIL 0 | WARN 0 | SKIP 6 | PASS 753 ]
+# [ FAIL 0 | WARN 0 | SKIP 6 | PASS 762 ]
 ```
 
 ## Notes
