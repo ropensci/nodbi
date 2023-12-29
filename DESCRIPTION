@@ -31,7 +31,8 @@ Imports:
     jsonlite,
     uuid,
     jqr,
-    DBI
+    DBI,
+    V8
 Suggests:
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),
