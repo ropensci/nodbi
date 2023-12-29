@@ -234,7 +234,7 @@ digestFields <- function(f = "", q = "") {
 
   # query mangling
 
-  queryFields <- unique(na.omit(stringi::stri_match_all_regex(
+  queryFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     sqlQ, '"([-@._\\w]+?)"')[[1]][, 2, drop = TRUE]))
 
   queryRootFields <- gsub("[.].*", "", queryFields)
@@ -261,13 +261,13 @@ digestFields <- function(f = "", q = "") {
 
   # fields mangling
 
-  includeFields <- unique(na.omit(stringi::stri_match_all_regex(
+  includeFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     f, '"([-@._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]))
 
   includeRootFields <- unique(gsub("[.].*", "", includeFields))
   includeRootFields <- includeRootFields[includeRootFields != "_id"]
 
-  excludeFields <- unique(na.omit(stringi::stri_match_all_regex(
+  excludeFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     f, '"([-@._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]))
 
   fieldStrings <- unique(c(includeFields, excludeFields))
@@ -439,7 +439,7 @@ insObj <- function(x) {
     i <- stringi::stri_replace_all_fixed(oneFound, c("/**", "**/"), "", vectorize_all = FALSE)
     i <- trimws(i)
     b <- stringi::stri_extract_all_fixed(i, c("'", '"'), simplify = FALSE)
-    b <- unique(na.omit(unlist(b)))
+    b <- unique(stats::na.omit(unlist(b)))
 
     i <- gsub("'|\"", "", i)
     if (grepl("[$]", i)) { # handle list

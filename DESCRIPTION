@@ -32,7 +32,8 @@ Imports:
     uuid,
     jqr,
     DBI,
-    V8
+    V8,
+    R.utils
 Suggests:
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),

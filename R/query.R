@@ -41,10 +41,15 @@
 #' docdb_query(src, "myKey", query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}')
 #' docdb_query(src, "myKey", query = '{}', fields = '{"_id":0, "mpg":1, "cyl":1}')
 #'
-#' docdb_query(src, "myKey", query = '{"$and": [{"age": {"$gt": 21}}, {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}')
-#' docdb_query(src, "myKey", query = '{"$or": [{"rows.elements.status": "OK"}, {"$and": [{"_id": "5cd6785325ce3a94dfc54096"}, {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}]}')
-#' docdb_query(src, "myKey", query = '{"$and": [{"_id": "5cd6785325ce3a94dfc54096"}, {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}')
-#' docdb_query(src, "myKey", query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA", "New York, NY, USA"]}}', fields <- '{"age": 1, "friends.id": 1, "_id":0, "rows.elements.status": 1}')
+#' docdb_query(src, "myKey", query = '{"$and": [{"age": {"$gt": 21}},
+#'  {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}')
+#' docdb_query(src, "myKey", query = '{"$or": [{"rows.elements.status": "OK"}, {"$and": [
+#'  {"_id": "5cd6785325ce3a94dfc54096"}, {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}]}')
+#' docdb_query(src, "myKey", query = '{"$and": [{"_id": "5cd6785325ce3a94dfc54096"},
+#'  {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}')
+#' docdb_query(src, "myKey", query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA",
+#'  "New York, NY, USA"]}}', fields = '{"age": 1, "friends.id": 1, "_id":0,
+#'  "rows.elements.status": 1}')
 #'
 #' docdb_query(src, "myKey", query = '{"rows.elements.status": "OK"}', listfields = TRUE)
 #'
@@ -1180,6 +1185,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
 #' processDbGetQuery
 #'
+#' @importFrom R.utils countLines
 #' @keywords internal
 #' @noRd
 #'
