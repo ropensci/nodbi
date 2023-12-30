@@ -14,7 +14,7 @@ docdb_create(src, key, value, ...)
 \item{key}{(character) The name of the container in the
 database backend (corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{value}{The data to be created in the database:
 a single data.frame, a JSON string, a list, or a
@@ -46,7 +46,7 @@ in the database. If there are no such \verb{_id}'s in \code{value},
 row names (if any exist) of \code{value} will be used as \verb{_id}'s,
 otherwise random \verb{_id}'s will be created (using
 \code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE} for
-SQLite und PostgreSQL, or using DuckDB's built-in \code{uuid()}).
+SQLite and PostgreSQL, or using DuckDB's built-in \code{uuid()}).
 
 A warning is emitted for document(s) in \code{value} when the same
 \verb{_id}'s already exists in the collection \code{key};

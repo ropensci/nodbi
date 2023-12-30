@@ -70,7 +70,7 @@ native query and filtering functions.</p>
 <dd><p>(character) The name of the container in the
 database backend (corresponds to <code>collection</code> for MongoDB,
 <code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch, and to
-a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
+a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>query</dt>
@@ -122,10 +122,15 @@ example below.</p>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{}'</span>, fields <span class="op">=</span> <span class="st">'{"_id":0, "mpg":1, "cyl":1}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$and": [{"age": {"$gt": 21}}, {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$or": [{"rows.elements.status": "OK"}, {"$and": [{"_id": "5cd6785325ce3a94dfc54096"}, {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}]}'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$and": [{"_id": "5cd6785325ce3a94dfc54096"}, {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"origin_addresses": {"$in": ["Santa Barbara, CA, USA", "New York, NY, USA"]}}'</span>, <span class="va">fields</span> <span class="op">&lt;-</span> <span class="st">'{"age": 1, "friends.id": 1, "_id":0, "rows.elements.status": 1}'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$and": [{"age": {"$gt": 21}},</span></span></span>
+<span class="r-in"><span><span class="st"> {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$or": [{"rows.elements.status": "OK"}, {"$and": [</span></span></span>
+<span class="r-in"><span><span class="st"> {"_id": "5cd6785325ce3a94dfc54096"}, {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}]}'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$and": [{"_id": "5cd6785325ce3a94dfc54096"},</span></span></span>
+<span class="r-in"><span><span class="st"> {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"origin_addresses": {"$in": ["Santa Barbara, CA, USA",</span></span></span>
+<span class="r-in"><span><span class="st"> "New York, NY, USA"]}}'</span>, fields <span class="op">=</span> <span class="st">'{"age": 1, "friends.id": 1, "_id":0,</span></span></span>
+<span class="r-in"><span><span class="st"> "rows.elements.status": 1}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"rows.elements.status": "OK"}'</span>, listfields <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

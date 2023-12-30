@@ -14,7 +14,7 @@ docdb_get(src, key, limit = NULL, ...)
 \item{key}{(character) The name of the container in the
 database backend (corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{limit}{(integer) Maximum number of documents
 to return. If not set, defaults to 10,000 for

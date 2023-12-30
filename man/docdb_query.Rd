@@ -14,7 +14,7 @@ docdb_query(src, key, query, ...)
 \item{key}{(character) The name of the container in the
 database backend (corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{query}{(character) A JSON query string, see examples.
 Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},

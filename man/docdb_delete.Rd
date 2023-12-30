@@ -14,7 +14,7 @@ docdb_delete(src, key, ...)
 \item{key}{(character) The name of the container in the
 database backend (corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{...}{Optionally, specify \code{query} parameter with a
 JSON query as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.

@@ -14,7 +14,7 @@ docdb_exists(src, key, ...)
 \item{key}{(character) The name of the container in the
 database backend (corresponds to \code{collection} for MongoDB,
 \code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{...}{Passed to functions:
 \itemize{

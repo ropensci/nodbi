@@ -24,7 +24,7 @@
 # nodbi 0.9.7
 
 ## Changes
-* changed `docdb_update()` to directly use ndjson from file for duckdb
+* changed `docdb_update()` to directly use NDJSON from file for duckdb
 * cleaned up unnecessary code in `docdb_create()`
 * no more using transactions with `src_duckdb()`
 

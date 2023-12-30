@@ -14,8 +14,9 @@ man-roxygen
 ^revdep$
 ^LICENSE\.md$
 ^private$
-.DS_Store
-.lintr
+\.DS_Store
+\.lintr
 ^CRAN-RELEASE$
 ^CRAN-SUBMISSION$
 ^docs
+\.vscode

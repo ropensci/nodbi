@@ -636,12 +636,21 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # - continue field mangling
   if (length(fldQ$includeFields)) {
 
-    fldQ$composeJson <- '
+    if (length(fldQ$includeFields) == 1L &&
+        fldQ$includeFields == "_id") {
+
+      fldQ$composeJson <- '\'{"_id":"\' || _id || \'"}\''
+      fldQ$includeFields <- character(0L)
+
+    } else {
+
+      fldQ$composeJson <- '
     \'{"_id":"\' || _id || \'",\' || group_concat(\'"\' ||
     LTRIM(fkr, \'$.\') || \'":\' ||
     IIF(type = \'text\', CONCAT(\'"\', REPLACE(value, \'"\', \'\\"\'), \'"\'), value)
     ) || \'}\''
 
+    }
   } else {
 
     fldQ$composeJson <- '
@@ -1024,6 +1033,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   if (length(fldQ$selectCondition)) fldQ$selectCondition <-
     paste0("(", fldQ$selectCondition, " <> '{}')", collapse = " OR ")
 
+
   # query
 
   # - if all query fields are top level elements
@@ -1104,13 +1114,36 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   if (!length(fldQ$queryCondition) &&
       !length(fldQ$selectCondition)) fldQ$selectCondition <- "TRUE"
 
-  # handle fields == '{}' and fields == '{"_id":1}'
-  if (!length(fldQ$includeFields[fldQ$includeFields != "_id"])) {
+  # - if query needs jqr
+  fldQ$jqrWhere <- character(0L)
+  if (length(fldQ$queryCondition)) {
+
+    fldQ$jqrWhere <- fldQ$queryJq
+
+  }
+
+
+  # - query if fields == '{}' or
+  #   if jqrWhere is needed
+  if (!length(fldQ$includeFields) ||
+      length(fldQ$jqrWhere)) {
 
     fldQ$extractFields <- paste0(", json", fldQ$extractFields)
     fldQ$selectFields <- "\'{\"_id\": \"\' || _id || \'\", \' || LTRIM(json, \'{\')"
 
   }
+
+  # - query if fields == '{"_id":1}' and
+  #   jqrWhere is not needed
+  if (length(fldQ$includeFields) == 1L &&
+      fldQ$includeFields == "_id" &&
+      !length(fldQ$jqrWhere)) {
+
+    fldQ$selectFields <- "\'{\"_id\": \"\' || _id || \'\"}\'"
+    fldQ$includeFields <- character(0L)
+
+  }
+
 
   # compose statement
   statement <- insObj('
@@ -1123,15 +1156,6 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     WHERE  (
     /** fldQ$selectCondition **/
     );')
-
-
-  # mangle query
-  fldQ$jqrWhere <- character(0L)
-  if (length(fldQ$queryCondition)) {
-
-    fldQ$jqrWhere <- fldQ$queryJq
-
-  }
 
 
   # special case: return all fields if listfields != NULL

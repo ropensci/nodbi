@@ -173,6 +173,7 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src, key, query = '{"$or": [{"age": {"$gt": 21}}, {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}', fields = '{"age": 1, "friends.name": 1}')), c(3L, 3L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"$or": [{"email": {"$regex": "^lacychen"}}, {"friends.name": "Dona Bartlett"}]}')), c(2L, 11L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"$or": [{"email": {"$regex": "lacychen@conjurica.com"}}, {"tags": {"$regex": "^duis$"}}]}')), c(2L, 11L))
+  expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.name": "Dona Bartlett"}', fields = '{"_id": 1}')), c(1L, 1L))
   #
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": "Lacy Chen"}')), c(1L, 11L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"age": 20}')), c(2L, 11L))
