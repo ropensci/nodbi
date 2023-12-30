@@ -1301,7 +1301,7 @@ processDbGetQuery <- function(
 
     # debug
     if (options()[["verbose"]]) {
-      message("outputFields: ", outputFields, "\n")
+      message("outputFields: ", paste0(outputFields, collapse = " / "), "\n")
     }
 
     # early exit
@@ -1399,29 +1399,32 @@ processOutputFields <- function(tfname, outputFields, tjname = NULL) {
 
   if (jqFields != "") jqFields <- paste0(jqFields, ", ", collapse = "")
 
-  jqFields <- paste0('{', paste0(c(jqFields, paste0(
-    sapply(
-      subFields,
-      function(s) {
-        # first item
-        k <- paste0('"', s[1], '')
-        v <- paste0(' [."', s[1], '" | (if type != "array" then [.][] else .[] end) | ')
-        # next item(s)
-        for (i in (seq_len(length(s) - 2) + 1)) {
-          k <- paste0(k, '.', s[i], '')
-          v <- paste0(v, '."', s[i], '" | (if type != "array" then [.][] else .[] end) | ')
-        }
-        # last item
-        k <- paste0(k, '.', s[length(s)], '": ')
-        v <- paste0(v, '."', s[length(s)], '"]')
-        # combine item(s)
-        paste0(k, v)
-      }, USE.NAMES = FALSE),
-    collapse = ", ")), collapse = ""), "}")
+  jqFields <- paste0(
+    'def m1(s): s | (if length == 0 then null else . end) | (if type != "array" then [.][] else .[] end); ',
+    'def m2(s): s | (if length > 1 then [.][] else .[] end); {',
+    paste0(c(jqFields, paste0(
+      sapply(
+        subFields,
+        function(s) {
+          # first item
+          k <- paste0('"', s[1], '')
+          v <- paste0(' [."', s[1], '" | m1(.) | ')
+          # next item(s)
+          for (i in (seq_len(length(s) - 2) + 1)) {
+            k <- paste0(k, '.', s[i], '')
+            v <- paste0(v, '."', s[i], '" | m1(.) | ')
+          }
+          # last item
+          k <- paste0(k, '.', s[length(s)], '": ')
+          v <- paste0(v, '."', s[length(s)], '"] | m2(.) ')
+          # combine item(s)
+          paste0(k, v)
+        }, USE.NAMES = FALSE),
+      collapse = ", ")), collapse = ""), "}")
 
   # debug
   if (options()[["verbose"]]) {
-    message("JQ outputFields: ", paste0(jqFields, collapse = " / "), "\n")
+    message("JQ processOutput: ", jqFields, "\n")
   }
 
   # early return
@@ -1431,7 +1434,7 @@ processOutputFields <- function(tfname, outputFields, tjname = NULL) {
         jqr::jq(file(tfname), jqFields)),
       verbose = FALSE))
 
-  # write data for futher processing
+  # write data for further processing
   jqr::jq(
     file(tfname),
     jqFields,

@@ -192,6 +192,11 @@ test_that("docdb_query", {
     docdb_query(src = src, key = key, query = '{"tags": {"$regex": "^[a-z]{3,4}$"}}', fields = '{"name": 1, "age": 1, "_id": 0}')), c(3L, 2L))
   expect_true(docdb_delete(src = src, key = key))
 
+  # special test for lifting nested values as unnested values
+  expect_equal(docdb_create(src, key, value = '[{"a": {"b": {"c": 3}}},{"a": {"b": {"c": 4}}}]'), 2L)
+  expect_equal(docdb_query(src = src, key = key, query = '{}', fields = '{"a.b.c": 1, "_id": 0}')[[1]], 3:4)
+  expect_true(docdb_delete(src = src, key = key))
+
   # testJson2
   expect_equal(docdb_create(src = src, key = key, value = testJson2), 2L)
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"rows.elements.distance.somevalue": 1}')), c(2L, 2L))

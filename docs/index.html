@@ -72,7 +72,7 @@
 <div class="page-header"><h1 id="nodbi">nodbi<a class="anchor" aria-label="anchor" href="#nodbi"></a>
 </h1></div>
 <p>⁠<!-- badges: start --> <a href="https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/rfhb/nodbi" class="external-link"><img src="https://codecov.io/gh/rfhb/nodbi/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://CRAN.R-project.org/package=nodbi" class="external-link"><img src="https://www.r-pkg.org/badges/version/nodbi" alt="CRAN status"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a> ⁠<!-- badges: end --></p>
-<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-12-30.</p>
+<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2023-12-31.</p>
 <table class="table">
 <colgroup>
 <col width="42%">
@@ -436,41 +436,38 @@
 <span><span class="co"># 1    MongoDB           10     1.8</span></span>
 <span><span class="co"># 6     DuckDB           10     1.7</span></span>
 <span><span class="co"># 2     SQLite           10     1.6</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
-</h2>
+<p>2## Testing {#testing}</p>
 <p>Every database backend is subjected to identical tests, see <a href="https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R" class="external-link">core-nodbi.R</a>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 2023-12-30</span></span>
+<code class="sourceCode R"><span><span class="co"># 2023-12-31</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># ✔ | F W  S  OK | Context</span></span>
-<span><span class="co"># ✔ |      2 148 | couchdb [96.1s]                                                          </span></span>
-<span><span class="co"># ✔ |      1 147 | duckdb [4.1s]                                                            </span></span>
-<span><span class="co"># ✔ |      2 146 | elastic [79.5s]                                                          </span></span>
-<span><span class="co"># ✔ |      2 146 | mongodb [5.2s]                                                           </span></span>
-<span><span class="co"># ✔ |        148 | postgres [36.0s]                                                         </span></span>
-<span><span class="co"># ✔ |        150 | sqlite [32.2s]                                                           </span></span>
+<span><span class="co"># ✔ |      2 151 | couchdb [114.9s]                                                      </span></span>
+<span><span class="co"># ✔ |      1 150 | duckdb [5.2s]                                                         </span></span>
+<span><span class="co"># ✔ |      2 149 | elastic [89.3s]                                                       </span></span>
+<span><span class="co"># ✔ |      2 149 | mongodb [5.8s]                                                        </span></span>
+<span><span class="co"># ✔ |        151 | postgres [35.7s]                                                      </span></span>
+<span><span class="co"># ✔ |        153 | sqlite [32.6s]                                                        </span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ══ Results ═══════════════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co"># Duration: 253.3 s</span></span>
+<span><span class="co"># ══ Results ════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co"># Duration: 283.9 s</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ── Skipped tests (7) ─────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co"># ── Skipped tests (7) ──────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co"># • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3,</span></span>
 <span><span class="co">#   test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
 <span><span class="co"># • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3,</span></span>
 <span><span class="co">#   test-duckdb.R:22:3, test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 885 ]</span></span>
+<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 903 ]</span></span>
 <span></span>
-<span><span class="co"># 2023-12-30</span></span>
+<span><span class="co"># 2023-12-31</span></span>
 <span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
-<span><span class="co"># nodbi Coverage: 94.46%</span></span>
+<span><span class="co"># nodbi Coverage: 94.47%</span></span>
 <span><span class="co"># R/src_duckdb.R: 76.92%</span></span>
 <span><span class="co"># R/zzz.R: 86.75%</span></span>
 <span><span class="co"># R/src_mongo.R: 91.30%</span></span>
 <span><span class="co"># R/update.R: 93.94%</span></span>
-<span><span class="co"># R/query.R: 94.86%</span></span>
+<span><span class="co"># R/query.R: 94.88%</span></span>
 <span><span class="co"># R/src_postgres.R: 95.65%</span></span>
 <span><span class="co"># R/create.R: 96.26%</span></span>
 <span><span class="co"># R/delete.R: 97.96%</span></span>
