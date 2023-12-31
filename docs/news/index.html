@@ -51,8 +51,15 @@
 <h2 class="page-header" data-toc-text="0.9.8.9001" id="nodbi-0989001">nodbi 0.9.8.9001<a class="anchor" aria-label="anchor" href="#nodbi-0989001"></a></h2>
 <div class="section level3">
 <h3 id="changes-0-9-8-9001">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-8-9001"></a></h3>
-<ul><li>reimplementation of <code>docdb_query</code> to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB)</li>
-<li>
+<ul><li>
+<code>_id</code> is always returned, unless specified with <code>"_id":0</code> in parameter <code>fields</code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="potentially-breaking-change-0-9-8-9001">Potentially breaking change<a class="anchor" aria-label="anchor" href="#potentially-breaking-change-0-9-8-9001"></a></h3>
+<ul><li>
+<p>reimplementation of <code>docdb_query</code> to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB).</p>
+<ul><li>
 <code>query</code> can now be complex (nested, various operators) and is digested with a Javascript helper</li>
 <li>
 <code>fields</code> can now be nested fields (e.g., <code>friends.name</code>) and directly returns value lifted from the nested field</li>
@@ -68,6 +75,7 @@
 <li>factored out common code</li>
 <li>expanded testing</li>
 <li>updated docs</li>
+</ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-9-8-9001">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-8-9001"></a></h3>

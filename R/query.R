@@ -645,8 +645,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
     } else {
 
       fldQ$composeJson <- '
-    \'{"_id":"\' || _id || \'",\' || group_concat(\'"\' ||
-    LTRIM(fkr, \'$.\') || \'":\' ||
+    \'{"_id":"\' || _id || \'",\' || group_concat(\'"\' || fkr || \'":\' ||
     IIF(type = \'text\', CONCAT(\'"\', REPLACE(value, \'"\', \'\\"\'), \'"\'), value)
     ) || \'}\''
 
@@ -661,18 +660,22 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
   # query
 
+  # - using root fields so as to later mangle json with jqr,
+  #   since RSQLite does not include regex_replace() out of
+  #   the box, but this would be needed to remove from column
+  #   value the quantifiers between fields in fullkey or path
   if (length(fldQ$includeRootFields)) fldQ$includeRootFields <- paste0(
     'AND ( fkr REGEXP "^(', paste0(
-      '[$][.]', fldQ$includeRootFields, collapse = "|"),
+      fldQ$includeRootFields, collapse = "|"),
     ')$" AND value <> "{}" ) ')
 
+  # - map query to row-wise testing
   fldQ$queryCondition <- gsub("'", '"', fldQ$queryCondition)
-
   for (i in fldQ$queryPaths) {
 
     fldQ$queryCondition <- gsub(
       paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
-      paste0('SUM ( fkr REGEXP "[$][.]',
+      paste0('SUM ( fkr REGEXP "^',
              gsub('"[.]"', "[-#\\\\\\\\[\\\\\\\\]0-9]*[.]", i),
              '" AND value \\2 ) > 0 \\3'),
       fldQ$queryCondition
@@ -681,16 +684,16 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
   # _id in query
   fldQ$queryCondition <- gsub(
-    'fkr REGEXP \\"\\[\\$\\]\\[.\\]_id\\" AND value',
+    'fkr REGEXP \\"\\^_id\\" AND value',
     "_id", fldQ$queryCondition)
 
   # - empty query
   if (!length(fldQ$queryCondition)) fldQ$queryCondition <- "TRUE"
 
-
   # statement
   statement <- insObj('
-    WITH extracted AS ( SELECT _id, value, type, REPLACE(fullkey, \'"\', \'\') AS fkr
+    WITH extracted AS ( SELECT _id, value, type,
+     LTRIM(REPLACE(fullkey, \'"\', \'\'), \'$.\') AS fkr
     FROM "/** key **/", json_tree("/** key **/".json)
     WHERE value <> "{}" )
     SELECT /** fldQ$composeJson **/
@@ -1400,23 +1403,23 @@ processOutputFields <- function(tfname, outputFields, tjname = NULL) {
   if (jqFields != "") jqFields <- paste0(jqFields, ", ", collapse = "")
 
   jqFields <- paste0(
-    'def m1(s): s | (if length == 0 then null else . end) | (if type != "array" then [.][] else .[] end); ',
-    'def m2(s): s | (if length > 1 then [.][] else .[] end); {',
+    'def m1: . | (if length == 0 then null else (if type != "array" then [.][] else .[] end) end); ',
+    'def m2: . | (if length > 1 then [.][] else .[] end); {',
     paste0(c(jqFields, paste0(
       sapply(
         subFields,
         function(s) {
           # first item
           k <- paste0('"', s[1], '')
-          v <- paste0(' [."', s[1], '" | m1(.) | ')
+          v <- paste0(' [."', s[1], '" | m1 | ')
           # next item(s)
           for (i in (seq_len(length(s) - 2) + 1)) {
             k <- paste0(k, '.', s[i], '')
-            v <- paste0(v, '."', s[i], '" | m1(.) | ')
+            v <- paste0(v, '."', s[i], '" | m1 | ')
           }
           # last item
           k <- paste0(k, '.', s[length(s)], '": ')
-          v <- paste0(v, '."', s[length(s)], '"] | m2(.) ')
+          v <- paste0(v, '."', s[length(s)], '"] | m2 ')
           # combine item(s)
           paste0(k, v)
         }, USE.NAMES = FALSE),
