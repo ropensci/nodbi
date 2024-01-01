@@ -15,12 +15,10 @@
 #'
 #' @inheritParams docdb_create
 #'
-#' @param query (character) A JSON query string to
-#' identify the documents that should be updated
-#' (patched) with \code{value},
-#'  Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
-#'  with at most one logic operator ('$and' if not specified, or '$or'),
-#'  see examples below and in [docdb_query()].
+#' @param query (character) A JSON query string, see examples.
+#'  Can use comparisons / tests (`$lt`, `$lte`, `$gt`, `$gte`,
+#'  `$ne`, `$in`, `$regex`), with logic operators (`$and`,
+#'  `$or`, `(`, `)`), including nested queries, see examples.
 #'
 #' @param ... Passed on to functions:
 #' - CouchDB: [sofa::db_bulk_create()]
@@ -47,6 +45,11 @@ docdb_update <- function(src, key, value, query, ...) {
   assert(key, "character")
   assert(value, c("data.frame", "list", "character"))
   assert(query, c("json", "character"))
+
+  if (query == "") {
+    warning('query = "" is deprecated, use query = "{}"')
+    query = "{}"
+  }
   stopifnot(jsonlite::validate(query))
 
   UseMethod("docdb_update", src)

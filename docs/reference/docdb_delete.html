@@ -73,7 +73,7 @@ a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 
 <dt>...</dt>
 <dd><p>Optionally, specify <code>query</code> parameter with a
-JSON query as per <code><a href="docdb_query.html">docdb_query()</a></code> to identify documents to be deleted.
+JSON string as per <code><a href="docdb_query.html">docdb_query()</a></code> to identify documents to be deleted.
 If not specified, the default is to delete the container <code>key</code>.</p>
 <p>Other parameters are passed on to functions:</p><ul><li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code>$remove</p></li>
 <li><p>SQLite: <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">DBI::dbExecute()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code></p></li>
@@ -90,7 +90,7 @@ If not specified, the default is to delete the container <code>key</code>.</p>
 
 <p>(logical) success of operation. Typically <code>TRUE</code> if
 document(s) or collection existed, and <code>FALSE</code> if document(s)
-did not exist or collection did not exist or delete was not successful.</p>
+did not exist, or collection did not exist, or delete was not successful.</p>
     </div>
 
     <div id="ref-examples">

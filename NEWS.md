@@ -1,20 +1,21 @@
 # nodbi 0.9.8.9001
 
-## Changes
+## Deprecated
+  * Parameter `query` should be a valid JSON string and now triggers a warning if empty; change `query = ""` into `query = "{}"` 
 
-* `_id` is always returned, unless specified with `"_id":0` in parameter `fields`
+## Changes
+* Elasticsearch made to immediately refresh index after `docdb_create` and other functions
 
 ## Potentially breaking change
-
-* reimplementation of `docdb_query` to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB).  
-
+*  `docdb_query()` reimplementation to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB).
   * `query` can now be complex (nested, various operators) and is digested with a Javascript helper
-  * `fields` can now be nested fields (e.g., `friends.name`) and directly returns value lifted from the nested field 
-  * `listfields` parameter newly implemented to return all dot paths for fields of all or selected documents in collection 
-  * expanded use of `jqr` for mangling parameters, selecting documents, filtering fields and lifting nested field values
-  * `docdb_query(src, key, query = {}, fields = {})` now delegates to `docdb_get(src, key)`
+  * `fields` can now be nested fields (e.g., `friends.name`) to directly return values lifted from the nested field 
+  * `listfields` parameter newly implemented to return dot paths for all fields of all or selected documents in collection 
+  * expanded use of `jq` via `jqr` for mangling parameters, selecting documents, filtering fields and lifting nested field values
+  * `docdb_query(src, key, query = "{}", fields = "{}")` now delegates to `docdb_get(src, key)`
+  * `_id` is always returned, unless specified with `"_id": 0` in parameter `fields`
   * workaround for path collisions of MongoDB
-  * some acceleration of `docdb_query`
+  * some acceleration of `docdb_query()`
   * factored out common code 
   * expanded testing
   * updated docs

@@ -224,16 +224,9 @@ test_that("docdb_query", {
   # listfields
   expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
   fields <- docdb_query(src = src, key = key, query = '{}', listfields = TRUE)
-  # sqlite = 23, duckdb = 23, mongo = 22, postgres = 23
-  # [1] "about"        "age"          "am"           "balance"      "carb"         "cyl"          "disp"
-  # [8] "drat"         "email"        "eyeColor"     "friends"      "friends.id"   "friends.name" "gear"
-  # [15] "hp"           "isActive"     "mpg"          "name"         "qsec"         "registered"   "tags"
-  # [22] "vs"           "wt"
-  expect_true(length(fields) >= 21)
-  expect_true(length(fields) <= 23)
-  #
+  expect_true(length(fields) == 23)
   fields <- docdb_query(src = src, key = key, query = '{"name": {"$regex": "^[LW].*"}}', listfields = TRUE)
-  # sqlite = 12, duckdb = 35, mongo = 11, postgres = 12, elastic = 12
+  expect_true(length(fields) == 12)
 
   # clean up
   expect_true(docdb_delete(src = src, key = key))

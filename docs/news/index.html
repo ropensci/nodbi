@@ -50,32 +50,37 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.9.8.9001" id="nodbi-0989001">nodbi 0.9.8.9001<a class="anchor" aria-label="anchor" href="#nodbi-0989001"></a></h2>
 <div class="section level3">
-<h3 id="changes-0-9-8-9001">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-8-9001"></a></h3>
-<ul><li>
-<code>_id</code> is always returned, unless specified with <code>"_id":0</code> in parameter <code>fields</code>
+<h3 id="deprecated-0-9-8-9001">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-0-9-8-9001"></a></h3>
+<ul><li>Parameter <code>query</code> should be a valid JSON string and now triggers a warning if empty; change <code>query = ""</code> into <code>query = "{}"</code>
 </li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-0-9-8-9001">Changes<a class="anchor" aria-label="anchor" href="#changes-0-9-8-9001"></a></h3>
+<ul><li>Elasticsearch made to immediately refresh index after <code>docdb_create</code> and other functions</li>
 </ul></div>
 <div class="section level3">
 <h3 id="potentially-breaking-change-0-9-8-9001">Potentially breaking change<a class="anchor" aria-label="anchor" href="#potentially-breaking-change-0-9-8-9001"></a></h3>
 <ul><li>
-<p>reimplementation of <code>docdb_query</code> to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB).</p>
-<ul><li>
+<code><a href="../reference/docdb_query.html">docdb_query()</a></code> reimplementation to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB).</li>
+<li>
 <code>query</code> can now be complex (nested, various operators) and is digested with a Javascript helper</li>
 <li>
-<code>fields</code> can now be nested fields (e.g., <code>friends.name</code>) and directly returns value lifted from the nested field</li>
+<code>fields</code> can now be nested fields (e.g., <code>friends.name</code>) to directly return values lifted from the nested field</li>
 <li>
-<code>listfields</code> parameter newly implemented to return all dot paths for fields of all or selected documents in collection</li>
-<li>expanded use of <code>jqr</code> for mangling parameters, selecting documents, filtering fields and lifting nested field values</li>
+<code>listfields</code> parameter newly implemented to return dot paths for all fields of all or selected documents in collection</li>
+<li>expanded use of <code>jq</code> via <code>jqr</code> for mangling parameters, selecting documents, filtering fields and lifting nested field values</li>
 <li>
-<code>docdb_query(src, key, query = {}, fields = {})</code> now delegates to <code>docdb_get(src, key)</code>
+<code>docdb_query(src, key, query = "{}", fields = "{}")</code> now delegates to <code>docdb_get(src, key)</code>
+</li>
+<li>
+<code>_id</code> is always returned, unless specified with <code>"_id": 0</code> in parameter <code>fields</code>
 </li>
 <li>workaround for path collisions of MongoDB</li>
-<li>some acceleration of <code>docdb_query</code>
+<li>some acceleration of <code><a href="../reference/docdb_query.html">docdb_query()</a></code>
 </li>
 <li>factored out common code</li>
 <li>expanded testing</li>
 <li>updated docs</li>
-</ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-9-8-9001">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-8-9001"></a></h3>

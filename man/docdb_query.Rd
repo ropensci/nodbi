@@ -28,12 +28,13 @@ vector of all fields in dot path notation.}
 }
 \value{
 Data frame with requested documents, may have nested
-lists in columns. If \code{query = "{}"} and neither \code{fields}
-not \code{listfields} is specified, runs \code{\link[=docdb_get]{docdb_get()}}.
+lists in columns.
 }
 \description{
 Uses \link{jqr} for complementing the databases'
 native query and filtering functions.
+If \code{query = "{}"} and neither \code{fields}
+nor \code{listfields} is specified, runs \code{\link[=docdb_get]{docdb_get()}}.
 }
 \note{
 A dot in \code{query} or \code{fields} is interpreted as a dot path,
@@ -64,7 +65,7 @@ docdb_query(src, "myKey", query = '{"$or": [{"rows.elements.status": "OK"}, {"$a
 docdb_query(src, "myKey", query = '{"$and": [{"_id": "5cd6785325ce3a94dfc54096"},
  {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}')
 docdb_query(src, "myKey", query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA",
- "New York, NY, USA"]}}', fields = '{"age": 1, "friends.id": 1, "_id":0,
+ "New York, NY, USA"]}}', fields = '{"age": 1, "friends.id": 1, "_id": 0,
  "rows.elements.status": 1}')
 
 docdb_query(src, "myKey", query = '{"rows.elements.status": "OK"}', listfields = TRUE)

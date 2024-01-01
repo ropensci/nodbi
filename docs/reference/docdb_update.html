@@ -90,12 +90,10 @@ file name or URL that points to NDJSON documents</p></dd>
 
 
 <dt>query</dt>
-<dd><p>(character) A JSON query string to
-identify the documents that should be updated
-(patched) with <code>value</code>,
-Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
-with at most one logic operator ('$and' if not specified, or '$or'),
-see examples below and in <code><a href="docdb_query.html">docdb_query()</a></code>.</p></dd>
+<dd><p>(character) A JSON query string, see examples.
+Can use comparisons / tests (<code>$lt</code>, <code>$lte</code>, <code>$gt</code>, <code>$gte</code>,
+<code>$ne</code>, <code>$in</code>, <code>$regex</code>), with logic operators (<code>$and</code>,
+<code>$or</code>, <code>(</code>, <code>)</code>), including nested queries, see examples.</p></dd>
 
 
 <dt>...</dt>

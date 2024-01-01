@@ -17,7 +17,7 @@ database backend (corresponds to \code{collection} for MongoDB,
 a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{...}{Optionally, specify \code{query} parameter with a
-JSON query as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
+JSON string as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
 If not specified, the default is to delete the container \code{key}.
 
 Other parameters are passed on to functions:
@@ -33,7 +33,7 @@ Other parameters are passed on to functions:
 \value{
 (logical) success of operation. Typically \code{TRUE} if
 document(s) or collection existed, and \code{FALSE} if document(s)
-did not exist or collection did not exist or delete was not successful.
+did not exist, or collection did not exist, or delete was not successful.
 }
 \description{
 Delete documents or container

@@ -2,6 +2,8 @@
 #'
 #' Uses [jqr] for complementing the databases'
 #' native query and filtering functions.
+#' If \code{query = "{}"} and neither `fields`
+#' nor `listfields` is specified, runs [docdb_get()].
 #'
 #' @inheritParams docdb_create
 #'
@@ -20,8 +22,7 @@
 #' example below.
 #'
 #' @return Data frame with requested documents, may have nested
-#'  lists in columns. If \code{query = "{}"} and neither `fields`
-#'  not `listfields` is specified, runs [docdb_get()].
+#'  lists in columns.
 #'
 #' @export
 #'
@@ -48,7 +49,7 @@
 #' docdb_query(src, "myKey", query = '{"$and": [{"_id": "5cd6785325ce3a94dfc54096"},
 #'  {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}')
 #' docdb_query(src, "myKey", query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA",
-#'  "New York, NY, USA"]}}', fields = '{"age": 1, "friends.id": 1, "_id":0,
+#'  "New York, NY, USA"]}}', fields = '{"age": 1, "friends.id": 1, "_id": 0,
 #'  "rows.elements.status": 1}')
 #'
 #' docdb_query(src, "myKey", query = '{"rows.elements.status": "OK"}', listfields = TRUE)
@@ -59,6 +60,11 @@ docdb_query <- function(src, key, query, ...) {
   assert(src, "docdb_src")
   assert(key, "character")
   assert(query, c("json", "character"))
+
+  if (query == "") {
+    warning('query = "" is deprecated, use query = "{}"')
+    query = "{}"
+  }
   stopifnot(jsonlite::validate(query))
 
   # query can be empty but then fields should not be empty

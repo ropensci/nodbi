@@ -3,7 +3,7 @@
 #' @inheritParams docdb_create
 #'
 #' @param ... Optionally, specify \code{query} parameter with a
-#' JSON query as per [docdb_query()] to identify documents to be deleted.
+#' JSON string as per [docdb_query()] to identify documents to be deleted.
 #' If not specified, the default is to delete the container \code{key}.
 #'
 #' Other parameters are passed on to functions:
@@ -16,7 +16,7 @@
 #'
 #' @return (logical) success of operation. Typically \code{TRUE} if
 #' document(s) or collection existed, and \code{FALSE} if document(s)
-#' did not exist or collection did not exist or delete was not successful.
+#' did not exist, or collection did not exist, or delete was not successful.
 #'
 #' @export
 #'

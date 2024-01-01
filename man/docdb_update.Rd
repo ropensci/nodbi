@@ -20,12 +20,10 @@ a table name for DuckDB, SQLite and PostgreSQL)}
 a single data.frame, a JSON string, a list, or a
 file name or URL that points to NDJSON documents}
 
-\item{query}{(character) A JSON query string to
-identify the documents that should be updated
-(patched) with \code{value},
-Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
-with at most one logic operator ('$and' if not specified, or '$or'),
-see examples below and in \code{\link[=docdb_query]{docdb_query()}}.}
+\item{query}{(character) A JSON query string, see examples.
+Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
+\verb{$ne}, \verb{$in}, \verb{$regex}), with logic operators (\verb{$and},
+\verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.}
 
 \item{...}{Passed on to functions:
 \itemize{
