@@ -712,7 +712,8 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
     # statement
     statement <- insObj('
-      WITH extracted AS ( SELECT _id, value, REPLACE(fullkey, \'"\', \'\') AS fkr
+      WITH extracted AS ( SELECT _id, value,
+        LTRIM(REPLACE(fullkey, \'"\', \'\'), \'$.\') AS fkr
       FROM "/** key **/", json_tree("/** key **/".json)
       WHERE value <> "{}" )
       SELECT DISTINCT fkr
