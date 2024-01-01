@@ -48,7 +48,7 @@ docdb_update <- function(src, key, value, query, ...) {
 
   if (query == "") {
     warning('query = "" is deprecated, use query = "{}"')
-    query = "{}"
+    query <- "{}"
   }
   stopifnot(jsonlite::validate(query))
 
