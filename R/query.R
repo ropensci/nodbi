@@ -507,21 +507,33 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
       query = query
       )[["_id"]]}, silent = TRUE)
 
-    # early return
-    if (!inherits(fields, "try-error")) return(
-      sort(fields[fields != "_id"]))
+    # alternative approach
+    if (inherits(fields, "try-error")) {
 
-    # alternative using jq
-    tf <- tempfile()
-    on.exit(unlink(tfname), add = TRUE)
+      # get files for
+      tf <- tempfile()
+      on.exit(unlink(tfname), add = TRUE)
 
-    # NOTE mass export
-    src$con$export(con = file(tf), query = query)
+      # NOTE mass export
+      src$con$export(con = file(tf), query = query)
 
-    fields <- as.character(jqr::jq(file(tf), 'path(..) | join (".") '))
+      # use jq
+      fields <- as.character(jqr::jq(file(tf), 'path(..) | join (".") '))
+
+    } # if try-error"
 
     # mangle "\"item.0.sub\"
-    fields <- unique(gsub('"|[.][0-9]+', "", fields))
+    fields <- gsub('"|[.][0-9]+', "", fields)
+
+    # add parent fields e.g. "friends" for "friends.id"
+    parentFields <- strsplit(fields[grepl("[.]", fields)], ".", fixed = TRUE)
+    parentFields <- lapply(parentFields, function(i) sapply(
+      rev(seq_along(i))[-1], function(ii) paste0(i[1:ii], collapse = ".")))
+    parentFields <- unique(unlist(parentFields))
+
+    # format
+    fields <- c(fields, parentFields)
+    fields <- unique(fields)
     fields <- fields[fields != ""]
     fields <- fields[fields != "_id"]
 
