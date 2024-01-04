@@ -828,8 +828,11 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
     #    "regular processing" (below) generates the sought outputFields
 
     fldQ$selectFields <- paste0(
-      sprintf("'%s', \"%s\"",
-              fldQ$includeMaxCharFields, fldQ$includeMaxCharFields), collapse = ", ")
+      unique(sprintf(
+        "'%s', \"%s\"",
+        fldQ$includeMaxCharFields,
+        fldQ$includeMaxCharFields)),
+      collapse = ", ")
 
     if (!any("_id" == fldQ$excludeFields) &&
         !any("_id" == fldQ$includeFields)) fldQ$selectFields <- paste0(
@@ -846,9 +849,10 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   # - extractFields
   fldQ$extractFields <- paste0(
-    sprintf(", jsonb_path_query_array(json, \'$.\"%s\"') AS \"%s\"", # _array
-            gsub('[.]', '"."', fldQ$includeMaxCharFields[fldQ$includeMaxCharFields != "_id"]),
-            fldQ$includeMaxCharFields[fldQ$includeMaxCharFields != "_id"]),
+    unique(sprintf(
+      ", jsonb_path_query_array(json, \'$.\"%s\"') AS \"%s\"", # _array
+      gsub('[.]', '"."', fldQ$includeMaxCharFields[fldQ$includeMaxCharFields != "_id"]),
+      fldQ$includeMaxCharFields[fldQ$includeMaxCharFields != "_id"])),
     collapse = " ")
 
   # PostgreSQL limitation (identifiers to have fewer than 63 bytes,
@@ -1487,7 +1491,7 @@ processOutputFields <- function(
       subFields <- lapply(seq_along(subFields), function(i)
         c(extractedFields[i], subFields[[i]]))
 
-      subFields <- subFields[sapply(subFields, length) > 1L]
+      subFields <- subFields[sapply(subFields, length) >= 1L]
 
     }
 
