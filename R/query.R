@@ -812,17 +812,24 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   # fields
 
+  # - includeFields
   if (length(fldQ$includeFields)) {
 
-    # - stop for particularity
+    # - jsonb_build_object() accepts maximally 100 arguments
     if (length(fldQ$includeFields) > 49L) stop(
-      "For src_postgres(), only less than ",
+      "For src_postgres(), only fewer than ",
       "50 fields can be included."
     )
 
+    # PostgreSQL in standard configuration uses identifiers of more than 63 bytes,
+    # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+    # NOTICE: identifier "abcd..." will be truncated to "abcd..."
+    # => replace includeFields with longest dot path that is less than 63 characters;
+    #    "regular processing" (below) generates the sought outputFields
+
     fldQ$selectFields <- paste0(
       sprintf("'%s', \"%s\"",
-              fldQ$includeFields, fldQ$includeFields), collapse = ", ")
+              fldQ$includeMaxCharFields, fldQ$includeMaxCharFields), collapse = ", ")
 
     if (!any("_id" == fldQ$excludeFields) &&
         !any("_id" == fldQ$includeFields)) fldQ$selectFields <- paste0(
@@ -837,12 +844,17 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   }
 
+  # - extractFields
   fldQ$extractFields <- paste0(
     sprintf(", jsonb_path_query_array(json, \'$.\"%s\"') AS \"%s\"", # _array
-            gsub('[.]', '"."', fldQ$includeFields[fldQ$includeFields != "_id"]),
-            fldQ$includeFields[fldQ$includeFields != "_id"]),
+            gsub('[.]', '"."', fldQ$includeMaxCharFields[fldQ$includeMaxCharFields != "_id"]),
+            fldQ$includeMaxCharFields[fldQ$includeMaxCharFields != "_id"]),
     collapse = " ")
 
+  # PostgreSQL limitation (identifiers to have fewer than 63 bytes,
+  # see above) does not seem to apply to the json(b) functions:
+
+  # - existsFields
   fldQ$existsFields <- paste0(
     sprintf("jsonb_path_exists(json, '$.\"%s\"')",
             gsub('[.]', '"."', fldQ$includeFields[fldQ$includeFields != "_id"])), collapse = " OR ")
@@ -851,10 +863,13 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   # query
 
+  # - no query
   if (!length(fldQ$queryCondition)) fldQ$queryCondition <- "TRUE"
 
+  # - quotation for sql
   fldQ$queryCondition <- gsub("'", '"', fldQ$queryCondition)
 
+  # - adapt sql to postgresql functions
   for (i in fldQ$queryPaths[fldQ$queryPaths != "_id"]) {
 
     fldQ$queryCondition <- gsub(
@@ -863,7 +878,6 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
       fldQ$queryCondition)
 
     # - special case IN
-
     if (grepl(paste0("\"", i, "\" IN \\("), fldQ$queryCondition)) {
 
       # "jsonb_path_exists(json, '$[*] ? (@.\"a\" == \"b\" || @.\"a\" == \"c\")')"
@@ -888,6 +902,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
     }
 
+    # special case REGEXP
     fldQ$queryCondition <- gsub(
       paste0(i, '" REGEXP '),
       paste0(i, '" like_regex '),
@@ -900,7 +915,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   fldQ$queryCondition <- gsub('"_id" (~|!=|<=|>=|<>|=)=? "(.+?)"',
                               "\"_id\" \\1 '\\2'", fldQ$queryCondition)
 
-  # - mangle _id, since character values should be in double quotes
+  # - mangle _id with IN, since character values should be in double quotes
   all <- stringi::stri_extract_all_regex(
     fldQ$queryCondition, '"_id" IN \\((.+?)\\)')[[1]]
   if (!is.na(all)) {
@@ -914,19 +929,6 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
       paste0('"_id" IN (', rep, ")"),
       vectorize_all = FALSE
     )}
-
-
-  # statement
-  statement <- insObj('
-    SELECT
-    /** fldQ$selectFields **/
-    AS json FROM "/** key **/"
-    /** fldQ$extractFields **/
-    WHERE  (
-    /** fldQ$existsFields **/
-    ) AND (
-    /** fldQ$queryCondition **/
-    );')
 
 
   # early return if listfields
@@ -972,13 +974,34 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   }
 
+
+  # statement
+  statement <- insObj('
+    SELECT
+    /** fldQ$selectFields **/
+    AS json FROM "/** key **/"
+    /** fldQ$extractFields **/
+    WHERE  (
+    /** fldQ$existsFields **/
+    ) AND (
+    /** fldQ$queryCondition **/
+    );')
+
+
   # regular processing
+  #
+  # - parametrise processOutputFields
+  if (setequal(fldQ$includeFields, fldQ$includeMaxCharFields)) extractedFields <-
+    fldQ$includeFields else extractedFields <- fldQ$includeMaxCharFields
+  #
+  # - get data
   return(processDbGetQuery(
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
     outputFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields,
-    recurse = FALSE))
+    extractedFields = extractedFields
+  ))
 
 }
 
@@ -1235,7 +1258,7 @@ processDbGetQuery <- function(
     jqrWhere = character(0L),
     outputFields = character(0L),
     excludeFields = character(0L),
-    recurse = TRUE) {
+    extractedFields = character(0L)) {
 
 
   # debug
@@ -1325,14 +1348,14 @@ processDbGetQuery <- function(
 
     # early exit
     if (!length(excludeFields)) return(
-      processOutputFields(tfname, outputFields, recurse = recurse))
+      processOutputFields(tfname, outputFields, extractedFields = extractedFields))
 
     # get another file name
     tjname <- tempfile()
     on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
 
     # write data
-    processOutputFields(tfname, outputFields, tjname, recurse)
+    processOutputFields(tfname, outputFields, tjname, extractedFields)
 
     # early exit
     if (!file.size(tjname)) return(NULL)
@@ -1393,71 +1416,120 @@ processExcludeFields <- function(df, excludeFields) {
 #' @keywords internal
 #' @noRd
 #'
-processOutputFields <- function(tfname, outputFields, tjname = NULL, recurse = TRUE) {
+processOutputFields <- function(
+    tfname,
+    outputFields,
+    tjname = NULL,
+    extractedFields = character(0L)) {
 
   # create output json with dot field names that
   # represent nested fields and their values
 
-  # input:
-  # {"_id", "friends": {"id": [."friends" | (if type != "array" then [.] else .[] end) | ."id"] }}
+  # recursive (default):
   #
-  # script:
-  # "{\"_id\", \"friends.id\": [.\"friends\" | (if type != \"array\" then [.][] else .[] end) | .\"id\"]}"
+  # - input:
+  # {"_id": "5cd67853f841025e65ce0ce2", "friends": {"id": [0, 1, 2]}}
   #
-  # output:
+  # - script:
+  # "{\"_id\", \"friends.id\": [.\"friends\" | m1 | .\"id\" ] | m2}"
+  #
+  # - output:
+  # {"_id", "friends.id": [1, 2, 3]}
+  #
+  # postgres:
+  #
+  # - input:
+  # {"_id": "5cd67853f841025e65ce0ce2", "friends.id": [0, 1, 2]}
+  #
+  # - script:
+  # "{\"_id\", \"friends.id\": [.\"friends\".\"id\"] | m2}"
+  #
+  # - output:
   # {"_id", "friends.id": [1, 2, 3]}
 
   jqFcts <-
     'def m1: . | (if length == 0 then null else (if type != "array" then [.][] else .[] end) end);
-     def m2: . | (if length > 1 then [.][] else .[] end); {'
+     def m2: . | (if length > 1 then [.][] else .[] end); '
 
-  if (recurse) {
+  if (!length(extractedFields)) {
 
+    # default
     subFields <- strsplit(outputFields, split = "[.]")
     rootFields <- subFields[sapply(subFields, length) == 1L]
     subFields <- subFields[sapply(subFields, length) > 1L]
 
-    jqFields <- ifelse(!length(rootFields), '"_id"', paste0(
-      # keep _id even if not specified, can be
-      # removed with _id:0 in subsequent step
-      '"', unique(c("_id", rootFields)), '"', collapse = ", "))
-
-    if (jqFields != "") jqFields <- paste0(jqFields, ", ", collapse = "")
-
-    jqFields <- paste0(jqFcts,
-                       paste0(c(jqFields, paste0(
-                         sapply(
-                           subFields,
-                           function(s) {
-                             # first item
-                             k <- paste0('"', s[1], '')
-                             v <- paste0(' [."', s[1], '" | m1 | ')
-                             # next item(s)
-                             for (i in (seq_len(length(s) - 2) + 1)) {
-                               k <- paste0(k, '.', s[i], '')
-                               v <- paste0(v, '."', s[i], '" | m1 | ')
-                             }
-                             # last item
-                             k <- paste0(k, '.', s[length(s)], '": ')
-                             v <- paste0(v, '."', s[length(s)], '"] | m2 ')
-                             # combine item(s)
-                             paste0(k, v)
-                           }, USE.NAMES = FALSE),
-                         collapse = ", ")), collapse = ""), "}")
-
   } else {
 
-    # this is only for postgres which already creates
-    # an NDJSON that has already nested elements lifted
-    # to the requested field level, e.g. "friends.id"
+    # postgres
 
-    jqFields <- outputFields[outputFields != "_id"]
+    if (setequal(outputFields, extractedFields)) {
 
-    jqFields <- paste0(jqFcts, '"_id", ',
-                       paste0('"', outputFields, '": [."', outputFields, '" | m1 ] | m2 ',
-                              collapse = ", "), "}")
+      # identifiers were short enough so
+      # no recursive approach is needed
+      subFields <- outputFields[outputFields != "_id"]
 
-  } # if
+    } else {
+
+      # recurse only for those elements of the dot path that
+      # extend beyond the maximum length of the dot path as per
+      # extractedFields, for example
+      # [[1]]
+      # [1] "clinical_results.reported_events.other_events.category_list"
+      # [2] "category"
+      # [3] "event_list"
+
+      subFields <- gsub(
+        "^[.]", "", stringi::stri_replace_all_fixed(
+          outputFields, extractedFields, ""))
+
+      subFields <- strsplit(subFields, split = "[.]")
+
+      subFields <- lapply(seq_along(subFields), function(i)
+        c(extractedFields[i], subFields[[i]]))
+
+      subFields <- subFields[sapply(subFields, length) > 1L]
+
+    }
+
+    rootFields <- character(0L)
+
+  }
+
+  jqFields <- ifelse(!length(rootFields), '"_id"', paste0(
+    # keep _id even if not specified, can be
+    # removed with _id:0 in subsequent step
+    '"', unique(c("_id", rootFields)), '"', collapse = ", "))
+
+  if (jqFields != "" && length(subFields)) jqFields <-
+    paste0(jqFields, ", ", collapse = "")
+
+  jqFields <- paste0(
+    jqFcts, "{",
+    paste0(c(jqFields, paste0(
+      sapply(
+        subFields,
+        function(s) {
+          # used for postgres which already
+          # extracts nested fields by SQL
+          if (length(s) == 1L) return(paste0(
+            '"', s, '": [."', s, '" | m1 ] | m2 '
+          ))
+          # other cases
+          # -first item
+          k <- paste0('"', s[1], '')
+          v <- paste0(' [."', s[1], '" | m1 | ')
+          # - any next item(s)
+          for (i in (seq_len(length(s) - 2) + 1)) {
+            k <- paste0(k, '.', s[i], '')
+            v <- paste0(v, '."', s[i], '" | m1 | ')
+          }
+          # - last item
+          k <- paste0(k, '.', s[length(s)], '": ')
+          v <- paste0(v, '."', s[length(s)], '"] | m2 ')
+          # - combine items
+          return(paste0(k, v))
+        }, USE.NAMES = FALSE),
+      collapse = ", ")), collapse = ""), "}")
 
   # debug
   if (options()[["verbose"]]) {

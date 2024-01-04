@@ -267,6 +267,16 @@ digestFields <- function(f = "", q = "") {
   includeRootFields <- unique(gsub("[.].*", "", includeFields))
   includeRootFields <- includeRootFields[includeRootFields != "_id"]
 
+  includeMaxCharFields <- sapply(
+    includeFields, function(i) {
+      if (!grepl(".", i, fixed = TRUE)) return(i)
+      if (nchar(i) <= 63L) return(i)
+      locDot <- substring(i, 1L, 63L) # 63L bytes is maximum for postgres
+      # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+      locDot <- stringi::stri_locate_last_fixed(locDot, ".")[1, "start", drop = TRUE]
+      substring(i, 1L, locDot - 1L)
+    }, USE.NAMES = FALSE)
+
   excludeFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     f, '"([-@._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]))
 
