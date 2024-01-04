@@ -14,7 +14,7 @@
   * expanded use of `jq` via `jqr` for mangling parameters, selecting documents, filtering fields and lifting nested field values
   * `docdb_query(src, key, query = "{}", fields = "{}")` now delegates to `docdb_get(src, key)`
   * `_id` is always returned, unless specified with `"_id": 0` in parameter `fields`
-  * for `scr_postgres`, only works with fewer than 50 fields in `fields`
+  * for `scr_postgres`, only fewer than 50 fields if any can be specified in `fields`
   * workaround for path collisions of MongoDB
   * some acceleration of `docdb_query()`
   * factored out common code 
