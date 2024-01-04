@@ -282,40 +282,6 @@ digestFields <- function(f = "", q = "") {
 
   }
 
-  # helper for each unique element of minimum path length,
-  # determine which in fieldStrings is the longest common path
-  longestCommon <- function(strVector, minLength = 2, itemSep = ".") {
-
-    strSplit <- strsplit(strVector, split = itemSep, fixed = TRUE)
-
-    minElements <- sapply(strSplit, function(i)
-      paste0(i[1:min(length(i), minLength)], collapse = itemSep))
-    minElements <- unique(minElements)
-
-    maxPaths <- lapply(minElements, function(i) {
-
-      elemSet <- strVector[grepl(paste0("^", i), strVector)]
-      elemSet <- strsplit(elemSet, split = itemSep, fixed = TRUE)
-
-      maxNumSeq <- seq(
-        from = min(minLength + 1L, max(sapply(elemSet, length))),
-        to = max(sapply(elemSet, length)))
-
-      maxPath <- sapply(maxNumSeq, function(i)
-        allEqualAtPos(elemSet, i), USE.NAMES = FALSE)
-
-      # return minElement if no longer path found
-      maxNum <- ifelse(any(maxPath), max(maxNumSeq[maxPath]), minLength)
-
-      elemSet[[1]][seq(from = 1L, to = min(length(elemSet[[1]]), maxNum))]
-
-    })
-
-    # concate to fields
-    sapply(maxPaths, function(i) paste0(unlist(i), collapse = itemSep))
-
-  }
-
   # translate mongo query into jq script to filter and select:
 
   # {"$or": [{"rows.elements.status": "OK"},
@@ -398,10 +364,9 @@ digestFields <- function(f = "", q = "") {
   # output
   return(list(
     # vector of fields
-    longestFields = longestCommon(strVector = fieldStrings, minLength = 1),
-    longestQuery = longestCommon(strVector = queryFields, minLength = 1),
     includeFields = includeFields,
     includeRootFields = includeRootFields,
+    includeMaxCharFields = includeMaxCharFields,
     excludeFields = excludeFields,
     queryRootFields = queryRootFields,
     queryFields = queryFields,
