@@ -963,27 +963,13 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   }
 
-  # processing
-
-  # - return
-  return(
-    processExcludeFields(
-      jsonlite::stream_in(
-        textConnection(
-          jqr::jq(
-            # converting to text to address:
-            # jq method not implemented for pq_jsonb
-            as.character(
-              DBI::dbGetQuery(
-                conn = src$con,
-                statement = statement,
-                n = n)[["json"]]),
-            # script to flatten or unbox arrays of length 1
-            " with_entries ( .value |= (if type == \"array\"
-              and length == 1 then .[] else . end) ) ")
-        ), verbose = FALSE
-      ), fldQ$excludeFields)
-  )
+  # regular processing
+  return(processDbGetQuery(
+    getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+               statement = statement, n = n)[["json"]], "")',
+    outputFields = fldQ$includeFields,
+    excludeFields = fldQ$excludeFields,
+    recurse = FALSE))
 
 }
 
@@ -1239,7 +1225,8 @@ processDbGetQuery <- function(
     getData,
     jqrWhere = character(0L),
     outputFields = character(0L),
-    excludeFields = character(0L)) {
+    excludeFields = character(0L),
+    recurse = TRUE) {
 
 
   # debug
@@ -1329,14 +1316,14 @@ processDbGetQuery <- function(
 
     # early exit
     if (!length(excludeFields)) return(
-      processOutputFields(tfname, outputFields))
+      processOutputFields(tfname, outputFields, recurse = recurse))
 
     # get another file name
     tjname <- tempfile()
     on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
 
     # write data
-    processOutputFields(tfname, outputFields, tjname)
+    processOutputFields(tfname, outputFields, tjname, recurse)
 
     # early exit
     if (!file.size(tjname)) return(NULL)
@@ -1397,7 +1384,7 @@ processExcludeFields <- function(df, excludeFields) {
 #' @keywords internal
 #' @noRd
 #'
-processOutputFields <- function(tfname, outputFields, tjname = NULL) {
+processOutputFields <- function(tfname, outputFields, tjname = NULL, recurse = TRUE) {
 
   # create output json with dot field names that
   # represent nested fields and their values
@@ -1411,39 +1398,57 @@ processOutputFields <- function(tfname, outputFields, tjname = NULL) {
   # output:
   # {"_id", "friends.id": [1, 2, 3]}
 
-  subFields <- strsplit(outputFields, split = "[.]")
-  rootFields <- subFields[sapply(subFields, length) == 1L]
-  subFields <- subFields[sapply(subFields, length) > 1L]
+  jqFcts <-
+    'def m1: . | (if length == 0 then null else (if type != "array" then [.][] else .[] end) end);
+     def m2: . | (if length > 1 then [.][] else .[] end); {'
 
-  jqFields <- ifelse(!length(rootFields), '"_id"', paste0(
-    # keep _id even if not specified, can be
-    # removed with _id:0 in subsequent step
-    '"', unique(c("_id", rootFields)), '"', collapse = ", "))
+  if (recurse) {
 
-  if (jqFields != "") jqFields <- paste0(jqFields, ", ", collapse = "")
+    subFields <- strsplit(outputFields, split = "[.]")
+    rootFields <- subFields[sapply(subFields, length) == 1L]
+    subFields <- subFields[sapply(subFields, length) > 1L]
 
-  jqFields <- paste0(
-    'def m1: . | (if length == 0 then null else (if type != "array" then [.][] else .[] end) end); ',
-    'def m2: . | (if length > 1 then [.][] else .[] end); {',
-    paste0(c(jqFields, paste0(
-      sapply(
-        subFields,
-        function(s) {
-          # first item
-          k <- paste0('"', s[1], '')
-          v <- paste0(' [."', s[1], '" | m1 | ')
-          # next item(s)
-          for (i in (seq_len(length(s) - 2) + 1)) {
-            k <- paste0(k, '.', s[i], '')
-            v <- paste0(v, '."', s[i], '" | m1 | ')
-          }
-          # last item
-          k <- paste0(k, '.', s[length(s)], '": ')
-          v <- paste0(v, '."', s[length(s)], '"] | m2 ')
-          # combine item(s)
-          paste0(k, v)
-        }, USE.NAMES = FALSE),
-      collapse = ", ")), collapse = ""), "}")
+    jqFields <- ifelse(!length(rootFields), '"_id"', paste0(
+      # keep _id even if not specified, can be
+      # removed with _id:0 in subsequent step
+      '"', unique(c("_id", rootFields)), '"', collapse = ", "))
+
+    if (jqFields != "") jqFields <- paste0(jqFields, ", ", collapse = "")
+
+    jqFields <- paste0(jqFcts,
+                       paste0(c(jqFields, paste0(
+                         sapply(
+                           subFields,
+                           function(s) {
+                             # first item
+                             k <- paste0('"', s[1], '')
+                             v <- paste0(' [."', s[1], '" | m1 | ')
+                             # next item(s)
+                             for (i in (seq_len(length(s) - 2) + 1)) {
+                               k <- paste0(k, '.', s[i], '')
+                               v <- paste0(v, '."', s[i], '" | m1 | ')
+                             }
+                             # last item
+                             k <- paste0(k, '.', s[length(s)], '": ')
+                             v <- paste0(v, '."', s[length(s)], '"] | m2 ')
+                             # combine item(s)
+                             paste0(k, v)
+                           }, USE.NAMES = FALSE),
+                         collapse = ", ")), collapse = ""), "}")
+
+  } else {
+
+    # this is only for postgres which already creates
+    # an NDJSON that has already nested elements lifted
+    # to the requested field level, e.g. "friends.id"
+
+    jqFields <- outputFields[outputFields != "_id"]
+
+    jqFields <- paste0(jqFcts, '"_id", ',
+                       paste0('"', outputFields, '": [."', outputFields, '" | m1 ] | m2 ',
+                              collapse = ", "), "}")
+
+  } # if
 
   # debug
   if (options()[["verbose"]]) {
