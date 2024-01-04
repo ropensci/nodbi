@@ -143,7 +143,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   tfname <- tempfile()
   tfnameCon <- file(tfname, open = "at")
   # register to close and remove file after used for streaming
-  on.exit(unlink(tfname), add = TRUE)
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
   on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
 
   # check

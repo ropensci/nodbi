@@ -163,7 +163,7 @@ sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
   tfnameCon <- file(description = tfname, open = "wt")
   # register to remove file after used for streaming
   on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-  on.exit(unlink(tfname), add = TRUE)
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
   # get data, write to file in ndjson format
   writeLines(

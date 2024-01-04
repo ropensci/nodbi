@@ -628,7 +628,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
     tfnameCon <- file(tfname, open = "wt")
     # register to close and remove file after used for streaming
     on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-    on.exit(unlink(tfname), add = TRUE)
+    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
     # if json in character vector
     if ((all(class(value) %in% "character")) &&

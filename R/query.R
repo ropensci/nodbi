@@ -512,7 +512,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
       # get files for
       tf <- tempfile()
-      on.exit(unlink(tfname), add = TRUE)
+      on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
       # NOTE mass export
       src$con$export(con = file(tf), query = query)
@@ -520,7 +520,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
       # use jq
       fields <- as.character(jqr::jq(file(tf), 'path(..) | join (".") '))
 
-    } # if try-error"
+    } # if try-error
 
     # mangle "\"item.0.sub\"
     fields <- gsub('"|[.][0-9]+', "", fields)
@@ -556,7 +556,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
   # - jq to extract fields and subfields
   tfname <- tempfile()
-  on.exit(unlink(tfname), add = TRUE)
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
 
   # - fldQ$includeFields has subfields thus mangle
@@ -582,7 +582,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
     # get another file name
     tjname <- tempfile()
-    on.exit(unlink(tjname), add = TRUE)
+    on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
 
     # write data
     processOutputFields(tfname, fldQ$includeFields, tjname)
@@ -1250,7 +1250,7 @@ processDbGetQuery <- function(
 
   # temporary file and connection
   tfname <- tempfile()
-  on.exit(unlink(tfname), add = TRUE)
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
 
   #### .write dbGetQuery ####
@@ -1293,11 +1293,12 @@ processDbGetQuery <- function(
         !length(excludeFields)) return(
           jsonlite::stream_in(
             textConnection(
-              jqr::jq(file(tfname), jqrWhere)), verbose = FALSE))
+              jqr::jq(file(tfname), jqrWhere)),
+            verbose = FALSE))
 
     # get another file name
     tjname <- tempfile()
-    on.exit(unlink(tjname), add = TRUE)
+    on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
 
     # write data
     jqr::jq(
@@ -1332,7 +1333,7 @@ processDbGetQuery <- function(
 
     # get another file name
     tjname <- tempfile()
-    on.exit(unlink(tjname), add = TRUE)
+    on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
 
     # write data
     processOutputFields(tfname, outputFields, tjname)
