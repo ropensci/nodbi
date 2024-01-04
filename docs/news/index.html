@@ -61,7 +61,7 @@
 <div class="section level3">
 <h3 id="potentially-breaking-change-0-9-8-9001">Potentially breaking change<a class="anchor" aria-label="anchor" href="#potentially-breaking-change-0-9-8-9001"></a></h3>
 <ul><li>
-<code><a href="../reference/docdb_query.html">docdb_query()</a></code> reimplementation to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB).</li>
+<code><a href="../reference/docdb_query.html">docdb_query()</a></code> reimplementation to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB). Details:</li>
 <li>
 <code>query</code> can now be complex (nested, various operators) and is digested with a Javascript helper</li>
 <li>
@@ -74,6 +74,8 @@
 </li>
 <li>
 <code>_id</code> is always returned, unless specified with <code>"_id": 0</code> in parameter <code>fields</code>
+</li>
+<li>for <code>scr_postgres</code>, only works with fewer than 50 fields in <code>fields</code>
 </li>
 <li>workaround for path collisions of MongoDB</li>
 <li>some acceleration of <code><a href="../reference/docdb_query.html">docdb_query()</a></code>
