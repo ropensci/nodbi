@@ -14,15 +14,18 @@
 #'
 #' @param ... Optionally, specify `fields` as a JSON string of
 #' fields to be returned from anywhere in the tree, see examples.
-#' Alternatively, specify `listfields` with any value to obtain a
-#' vector of all fields in dot path notation.
+#' For `src_postgres()`, only fewer than 50 fields can be requested
+#' to be returned by the function.
+#' Alternatively, specify `listfields` with any value to return
+#' just the names of all fields in dot path notation.
 #'
 #' @note A dot in `query` or `fields` is interpreted as a dot path,
 #' pointing to a fields nested within another, e.g. `friends.id` in
 #' example below.
 #'
 #' @return Data frame with requested documents, may have nested
-#'  lists in columns.
+#'  lists in columns. Or a vector of all field names in do path
+#'  notation, if `listfields` is specified.
 #'
 #' @export
 #'
@@ -810,6 +813,12 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   # fields
 
   if (length(fldQ$includeFields)) {
+
+    # - stop for particularity
+    if (length(fldQ$includeFields) > 49L) stop(
+      "For src_postgres(), only less than ",
+      "50 fields can be included."
+    )
 
     fldQ$selectFields <- paste0(
       sprintf("'%s', \"%s\"",

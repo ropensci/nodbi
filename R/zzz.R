@@ -450,8 +450,9 @@ insObj <- function(x) {
     }
 
     if (!is.null(c) && length(c)) {
-      if (length(c) > 1L) stop(call. = FALSE,
-                               "Objects should be atomic character vectors, this is not: ", i)
+      if (length(c) > 1L) stop(
+        call. = FALSE,
+        "Objects should be atomic character vectors, this is not: ", i)
       if (length(b)) c <- paste0(b, c, b, collapse = "")
       x <- stringi::stri_replace_all_fixed(x, oneFound, c)
     }

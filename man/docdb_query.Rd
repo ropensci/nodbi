@@ -23,12 +23,15 @@ Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
 
 \item{...}{Optionally, specify \code{fields} as a JSON string of
 fields to be returned from anywhere in the tree, see examples.
-Alternatively, specify \code{listfields} with any value to obtain a
-vector of all fields in dot path notation.}
+For \code{src_postgres()}, only fewer than 50 fields can be requested
+to be returned by the function.
+Alternatively, specify \code{listfields} with any value to return
+just the names of all fields in dot path notation.}
 }
 \value{
 Data frame with requested documents, may have nested
-lists in columns.
+lists in columns. Or a vector of all field names in do path
+notation, if \code{listfields} is specified.
 }
 \description{
 Uses \link{jqr} for complementing the databases'
