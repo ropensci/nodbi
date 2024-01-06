@@ -1453,8 +1453,11 @@ processOutputFields <- function(
 
   jqFcts <- paste0(
     # m1 replaces missing values with null to allow further processing
-    #    if a field cannot be found, and *recursively* goes into arrays
-    'def m1: . | (if length == 0 then null else (if type != "array" then [.][] else (.[] | m1) end) end);',
+    #    if a field cannot be found, but takes care of boolean because
+    #    "It is an error to use length on a boolean" and then goes
+    #    recursively into arrays
+    'def m1: . | (if type != "boolean" and length == 0 then null else . end)
+               | (if type == "array" then (.[] | m1) else [.][] end);',
     # m2 provides a final scalar unless there are several elements
     'def m2: . | (if length > 1 then [.][] else .[] end); ')
 
