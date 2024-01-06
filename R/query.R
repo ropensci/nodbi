@@ -1451,9 +1451,12 @@ processOutputFields <- function(
   # - output:
   # {"_id", "friends.id": [1, 2, 3]}
 
-  jqFcts <-
-    'def m1: . | (if length == 0 then null else (if type != "array" then [.][] else .[] end) end);
-     def m2: . | (if length > 1 then [.][] else .[] end); '
+  jqFcts <- paste0(
+    # m1 replaces missing values with null to allow further processing
+    #    if a field cannot be found, and *recursively* goes into arrays
+    'def m1: . | (if length == 0 then null else (if type != "array" then [.][] else (.[] | m1) end) end);',
+    # m2 provides a final scalar unless there are several elements
+    'def m2: . | (if length > 1 then [.][] else .[] end); ')
 
   if (!length(extractedFields)) {
 
@@ -1529,7 +1532,7 @@ processOutputFields <- function(
           }
           # - last item
           k <- paste0(k, '.', s[length(s)], '": ')
-          v <- paste0(v, '."', s[length(s)], '"] | m2 ')
+          v <- paste0(v, '."', s[length(s)], '" | m1 ] | m2 ')
           # - combine items
           return(paste0(k, v))
         }, USE.NAMES = FALSE),
