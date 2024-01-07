@@ -1465,8 +1465,7 @@ processOutputFields <- function(
 
     # default
     subFields <- strsplit(outputFields, split = "[.]")
-    rootFields <- subFields[sapply(subFields, length) == 1L]
-    subFields <- subFields[sapply(subFields, length) > 1L]
+    subFields <- subFields[sapply(subFields, length) >= 1L]
 
   } else {
 
@@ -1501,16 +1500,13 @@ processOutputFields <- function(
 
     }
 
-    rootFields <- character(0L)
-
   }
 
-  jqFields <- ifelse(!length(rootFields), '"_id"', paste0(
-    # keep _id even if not specified, can be
-    # removed with _id:0 in subsequent step
-    '"', unique(c("_id", rootFields)), '"', collapse = ", "))
+  # keep _id even if not specified, can be
+  # removed with _id:0 in subsequent step
+  jqFields <- '"_id"'
 
-  if (jqFields != "" && length(subFields)) jqFields <-
+  if (length(subFields)) jqFields <-
     paste0(jqFields, ", ", collapse = "")
 
   jqFields <- paste0(
