@@ -138,7 +138,7 @@ src <- nodbi::src_postgres(
 
 ## Walk-through {#walk-through}
 
-This example is to show how functional `nodbi` is at this time.
+This example is to show how functional `nodbi` is at this time: With any of the six database backends, the functions work in the same way and return the same values. 
 
 ```{r}
 # load nodbi
@@ -151,9 +151,11 @@ key <- "my_container"
 src <- src_duckdb()
 src <- src_mongo(collection = key)
 src <- src_sqlite()
-src <- src_couchdb()
-src <- src_elastic()
 src <- src_postgres()
+src <- src_elastic()
+src <- src_couchdb(
+  user = Sys.getenv("COUCHDB_TEST_USER"), 
+  pwd = Sys.getenv("COUCHDB_TEST_PWD"))
 
 # check if container already exists
 docdb_exists(src, key)
@@ -315,15 +317,14 @@ result <- rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 
-# 2024-01-06 with 2015 mobile hardware, databases via homebrew
+# 2024-01-07 with 2015 mobile hardware, databases via homebrew
 result[rev(order(result$elapsed)), ]
-#         test replications elapsed
-# 4    CouchDB           10   294.9
-# 3    Elastic           10    33.2
-# 5 PostgreSQL           10     4.9
-# 6     DuckDB           10     1.9
-# 1    MongoDB           10     1.6
-# 2     SQLite           10     1.6
+# 4    CouchDB           10   361.5
+# 3    Elastic           10    41.4
+# 5 PostgreSQL           10     3.6
+# 2     SQLite           10     2.4
+# 6     DuckDB           10     2.4
+# 1    MongoDB           10     1.9
 ```
 
 2## Testing {#testing}
@@ -332,35 +333,35 @@ Every database backend is subjected to identical tests, see [core-nodbi.R](https
 
 ```{r testing_and_coverage}
 #
-# 2024-01-06
+# 2024-01-07
 testthat::test_local()
 # ✔ | F W  S  OK | Context
-# ✔ |      2 151 | couchdb [109.9s]                                                                   
-# ✔ |      1 150 | duckdb [5.1s]                                                                      
-# ✔ |      2 149 | elastic [104.5s]                                                                   
-# ✔ |      2 149 | mongodb [6.7s]                                                                     
-# ✔ |        151 | postgres [39.9s]                                                                   
-# ✔ |        153 | sqlite [33.4s]                                                                     
+# ✔ |      2 151 | couchdb [132.4s]                                                                            
+# ✔ |      1 150 | duckdb [6.4s]                                                                               
+# ✔ |      2 149 | elastic [122.7s]                                                                            
+# ✔ |      2 149 | mongodb [7.8s]                                                                              
+# ✔ |        151 | postgres [50.0s]                                                                            
+# ✔ |        153 | sqlite [44.2s]                                                                              
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════════════════
-# Duration: 299.8 s
+# ══ Results ══════════════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 364.0 s
 # 
-# ── Skipped tests (7) ───────────────────────────────────────────────────────────────────────────────
-# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3,
+# ── Skipped tests (7) ────────────────────────────────────────────────────────────────────────────────────────
+# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,
+#   test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3,
 #   test-elastic.R:21:3, test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3,
-#   test-duckdb.R:22:3, test-elastic.R:21:3, test-mongodb.R:24:3
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 903 ]
 
-# 2024-01-06
+# 2024-01-07
 covr::package_coverage(type = "all")
-# nodbi Coverage: 93.49%
+# nodbi Coverage: 93.48%
 # R/src_duckdb.R: 76.92%
 # R/zzz.R: 82.05%
 # R/src_mongo.R: 91.30%
 # R/update.R: 93.33%
-# R/query.R: 93.41%
+# R/query.R: 93.39%
 # R/src_postgres.R: 95.65%
 # R/create.R: 96.26%
 # R/delete.R: 97.96%
