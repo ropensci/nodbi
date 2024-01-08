@@ -588,7 +588,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
         silent = TRUE
       )
     } else {
-      result <- result + try(
+      tmpRes <- try(
         DBI::dbWithTransaction(
           conn = src$con,
           code = {
@@ -600,6 +600,13 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
         ),
         silent = TRUE
       )
+      if (!inherits(tmpRes, "try-error")) {
+        result <- result + tmpRes
+      } else {
+        message("Failed to update _id(s) ", 
+                paste0(ids[i], collapse = " / "), 
+                ", reason: ", tmpRes)
+      }
     } # if
 
   } # for
