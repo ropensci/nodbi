@@ -580,7 +580,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
     # update data
     if (inherits(src, "src_duckdb")) {
-      result <- result + try(
+      tmpRes <- try(
         DBI::dbExecute(
           conn = src$con,
           statement = statement
@@ -600,14 +600,16 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
         ),
         silent = TRUE
       )
-      if (!inherits(tmpRes, "try-error")) {
-        result <- result + tmpRes
-      } else {
-        message("Failed to update _id(s) ", 
-                paste0(ids[i], collapse = " / "), 
-                ", reason: ", tmpRes)
-      }
     } # if
+
+    if (!inherits(tmpRes, "try-error")) {
+      result <- result + tmpRes
+    } else {
+      message(
+        "Failed to update _id(s) ",
+        paste0(ids[i], collapse = " / "),
+        ", reason: ", tmpRes)
+    }
 
   } # for
 
