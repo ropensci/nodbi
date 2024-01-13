@@ -399,17 +399,18 @@ digestFields <- function(f = "", q = "") {
 #' @keywords internal
 #' @noRd
 #'
-insObj <- function(x) {
-
-  p <- parent.frame()
+insObj <- function(x, p = parent.frame(), e = NULL) {
 
   x <- gsub("\n+", " ", x)
   x <- gsub("  +", " ", x)
 
   allFound <- stringi::stri_extract_all_regex(x, "(/[*][*].*?[*][*]/)", simplify = FALSE)[[1]]
-  allFound <- unique(allFound)
 
-  for (oneFound in allFound) {
+  if (setequal(allFound, e)) stop("Could not find ", allFound)
+
+  if (all(is.na(allFound))) return(x)
+
+  for (oneFound in unique(allFound)) {
 
     i <- stringi::stri_replace_all_fixed(oneFound, c("/**", "**/"), "", vectorize_all = FALSE)
     i <- trimws(i)
@@ -433,5 +434,6 @@ insObj <- function(x) {
     }
   }
 
-  return(x)
+  # recurse
+  insObj(x = x, p = p, e = allFound)
 }
