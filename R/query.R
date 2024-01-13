@@ -82,7 +82,6 @@ docdb_query <- function(src, key, query, ...) {
       params$query <- NULL
       params$fields <- NULL
       params$listfields <- NULL
-      #if (!length(params)) params <- NULL
       if (is.list(params) &&
           !is.null(params$limit)) {
         limit <- params$limit
@@ -762,6 +761,227 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   return(processDbGetQuery(
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
+    outputFields = fldQ$includeFields,
+    excludeFields = fldQ$excludeFields))
+
+}
+
+
+#' @export
+docdb_query.src_sqlite <- function(src, key, query, ...) {
+
+
+  # make dotted parameters accessible
+  params <- list(...)
+
+
+  # query
+  query <- jsonlite::minify(query)
+
+
+  # add limit if not in params
+  n <- -1L
+  if (!is.null(params$limit)) n <- params$limit
+
+
+  # add fields if not in params
+  fields <- "{}"
+  if (!is.null(params$fields)) fields <- jsonlite::minify(params$fields)
+
+
+  # digest
+  fldQ <- digestFields(f = fields, q = query)
+
+
+  # early return if only _id is requested
+  if (query == "{}" &&
+      length(fldQ$includeFields) == 1L &&
+      fldQ$includeFields == "_id") {
+
+    statement <- paste0(
+      "SELECT DISTINCT _id ",
+      "FROM \"", key, "\";")
+
+    return(DBI::dbGetQuery(
+      conn = src$con,
+      n = n, statement = statement))
+
+  }
+
+
+  # special case: return all fields if listfields != NULL
+  if (!is.null(params$listfields)) {
+
+    # this case is run only with SQL
+
+    # - transform query
+    fldQ$queryCondition <- gsub("'", '"', fldQ$queryCondition)
+    for (i in fldQ$queryPaths) {
+
+      fldQ$queryCondition <- gsub(
+        paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
+        paste0('SUM ( fkr REGEXP "^',
+               gsub('"[.]"', "[-#\\\\\\\\[\\\\\\\\]0-9]*[.]", i),
+               '" AND value \\2 ) > 0 \\3'),
+        fldQ$queryCondition
+      )
+    }
+
+    # _id in query
+    fldQ$queryCondition <- gsub(
+      'fkr REGEXP \\"\\^_id\\" AND value',
+      "_id", fldQ$queryCondition)
+
+    # fallback but only for listfields
+    if (!length(fldQ$queryCondition)) fldQ$queryCondition <- "TRUE"
+
+    # statement
+    statement <- insObj('
+      WITH extracted AS ( SELECT _id, value,
+        LTRIM(REPLACE(fullkey, \'"\', \'\'), \'$.\') AS fkr
+      FROM "/** key **/", json_tree("/** key **/".json) )
+      SELECT DISTINCT fkr
+      AS flds FROM extracted WHERE ( _id IN (
+      SELECT _id FROM extracted GROUP BY _id HAVING (
+      /** fldQ$queryCondition **/  ) ) )
+      ORDER BY flds;')
+
+    # TODO WHERE value <> "{}" AND value <> "" )
+
+
+    # debug
+    if (options()[["verbose"]]) {
+      message("\nSQL: ", statement, "\n")
+    }
+
+    # get all fullkeys and types
+    fields <- DBI::dbGetQuery(
+      conn = src$con,
+      statement = statement,
+      n = -1L)[, "flds", drop = TRUE]
+
+    # remove "$.", array elements "$.item[0]"
+    fields <- unique(gsub("\\$[.]?|\\[[-#0-9]+\\]", "", fields))
+    fields <- fields[fields != ""]
+
+    # return field names
+    return(fields)
+  }
+
+
+  # fields
+
+
+  # - one of these has to have a value (could be _id)
+  tmpFields <- c(fldQ$includeRootFields, fldQ$queryRootFields)
+  tmpFields <- unique(tmpFields[tmpFields != "_id"])
+
+
+  # - select extracts or full json
+  if (length(fldQ$includeFields[fldQ$includeFields != "_id"])) {
+
+    # json_extract(X,P1,P2,...) If only a single path P1 is provided,
+    # then the SQL datatype of the result is ... a text representation
+    # for JSON object and array values
+
+    # - extract specific fields
+    fldQ$composeJson <- paste0(
+      "'", tmpFields, "', ",
+      'json_extract("/** key **/".json, "$.',
+      tmpFields, '")'
+    )
+    fldQ$composeJson <- paste0(fldQ$composeJson, collapse = ",")
+    fldQ$composeJson <- paste0(
+      "json_object(\'_id\', _id, ", fldQ$composeJson, ")")
+
+  } else {
+
+    # - get all json
+    fldQ$composeJson <-
+      'json(\'{"_id":"\' || _id || \'", \' || LTRIM(json, \'{\'))'
+
+  }
+
+
+  # - fields in SQL query to reduce data sent into jq
+  fldQ$jsonWhere <- "TRUE"
+  if (length(tmpFields)) {
+
+    fldQ$jsonWhere <- paste0(
+      'json_extract("/** key **/".json, "$.', tmpFields, '") <> ""'
+    )
+    fldQ$jsonWhere <- paste0(fldQ$jsonWhere, collapse = " OR ")
+    fldQ$jsonWhere <- paste0("(", fldQ$jsonWhere, ")")
+  }
+
+
+  # query
+
+
+  # - transform query to use relevant json1 function
+  for (i in fldQ$queryPaths[fldQ$queryPaths != "_id"]) {
+
+    fldQ$queryCondition <- gsub(
+      paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
+      paste0('json_extract("/** key **/".json, "$.', i, '") \\2  \\3'),
+      fldQ$queryCondition
+    )
+  }
+
+  # - "tags":["aliqua","consectetur","commodo","velit","cupidatat","duis","dolore"]
+  #          ^ start of the string compared against regular expression
+  #   thus cover this and scalar strings by double quotes as alternative boundaries
+  fldQ$queryCondition <- stringi::stri_replace_all_fixed(fldQ$queryCondition, "'^", "'(\"|^)")
+  fldQ$queryCondition <- stringi::stri_replace_all_fixed(fldQ$queryCondition, "$'", "(\"|$)'")
+
+  # - special handling of IN since json_extract() returns an array
+  #   as text representation, thus set comparisons are not possible
+  for (i in fldQ$queryRootFields[fldQ$queryRootFields != "_id"]) {
+
+    ins <- stringi::stri_extract_all_regex(
+      # keep space before \\)"
+      fldQ$queryCondition, paste0("\"\\$.", i, "\"\\) IN \\((.+?) \\)"))[[1]]
+
+    if (!is.na(ins)) {
+
+      isString <- grepl("\\('", ins) # "5, 4" or "'a ,b', 'd, f'"
+      # keep space before \\)"
+      ii <- stringi::stri_replace_all_regex(ins, "\"(.+?)\"\\) IN \\((.+?) \\)", "$2")
+      ii <- trimws(ii)
+      ii <- stringi::stri_split_regex(ii, ifelse(isString, "', ", ", "))[[1]]
+      ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "")
+
+      ii <- paste0("\"$.", i, "\") REGEXP '", paste0(ii, collapse = "|"), "'")
+      fldQ$queryCondition <- stringi::stri_replace_all_fixed(
+        fldQ$queryCondition, ins, ii, vectorize_all = TRUE
+      )
+    }
+  }
+
+  # - if query needs jqr
+  fldQ$jqrWhere <- character(0L)
+  if (length(fldQ$queryCondition)) {
+    if (setequal(fldQ$queryFields, fldQ$queryRootFields)) {
+      fldQ$jsonWhere <- paste0(fldQ$jsonWhere, " AND (", fldQ$queryCondition, ")")
+    } else {
+      fldQ$jqrWhere <- fldQ$queryJq
+    }
+  }
+
+
+  # statement
+  statement <- insObj('
+      SELECT /** fldQ$composeJson **/
+      AS json FROM "/** key **/"
+      WHERE /** fldQ$jsonWhere **/
+      ;')
+
+
+  # regular processing
+  return(processDbGetQuery(
+    getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+               statement = statement, n = n)[["json"]], "")',
+    jqrWhere = fldQ$jqrWhere,
     outputFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields))
 
