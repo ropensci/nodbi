@@ -109,9 +109,9 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 
   # https://cran.r-project.org/web/packages/sofa/vignettes/query_tutorial.html
 
-  # make dotted parameters accessible
-  limit <- 9999999L
+  # handle dotted parameters
   params <- list(...)
+  limit <- 9999999L
   if (!is.null(params[["limit"]])) {
     limit <- params$limit
     params$limit <- NULL
@@ -1160,11 +1160,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
   # - if query needs jqr
   fldQ$jqrWhere <- character(0L)
-  if (length(fldQ$queryCondition)) {
-
-    fldQ$jqrWhere <- fldQ$queryJq
-
-  }
+  if (length(fldQ$queryCondition)) fldQ$jqrWhere <- fldQ$queryJq
 
 
   # - query if fields == '{}' or
