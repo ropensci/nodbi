@@ -406,8 +406,7 @@ insObj <- function(x, p = parent.frame(), e = NULL) {
 
   allFound <- stringi::stri_extract_all_regex(x, "(/[*][*].*?[*][*]/)", simplify = FALSE)[[1]]
 
-  if (setequal(allFound, e)) stop("Could not find ", allFound)
-
+  if (setequal(allFound, e)) return(x)
   if (all(is.na(allFound))) return(x)
 
   for (oneFound in unique(allFound)) {
