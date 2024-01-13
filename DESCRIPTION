@@ -45,7 +45,7 @@ Suggests:
     withr,
     callr,
     webfakes (>= 1.2.0)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org

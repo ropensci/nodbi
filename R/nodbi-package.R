@@ -7,12 +7,12 @@
 #'
 #' @name nodbi-package
 #' @docType package
+#' @author Ralf Herold \email{ralf.herold@@mailbox.org}
 #' @author Scott Chamberlain \email{sckott@@protonmail.com}
 #' @author Rich FitzJohn \email{rich.fitzjohn@@gmail.com}
 #' @author Jeroen Ooms \email{jeroen.ooms@@stat.ucla.edu}
-#' @author Ralf Herold \email{ralf.herold@@mailbox.org}
-#' @keywords package
-NULL
+#' @keywords internal
+"_PACKAGE"
 
 
 
