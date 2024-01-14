@@ -131,8 +131,8 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
 
   if (length(errors)) {
     warning("Could not create ", length(errors),
-    " documents, reason: ", unique(errors),
-    call. = FALSE, immediate. = TRUE)
+            " documents, reason: ", unique(errors),
+            call. = FALSE, immediate. = TRUE)
   }
 
   # return
@@ -262,7 +262,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
           # Stream import data in jsonlines format from a
           # connection, similar to the mongoimport utility.
           con = value
-          )),
+        )),
       silent = TRUE)
 
   } else {
@@ -291,33 +291,21 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       if (!nrow(value)) return(0L)
       # convert to ndjson which is the format in which errors are raised
       # if names (keys) had problematic characters such as . or $
-      row.names(value) <- NULL
-      ndjson <- NULL
-      jsonlite::stream_out(
-        value, con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE, digits = NA)
-      value <- ndjson
+      value <- items2ndjson(value, mergeIdCol = TRUE)
     } # if data.frame
 
     # convert lists (incl. from previous step) to NDJSON
     if (inherits(value, "list")) {
       # add canonical _id's
       if (((!is.null(names(value)) && !any(names(value) == "_id")) &&
-          !any(sapply(value, function(i) any(names(i) == "_id")))) ||
+           !any(sapply(value, function(i) any(names(i) == "_id")))) ||
           !any(names(unlist(value)) == "_id")
       ) {
         value <- lapply(value, function(i) c(
           "_id" = uuid::UUIDgenerate(use.time = TRUE), i))
       }
-      # split into vector of ndjson records
-      row.names(value) <- NULL
-      ndjson <- NULL
-      jsonlite::stream_out(
-        jsonlite::fromJSON(
-          jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
-        con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE, digits = NA)
-      value <- ndjson
+      # split list into vector of ndjson records
+      value <- items2ndjson(value, mergeIdCol = TRUE)
     }
 
     # insert data.frame or JSON
@@ -421,17 +409,9 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     } # if no _id column
     #
     if (ncol(value) > 2L || (ncol(value) == 2L &&
-       !all(sort(names(value)) == c("_id", "json")))) {
-      # convert if there is no json column yet
-      row.names(value) <- NULL
-      ndjson <- NULL
-      jsonlite::stream_out(
-        value[, -match("_id", names(value)), drop = FALSE],
-        con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE, digits = NA)
-      value[["json"]] <- ndjson
-      # remove original columns
-      value <- value[, c("_id", "json"), drop = FALSE]
+                             !all(sort(names(value)) == c("_id", "json")))) {
+      # no json column, thus convert to df with ndjson in json column
+      value <- items2ndjson(value)
     }
     #
     if (all(class(value[["_id"]]) %in% "list")) {
@@ -535,18 +515,11 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
       }
     } # if no _id column
     #
-    if (ncol(value) > 2L || (ncol(value) == 2L &&
-       !all(sort(names(value)) == c("_id", "json")))) {
-      # convert if there is no json column yet
-      row.names(value) <- NULL
-      ndjson <- NULL
-      jsonlite::stream_out(
-        value[, -match("_id", names(value)), drop = FALSE],
-        con = textConnection("ndjson", open = "w", local = TRUE),
-        verbose = FALSE, auto_unbox = TRUE, digits = NA)
-      value[["json"]] <- ndjson
-      # remove original columns
-      value <- value[, c("_id", "json"), drop = FALSE]
+    if (ncol(value) > 2L ||
+        (ncol(value) == 2L &&
+         !all(sort(names(value)) == c("_id", "json")))) {
+      # no json column, thus convert to df with ndjson in json column
+      value <- items2ndjson(value)
     }
     #
     if (all(class(value[["_id"]]) %in% "list")) {
@@ -633,7 +606,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
     # if json in character vector
     if ((all(class(value) %in% "character")) &&
         (length(value)  == 1L) && jsonlite::validate(value)
-        ) {
+    ) {
       # convert to list
       value <- jsonlite::fromJSON(value, simplifyVector = TRUE)
     }
@@ -764,4 +737,63 @@ isFile <- function(x) {
       file.access(x, mode = 4)) == 0L,
     silent = TRUE)
   return(!inherits(out, "try-error") && out)
+}
+
+items2ndjson <- function(df, mergeIdCol = FALSE) {
+
+  # - function takes a data frame or list
+  # - if mergeIdCol, builds ndjson vector from df items
+  # - if not, builds ndjson from columns except _id
+  #   returns data frame with columns _id and json
+
+  if (!inherits(df, "data.frame") && !inherits(df, "list")) stop()
+
+  if (inherits(df, "data.frame")) row.names(df) <- NULL
+
+  if (inherits(df, "list")) df <-
+      jsonlite::fromJSON(
+        jsonlite::toJSON(df, auto_unbox = TRUE, digits = NA))
+
+  # temporary file and connection
+  tfname <- tempfile()
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+
+  tfnameCon <- file(tfname, open = "wt")
+  on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+
+  if (mergeIdCol) {
+
+    jsonlite::stream_out(
+      x = df,
+      con = tfnameCon,
+      verbose = FALSE,
+      auto_unbox = TRUE,
+      digits = NA)
+
+    close(tfnameCon)
+    tfnameCon <- file(tfname, open = "rt")
+    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+
+    return(readLines(tfnameCon))
+
+  } else {
+
+    jsonlite::stream_out(
+      x = df[, -match("_id", names(df)), drop = FALSE],
+      con = tfnameCon,
+      verbose = FALSE,
+      auto_unbox = TRUE,
+      digits = NA)
+
+    close(tfnameCon)
+    tfnameCon <- file(tfname, open = "rt")
+    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+
+    return(
+      data.frame(
+        "_id" = df[["_id"]],
+        "json" = readLines(tfnameCon),
+        check.names = FALSE
+      ))
+  }
 }
