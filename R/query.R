@@ -70,6 +70,9 @@ docdb_query <- function(src, key, query, ...) {
   }
   stopifnot(jsonlite::validate(query))
 
+  # jq script for extracting field names
+  jqFieldNames <- '[ path(..) | map(select(type == "string")) | join(".") ] | unique[] '
+
   # query can be empty but then fields should not be empty
   if (jsonlite::minify(query) == '{}') {
 
@@ -201,9 +204,8 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    j <- 'path(..) | join (".") '
     fldQ$jqrWhere <- ifelse(
-      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", j), j)
+      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
 
     fields <- processDbGetQuery(
       getData = 'jqr::jq(do.call(sofa::db_query, c(list(cushion = src$con,
@@ -374,9 +376,8 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
     # https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-mapping.html
     # could theoretically be used but no query seems possible to limit fields to found docs
 
-    j <- 'path(..) | join (".") '
     fldQ$jqrWhere <- ifelse(
-      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", j), j)
+      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
 
     fields <- processDbGetQuery(
       getData = sub(", source = fldQ\\$includeFields", "", getData),
@@ -520,7 +521,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
       src$con$export(con = file(tf), query = query)
 
       # use jq
-      fields <- as.character(jqr::jq(file(tf), 'path(..) | join (".") '))
+      fields <- as.character(jqr::jq(file(tf), jqFieldNames))
 
     } # if try-error
 
@@ -1275,9 +1276,8 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     /** fldQ$selectCondition **/
     );')
 
-    j <- 'path(..) | join (".") '
     fldQ$jqrWhere <- ifelse(
-      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", j), j)
+      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
 
     fields <- processDbGetQuery(
       getData = 'paste0(DBI::dbGetQuery(conn = src$con,
