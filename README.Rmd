@@ -317,15 +317,15 @@ result <- rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 
-# 2024-01-09 with 2015 mobile hardware, databases via homebrew
+# 2024-01-14 with 2015 mobile hardware, databases via homebrew
 result[rev(order(result$elapsed)), ]
 #         test replications elapsed
-# 4    CouchDB           10   308.0
-# 3    Elastic           10    33.6
-# 2     SQLite           10     4.6
-# 5 PostgreSQL           10     2.5
-# 6     DuckDB           10     2.1
-# 1    MongoDB           10     1.6
+# 4    CouchDB           10   297.7
+# 3    Elastic           10    37.6
+# 5 PostgreSQL           10     8.7
+# 2     SQLite           10     2.1
+# 1    MongoDB           10     1.8
+# 6     DuckDB           10     1.8
 ```
 
 2## Testing {#testing}
@@ -334,43 +334,30 @@ Every database backend is subjected to identical tests, see [core-nodbi.R](https
 
 ```{r testing_and_coverage}
 #
-# 2024-01-09
+# 2024-01-14
 testthat::test_local()
 # ✔ | F W  S  OK | Context
-# ✔ |      2 151 | couchdb [120.4s]
-# ✔ |      1 150 | duckdb [4.8s]
-# ✔ |      2 149 | elastic [105.0s]
-# ✔ |      2 149 | mongodb [6.3s]
-# ✔ |        151 | postgres [49.2s]
-# ✔ |        153 | sqlite [44.1s]
+# ✔ |      2 152 | couchdb [111.3s]                                                                    
+# ✔ |      1 151 | duckdb [5.8s]                                                                       
+# ✔ |      2 150 | elastic [94.0s]                                                                     
+# ✔ |      2 150 | mongodb [6.4s]                                                                      
+# ✔ |        153 | postgres [12.5s]                                                                    
+# ✔ |        154 | sqlite [7.7s]                                                                       
 # 
-# ══ Results ══════════════════════════════════
-# Duration: 330.2 s
+# ══ Results ══════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 238.2 s
 # 
-# ── Skipped tests (7) ────────────────────────
-# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3, test-elastic.R:21:3,
-#   test-mongodb.R:24:3
+# ── Skipped tests (7) ────────────────────────────────────────────────────────────────────────────────
+# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3,
+#   test-elastic.R:21:3, test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3,
+#   test-duckdb.R:22:3, test-elastic.R:21:3, test-mongodb.R:24:3
 # 
-# [ FAIL 0 | WARN 0 | SKIP 7 | PASS 903 ]
+# [ FAIL 0 | WARN 0 | SKIP 7 | PASS 910 ]
 
-# 2024-01-13
+# 2024-01-14
 covr::package_coverage(type = "all")
-# nodbi Coverage: 89.71%
-# R/src_duckdb.R: 76.92%
-# R/zzz.R: 82.05%
-# R/query.R: 84.28%
-# R/src_mongo.R: 91.30%
-# R/update.R: 92.16%
-# R/src_postgres.R: 95.65%
-# R/create.R: 96.26%
-# R/delete.R: 97.96%
-# R/get.R: 98.77%
-# R/exists.R: 100.00%
-# R/list.R: 100.00%
-# R/src_couchdb.R: 100.00%
-# R/src_elasticsearch.R: 100.00%
-# R/src_sqlite.R: 100.00%
+
 ```
 
 ## Notes

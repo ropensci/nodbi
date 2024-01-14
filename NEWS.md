@@ -6,6 +6,7 @@
 ## Changes
 * Elasticsearch made to immediately refresh index after `docdb_create` and other functions
 * `docdb_update()` now reports which records failed to update and then continues
+* refactor parts of `docdb_create()` to speed up handling large data frames and lists
 
 ## Potentially breaking change
 *  `docdb_query()` reimplementation to have the same functionality across all databases (DuckDB, SQLite, PostgreSQL, MongoDB, Elasticsearch, CouchDB); even though the API and unit tests remained, user provisions may break e.g. to handle return values of databases that previously were incompletely implemented (in particular Elasticsearch and CouchDB). Details: 
