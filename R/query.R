@@ -215,8 +215,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 
     # mangle "friends.0", "friends.0.id"
     fields <- unique(gsub("[.][0-9]+", "", fields))
-    fields <- fields[fields != "_id"]
-    fields <- fields[fields != ""]
+    fields <- fields[fields != "_id" & fields != ""]
 
     # return field names
     return(sort(fields))
@@ -385,8 +384,7 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 
     # mangle "friends.0", "friends.0.id"
     fields <- unique(gsub("[.][0-9]+", "", fields))
-    fields <- fields[fields != "_id"]
-    fields <- fields[fields != ""]
+    fields <- fields[fields != "_id" & fields != ""]
 
     # return field names
     return(sort(fields))
@@ -535,10 +533,8 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
     parentFields <- unique(unlist(parentFields))
 
     # format
-    fields <- c(fields, parentFields)
-    fields <- unique(fields)
-    fields <- fields[fields != ""]
-    fields <- fields[fields != "_id"]
+    fields <- unique(c(fields, parentFields))
+    fields <- fields[fields != "" & fields != "_id"]
 
     # return
     return(sort(fields))
@@ -652,60 +648,25 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   }
 
 
-  # special case: return all fields if listfields != NULL
-  if (!is.null(params$listfields)) {
-
-    # this case is run only with SQL
-
-    # - transform query
-    fldQ$queryCondition <- gsub("'", '"', fldQ$queryCondition)
-    for (i in fldQ$queryPaths) {
-
-      fldQ$queryCondition <- gsub(
-        paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
-        paste0('SUM ( fkr REGEXP "^',
-               gsub('"[.]"', "[-#\\\\\\\\[\\\\\\\\]0-9]*[.]", i),
-               '" AND value \\2 ) > 0 \\3'),
-        fldQ$queryCondition
-      )
-    }
-
-    # _id in query
-    fldQ$queryCondition <- gsub(
-      'fkr REGEXP \\"\\^_id\\" AND value',
-      "_id", fldQ$queryCondition)
-
-    # fallback but only for listfields
-    if (!length(fldQ$queryCondition)) fldQ$queryCondition <- "TRUE"
+  # special case: return all fields
+  # see below for handling queries
+  if (!is.null(params$listfields) & !length(fldQ$queryCondition)) {
 
     # statement
     statement <- insObj('
-      WITH extracted AS ( SELECT _id, value,
-        LTRIM(REPLACE(fullkey, \'"\', \'\'), \'$.\') AS fkr
-      FROM "/** key **/", json_tree("/** key **/".json) )
-      SELECT DISTINCT fkr
-      AS flds FROM extracted WHERE ( _id IN (
-      SELECT _id FROM extracted GROUP BY _id HAVING (
-      /** fldQ$queryCondition **/  ) ) )
-      ORDER BY flds;')
-
-    # TODO WHERE value <> "{}" AND value <> "" )
-
-
-    # debug
-    if (options()[["verbose"]]) {
-      message("\nSQL: ", statement, "\n")
-    }
+    SELECT DISTINCT fullkey AS flds
+    FROM "/** key **/", json_tree("/** key **/".json)
+    ORDER BY flds;')
 
     # get all fullkeys and types
     fields <- DBI::dbGetQuery(
       conn = src$con,
       statement = statement,
-      n = -1L)[, "flds", drop = TRUE]
+      n = -1L)[["flds"]]
 
     # remove "$.", array elements "$.item[0]"
-    fields <- unique(gsub("\\$[.]?|\\[[-#0-9]+\\]", "", fields))
-    fields <- fields[fields != ""]
+    fields <- unique(stringi::stri_replace_all_regex(fields, "\\$[.]?|\\[[-#0-9]+\\]", ""))
+    fields <- sort(fields[fields != ""])
 
     # return field names
     return(fields)
@@ -818,6 +779,26 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       AS json FROM "/** key **/"
       WHERE /** fldQ$jsonWhere **/
       ;')
+
+
+  # special case: return all fields if listfields != NULL
+  if (!is.null(params$listfields)) {
+
+    # jq function to obtain dot paths
+    fldQ$jqrWhere <- ifelse(
+      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
+
+    # process
+    fields <- unique(processDbGetQuery(
+      getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+                 statement = statement, n = n)[["json"]], "")',
+      jqrWhere = fldQ$jqrWhere)[["out"]])
+    fields <- fields[fields != "" & fields != "_id"]
+
+    # return field names
+    return(sort(fields))
+
+  }
 
 
   # regular processing
@@ -1286,8 +1267,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
     # mangle "friends.0", "friends.0.id"
     fields <- unique(gsub("[.][0-9]+", "", fields))
-    fields <- fields[fields != "_id"]
-    fields <- fields[fields != ""]
+    fields <- fields[fields != "_id" & fields != ""]
 
     # return field names
     return(sort(fields))
