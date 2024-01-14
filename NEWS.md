@@ -17,6 +17,7 @@
   * `docdb_query(src, key, query = "{}", fields = "{}")` now delegates to `docdb_get(src, key)`
   * `_id` is always returned, unless specified with `"_id": 0` in parameter `fields`
   * for `scr_postgres`, only fewer than 50 fields if any can be specified in `fields`
+  * for `src_sqlite`, minimise use of time-costly `json_tree`
   * workaround for path collisions of MongoDB
   * some acceleration of `docdb_query()`
   * factored out common code 
