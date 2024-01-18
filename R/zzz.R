@@ -436,3 +436,7 @@ insObj <- function(x, p = parent.frame(), e = NULL) {
   # recurse
   insObj(x = x, p = p, e = allFound)
 }
+
+
+# for use in query.R
+utils::globalVariables("jqFieldNames")
