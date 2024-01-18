@@ -79,7 +79,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache-version: 2
-          extra-packages: rcmdcheck, covr, sofa, elastic, mongolite, DBI, duckdb, webfakes, remotes, stringi, jsonlite, uuid, jqr, RPostgres, testthat, withr, callr
+          extra-packages: rcmdcheck, covr, remotes
 
       - name: Install any other deps and duckdb extension library
         run: |
