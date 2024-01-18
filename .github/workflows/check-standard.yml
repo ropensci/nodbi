@@ -30,46 +30,32 @@ jobs:
 
     steps:
 
-      # nodbi on linux:
+      # databases:
 
+      # https://github.com/ankane/setup-postgres#setup-postgres
+      # Works on Linux, Mac, and Windows
       - name: PostgreSQL
         uses: ankane/setup-postgres@v1
         with:
-          postgres-version: 14
           database: test
-
+          
+      # https://github.com/ankane/setup-mongodb#setup-mongodb
+      # Works on Linux, Mac, and Windows
       - name: MongoDB
-        if: runner.os == 'Linux'
-        uses: supercharge/mongodb-github-action@v1.10.0
+        uses: ankane/setup-mongodb@v1
 
-      - name: Prepare ElasticSearch
-        if: runner.os == 'Linux'
-        run: |
-          sudo swapoff -a
-          sudo sysctl -w vm.swappiness=1
-          sudo sysctl -w fs.file-max=262144
-          sudo sysctl -w vm.max_map_count=262144
+      # https://github.com/ankane/setup-elasticsearch#setup-elasticsearch
+      # Works on Linux, Mac, and Windows
+      - name: ElasticSearch
+        uses: ankane/setup-elasticsearch@v1
 
-      - name: Start ElasticSearch
-        if: runner.os == 'Linux'
-        uses: getong/elasticsearch-action@v1.2
-        with:
-          elasticsearch version: '7.6.1'
-          host port: 9200
-          container port: 9200
-          host node port: 9300
-          node port: 9300
-          discovery type: 'single-node'
-
+      # https://github.com/iamssen/couchdb-github-action
       - name: CouchDB
         if: runner.os == 'Linux'
         uses: iamssen/couchdb-github-action@master
         with:
           couchdb-version: '3.1'
 
-      - name: Install development libraries
-        if: runner.os == 'Linux'
-        run: sudo apt-get install -y libjq-dev
 
       # generic workflow:
 
@@ -83,15 +69,21 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 2
-          extra-packages: rcmdcheck, covr, sofa, elastic, mongolite, DBI, duckdb, RSQLite, webfakes, remotes, stringi, jsonlite, uuid, jqr, RPostgres, testthat, withr, callr
 
       # nodbi:
 
+      - name: Install development libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y libjq-dev
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 2
+          extra-packages: rcmdcheck, covr, sofa, elastic, mongolite, DBI, duckdb, webfakes, remotes, stringi, jsonlite, uuid, jqr, RPostgres, testthat, withr, callr
+
       - name: Install any other deps and duckdb extension library
         run: |
+          remotes::install_github("r-dbi/RSQLite")
           remotes::install_github("ropensci/nodbi")
           remotes::install_deps(pkgdir = ".", dependencies = TRUE)
           library(duckdb)
@@ -102,13 +94,15 @@ jobs:
           duckdb_shutdown(drv)
         shell: Rscript {0}
 
+
       # generic workflow:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
 
-      # also test coverage:
+
+      # test coverage:
 
       - name: Test coverage
         if: matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release'

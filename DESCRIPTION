@@ -38,7 +38,7 @@ Suggests:
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
-    RSQLite (>= 2.2.4),
+    RSQLite (>= 2.3.4.9005),
     duckdb (>= 0.6.0),
     RPostgres,
     testthat,

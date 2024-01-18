@@ -684,43 +684,44 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # fields
 
 
-  # - one of these has to have a value (could be _id)
+  # - check if subfields are needed
   tmpFields <- c(fldQ$includeRootFields, fldQ$queryRootFields)
   tmpFields <- unique(tmpFields[tmpFields != "_id"])
 
-
+    
   # - select extracts or full json
-  if (length(fldQ$includeFields[fldQ$includeFields != "_id"])) {
-
+  if (length(tmpFields) &&
+      length(fldQ$includeFields[fldQ$includeFields != "_id"])) {
+    
     # json_extract(X,P1,P2,...) If only a single path P1 is provided,
     # then the SQL datatype of the result is ... a text representation
     # for JSON object and array values
-
+    
     # - extract specific fields
     fldQ$composeJson <- paste0(
       "'", tmpFields, "', ",
-      'json_extract("/** key **/".json, "$.',
+      'jsonb_extract("/** key **/".json, "$.',
       tmpFields, '")'
     )
     fldQ$composeJson <- paste0(fldQ$composeJson, collapse = ",")
     fldQ$composeJson <- paste0(
       "json_object(\'_id\', _id, ", fldQ$composeJson, ")")
+    
+  }  else {
 
-  } else {
-
-    # - get all json
-    fldQ$composeJson <-
-      'json(\'{"_id":"\' || _id || \'", \' || LTRIM(json, \'{\'))'
-
+      # - have to write all json
+      fldQ$composeJson <-
+        'json(\'{"_id":"\' || _id || \'", \' || LTRIM(json(json), \'{\'))'
+      
   }
+  
 
-
-  # - fields in SQL query to reduce data sent into jq
+  # - fields in SQL query to reduce rows sent into jq
   fldQ$jsonWhere <- "TRUE"
   if (length(tmpFields)) {
 
     fldQ$jsonWhere <- paste0(
-      'json_extract("/** key **/".json, "$.', tmpFields, '") <> ""'
+      'jsonb_extract("/** key **/".json, "$.', tmpFields, '") <> ""'
     )
     fldQ$jsonWhere <- paste0(fldQ$jsonWhere, collapse = " OR ")
     fldQ$jsonWhere <- paste0("(", fldQ$jsonWhere, ")")
@@ -787,8 +788,8 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       AS json FROM "/** key **/"
       WHERE /** fldQ$jsonWhere **/
       ;')
-
-
+  
+  
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 

@@ -441,7 +441,7 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
   query <- jsonlite::minify(query)
 
   # SQL for patching, see https://www.sqlite.org/json1.html#jpatch
-  updFunction <- "json_patch"
+  updFunction <- "jsonb_patch"
 
   return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
 

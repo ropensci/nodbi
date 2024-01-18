@@ -354,7 +354,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
             conn = src$con,
             statement = paste0("CREATE TABLE \"", key, "\"",
                                " ( _id TEXT PRIMARY_KEY NOT NULL,",
-                               "  json JSON);"))
+                               "  json JSONB);"))
           DBI::dbExecute(
             conn = src$con,
             statement = paste0("CREATE UNIQUE INDEX ",
