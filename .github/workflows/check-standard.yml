@@ -76,13 +76,9 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get install -y libjq-dev
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 2
-          extra-packages: rcmdcheck, covr, remotes
-
-      - name: Install any other deps and duckdb extension library
+      - name: Install deps and duckdb extension library
         run: |
+          install.packages(c("remotes", "covr", "rcmdcheck")
           remotes::install_github("r-dbi/RSQLite")
           remotes::install_github("ropensci/nodbi")
           remotes::install_deps(pkgdir = ".", dependencies = TRUE)
