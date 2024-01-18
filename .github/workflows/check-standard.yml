@@ -78,7 +78,7 @@ jobs:
 
       - name: Install deps and duckdb extension library
         run: |
-          install.packages(c("remotes", "covr", "rcmdcheck")
+          install.packages(c("remotes", "covr", "rcmdcheck"))
           remotes::install_github("r-dbi/RSQLite")
           remotes::install_github("ropensci/nodbi")
           remotes::install_deps(pkgdir = ".", dependencies = TRUE)
