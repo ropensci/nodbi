@@ -175,6 +175,15 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 
   # fields
 
+  # - special case fields = '{"_id": 1}'
+  if (!length(fldQ$includeRootFields) && 
+      length(fldQ$includeFields) == 1L && 
+      fldQ$includeFields == "_id") {
+    
+    fldQ$includeRootFields <- "_id"
+    
+  }
+  
   # - add fields
   if (length(fldQ$includeRootFields)) {
 
