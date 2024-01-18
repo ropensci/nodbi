@@ -426,6 +426,11 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   params <- list(...)
 
 
+  # add limit if not in params
+  n <- 0L
+  if (!is.null(params$limit)) n <- params$limit
+
+
   # canonical sorting in nodbi
   if (!length(params[["sort"]])) params[["sort"]] <- '{"_id": 1}'
   if (!length(params[["fields"]])) params[["fields"]] <- '{}'
@@ -513,7 +518,8 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
                emit(key, 1);
       }}}}",
       reduce = "function(i) {return i}",
-      query = query
+      query = query,
+      limit = n
       )[["_id"]]}, silent = TRUE)
 
     # alternative approach
