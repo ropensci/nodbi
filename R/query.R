@@ -143,8 +143,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 
   }
 
-  # - handle search on top level where
-  #   a field could be an array, see
+  # - handle search on top level where a field could be an array, see
   #   https://docs.couchdb.org/en/stable/api/database/find.html#find-elemmatch
   if (query != "{}" &&
       length(fldQ$queryFields) &&
@@ -1229,19 +1228,6 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   }
 
 
-  # compose statement
-  statement <- insObj('
-    WITH extracted AS (
-    SELECT _id
-    /** fldQ$extractFields **/
-    FROM "/** key **/" )
-    SELECT /** fldQ$selectFields **/
-    AS json FROM extracted
-    WHERE  (
-    /** fldQ$selectCondition **/
-    );')
-
-
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
@@ -1274,6 +1260,19 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
   }
 
+  # compose statement
+  statement <- insObj('
+    WITH extracted AS (
+    SELECT _id
+    /** fldQ$extractFields **/
+    FROM "/** key **/" )
+    SELECT /** fldQ$selectFields **/
+    AS json FROM extracted
+    WHERE  (
+    /** fldQ$selectCondition **/
+    );')
+  
+  
   # general processing
   return(processDbGetQuery(
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
