@@ -176,14 +176,14 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   # fields
 
   # - special case fields = '{"_id": 1}'
-  if (!length(fldQ$includeRootFields) && 
-      length(fldQ$includeFields) == 1L && 
+  if (!length(fldQ$includeRootFields) &&
+      length(fldQ$includeFields) == 1L &&
       fldQ$includeFields == "_id") {
-    
+
     fldQ$includeRootFields <- "_id"
-    
+
   }
-  
+
   # - add fields
   if (length(fldQ$includeRootFields)) {
 
@@ -694,33 +694,41 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   tmpFields <- c(fldQ$includeRootFields, fldQ$queryRootFields)
   tmpFields <- unique(tmpFields[tmpFields != "_id"])
 
-    
+
   # - select extracts or full json
-  if (length(tmpFields) &&
-      length(fldQ$includeFields[fldQ$includeFields != "_id"])) {
-    
+  if (length(fldQ$includeFields)) {
+
     # json_extract(X,P1,P2,...) If only a single path P1 is provided,
     # then the SQL datatype of the result is ... a text representation
     # for JSON object and array values
-    
+
     # - extract specific fields
-    fldQ$composeJson <- paste0(
-      "'", tmpFields, "', ",
-      'jsonb_extract("/** key **/".json, "$.',
-      tmpFields, '")'
-    )
-    fldQ$composeJson <- paste0(fldQ$composeJson, collapse = ",")
-    fldQ$composeJson <- paste0(
-      "json_object(\'_id\', _id, ", fldQ$composeJson, ")")
-    
+    if (length(tmpFields)) {
+
+      fldQ$composeJson <- paste0(
+        "'", tmpFields, "', ",
+        'jsonb_extract("/** key **/".json, "$.',
+        tmpFields, '")'
+      )
+      fldQ$composeJson <- paste0(fldQ$composeJson, collapse = ",")
+      fldQ$composeJson <- paste0(
+        "json_object(\'_id\', _id, ", fldQ$composeJson, ")")
+
+    } else {
+
+      # - only _id
+      fldQ$composeJson <- "json_object(\'_id\', _id)"
+
+    }
+
   }  else {
 
       # - have to write all json
       fldQ$composeJson <-
         'json(\'{"_id":"\' || _id || \'", \' || LTRIM(json(json), \'{\'))'
-      
+
   }
-  
+
 
   # - fields in SQL query to reduce rows sent into jq
   fldQ$jsonWhere <- "TRUE"
@@ -794,8 +802,8 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       AS json FROM "/** key **/"
       WHERE /** fldQ$jsonWhere **/
       ;')
-  
-  
+
+
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
@@ -1228,8 +1236,22 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
       length(fldQ$jqrWhere)) {
 
     fldQ$extractFields <- paste0(", json", fldQ$extractFields)
-    fldQ$selectFields <- "\'{\"_id\": \"\' || _id || \'\", \' || LTRIM(json, \'{\')"
 
+    if (length(fldQ$includeFields)) {
+
+      # - export only necessary fields
+      tmpFields <- unique(c("_id", fldQ$includeRootFields, fldQ$queryRootFields))
+      fldQ$selectFields <- paste0(
+        "json_object(", paste0(
+          paste0("'", tmpFields, "', ", tmpFields),
+          collapse = ", "), ")")
+
+    } else {
+
+      # - export all json
+      fldQ$selectFields <- "\'{\"_id\": \"\' || _id || \'\", \' || LTRIM(json, \'{\')"
+
+    }
   }
 
   # - query if fields == '{"_id":1}' and
@@ -1287,8 +1309,8 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     WHERE  (
     /** fldQ$selectCondition **/
     );')
-  
-  
+
+
   # general processing
   return(processDbGetQuery(
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
