@@ -243,7 +243,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
                dbname = key, query = query, as = "json"), params)),
                ".docs[] | del(._rev)" )',
     jqrWhere = fldQ$jqrWhere,
-    outputFields = fldQ$includeFields,
+    includeFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields))
 
 }
@@ -403,7 +403,7 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
   return(processDbGetQuery(
     getData = getData,
     jqrWhere = fldQ$jqrWhere,
-    outputFields = fldQ$includeFields,
+    includeFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields))
 
 }
@@ -591,7 +591,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
   # - early exit
   if (!length(fldQ$excludeFields)) return(
-    processOutputFields(tfname, fldQ$includeFields))
+    processIncludeFields(tfname, fldQ$includeFields))
 
   # - any include
   if (length(fldQ$includeFields)) {
@@ -601,7 +601,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
     on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
 
     # write data
-    processOutputFields(tfname, fldQ$includeFields, tjname)
+    processIncludeFields(tfname, fldQ$includeFields, tjname)
 
     # early exit
     if (!file.size(tjname)) return(NULL)
@@ -832,7 +832,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
     jqrWhere = fldQ$jqrWhere,
-    outputFields = fldQ$includeFields,
+    includeFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields))
 
 }
@@ -895,7 +895,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
     # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
     # NOTICE: identifier "abcd..." will be truncated to "abcd..."
     # => replace includeFields with longest dot path that is less than 63 characters;
-    #    "regular processing" (below) generates the sought outputFields
+    #    "regular processing" (below) generates the sought includeFields
 
     fldQ$selectFields <- paste0(
       unique(sprintf(
@@ -1064,7 +1064,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   # regular processing
   #
-  # - parametrise processOutputFields
+  # - parametrise processIncludeFields
   if (setequal(fldQ$includeFields, fldQ$includeMaxCharFields)) extractedFields <-
     fldQ$includeFields else extractedFields <- fldQ$includeMaxCharFields
   #
@@ -1072,7 +1072,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   return(processDbGetQuery(
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
-    outputFields = fldQ$includeFields,
+    includeFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields,
     extractedFields = extractedFields
   ))
@@ -1319,7 +1319,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
     jqrWhere = fldQ$jqrWhere,
-    outputFields = fldQ$includeFields,
+    includeFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields))
 
 }
@@ -1338,7 +1338,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 processDbGetQuery <- function(
     getData,
     jqrWhere = character(0L),
-    outputFields = character(0L),
+    includeFields = character(0L),
     excludeFields = character(0L),
     extractedFields = character(0L)) {
 
@@ -1358,7 +1358,7 @@ processDbGetQuery <- function(
 
   # process and early exit
   if (!length(jqrWhere) &&
-      !length(outputFields) &&
+      !length(includeFields) &&
       !length(excludeFields)) return(
         jsonlite::stream_in(
           textConnection(
@@ -1390,7 +1390,7 @@ processDbGetQuery <- function(
     }
 
     # process
-    if (!length(outputFields) &&
+    if (!length(includeFields) &&
         !length(excludeFields)) return(
           jsonlite::stream_in(
             textConnection(
@@ -1418,26 +1418,26 @@ processDbGetQuery <- function(
   } # !is.null(jqrWhere)
 
 
-  #### .jq outputFields ####
+  #### .jq includeFields ####
 
-  # only if outputFields is defined
-  if (length(outputFields)) {
+  # only if includeFields is defined
+  if (length(includeFields)) {
 
     # debug
     if (options()[["verbose"]]) {
-      message("outputFields: ", paste0(outputFields, collapse = " / "), "\n")
+      message("includeFields: ", paste0(includeFields, collapse = " / "), "\n")
     }
 
     # early exit
     if (!length(excludeFields)) return(
-      processOutputFields(tfname, outputFields, extractedFields = extractedFields))
+      processIncludeFields(tfname, includeFields, extractedFields = extractedFields))
 
     # get another file name
     tjname <- tempfile()
     on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
 
     # write data
-    processOutputFields(tfname, outputFields, tjname, extractedFields)
+    processIncludeFields(tfname, includeFields, tjname, extractedFields)
 
     # early exit
     if (!file.size(tjname)) return(NULL)
@@ -1445,7 +1445,7 @@ processDbGetQuery <- function(
     # swap file name for next processing step
     tfname <- tjname
 
-  } # if (length(outputFields))
+  } # if (length(includeFields))
 
 
   #### .jq excludeFields ####
@@ -1493,14 +1493,14 @@ processExcludeFields <- function(df, excludeFields) {
 
 
 
-#' processOutputFields
+#' processIncludeFields
 #'
 #' @keywords internal
 #' @noRd
 #'
-processOutputFields <- function(
+processIncludeFields <- function(
     tfname,
-    outputFields,
+    includeFields,
     tjname = NULL,
     extractedFields = character(0L)) {
 
@@ -1542,18 +1542,18 @@ processOutputFields <- function(
   if (!length(extractedFields)) {
 
     # default
-    subFields <- strsplit(outputFields, split = "[.]")
+    subFields <- strsplit(includeFields, split = "[.]")
     subFields <- subFields[sapply(subFields, length) >= 1L]
 
   } else {
 
     # postgres
 
-    if (setequal(outputFields, extractedFields)) {
+    if (setequal(includeFields, extractedFields)) {
 
       # identifiers were short enough so
       # no recursive approach is needed
-      subFields <- outputFields[outputFields != "_id"]
+      subFields <- includeFields[includeFields != "_id"]
 
     } else {
 
@@ -1567,7 +1567,7 @@ processOutputFields <- function(
 
       subFields <- gsub(
         "^[.]", "", stringi::stri_replace_all_fixed(
-          outputFields, extractedFields, ""))
+          includeFields, extractedFields, ""))
 
       subFields <- strsplit(subFields, split = "[.]")
 
@@ -1634,6 +1634,6 @@ processOutputFields <- function(
     out = tjname
   )
 
-  return(NULL)
+  # early exit
+  if (file.size(tjname) <= 1L) return(NULL)
 
-} # processOutputFields
