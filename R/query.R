@@ -24,8 +24,9 @@
 #' example below.
 #'
 #' @return Data frame with requested documents, may have nested
-#'  lists in columns. Or a vector of all field names in do path
-#'  notation, if `listfields` is specified.
+#'  lists in columns; `NULL` if no documents could be found.
+#'  If `listfields` is specified: a vector of all field names
+#'  in dot path notation.
 #'
 #' @export
 #'
@@ -692,6 +693,9 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
   # fields
 
+  # - using json_*() for output and SQL WHERE,
+  #   using jsonb_*() within functions creating
+  #   output and for docdb_update() / patching
 
   # - check if subfields are needed
   tmpFields <- c(fldQ$includeRootFields, fldQ$queryRootFields)
@@ -701,7 +705,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # - select extracts or full json
   if (length(fldQ$includeFields)) {
 
-    # json_extract(X,P1,P2,...) If only a single path P1 is provided,
+    # jsonb_extract(X,P1,P2,...) If only a single path P1 is provided,
     # then the SQL datatype of the result is ... a text representation
     # for JSON object and array values
 
@@ -1637,3 +1641,4 @@ processIncludeFields <- function(
   # early exit
   if (file.size(tjname) <= 1L) return(NULL)
 
+} # processIncludeFields

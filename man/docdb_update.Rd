@@ -48,10 +48,12 @@ precedence.
 \verb{_id}'s, which then are used for iterative updating.
 }
 \details{
-Uses native functions with MongoDB, SQLite, and
-DuckDB; delete and create with Elasticsearch;
-a \code{plpgsql} function added to PostgreSQL;
-and \link{jqr} for CouchDB.
+Uses native functions with MongoDB (\code{update()}),
+SQLite (\code{jsonb_update()}), DuckDB
+(\code{jsonb_merge_patch()}),
+Elasticsearch (\code{elastic::docs_bulk_update()});
+a \code{plpgsql} function added to PostgreSQL,
+and a \link{jq} programme for CouchDB.
 }
 \examples{
 \dontrun{

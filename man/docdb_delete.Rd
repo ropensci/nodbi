@@ -18,7 +18,7 @@ a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{...}{Optionally, specify \code{query} parameter with a
 JSON string as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
-If not specified, the default is to delete the container \code{key}.
+If not specified (default), deletes the container \code{key}.
 
 Other parameters are passed on to functions:
 \itemize{

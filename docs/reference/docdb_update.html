@@ -114,10 +114,12 @@ Can use comparisons / tests (<code>$lt</code>, <code>$lte</code>, <code>$gt</cod
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Uses native functions with MongoDB, SQLite, and
-DuckDB; delete and create with Elasticsearch;
-a <code>plpgsql</code> function added to PostgreSQL;
-and jqr for CouchDB.</p>
+    <p>Uses native functions with MongoDB (<code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>),
+SQLite (<code>jsonb_update()</code>), DuckDB
+(<code>jsonb_merge_patch()</code>),
+Elasticsearch (<code><a href="https://docs.ropensci.org/elastic/reference/docs_bulk_update.html" class="external-link">elastic::docs_bulk_update()</a></code>);
+a <code>plpgsql</code> function added to PostgreSQL,
+and a jq programme for CouchDB.</p>
     </div>
 
     <div id="ref-examples">

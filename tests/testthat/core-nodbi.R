@@ -196,7 +196,7 @@ test_that("docdb_query", {
   expect_equal(docdb_create(src, key, value = '[{"a": {"b": {"c": 3}}},{"a": {"b": {"c": 4}}}]'), 2L)
   expect_equal(docdb_query(src = src, key = key, query = '{}', fields = '{"a.b.c": 1, "_id": 0}')[[1]], 3:4)
   tmp <- docdb_query(src = src, key = key, query = '{}', fields = '{"clinical_results.reported_events.other_events.category_list.category.event_list":1}')
-  expect_true(is.null(tmp) || !nrow(tmp))
+  expect_true(is.null(tmp))
   if (any(inherits(src, "src_postgres"))) expect_error(docdb_query(src = src, key = key, query = '{}', fields = paste0('{"', paste(1:50, collapse = '":1,"'), '":1}')))
   expect_true(docdb_delete(src = src, key = key))
 

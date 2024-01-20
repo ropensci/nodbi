@@ -74,7 +74,7 @@ a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 <dt>...</dt>
 <dd><p>Optionally, specify <code>query</code> parameter with a
 JSON string as per <code><a href="docdb_query.html">docdb_query()</a></code> to identify documents to be deleted.
-If not specified, the default is to delete the container <code>key</code>.</p>
+If not specified (default), deletes the container <code>key</code>.</p>
 <p>Other parameters are passed on to functions:</p><ul><li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code>$remove</p></li>
 <li><p>SQLite: <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">DBI::dbExecute()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code></p></li>
 <li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/docs_delete.html" class="external-link">elastic::docs_delete()</a></code> or <code><a href="https://docs.ropensci.org/elastic/reference/indices.html" class="external-link">elastic::index_delete()</a></code></p></li>

@@ -30,8 +30,9 @@ just the names of all fields in dot path notation.}
 }
 \value{
 Data frame with requested documents, may have nested
-lists in columns. Or a vector of all field names in do path
-notation, if \code{listfields} is specified.
+lists in columns; \code{NULL} if no documents could be found.
+If \code{listfields} is specified: a vector of all field names
+in dot path notation.
 }
 \description{
 Uses \link{jqr} for complementing the databases'

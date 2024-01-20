@@ -8,10 +8,12 @@
 #' \code{value} can have multiple documents and
 #' `_id`'s, which then are used for iterative updating.
 #'
-#' Uses native functions with MongoDB, SQLite, and
-#' DuckDB; delete and create with Elasticsearch;
-#' a `plpgsql` function added to PostgreSQL;
-#' and [jqr] for CouchDB.
+#' Uses native functions with MongoDB (`update()`),
+#' SQLite (`jsonb_update()`), DuckDB
+#' (`jsonb_merge_patch()`),
+#' Elasticsearch (`elastic::docs_bulk_update()`);
+#' a `plpgsql` function added to PostgreSQL,
+#' and a [jq] programme for CouchDB.
 #'
 #' @inheritParams docdb_create
 #'
