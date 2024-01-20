@@ -587,6 +587,9 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   )
 
   # - early exit
+  if (file.size(tfname) <= 1L) return(NULL)
+
+  # - early exit
   if (!length(fldQ$excludeFields)) return(
     processOutputFields(tfname, fldQ$includeFields))
 
