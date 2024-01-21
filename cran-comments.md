@@ -32,7 +32,7 @@
 
 We checked 2 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
-* r-lib/revdepcheck reported 1 problem, with R package ctrdata; this is because one of the upstream clinical trial registers had a change in data structure that leads to an error with the released ctrdata package. I am the maintainer of ctrdata and have an updated package ready that that I will submit here as soon as this nodbi submission is accepted. 
+* r-lib/revdepcheck reported 1 problem, with R package ctrdata; this is however unrelated to nodbi because one of ctrdata's upstream clinical trial registers had a change in data structure that leads to an error with the released ctrdata package. I am the maintainer of ctrdata and have an updated package ready that that I will submit as soon as this nodbi submission is accepted. 
 
 
 --------

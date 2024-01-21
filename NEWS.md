@@ -1,4 +1,4 @@
-# nodbi 0.9.8.9001
+# nodbi 0.10.0
 
 ## Deprecated
 * empty parameter `query` now triggers a warning as it should be a valid JSON string; change `query = ""` into `query = "{}"` 

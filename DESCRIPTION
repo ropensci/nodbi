@@ -4,7 +4,7 @@ Description: Simplified document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.9.8.9001
+Version: 0.10.0
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -38,7 +38,7 @@ Suggests:
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
-    RSQLite (>= 2.3.4.9005),
+    RSQLite (>= 2.3.5),
     duckdb (>= 0.6.0),
     RPostgres,
     testthat,
