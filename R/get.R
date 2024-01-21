@@ -3,9 +3,9 @@
 #' @inheritParams docdb_create
 #'
 #' @param limit (integer) Maximum number of documents
-#'  to return. If not set, defaults to 10,000 for
-#'  Elasticsearch and all documents for MongoDB,
-#'  SQLite, CouchDB, PostgreSQL, and DuckDB.
+#'  to return. If `NULL` or not set (default), 10,000 for
+#'  Elasticsearch and all documents for MongoDB, SQLite,
+#'  CouchDB, PostgreSQL, and DuckDB.
 #'
 #' @param ... Passed on to functions:
 #' - MongoDB: find() in [mongolite::mongo()]

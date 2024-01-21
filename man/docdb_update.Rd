@@ -25,35 +25,25 @@ Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
 \verb{$ne}, \verb{$in}, \verb{$regex}), with logic operators (\verb{$and},
 \verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.}
 
-\item{...}{Passed on to functions:
-\itemize{
-\item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
-\item Elasticsearch: \code{\link[elastic:docs_bulk_update]{elastic::docs_bulk_update()}}
-\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item SQLite: ignored
-\item PostgreSQL: ignored
-\item DuckDB: ignored
-}}
+\item{...}{Passed on to functions \code{\link[elastic:docs_bulk_update]{elastic::docs_bulk_update()}},
+and \code{\link[mongolite:mongo]{mongolite::mongo()}}$update().}
 }
 \value{
 (integer) Number of successfully updated documents
 }
 \description{
 Documents are updated by patching their JSON with
-\code{value}.
-Documents are identified by the \code{query} or
-by \verb{_id}'s in \code{value}, where the latter takes
-precedence.
-\code{value} can have multiple documents and
-\verb{_id}'s, which then are used for iterative updating.
+\code{value}. Documents are identified by a \code{query}
+or by \verb{_id}'s in \code{value}, where the latter takes
+precedence. \code{value} can have multiple documents (with
+\verb{_id}'s), which then are iteratively updated.
 }
 \details{
-Uses native functions with MongoDB (\code{update()}),
-SQLite (\code{jsonb_update()}), DuckDB
-(\code{jsonb_merge_patch()}),
+Uses native functions in MongoDB (\code{\link[mongolite:mongo]{mongolite::mongo()}}$update()),
+SQLite (\code{jsonb_update()}), DuckDB (\code{jsonb_merge_patch()}),
 Elasticsearch (\code{elastic::docs_bulk_update()});
-a \code{plpgsql} function added to PostgreSQL,
-and a \link{jq} programme for CouchDB.
+a \code{plpgsql} function added when calling \code{src_postgres()},
+and a \link{jqr} programme for CouchDB.
 }
 \examples{
 \dontrun{

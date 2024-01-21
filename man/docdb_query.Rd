@@ -21,12 +21,20 @@ Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
 \verb{$ne}, \verb{$in}, \verb{$regex}), with logic operators (\verb{$and},
 \verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.}
 
-\item{...}{Optionally, specify \code{fields} as a JSON string of
-fields to be returned from anywhere in the tree, see examples.
-For \code{src_postgres()}, only fewer than 50 fields can be requested
-to be returned by the function.
-Alternatively, specify \code{listfields} with any value to return
-just the names of all fields in dot path notation.}
+\item{...}{Optional parameters:
+\itemize{
+\item Specify \code{fields} as a JSON string of fields to be returned
+from anywhere in the tree, or to be excluded from being returned,
+e.g. \code{fields  = '{"nameOfMy.SubFieldToInclude:" 1, "_id": 0}'}
+and see examples. If \code{fields} is not specified, the complete
+JSON document is returned. For \code{src_postgres()}, only fewer
+than 50 fields can be requested to be returned by the function.
+\item Specify \code{limit} as integer for the maximum number of documents
+to be returned.
+\item Specify \code{listfields = TRUE} to return just the names of
+all fields, from all documents or from the maximum number of
+documents as specified in \code{limit}.
+}}
 }
 \value{
 Data frame with requested documents, may have nested
@@ -35,15 +43,15 @@ If \code{listfields} is specified: a vector of all field names
 in dot path notation.
 }
 \description{
-Uses \link{jqr} for complementing the databases'
-native query and filtering functions.
+Complements the databases' native query and filtering functions
+by using \link{jqr}.
 If \code{query = "{}"} and neither \code{fields}
 nor \code{listfields} is specified, runs \code{\link[=docdb_get]{docdb_get()}}.
 }
 \note{
 A dot in \code{query} or \code{fields} is interpreted as a dot path,
-pointing to a fields nested within another, e.g. \code{friends.id} in
-example below.
+pointing to a field nested within another, e.g. \code{friends.id} in
+the example.
 }
 \examples{
 \dontrun{

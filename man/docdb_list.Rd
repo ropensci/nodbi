@@ -11,18 +11,10 @@ docdb_list(src, ...)
 \code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
-\item{...}{Passed to functions:
-\itemize{
-\item MongoDB: ignored
-\item SQLite: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
-\item Elasticsearch: ignored
-\item CouchDB: ignored
-\item PostgreSQL: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
-\item DuckDB: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
-}}
+\item{...}{Passed to function \code{\link[DBI:dbListTables]{DBI::dbListTables()}}}
 }
 \value{
-(vector) of names of containers that can be
+(vector) Names of containers that can be
 used as parameter \code{key} with other functions such as
 \code{\link[=docdb_create]{docdb_create()}}.
 }

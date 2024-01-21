@@ -2,6 +2,10 @@
 #'
 #' A message is emitted if the container `key` already exists.
 #'
+#' An error is raised for document(s) in `value` when their
+#' `_id` already exist(s) in the collection `key`;
+#' use [docdb_update()] to update such document(s).
+#'
 #' @section Identifiers:
 #' If `value` is a data.frame that has a column `_id`,
 #' or is a JSON string having a key `_id` at root level,
@@ -12,10 +16,6 @@
 #' otherwise random `_id`'s will be created (using
 #' [uuid::UUIDgenerate()] with \code{use.time = TRUE} for
 #' SQLite and PostgreSQL, or using DuckDB's built-in `uuid()`).
-#'
-#' A warning is emitted for document(s) in `value` when the same
-#' `_id`'s already exists in the collection `key`;
-#' use [docdb_update()] to update such document(s).
 #'
 #' @param src Source object, result of call to any of functions
 #' [src_mongo()], [src_sqlite()], [src_elastic()], [src_couchdb()]
@@ -30,13 +30,8 @@
 #' a single data.frame, a JSON string, a list, or a
 #' file name or URL that points to NDJSON documents
 #'
-#' @param ... Passed to functions:
-#' - CouchDB: [sofa::db_bulk_create()]
-#' - Elasticsearch: [elastic::docs_bulk()]
-#' - MongoDB: [mongolite::mongo()]
-#' - SQLite: ignored
-#' - PostgreSQL: ignored
-#' - DuckDB: ignored
+#' @param ... Passed to functions [sofa::db_bulk_create()],
+#' [elastic::docs_bulk()], and [mongolite::mongo()]$insert()
 #'
 #' @return (integer) Number of successfully created documents
 #'

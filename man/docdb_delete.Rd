@@ -18,20 +18,10 @@ a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{...}{Optionally, specify \code{query} parameter with a
 JSON string as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
-If not specified (default), deletes the container \code{key}.
-
-Other parameters are passed on to functions:
-\itemize{
-\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}$remove
-\item SQLite: \code{\link[DBI:dbExecute]{DBI::dbExecute()}} or \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}
-\item Elasticsearch: \code{\link[elastic:docs_delete]{elastic::docs_delete()}} or \code{\link[elastic:indices]{elastic::index_delete()}}
-\item CouchDB: \code{\link[sofa:db_delete]{sofa::db_delete()}} or \code{\link[sofa:doc_delete]{sofa::doc_delete()}}
-\item PostgreSQL: \code{\link[DBI:dbExecute]{DBI::dbExecute()}} or \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}
-\item DuckDB: \code{\link[DBI:dbExecute]{DBI::dbExecute()}} or \code{\link[DBI:dbRemoveTable]{DBI::dbRemoveTable()}}
-}}
+If not specified (default), deletes the container \code{key}.}
 }
 \value{
-(logical) success of operation. Typically \code{TRUE} if
+(logical) Success of operation. Typically \code{TRUE} if
 document(s) or collection existed, and \code{FALSE} if document(s)
 did not exist, or collection did not exist, or delete was not successful.
 }

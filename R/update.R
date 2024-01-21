@@ -1,19 +1,16 @@
 #' Update documents
 #'
 #' Documents are updated by patching their JSON with
-#' \code{value}.
-#' Documents are identified by the \code{query} or
-#' by `_id`'s in \code{value}, where the latter takes
-#' precedence.
-#' \code{value} can have multiple documents and
-#' `_id`'s, which then are used for iterative updating.
+#' \code{value}. Documents are identified by a \code{query}
+#' or by `_id`'s in \code{value}, where the latter takes
+#' precedence. \code{value} can have multiple documents (with
+#' `_id`'s), which then are iteratively updated.
 #'
-#' Uses native functions with MongoDB (`update()`),
-#' SQLite (`jsonb_update()`), DuckDB
-#' (`jsonb_merge_patch()`),
+#' Uses native functions in MongoDB ([mongolite::mongo()]$update()),
+#' SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`),
 #' Elasticsearch (`elastic::docs_bulk_update()`);
-#' a `plpgsql` function added to PostgreSQL,
-#' and a [jq] programme for CouchDB.
+#' a `plpgsql` function added when calling `src_postgres()`,
+#' and a [jqr] programme for CouchDB.
 #'
 #' @inheritParams docdb_create
 #'
@@ -22,13 +19,8 @@
 #'  `$ne`, `$in`, `$regex`), with logic operators (`$and`,
 #'  `$or`, `(`, `)`), including nested queries, see examples.
 #'
-#' @param ... Passed on to functions:
-#' - CouchDB: [sofa::db_bulk_create()]
-#' - Elasticsearch: [elastic::docs_bulk_update()]
-#' - MongoDB: [mongolite::mongo()]
-#' - SQLite: ignored
-#' - PostgreSQL: ignored
-#' - DuckDB: ignored
+#' @param ... Passed on to functions [elastic::docs_bulk_update()],
+#' and [mongolite::mongo()]$update().
 #'
 #' @return (integer) Number of successfully updated documents
 #'

@@ -20,21 +20,19 @@ a table name for DuckDB, SQLite and PostgreSQL)}
 a single data.frame, a JSON string, a list, or a
 file name or URL that points to NDJSON documents}
 
-\item{...}{Passed to functions:
-\itemize{
-\item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
-\item Elasticsearch: \code{\link[elastic:docs_bulk]{elastic::docs_bulk()}}
-\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item SQLite: ignored
-\item PostgreSQL: ignored
-\item DuckDB: ignored
-}}
+\item{...}{Passed to functions \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}},
+\code{\link[elastic:docs_bulk]{elastic::docs_bulk()}}, and \code{\link[mongolite:mongo]{mongolite::mongo()}}$insert()}
 }
 \value{
 (integer) Number of successfully created documents
 }
 \description{
 A message is emitted if the container \code{key} already exists.
+}
+\details{
+An error is raised for document(s) in \code{value} when their
+\verb{_id} already exist(s) in the collection \code{key};
+use \code{\link[=docdb_update]{docdb_update()}} to update such document(s).
 }
 \section{Identifiers}{
 
@@ -47,10 +45,6 @@ row names (if any exist) of \code{value} will be used as \verb{_id}'s,
 otherwise random \verb{_id}'s will be created (using
 \code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE} for
 SQLite and PostgreSQL, or using DuckDB's built-in \code{uuid()}).
-
-A warning is emitted for document(s) in \code{value} when the same
-\verb{_id}'s already exists in the collection \code{key};
-use \code{\link[=docdb_update]{docdb_update()}} to update such document(s).
 }
 
 \examples{

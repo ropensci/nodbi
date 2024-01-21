@@ -2,15 +2,9 @@
 #'
 #' @inheritParams docdb_create
 #'
-#' @param ... Passed to functions:
-#' - MongoDB: ignored
-#' - SQLite: [DBI::dbListTables()]
-#' - Elasticsearch: ignored
-#' - CouchDB: ignored
-#' - PostgreSQL: [DBI::dbListTables()]
-#' - DuckDB: [DBI::dbListTables()]
+#' @param ... Passed to function [DBI::dbListTables()]
 #'
-#' @return (vector) of names of containers that can be
+#' @return (vector) Names of containers that can be
 #' used as parameter `key` with other functions such as
 #' [docdb_create()].
 #'

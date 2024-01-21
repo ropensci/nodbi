@@ -2,17 +2,12 @@
 #'
 #' @inheritParams docdb_create
 #'
-#' @param ... Passed to functions:
-#' - MongoDB: count() in [mongolite::mongo()]
-#' - RSQLite: [DBI::dbListTables()]
-#' - Elasticsearch: [elastic::index_exists()]
-#' - CouchDB: [sofa::db_info()]
-#' - PostgreSQL: [DBI::dbListTables()]
-#' - DuckDB: [DBI::dbListTables()]
+#' @param ... Passed to functions [DBI::dbListTables()],
+#' [elastic::index_exists()], and [sofa::db_info()]
 #'
 #' @return (logical) `TRUE` or `FALSE` to indicate
 #'  existence of container \code{key} in database.
-#'  Note this does not mean that the container
+#'  Note this does not indicate if the container
 #'  holds any documents.
 #'
 #' @export

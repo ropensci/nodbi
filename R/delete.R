@@ -6,15 +6,7 @@
 #' JSON string as per [docdb_query()] to identify documents to be deleted.
 #' If not specified (default), deletes the container \code{key}.
 #'
-#' Other parameters are passed on to functions:
-#' - MongoDB: [mongolite::mongo()]$remove
-#' - SQLite: [DBI::dbExecute()] or [DBI::dbRemoveTable()]
-#' - Elasticsearch: [elastic::docs_delete()] or [elastic::index_delete()]
-#' - CouchDB: [sofa::db_delete()] or [sofa::doc_delete()]
-#' - PostgreSQL: [DBI::dbExecute()] or [DBI::dbRemoveTable()]
-#' - DuckDB: [DBI::dbExecute()] or [DBI::dbRemoveTable()]
-#'
-#' @return (logical) success of operation. Typically \code{TRUE} if
+#' @return (logical) Success of operation. Typically \code{TRUE} if
 #' document(s) or collection existed, and \code{FALSE} if document(s)
 #' did not exist, or collection did not exist, or delete was not successful.
 #'
