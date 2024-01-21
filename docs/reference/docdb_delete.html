@@ -74,21 +74,14 @@ a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 <dt>...</dt>
 <dd><p>Optionally, specify <code>query</code> parameter with a
 JSON string as per <code><a href="docdb_query.html">docdb_query()</a></code> to identify documents to be deleted.
-If not specified (default), deletes the container <code>key</code>.</p>
-<p>Other parameters are passed on to functions:</p><ul><li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code>$remove</p></li>
-<li><p>SQLite: <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">DBI::dbExecute()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code></p></li>
-<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/docs_delete.html" class="external-link">elastic::docs_delete()</a></code> or <code><a href="https://docs.ropensci.org/elastic/reference/indices.html" class="external-link">elastic::index_delete()</a></code></p></li>
-<li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_delete.html" class="external-link">sofa::db_delete()</a></code> or <code><a href="https://docs.ropensci.org/sofa/reference/doc_delete.html" class="external-link">sofa::doc_delete()</a></code></p></li>
-<li><p>PostgreSQL: <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">DBI::dbExecute()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code></p></li>
-<li><p>DuckDB: <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">DBI::dbExecute()</a></code> or <code><a href="https://dbi.r-dbi.org/reference/dbRemoveTable.html" class="external-link">DBI::dbRemoveTable()</a></code></p></li>
-</ul></dd>
+If not specified (default), deletes the container <code>key</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>(logical) success of operation. Typically <code>TRUE</code> if
+<p>(logical) Success of operation. Typically <code>TRUE</code> if
 document(s) or collection existed, and <code>FALSE</code> if document(s)
 did not exist, or collection did not exist, or delete was not successful.</p>
     </div>

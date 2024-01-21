@@ -99,7 +99,7 @@
       "@type": "SoftwareApplication",
       "identifier": "RSQLite",
       "name": "RSQLite",
-      "version": ">= 2.2.4",
+      "version": ">= 2.3.4.9005",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -279,7 +279,7 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "592.69KB",
+  "fileSize": "599.53KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
   "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"],

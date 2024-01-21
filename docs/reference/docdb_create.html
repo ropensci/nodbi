@@ -78,13 +78,8 @@ file name or URL that points to NDJSON documents</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Passed to functions:</p><ul><li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_bulk_create.html" class="external-link">sofa::db_bulk_create()</a></code></p></li>
-<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/docs_bulk.html" class="external-link">elastic::docs_bulk()</a></code></p></li>
-<li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
-<li><p>SQLite: ignored</p></li>
-<li><p>PostgreSQL: ignored</p></li>
-<li><p>DuckDB: ignored</p></li>
-</ul></dd>
+<dd><p>Passed to functions <code><a href="https://docs.ropensci.org/sofa/reference/db_bulk_create.html" class="external-link">sofa::db_bulk_create()</a></code>,
+<code><a href="https://docs.ropensci.org/elastic/reference/docs_bulk.html" class="external-link">elastic::docs_bulk()</a></code>, and <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code>$insert()</p></dd>
 
 </dl></div>
     <div id="value">
@@ -92,6 +87,12 @@ file name or URL that points to NDJSON documents</p></dd>
     
 
 <p>(integer) Number of successfully created documents</p>
+    </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>An error is raised for document(s) in <code>value</code> when their
+<code>_id</code> already exist(s) in the collection <code>key</code>;
+use <code><a href="docdb_update.html">docdb_update()</a></code> to update such document(s).</p>
     </div>
     <div id="identifiers">
     <h2>Identifiers</h2>
@@ -106,9 +107,6 @@ row names (if any exist) of <code>value</code> will be used as <code>_id</code>'
 otherwise random <code>_id</code>'s will be created (using
 <code><a href="https://rdrr.io/pkg/uuid/man/UUIDgenerate.html" class="external-link">uuid::UUIDgenerate()</a></code> with <code>use.time = TRUE</code> for
 SQLite and PostgreSQL, or using DuckDB's built-in <code>uuid()</code>).</p>
-<p>A warning is emitted for document(s) in <code>value</code> when the same
-<code>_id</code>'s already exists in the collection <code>key</code>;
-use <code><a href="docdb_update.html">docdb_update()</a></code> to update such document(s).</p>
     </div>
 
     <div id="ref-examples">

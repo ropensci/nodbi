@@ -351,12 +351,12 @@ result <- rbenchmark::benchmark(
 # 2024-01-20 with 2015 mobile hardware, databases via homebrew
 result[rev(order(result$elapsed)), ]
 #         test replications elapsed
-# 4    CouchDB           10   385.5
-# 3    Elastic           10    33.3
-# 5 PostgreSQL           10     3.3
-# 1    MongoDB           10     1.9
-# 6     DuckDB           10     1.7
-# 2     SQLite           10     1.5
+# 4    CouchDB           10   294.4
+# 3    Elastic           10    36.7
+# 5 PostgreSQL           10     2.8
+# 1    MongoDB           10     2.0
+# 6     DuckDB           10     1.6
+# 2     SQLite           10     1.4
 ```
 
 2## Testing {#testing}
@@ -366,24 +366,24 @@ Every database backend is subjected to identical tests, see
 
 ``` r
 #
-# 2024-01-20
+# 2024-01-21
 testthat::test_local()
 # ✔ | F W  S  OK | Context
-# ✔ |      2 152 | couchdb [99.6s]                                                                
-# ✔ |      1 151 | duckdb [4.5s]                                                                  
-# ✔ |      2 150 | elastic [87.6s]                                                                
-# ✔ |      2 150 | mongodb [5.9s]                                                                 
-# ✔ |        153 | postgres [10.0s]                                                               
-# ✔ |        154 | sqlite [6.0s]                                                                  
+# ✔ |      2 152 | couchdb [102.6s]                                                                            
+# ✔ |      1 151 | duckdb [4.2s]                                                                               
+# ✔ |      2 150 | elastic [97.9s]                                                                             
+# ✔ |      2 150 | mongodb [6.3s]                                                                              
+# ✔ |        153 | postgres [10.5s]                                                                            
+# ✔ |        154 | sqlite [5.9s]                                                                               
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════════════
-# Duration: 213.9 s
+# ══ Results ══════════════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 227.7 s
 # 
-# ── Skipped tests (7) ───────────────────────────────────────────────────────────────────────────
-# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3,
+# ── Skipped tests (7) ────────────────────────────────────────────────────────────────────────────────────────
+# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,
+#   test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3,
 #   test-elastic.R:21:3, test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3,
-#   test-duckdb.R:22:3, test-elastic.R:21:3, test-mongodb.R:24:3
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 910 ]
 
