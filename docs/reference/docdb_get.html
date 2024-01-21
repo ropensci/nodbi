@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.8.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
       </span>
     </div>
 
@@ -66,17 +66,16 @@
 
 <dt>key</dt>
 <dd><p>(character) The name of the container in the
-database backend
-(corresponds to <code>collection</code> for MongoDB,
-<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
+database backend (corresponds to <code>collection</code> for MongoDB,
+<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>limit</dt>
 <dd><p>(integer) Maximum number of documents
-to return. If not set, defaults to 10,000 for
-Elasticsearch and all documents for MongoDB,
-SQLite, CouchDB, PostgreSQL, and DuckDB.</p></dd>
+to return. If <code>NULL</code> or not set (default), 10,000 for
+Elasticsearch and all documents for MongoDB, SQLite,
+CouchDB, PostgreSQL, and DuckDB.</p></dd>
 
 
 <dt>...</dt>
@@ -93,7 +92,7 @@ SQLite, CouchDB, PostgreSQL, and DuckDB.</p></dd>
     <h2>Value</h2>
     
 
-<p>Document(s) in a data frame</p>
+<p>A data frame, one document per row</p>
     </div>
 
     <div id="ref-examples">

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.8.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
       </span>
     </div>
 
@@ -66,20 +66,14 @@
 
 <dt>key</dt>
 <dd><p>(character) The name of the container in the
-database backend
-(corresponds to <code>collection</code> for MongoDB,
-<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
+database backend (corresponds to <code>collection</code> for MongoDB,
+<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Passed to functions:</p><ul><li><p>MongoDB: count() in <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
-<li><p>RSQLite: <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">DBI::dbListTables()</a></code></p></li>
-<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/indices.html" class="external-link">elastic::index_exists()</a></code></p></li>
-<li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_info.html" class="external-link">sofa::db_info()</a></code></p></li>
-<li><p>PostgreSQL: <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">DBI::dbListTables()</a></code></p></li>
-<li><p>DuckDB: <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">DBI::dbListTables()</a></code></p></li>
-</ul></dd>
+<dd><p>Passed to functions <code><a href="https://dbi.r-dbi.org/reference/dbListTables.html" class="external-link">DBI::dbListTables()</a></code>,
+<code><a href="https://docs.ropensci.org/elastic/reference/indices.html" class="external-link">elastic::index_exists()</a></code>, and <code><a href="https://docs.ropensci.org/sofa/reference/db_info.html" class="external-link">sofa::db_info()</a></code></p></dd>
 
 </dl></div>
     <div id="value">
@@ -88,7 +82,7 @@ a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
 
 <p>(logical) <code>TRUE</code> or <code>FALSE</code> to indicate
 existence of container <code>key</code> in database.
-Note this does not mean that the container
+Note this does not indicate if the container
 holds any documents.</p>
     </div>
 

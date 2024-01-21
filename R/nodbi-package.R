@@ -7,37 +7,14 @@
 #'
 #' @name nodbi-package
 #' @docType package
+#' @author Ralf Herold \email{ralf.herold@@mailbox.org}
 #' @author Scott Chamberlain \email{sckott@@protonmail.com}
 #' @author Rich FitzJohn \email{rich.fitzjohn@@gmail.com}
 #' @author Jeroen Ooms \email{jeroen.ooms@@stat.ucla.edu}
-#' @author Ralf Herold \email{ralf.herold@@mailbox.org}
-#' @keywords package
-NULL
-
-#' This function is defunct.
-#' @rdname src_etcd-defunct
 #' @keywords internal
-#' @noRd
-src_etcd <- function() {
-  .Defunct(msg = "This function is defunct; etcd removed")
-}
+"_PACKAGE"
 
-#' This function is defunct.
-#' @rdname src_redis-defunct
-#' @keywords internal
-#' @noRd
-src_redis <- function() {
-  .Defunct(msg = "This function is defunct; redis removed")
-}
 
-#' Defunct functions in nodbi
-#'
-#' - [src_etcd]: etcd removed, with all its S3 methods for `docdb_*`
-#' - [src_redis]: redis removed, with all its S3 methods for `docdb_*`
-#'
-#' @name nodbi-defunct
-#' @noRd
-NULL
 
 #' Data set 'diamonds'
 #'

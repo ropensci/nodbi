@@ -12,25 +12,17 @@ docdb_exists(src, key, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)}
 
-\item{...}{Passed to functions:
-\itemize{
-\item MongoDB: count() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item RSQLite: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
-\item Elasticsearch: \code{\link[elastic:indices]{elastic::index_exists()}}
-\item CouchDB: \code{\link[sofa:db_info]{sofa::db_info()}}
-\item PostgreSQL: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
-\item DuckDB: \code{\link[DBI:dbListTables]{DBI::dbListTables()}}
-}}
+\item{...}{Passed to functions \code{\link[DBI:dbListTables]{DBI::dbListTables()}},
+\code{\link[elastic:indices]{elastic::index_exists()}}, and \code{\link[sofa:db_info]{sofa::db_info()}}}
 }
 \value{
 (logical) \code{TRUE} or \code{FALSE} to indicate
 existence of container \code{key} in database.
-Note this does not mean that the container
+Note this does not indicate if the container
 holds any documents.
 }
 \description{

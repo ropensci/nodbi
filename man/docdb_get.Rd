@@ -12,15 +12,14 @@ docdb_get(src, key, limit = NULL, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{limit}{(integer) Maximum number of documents
-to return. If not set, defaults to 10,000 for
-Elasticsearch and all documents for MongoDB,
-SQLite, CouchDB, PostgreSQL, and DuckDB.}
+to return. If \code{NULL} or not set (default), 10,000 for
+Elasticsearch and all documents for MongoDB, SQLite,
+CouchDB, PostgreSQL, and DuckDB.}
 
 \item{...}{Passed on to functions:
 \itemize{
@@ -33,7 +32,7 @@ SQLite, CouchDB, PostgreSQL, and DuckDB.}
 }}
 }
 \value{
-Document(s) in a data frame
+A data frame, one document per row
 }
 \description{
 Get all documents from container in database

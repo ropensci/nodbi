@@ -12,30 +12,27 @@ docdb_create(src, key, value, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{value}{The data to be created in the database:
-a single data.frame, a JSON string, a list,
-or a file name or URL that points to NDJSON documents}
+a single data.frame, a JSON string, a list, or a
+file name or URL that points to NDJSON documents}
 
-\item{...}{Passed to functions:
-\itemize{
-\item CouchDB: \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}}
-\item Elasticsearch: \code{\link[elastic:docs_bulk]{elastic::docs_bulk()}}
-\item MongoDB: \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item SQLite: ignored
-\item PostgreSQL: ignored
-\item DuckDB: ignored
-}}
+\item{...}{Passed to functions \code{\link[sofa:db_bulk_create]{sofa::db_bulk_create()}},
+\code{\link[elastic:docs_bulk]{elastic::docs_bulk()}}, and \code{\link[mongolite:mongo]{mongolite::mongo()}}$insert()}
 }
 \value{
 (integer) Number of successfully created documents
 }
 \description{
 A message is emitted if the container \code{key} already exists.
+}
+\details{
+An error is raised for document(s) in \code{value} when their
+\verb{_id} already exist(s) in the collection \code{key};
+use \code{\link[=docdb_update]{docdb_update()}} to update such document(s).
 }
 \section{Identifiers}{
 
@@ -47,11 +44,7 @@ in the database. If there are no such \verb{_id}'s in \code{value},
 row names (if any exist) of \code{value} will be used as \verb{_id}'s,
 otherwise random \verb{_id}'s will be created (using
 \code{\link[uuid:UUIDgenerate]{uuid::UUIDgenerate()}} with \code{use.time = TRUE} for
-SQLite und PostgreSQL, or using DuckDB's built-in \code{uuid()}).
-
-A warning is emitted for document(s) in \code{value} when the same
-\verb{_id}'s already exists in the collection \code{key};
-use \code{\link[=docdb_update]{docdb_update()}} to update such document(s).
+SQLite and PostgreSQL, or using DuckDB's built-in \code{uuid()}).
 }
 
 \examples{

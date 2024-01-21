@@ -4,7 +4,7 @@ Description: Simplified document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.9.8.9000
+Version: 0.10.0
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -31,19 +31,21 @@ Imports:
     jsonlite,
     uuid,
     jqr,
-    DBI
+    DBI,
+    V8,
+    R.utils
 Suggests:
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
-    RSQLite (>= 2.2.4),
+    RSQLite (>= 2.3.5),
     duckdb (>= 0.6.0),
     RPostgres,
     testthat,
     withr,
     callr,
     webfakes (>= 1.2.0)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org

@@ -1,0 +1,23 @@
+diff --git a/src/utils.js b/src/utils.js
+index a6dffb6..c98e8cf 100644
+--- a/src/utils.js
++++ b/src/utils.js
+@@ -12,7 +12,8 @@ const operatorsMap = {
+   $gte: '>=',
+   $ne: '!=',
+   $in: 'IN',
+-  $eq: '='
++  $eq: '=',
++  $regex: 'REGEXP'
+ }
+ 
+ /**
+@@ -71,7 +72,7 @@ const buildWhereElement = (elem, removeUnderscoreBeforeID) => {
+   if (field === MONGO_QUERY_OPERATOR) { // nested WHERE element
+     return '(' + getTyppedOperand(operand, operator, field) + ')'
+   } else { // simple WHERE element
+-    return field + ' ' + operator + ' ' + getTyppedOperand(operand, operator, field, removeUnderscoreBeforeID)
++    return '"' + field + '" ' + operator + ' ' + getTyppedOperand(operand, operator, field, removeUnderscoreBeforeID)
+   }
+ }
+ 

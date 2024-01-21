@@ -12,29 +12,18 @@ docdb_delete(src, key, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)}
 
-\item{...}{Optionally, specify \code{query} parameter with
-a JSON query as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
-If not specified, the default is to delete the container \code{key}.
-
-Other parameters are passed on to functions:
-\itemize{
-\item MongoDB: ignored
-\item SQLite: ignored
-\item Elasticsearch: ignored
-\item CouchDB: \code{\link[sofa:db_delete]{sofa::db_delete()}} or \code{\link[sofa:doc_delete]{sofa::doc_delete()}}
-\item PostgreSQL: ignored
-\item DuckDB: ignored
-}}
+\item{...}{Optionally, specify \code{query} parameter with a
+JSON string as per \code{\link[=docdb_query]{docdb_query()}} to identify documents to be deleted.
+If not specified (default), deletes the container \code{key}.}
 }
 \value{
-(logical) success of operation. Typically \code{TRUE} if
+(logical) Success of operation. Typically \code{TRUE} if
 document(s) or collection existed, and \code{FALSE} if document(s)
-did not exist or collection did not exist or delete was not successful.
+did not exist, or collection did not exist, or delete was not successful.
 }
 \description{
 Delete documents or container

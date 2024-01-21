@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.8.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
       </span>
     </div>
 
@@ -66,26 +66,20 @@
 
 <dt>key</dt>
 <dd><p>(character) The name of the container in the
-database backend
-(corresponds to <code>collection</code> for MongoDB,
-<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)</p></dd>
+database backend (corresponds to <code>collection</code> for MongoDB,
+<code>dbname</code> for CouchDB, <code>index</code> for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 
 
 <dt>value</dt>
 <dd><p>The data to be created in the database:
-a single data.frame, a JSON string, a list,
-or a file name or URL that points to NDJSON documents</p></dd>
+a single data.frame, a JSON string, a list, or a
+file name or URL that points to NDJSON documents</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Passed to functions:</p><ul><li><p>CouchDB: <code><a href="https://docs.ropensci.org/sofa/reference/db_bulk_create.html" class="external-link">sofa::db_bulk_create()</a></code></p></li>
-<li><p>Elasticsearch: <code><a href="https://docs.ropensci.org/elastic/reference/docs_bulk.html" class="external-link">elastic::docs_bulk()</a></code></p></li>
-<li><p>MongoDB: <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code></p></li>
-<li><p>SQLite: ignored</p></li>
-<li><p>PostgreSQL: ignored</p></li>
-<li><p>DuckDB: ignored</p></li>
-</ul></dd>
+<dd><p>Passed to functions <code><a href="https://docs.ropensci.org/sofa/reference/db_bulk_create.html" class="external-link">sofa::db_bulk_create()</a></code>,
+<code><a href="https://docs.ropensci.org/elastic/reference/docs_bulk.html" class="external-link">elastic::docs_bulk()</a></code>, and <code><a href="https://rdrr.io/pkg/mongolite/man/mongo.html" class="external-link">mongolite::mongo()</a></code>$insert()</p></dd>
 
 </dl></div>
     <div id="value">
@@ -93,6 +87,12 @@ or a file name or URL that points to NDJSON documents</p></dd>
     
 
 <p>(integer) Number of successfully created documents</p>
+    </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>An error is raised for document(s) in <code>value</code> when their
+<code>_id</code> already exist(s) in the collection <code>key</code>;
+use <code><a href="docdb_update.html">docdb_update()</a></code> to update such document(s).</p>
     </div>
     <div id="identifiers">
     <h2>Identifiers</h2>
@@ -106,10 +106,7 @@ in the database. If there are no such <code>_id</code>'s in <code>value</code>,
 row names (if any exist) of <code>value</code> will be used as <code>_id</code>'s,
 otherwise random <code>_id</code>'s will be created (using
 <code><a href="https://rdrr.io/pkg/uuid/man/UUIDgenerate.html" class="external-link">uuid::UUIDgenerate()</a></code> with <code>use.time = TRUE</code> for
-SQLite und PostgreSQL, or using DuckDB's built-in <code>uuid()</code>).</p>
-<p>A warning is emitted for document(s) in <code>value</code> when the same
-<code>_id</code>'s already exists in the collection <code>key</code>;
-use <code><a href="docdb_update.html">docdb_update()</a></code> to update such document(s).</p>
+SQLite and PostgreSQL, or using DuckDB's built-in <code>uuid()</code>).</p>
     </div>
 
     <div id="ref-examples">

@@ -34,30 +34,8 @@ src_sqlite <- function(dbname = ":memory:",
     dbname = dbname,
     ...)
 
-  # check if json1 extension is supported
-  if (inherits(
-    try(
-      DBI::dbGetQuery(
-        conn = con,
-        statement = paste0("SELECT json_patch('{\"a\":1}','{\"a\":9}');")
-      ), silent = TRUE
-  ), "try-error")) {
-    stop("SQLite does not have json1 extension enabled. Call ",
-         "install.packages('RSQLite') to install a current version.")
-  }
-
-  # check if regular expressions are supported (RSQLite >= 2.1.2)
-  if (inherits(
-    try({
-      RSQLite::initRegExp(db = con)
-      DBI::dbExecute(
-        conn = con,
-        statement = paste0('SELECT * FROM (VALUES ("Astring")) WHERE 1 REGEXP "[A-Z]+";'))
-    }, silent = TRUE
-  ), "try-error")) {
-    stop("SQLite does not support REGEXP. Call ",
-         "install.packages('RSQLite') to install a current version.")
-  }
+  # enable regular expressions
+  RSQLite::initRegExp(db = con)
 
   # set timeout for concurrency to 10s
   DBI::dbExecute(con, "PRAGMA busy_timeout = 10000;")

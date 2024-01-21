@@ -12,50 +12,75 @@ docdb_query(src, key, query, ...)
 \code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
 
 \item{key}{(character) The name of the container in the
-database backend
-(corresponds to \code{collection} for MongoDB,
-\code{dbname} for CouchDB, \code{index} for Elasticsearch and to
-a table name for DuckDb, SQLite and PostgreSQL)}
+database backend (corresponds to \code{collection} for MongoDB,
+\code{dbname} for CouchDB, \code{index} for Elasticsearch, and to
+a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{query}{(character) A JSON query string, see examples.
-Can use comparisons / tests (e.g., '$gt', '$ne', '$in', '$regex'),
-with at most one logic operator ('$and' if not specified, or '$or'),
-see examples.}
+Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
+\verb{$ne}, \verb{$in}, \verb{$regex}), with logic operators (\verb{$and},
+\verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.}
 
-\item{...}{Optionally, specify \code{fields} as a JSON string of
-fields to be returned from anywhere in the tree, see examples.}
+\item{...}{Optional parameters:
+\itemize{
+\item Specify \code{fields} as a JSON string of fields to be returned
+from anywhere in the tree, or to be excluded from being returned,
+e.g. \code{fields  = '{"nameOfMy.SubFieldToInclude:" 1, "_id": 0}'}
+and see examples. If \code{fields} is not specified, the complete
+JSON document is returned. For \code{src_postgres()}, only fewer
+than 50 fields can be requested to be returned by the function.
+\item Specify \code{limit} as integer for the maximum number of documents
+to be returned.
+\item Specify \code{listfields = TRUE} to return just the names of
+all fields, from all documents or from the maximum number of
+documents as specified in \code{limit}.
+}}
 }
 \value{
 Data frame with requested documents, may have nested
-lists in columns. If \code{query = "{}"} and fields are not
-specified, consider using \code{\link[=docdb_get]{docdb_get()}}.
+lists in columns; \code{NULL} if no documents could be found.
+If \code{listfields} is specified: a vector of all field names
+in dot path notation.
 }
 \description{
-Get documents or parts with filtering query
+Complements the databases' native query and filtering functions
+by using \link{jqr}.
+If \code{query = "{}"} and neither \code{fields}
+nor \code{listfields} is specified, runs \code{\link[=docdb_get]{docdb_get()}}.
 }
 \note{
-A dot in \code{query} or \code{fields} is interpreted as a dot path;
-it is not supported to have a dot within the key / name of a field.
-
-Main functions used per database:
-\itemize{
-\item MongoDB: find() in \code{\link[mongolite:mongo]{mongolite::mongo()}}
-\item SQLite: SQL query using built-in \code{json_tree()}
-\item Elasticsearch: \code{\link[elastic:Search]{elastic::Search()}}
-\item CouchDB: \code{\link[sofa:db_query]{sofa::db_query()}}
-\item PostgreSQL: SQL query using built-in \code{jsonb_build_object()}
-\item DuckDB: SQL using built-in \code{json_extract()}
-}
+A dot in \code{query} or \code{fields} is interpreted as a dot path,
+pointing to a field nested within another, e.g. \code{friends.id} in
+the example.
 }
 \examples{
 \dontrun{
 src <- src_sqlite()
-docdb_create(src, "mtcars", mtcars)
-docdb_query(src, "mtcars", query = '{"mpg":21}')
-docdb_query(src, "mtcars", query = '{"mpg":21, "gear": {"$lte": 4}}')
-docdb_query(src, "mtcars", query = '{"mpg":21}', fields = '{"_id":0, "mpg":1, "cyl":1}')
-docdb_query(src, "mtcars", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
+
+docdb_create(src, "myKey", mtcars)
+docdb_create(src, "myKey", contacts)
+docdb_create(src, "myKey", mapdata)
+
+docdb_query(src, "myKey", query = '{"mpg":21}')
+docdb_query(src, "myKey", query = '{"mpg":21, "gear": {"$lte": 4}}')
+docdb_query(src, "myKey", query = '{"mpg":21}', fields = '{"_id":0, "mpg":1, "cyl":1}')
+docdb_query(src, "myKey", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
+
 # complex query, not supported for src_elastic and src_couchdb backends at this time:
-docdb_query(src, "mtcars", query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}')
+docdb_query(src, "myKey", query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}')
+docdb_query(src, "myKey", query = '{}', fields = '{"_id":0, "mpg":1, "cyl":1}')
+
+docdb_query(src, "myKey", query = '{"$and": [{"age": {"$gt": 21}},
+ {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}')
+docdb_query(src, "myKey", query = '{"$or": [{"rows.elements.status": "OK"}, {"$and": [
+ {"_id": "5cd6785325ce3a94dfc54096"}, {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}]}')
+docdb_query(src, "myKey", query = '{"$and": [{"_id": "5cd6785325ce3a94dfc54096"},
+ {"friends.name": {"$regex": "^B[a-z]{3,90}.*"}}]}')
+docdb_query(src, "myKey", query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA",
+ "New York, NY, USA"]}}', fields = '{"age": 1, "friends.id": 1, "_id": 0,
+ "rows.elements.status": 1}')
+
+docdb_query(src, "myKey", query = '{"rows.elements.status": "OK"}', listfields = TRUE)
+
 }
 }
