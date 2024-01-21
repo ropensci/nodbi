@@ -588,7 +588,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   )
 
   # - early exit
-  if (file.size(tfname) <= 1L) return(NULL)
+  if (file.size(tfname) <= 2L) return(NULL)
 
   # - early exit
   if (!length(fldQ$excludeFields)) return(
@@ -605,7 +605,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
     processIncludeFields(tfname, fldQ$includeFields, tjname)
 
     # early exit
-    if (!file.size(tjname)) return(NULL)
+    if (file.size(tjname) <= 2L) return(NULL)
 
     # swap file name for next processing step
     tfname <- tjname
@@ -1375,7 +1375,7 @@ processDbGetQuery <- function(
     con = tfname)
 
   # early exit
-  if (file.size(tfname) <= 1L) return(NULL)
+  if (file.size(tfname) <= 2L) return(NULL)
 
   # debug
   if (options()[["verbose"]]) {
@@ -1414,7 +1414,7 @@ processDbGetQuery <- function(
     )
 
     # early exit
-    if (!file.size(tjname)) return(NULL)
+    if (file.size(tjname) <= 2L) return(NULL)
 
     # swap file name
     tfname <- tjname
@@ -1444,7 +1444,7 @@ processDbGetQuery <- function(
     processIncludeFields(tfname, includeFields, tjname, extractedFields)
 
     # early exit
-    if (!file.size(tjname)) return(NULL)
+    if (file.size(tjname) <= 2L) return(NULL)
 
     # swap file name for next processing step
     tfname <- tjname
@@ -1639,6 +1639,6 @@ processIncludeFields <- function(
   )
 
   # early exit
-  if (file.size(tjname) <= 1L) return(NULL)
+  if (file.size(tjname) <= 2L) return(NULL)
 
 } # processIncludeFields
