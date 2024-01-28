@@ -1529,18 +1529,18 @@ processIncludeFields <- function(
   # "{\"_id\", \"friends.id\": [.\"friends\" | m1 | .\"id\" ] | m2}"
   #
   # - output:
-  # {"_id", "friends.id": [1, 2, 3]}
+  # {"_id", "friends.id": [0, 1, 2]}
   #
-  # postgres:
+  # alternative (from json_extract(path)):
   #
   # - input:
   # {"_id": "5cd67853f841025e65ce0ce2", "friends.id": [0, 1, 2]}
   #
   # - script:
-  # "{\"_id\", \"friends.id\": [.\"friends\".\"id\"] | m2}"
+  # "{\"_id\", \"friends.id\": [.\"friends\".\"id\"] | m2}"
   #
   # - output:
-  # {"_id", "friends.id": [1, 2, 3]}
+  # {"_id", "friends.id": [0, 1, 2]}
 
   jqFcts <- paste0(
     # m1 replaces missing values with null to allow further processing
