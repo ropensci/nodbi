@@ -123,7 +123,7 @@ docdb_get.src_mongo <- function(src, key, limit = NULL, ...) {
 #' @export
 docdb_get.src_sqlite <- function(src, key, limit = NULL, ...) {
 
-  getFunction <- "json"
+  getFunction <- "json(json)"
   return(sqlGet(src = src, key = key, limit = limit, getFunction = getFunction, ...))
 }
 

@@ -256,6 +256,7 @@ test_that("docdb_update", {
   # tests0
   expect_equal(docdb_update(src = src, key = key, value = '{"vs": 77}', query = '{"gear": {"$in": [5,4]}}'), 17L)
   expect_true(all(docdb_query(src, key, query = '{"gear": {"$in": [5,4]}}', fields = '{"vs": 1}')[["vs"]] == 77L))
+  expect_equal(sum(docdb_get(src = src, key = key)[["_id"]] == "Cadillac Fleetwood"), 1L)
 
   # tests1
   expect_equal(docdb_update(src = src, key = key, value = mtcars[3, 4:5], query = '{"gear": 3}'), 15L) # hp = 93, drat = 3.9
