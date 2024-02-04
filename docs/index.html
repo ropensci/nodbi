@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0.9000</span>
       </span>
     </div>
 
@@ -72,7 +72,7 @@
 <div class="page-header"><h1 id="nodbi">nodbi<a class="anchor" aria-label="anchor" href="#nodbi"></a>
 </h1></div>
 <p>⁠<!-- badges: start --> <a href="https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/rfhb/nodbi" class="external-link"><img src="https://codecov.io/gh/rfhb/nodbi/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://CRAN.R-project.org/package=nodbi" class="external-link"><img src="https://www.r-pkg.org/badges/version/nodbi" alt="CRAN status"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a> ⁠<!-- badges: end --></p>
-<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2024-01-18.</p>
+<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2024-02-04.</p>
 <table class="table">
 <colgroup>
 <col width="42%">
@@ -429,39 +429,39 @@
 <span>  columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'test'</span>, <span class="st">'replications'</span>, <span class="st">'elapsed'</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2024-01-20 with 2015 mobile hardware, databases via homebrew</span></span>
+<span><span class="co"># 2024-02-04 with 2015 mobile hardware, databases via homebrew</span></span>
 <span><span class="va">result</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">elapsed</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="co">#         test replications elapsed</span></span>
-<span><span class="co"># 4    CouchDB           10   294.4</span></span>
-<span><span class="co"># 3    Elastic           10    36.7</span></span>
-<span><span class="co"># 5 PostgreSQL           10     2.8</span></span>
-<span><span class="co"># 1    MongoDB           10     2.0</span></span>
-<span><span class="co"># 6     DuckDB           10     1.6</span></span>
-<span><span class="co"># 2     SQLite           10     1.4</span></span></code></pre></div>
+<span><span class="co"># 4    CouchDB           10   286.1</span></span>
+<span><span class="co"># 3    Elastic           10    32.7</span></span>
+<span><span class="co"># 5 PostgreSQL           10     3.2</span></span>
+<span><span class="co"># 6     DuckDB           10     1.7</span></span>
+<span><span class="co"># 1    MongoDB           10     1.7</span></span>
+<span><span class="co"># 2     SQLite           10     1.5</span></span></code></pre></div>
 <p>2## Testing {#testing}</p>
 <p>Every database backend is subjected to identical tests, see <a href="https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R" class="external-link">core-nodbi.R</a>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#</span></span>
-<span><span class="co"># 2024-01-21</span></span>
+<span><span class="co"># 2024-02-04</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># ✔ | F W  S  OK | Context</span></span>
-<span><span class="co"># ✔ |      2 152 | couchdb [102.6s]                                                                            </span></span>
-<span><span class="co"># ✔ |      1 151 | duckdb [4.2s]                                                                               </span></span>
-<span><span class="co"># ✔ |      2 150 | elastic [97.9s]                                                                             </span></span>
-<span><span class="co"># ✔ |      2 150 | mongodb [6.3s]                                                                              </span></span>
-<span><span class="co"># ✔ |        153 | postgres [10.5s]                                                                            </span></span>
-<span><span class="co"># ✔ |        154 | sqlite [5.9s]                                                                               </span></span>
+<span><span class="co"># ✔ |      2 153 | couchdb [102.6s]                                                                         </span></span>
+<span><span class="co"># ✔ |      1 152 | duckdb [4.3s]                                                                            </span></span>
+<span><span class="co"># ✔ |      2 151 | elastic [95.6s]                                                                          </span></span>
+<span><span class="co"># ✔ |      2 151 | mongodb [5.7s]                                                                           </span></span>
+<span><span class="co"># ✔ |        154 | postgres [10.9s]                                                                         </span></span>
+<span><span class="co"># ✔ |        155 | sqlite [5.9s]                                                                            </span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ══ Results ══════════════════════════════════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co"># Duration: 227.7 s</span></span>
+<span><span class="co"># ══ Results ═══════════════════════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co"># Duration: 225.4 s</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ── Skipped tests (7) ────────────────────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co"># ── Skipped tests (7) ─────────────────────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co"># • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,</span></span>
 <span><span class="co">#   test-mongodb.R:24:3</span></span>
 <span><span class="co"># • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3,</span></span>
 <span><span class="co">#   test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 910 ]</span></span>
+<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 916 ]</span></span>
 <span></span>
 <span><span class="co"># 2024-01-20</span></span>
 <span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
