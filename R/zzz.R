@@ -285,16 +285,6 @@ digestFields <- function(f, q) {
 
   fieldStrings <- unique(c(includeFields, excludeFields))
 
-  # helper function to use a strsplit list and compare for
-  # each list item if the vector positions p are all equal
-  allEqualAtPos <- function(l, p) {
-
-    o <- unlist(sapply(l, function(i) if (length(i) >= p) i[p] else NULL))
-    if (is.null(o)) return(FALSE)
-    return(as.logical(table(o)[[1]] == length(l)))
-
-  }
-
   # translate mongo query into jq script to filter and select:
 
   # {"$or": [{"rows.elements.status": "OK"},
