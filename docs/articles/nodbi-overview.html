@@ -178,6 +178,10 @@ array.</p>
 <span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="va">contacts</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: container 'my_container' already exists</span></span>
 <span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
+<p>Check and list any other containers exist in the database:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/docdb_list.html">docdb_list</a></span><span class="op">(</span>src <span class="op">=</span> <span class="va">src</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "my_container"</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="identifiers">Identifiers<a class="anchor" aria-label="anchor" href="#identifiers"></a>
@@ -194,8 +198,8 @@ be created, or the number of the subset of documents in
 <code>value</code> that did not yet exist and could newly be created.
 (For updating existing documents, see below function
 <code><a href="../reference/docdb_update.html">docdb_update()</a></code>.)</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Zero new documents created</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># zero new documents created</span></span>
 <span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: container 'my_container' already exists</span></span>
 <span><span class="co">#&gt; Warning: Could not create some documents, reason: rapi_execute</span></span>
@@ -206,7 +210,7 @@ be created, or the number of the subset of documents in
 </h4>
 <p>All documents in a container can now be retrieved with
 <code>docdb_get</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load library for more </span></span>
 <span><span class="co"># readable print output</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
@@ -216,16 +220,16 @@ be created, or the number of the subset of documents in
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 137 × 31</span></span></span>
 <span><span class="co">#&gt;    `_id`   url   args  headers$Host origin    id isActive balance   age eyeColor</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;df[&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 00c29d… http…       httpbin.org  143.1…     0 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 0319a5… http…       httpbin.org  143.1…     4 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 058847… http…       httpbin.org  143.1…    11 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 069c46… http…       httpbin.org  143.1…    24 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 0727fb… http…       httpbin.org  143.1…    62 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 0a2001… http…       httpbin.org  143.1…    72 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 0a52a6… http…       httpbin.org  143.1…     1 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 128e76… http…       httpbin.org  143.1…    70 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 14e243… http…       httpbin.org  143.1…    52 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1547f8… http…       httpbin.org  143.1…    66 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 02208c… http…       httpbin.org  143.1…    69 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 03c250… http…       httpbin.org  143.1…    27 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 061055… http…       httpbin.org  143.1…    47 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 0894e0… http…       httpbin.org  143.1…    37 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 096ce6… http…       httpbin.org  143.1…    10 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 0ea00c… http…       httpbin.org  143.1…    60 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 0ff8bd… http…       httpbin.org  143.1…    97 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1836dc… http…       httpbin.org  143.1…    15 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1ba36f… http…       httpbin.org  143.1…    44 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1c815a… http…       httpbin.org  143.1…    14 <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>      </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 127 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more variables: headers$`X-Amzn-Trace-Id` &lt;chr&gt;, $`User-Agent` &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   $Accept &lt;chr&gt;, name &lt;chr&gt;, email &lt;chr&gt;, about &lt;chr&gt;, registered &lt;chr&gt;,</span></span></span>
@@ -240,8 +244,8 @@ be created, or the number of the subset of documents in
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
 <span><span class="co">#&gt;   `_id`                                url       args  headers$Host origin    id</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;df[&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 00c29d49-485e-4a18-9bf6-cd57a56fdd5b https://…       httpbin.org  143.1…     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0319a586-7985-47e1-a3a8-41d18e5031fd https://…       httpbin.org  143.1…     4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 02208cd5-74e3-4a77-abd2-45f9942df534 https://…       httpbin.org  143.1…    69</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 03c250d0-a048-44e3-b626-32ea616671f4 https://…       httpbin.org  143.1…    27</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: headers$`X-Amzn-Trace-Id` &lt;chr&gt;, $`User-Agent` &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   $Accept &lt;chr&gt;</span></span></span></code></pre></div>
 </div>
@@ -254,7 +258,7 @@ documents and a filter to select fields of interest.</p>
 <p>Both parameters <code>query</code> (obligatory) and
 <code>fields</code> (optional) use, across all databases, MongoDB syntax
 such as documented for <a href="https://www.mongodb.com/docs/manual/crud/" class="external-link">queries</a> and <a href="https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/" class="external-link">fields</a>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># query for some documents</span></span>
 <span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span>src <span class="op">=</span> <span class="va">src</span>, key <span class="op">=</span> <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"mpg": {"$gte": 30}}'</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              _id  mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></span>
@@ -265,7 +269,7 @@ such as documented for <a href="https://www.mongodb.com/docs/manual/crud/" class
 <p>Unless <code>fields</code> specifies <code>"_id": 0</code>, the
 <code>_id</code> field is always included in the output of
 <code>docdb_query</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># query some fields from some documents; 'query' is a mandatory </span></span>
 <span><span class="co"># parameter and is used here in its position in the signature</span></span>
 <span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="st">'{"mpg": {"$gte": 30}}'</span>, fields <span class="op">=</span> <span class="st">'{"wt": 1, "mpg": 1}'</span><span class="op">)</span></span>
@@ -274,7 +278,7 @@ such as documented for <a href="https://www.mongodb.com/docs/manual/crud/" class
 <span><span class="co">#&gt; 2    Honda Civic 1.615 30.4</span></span>
 <span><span class="co">#&gt; 3 Toyota Corolla 1.835 33.9</span></span>
 <span><span class="co">#&gt; 4   Lotus Europa 1.513 30.4</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># query some fields from some documents, limit return to one document</span></span>
 <span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="st">'{"mpg": {"$gte": 30}}'</span>, fields <span class="op">=</span> <span class="st">'{"_id": 0, "mpg": 1}'</span>, limit <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    mpg</span></span>
@@ -282,7 +286,7 @@ such as documented for <a href="https://www.mongodb.com/docs/manual/crud/" class
 <p>Queries can be more complex such as in this example, showing a dot
 notation of a sub-field and an example operator (regular
 expression).</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># query some subitem fields from some documents</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span></span>
 <span>  <span class="va">src</span>, <span class="va">key</span>, </span>
@@ -298,7 +302,7 @@ expression).</p>
 <span><span class="co">#&gt;   ..$ : chr  "Baird Keller" "Francesca Reese" "Dona Bartlett"</span></span></code></pre></div>
 <p>Queries work across documents of different structure such as
 here.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># query with results across documents</span></span>
 <span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span></span>
 <span>  <span class="va">src</span>, <span class="va">key</span>, </span>
@@ -314,6 +318,40 @@ here.</p>
 <span><span class="co">#&gt; 7             Lotus Europa              &lt;NA&gt; 95.1</span></span></code></pre></div>
 </div>
 <div class="section level4">
+<h4 id="field-names">Field names<a class="anchor" aria-label="anchor" href="#field-names"></a>
+</h4>
+<p>The <code>JSON</code> data handle by package <code>nodbi</code> may
+have a large number of field included nested fields in objects (see for
+example <code>name</code> within array <code>friends</code> above), and
+there is no simple function to list field names.</p>
+<p>Thus, an argument is provided for <code>docdb_query</code> so that
+the function returns only the comprehensive list of all field names in
+documents selected with a query (or in all documents in the container if
+<code>query = "{}"</code> is specified).</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"_id": {"$regex": "^[0-9]"}}'</span>, listfields <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "about"                            "age"                             </span></span>
+<span><span class="co">#&gt;  [3] "args"                             "balance"                         </span></span>
+<span><span class="co">#&gt;  [5] "destination_addresses"            "email"                           </span></span>
+<span><span class="co">#&gt;  [7] "eyeColor"                         "friends"                         </span></span>
+<span><span class="co">#&gt;  [9] "friends.id"                       "friends.name"                    </span></span>
+<span><span class="co">#&gt; [11] "headers"                          "headers.Accept"                  </span></span>
+<span><span class="co">#&gt; [13] "headers.Host"                     "headers.User-Agent"              </span></span>
+<span><span class="co">#&gt; [15] "headers.X-Amzn-Trace-Id"          "id"                              </span></span>
+<span><span class="co">#&gt; [17] "isActive"                         "name"                            </span></span>
+<span><span class="co">#&gt; [19] "origin"                           "origin_addresses"                </span></span>
+<span><span class="co">#&gt; [21] "registered"                       "rows"                            </span></span>
+<span><span class="co">#&gt; [23] "rows.elements"                    "rows.elements.distance"          </span></span>
+<span><span class="co">#&gt; [25] "rows.elements.distance.somevalue" "rows.elements.distance.text"     </span></span>
+<span><span class="co">#&gt; [27] "rows.elements.duration"           "rows.elements.duration.somevalue"</span></span>
+<span><span class="co">#&gt; [29] "rows.elements.duration.text"      "rows.elements.status"            </span></span>
+<span><span class="co">#&gt; [31] "status"                           "tags"                            </span></span>
+<span><span class="co">#&gt; [33] "url"</span></span></code></pre></div>
+<p>The dot notation is a path from a root field to the nested field, and
+this notation can be used in <code>query</code> and <code>fields</code>
+parameters of <code>docdb_query</code>.</p>
+</div>
+<div class="section level4">
 <h4 id="docdb_update">docdb_update<a class="anchor" aria-label="anchor" href="#docdb_update"></a>
 </h4>
 <p>Queries can also be used for updating (patching) selected documents
@@ -326,7 +364,7 @@ from a JSON string, a data frame, a list or a file with
 <code>_id</code>’s, these are used to identify the documents that should
 be updated. The function uses specific and fast <code>SQL</code>
 functions for most databases.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># number of documents corresponding to query</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"carb": 3}'</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
@@ -348,7 +386,7 @@ functions for most databases.</p>
 <p>Documents and containers can be deleted with
 <code>docdb_delete</code>. Its return value corresponds to the success
 of the delete operation.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># number of documents corresponding to query</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"age": {"$lte": 23}}'</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 4</span></span>
@@ -374,7 +412,7 @@ those databases that require it (SQLite, DuckDB, PostgreSQL).</p>
 <p>Nevertheless, it is good practice to manually disconnect and shut
 down connections as such as specific to the database, for example for
 DuckDB:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span></span>
 <span><span class="co">#&gt; src: duckdb</span></span>
 <span><span class="co">#&gt; Database: :memory:</span></span>

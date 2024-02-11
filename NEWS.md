@@ -1,10 +1,16 @@
 # nodbi 0.10.1.9000
 
+## Changes
+* added vignette
+* added tests internal functions, verbose option
 * added caching to GitHub action workflow
 * added missing fields validity check for duckdb
-* added vignette
-* docTyp'ed src.R
+* more robust parameter checks in `docdb_query` and `docdb_update`
+* ensure `NULL` also for all MongoDB returns
 
+## Bug fix
+* docTyp'ed src.R
+* minify `JSON` with Elasticsearch in `docdb_update`
 
 # nodbi 0.10.1
 
