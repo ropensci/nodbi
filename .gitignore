@@ -13,3 +13,4 @@ revdep/checks
 revdep/library
 private/
 CRAN-SUBMISSION
+inst/doc

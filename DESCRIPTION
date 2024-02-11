@@ -4,7 +4,7 @@ Description: Simplified document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.10.1
+Version: 0.10.1.9000
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -44,8 +44,11 @@ Suggests:
     testthat,
     withr,
     callr,
-    webfakes (>= 1.2.0)
+    webfakes (>= 1.2.0),
+    knitr,
+    rmarkdown
 RoxygenNote: 7.3.1
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org
+VignetteBuilder: knitr
