@@ -129,7 +129,7 @@ closeNodbiConnections <- function(e) {
   )
 
   # load javascript
-  initTranformers()
+  initTransformers()
 
 }
 
@@ -150,7 +150,7 @@ closeNodbiConnections <- function(e) {
 
 
 
-#' initTranformers
+#' initTransformers
 #'
 #' provide access to javascript functions and modules
 #' stored in inst/js or subdir js of installed package
@@ -163,7 +163,7 @@ closeNodbiConnections <- function(e) {
 #' @keywords internal
 #' @noRd
 #'
-initTranformers <- function() {
+initTransformers <- function() {
 
   # early exit
   if (length(.nodbi)) return(NULL)
@@ -211,7 +211,7 @@ digestFields <- function(f, q) {
   f <- jsonlite::minify(f)
 
   # translate q into SQL query syntax using mongo2sql
-  initTranformers()
+  initTransformers()
 
   # - used:
   # $gt, $gte, $lt, $lte, $ne
