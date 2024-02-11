@@ -88,6 +88,12 @@ jsonlite::minify(contacts)
 docdb_create(src, key, contacts)
 ```
 
+Check and list any other containers exist in the database:
+
+```{r}
+docdb_list(src = src)
+```
+
 ### Identifiers
 
 The unique document identifier is its `_id`. The `_id`'s of an input `value` are either the row names of a data frame (such as `mtcars`) or top-level elements with the name `_id` such as in `contacts` as shown just above. 
@@ -97,7 +103,7 @@ Thus, expect a warning when trying to create documents with `_id`'s that already
 The return value can be `0` when no documents could newly be created, or the number of the subset of documents in `value` that did not yet exist and could newly be created. (For updating existing documents, see below function `docdb_update()`.) 
 
 ```{r}
-# Zero new documents created
+# zero new documents created
 docdb_create(src, key, value = mtcars)
 ```
 
@@ -163,6 +169,18 @@ docdb_query(
   query = '{"$or": [{"age": {"$gt": 21}}, {"mpg": {"$gte": 30}}]}', 
   fields = '{"name": 1, "disp": 1}')
 ```
+
+### Field names
+
+The `JSON` data handle by package `nodbi` may have a large number of field included nested fields in objects (see for example `name` within array `friends` above), and there is no simple function to list field names. 
+
+Thus, an argument is provided for `docdb_query` so that the function returns only the comprehensive list of all field names in documents selected with a query (or in all documents in the container if `query = "{}"` is specified). 
+
+```{r}
+docdb_query(src, key, query = '{"_id": {"$regex": "^[0-9]"}}', listfields = TRUE)
+```
+
+The dot notation is a path from a root field to the nested field, and this notation can be used in `query` and `fields` parameters of `docdb_query`. 
 
 ### docdb_update
 
