@@ -32,4 +32,6 @@
 #' - duckdb - \url{https://CRAN.R-project.org/package=duckdb}
 #'
 #' @name src
+#' @docType data
+#'
 NULL
