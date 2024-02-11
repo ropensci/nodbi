@@ -46,7 +46,8 @@ Suggests:
     callr,
     webfakes (>= 1.2.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    tibble
 RoxygenNote: 7.3.1
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
