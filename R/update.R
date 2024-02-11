@@ -211,6 +211,7 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
       if (isUrl(value)) {
         value <- jsonlite::stream_in(url(value), verbose = FALSE)
       } else {
+        if (length(value) == 1L) value <- jsonlite::minify(value)
         value <- jsonlite::stream_in(textConnection(value), verbose = FALSE)
       }
     }
