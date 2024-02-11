@@ -138,14 +138,16 @@ test_that("docdb_query", {
     rm(src, key, tmp)
   }, silent = TRUE), add = TRUE)
 
-  # testJson
-  expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
-  #
   # testJson2
   expect_equal(docdb_create(src = src, key = key, value = testJson2), 2L)
   #
+  # testJson
+  expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
+  #
   expect_error(docdb_query(src = src, key = key, query = "NOTJSON"))
   expect_error(docdb_query(src = src, key = key, query = '{"$or": [{"$or": {"gear": 4}}, {"cyl": 6}]}')) # why error?
+  expect_error(docdb_query(src = src, key = key, query = '{"gear": {"$unavailable": 6}}'))
+  expect_warning(docdb_query(src = src, key = key, query = "", fields = '{"_id":1}'), "deprecated")
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}')), c(7L, 15L))
   expect_equal(nrow(docdb_query(src = src, key = key, query = '{}', limit = 3L)), 3L)
   #
@@ -155,8 +157,10 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"email": 1}')), c(5L, 2L))
   #
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}')), c(3L, 11L))
+  expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": {"$gte": 0}}', limit = 1L)), c(1L, 11L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"friends.id": 1}')), c(3L, 2L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"_id": 1}')), c(3L, 1L))
+  expect_null(docdb_query(src = src, key = key, query = '{"friends.id": 9}', fields = '{"_id": 0, "notexisting": 1}'))
   #
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"_id":"5cd67853f841025e65ce0ce2"}', fields = '{"email": 1, "_id": 0}')), c(1L, 1L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": {"$regex": "lacychen@conjurica.com"}}')), c(1L, 11L))
@@ -197,7 +201,8 @@ test_that("docdb_query", {
   expect_equal(docdb_query(src = src, key = key, query = '{}', fields = '{"a.b.c": 1, "_id": 0}')[[1]], 3:4)
   tmp <- docdb_query(src = src, key = key, query = '{}', fields = '{"clinical_results.reported_events.other_events.category_list.category.event_list":1}')
   expect_true(is.null(tmp))
-  if (any(inherits(src, "src_postgres"))) expect_error(docdb_query(src = src, key = key, query = '{}', fields = paste0('{"', paste(1:50, collapse = '":1,"'), '":1}')))
+  if (any(inherits(src, "src_postgres"))) expect_error(docdb_query(src = src, key = key, query = '{}', fields = paste0('{"', paste0("a", 1:50, collapse = '":1,"'), '":1}')))
+  expect_null(docdb_query(src = src, key = key, query = '{}', fields = paste0('{"', paste0("a", 1:49, collapse = '":1,"'), '":1}')))
   expect_true(docdb_delete(src = src, key = key))
 
   # testJson2
@@ -302,7 +307,12 @@ test_that("docdb_update", {
   expect_equal(docdb_create(src = src, key = key, value = tF), 5L)
   expect_equal(docdb_update(src = src, key = key, value = tF, query = '{}'), 5L)
   expect_equal(docdb_update(src = src, key = key, value = jqr::jq(file(tF), " del ( ._id) "), query = '{"email": {"$regex": ".+"}}'), 5L)
-  #
+
+  # warnings and errors
+  expect_warning(docdb_update(src = src, key = key, value = testJson, query = ""), "deprecated")
+  expect_warning(docdb_update(src = src, key = key, value = tF, query = '{"_id": {"$regex": "[f-z]"}}'), "Ignoring the specified")
+  expect_error(docdb_update(src = src, key = key, value = testJson2, query = '{"_id": {"$regex": "[f-z]"}}'), "Unequal number of documents")
+
   # from url
   skip_if(is.null(httpbin), "package webfakes missing")
   #
@@ -310,7 +320,7 @@ test_that("docdb_update", {
   expect_equal(docdb_update(src = src, key = key, value = httpbin$url("/stream/14"), query = '{"gear": 3}'), 14L)
   expect_equal(sort(names(docdb_query(src = src, key = key, query = '{"_id":"Hornet 4 Drive"}', fields = '{"args":0, "id":0}'))), # Elastic id issue
                sort(c("_id","mpg","cyl","disp","hp","drat","wt","qsec","vs","am","gear","carb","url","headers","origin")))
-  #
+
 })
 
 #### transactions ####
@@ -458,3 +468,4 @@ test_that("internal functions", {
   expect_equal(nodbi:::insObj("with /** 'tmp' **/ brackets"), "with 'xyz' brackets")
 
 })
+
