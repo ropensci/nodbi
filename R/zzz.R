@@ -204,8 +204,11 @@ initTranformers <- function() {
 #' @keywords internal
 #' @noRd
 #'
-digestFields <- function(f = "", q = "") {
+digestFields <- function(f, q) {
 
+  # check parameter
+  if (is.null(f)) f <- "{}"
+  f <- jsonlite::minify(f)
 
   # translate q into SQL query syntax using mongo2sql
   initTranformers()
