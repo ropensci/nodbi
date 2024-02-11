@@ -130,9 +130,10 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   }
 
   # check parameters
-  fields <- '{}'
-  if (!is.null(params[["fields"]])) fields <- params[["fields"]]
+  fields <- "{}"
+  if (!is.null(params$fields)) fields <- params$fields
   stopifnot(jsonlite::validate(fields))
+  fields <- jsonlite::minify(fields)
   query <- jsonlite::minify(query)
 
   # digest and mangle
@@ -274,9 +275,10 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
   }
 
   # check parameters
-  fields <- '{}'
-  if (!is.null(params[["fields"]])) fields <- params[["fields"]]
+  fields <- "{}"
+  if (!is.null(params$fields)) fields <- params$fields
   stopifnot(jsonlite::validate(fields))
+  fields <- jsonlite::minify(fields)
   query <- jsonlite::minify(query)
 
 
@@ -652,7 +654,9 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
   # add fields if not in params
   fields <- "{}"
-  if (!is.null(params$fields)) fields <- jsonlite::minify(params$fields)
+  if (!is.null(params$fields)) fields <- params$fields
+  stopifnot(jsonlite::validate(fields))
+  fields <- jsonlite::minify(fields)
 
 
   # digest
@@ -866,8 +870,9 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
   # add fields if not in params
   fields <- "{}"
-  if (!is.null(params$fields)) fields <- jsonlite::minify(params$fields)
-
+  if (!is.null(params$fields)) fields <- params$fields
+  stopifnot(jsonlite::validate(fields))
+  fields <- jsonlite::minify(fields)
 
   # query
   query <- jsonlite::minify(query)
@@ -1113,6 +1118,8 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   # add fields if not in params
   fields <- "{}"
   if (!is.null(params$fields)) fields <- params$fields
+  stopifnot(jsonlite::validate(fields))
+  fields <- jsonlite::minify(fields)
 
 
   # digest and mangle
