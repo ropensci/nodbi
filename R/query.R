@@ -121,10 +121,11 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   # https://cran.r-project.org/web/packages/sofa/vignettes/query_tutorial.html
 
   # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
   params <- list(...)
   limit <- 9999999L
-  if (!is.null(params[["limit"]])) {
+  if (!is.null(params$limit)) {
     limit <- params$limit
     params$limit <- NULL
   }
@@ -260,6 +261,7 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
 
   # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
   params <- list(...)
   limit <- 10000L # see help(Search)
@@ -417,6 +419,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
 
   # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
   params <- list(...)
   n <- 0L
@@ -621,6 +624,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
 
   # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
   params <- list(...)
   n <- -1L
@@ -828,6 +832,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
 
 
   # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
   params <- list(...)
   n <- -1L
@@ -1059,6 +1064,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
 
   # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
   params <- list(...)
   n <- -1L

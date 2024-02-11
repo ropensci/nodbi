@@ -44,7 +44,6 @@ docdb_update <- function(src, key, value, query, ...) {
     warning('query = "" is deprecated, use query = "{}"')
     query <- "{}"
   }
-  stopifnot(jsonlite::validate(query))
 
   UseMethod("docdb_update", src)
 }
@@ -58,7 +57,8 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   # JSON structure (or object, when you are doing actual programming),
   # and save the entire new revision (or version) of that document back into CouchDB.
 
-  # get original set
+  # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
   # process value, target is json strings in file
@@ -191,8 +191,11 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
 #' @export
 docdb_update.src_elastic <- function(src, key, value, query, ...) {
 
-  # process value, target is data frame
+  # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
+
+  # process value, target is data frame
 
   # needed because target is data frame
   # but data frame could be serialised
@@ -308,6 +311,9 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # special check for mongo
   chkSrcMongo(src, key)
+
+  # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
   # if regexp query lacks options, add them in
@@ -432,6 +438,8 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 #' @export
 docdb_update.src_sqlite <- function(src, key, value, query, ...) {
 
+  # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
   # SQL for patching, see https://www.sqlite.org/json1.html#jpatch
@@ -444,6 +452,8 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
 #' @export
 docdb_update.src_postgres <- function(src, key, value, query, ...) {
 
+  # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
   # Since PostgreSQL has no internal function,
@@ -457,6 +467,8 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
 #' @export
 docdb_update.src_duckdb <- function(src, key, value, query, ...) {
 
+  # handle parameters
+  if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
   # use file based approach
