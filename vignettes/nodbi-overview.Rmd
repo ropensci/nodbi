@@ -168,7 +168,7 @@ docdb_query(
 
 Queries can also be used for updating (patching) selected documents with a new `value`(s). The return value of `docdb_update` corresponds to the number of documents that were updated. 
 
-This is another powerful function because  `value` can come from a JSON string, a data frame, a list or a file with `NDJSON` lines, and if `value` includes already `_id`'s, these are used to identify the documents that should be updated. The function uses specific and fast `SQL` functions for most datsabases. 
+This is another powerful function because  `value` can come from a JSON string, a data frame, a list or a file with `NDJSON` lines, and if `value` includes already `_id`'s, these are used to identify the documents that should be updated. The function uses specific and fast `SQL` functions for most databases. 
 
 ```{r}
 # number of documents corresponding to query

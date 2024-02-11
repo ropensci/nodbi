@@ -1,3 +1,11 @@
+# nodbi 0.10.1.9000
+
+* added caching to GitHub action workflow
+* added missing fields validity check for duckdb
+* added vignette
+* docTyp'ed src.R
+
+
 # nodbi 0.10.1
 
 ## Bug fix
