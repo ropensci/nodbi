@@ -47,8 +47,6 @@
 * expanded testing
 * updated docs
 
-## Bug fixes
-
 # nodbi 0.9.8
 
 ## Bug fixes

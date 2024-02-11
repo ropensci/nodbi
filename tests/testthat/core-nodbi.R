@@ -138,11 +138,12 @@ test_that("docdb_query", {
     rm(src, key, tmp)
   }, silent = TRUE), add = TRUE)
 
-  # testJson2
-  expect_equal(docdb_create(src = src, key = key, value = testJson2), 2L)
-  #
   # testJson
   expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
+  expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": {"$gte": 0}}', limit = 1L)), c(1L, 11L))
+  #
+  # testJson2
+  expect_equal(docdb_create(src = src, key = key, value = testJson2), 2L)
   #
   expect_error(docdb_query(src = src, key = key, query = "NOTJSON"))
   expect_error(docdb_query(src = src, key = key, query = '{"$or": [{"$or": {"gear": 4}}, {"cyl": 6}]}')) # why error?
@@ -157,7 +158,6 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"email": 1}')), c(5L, 2L))
   #
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}')), c(3L, 11L))
-  expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": {"$gte": 0}}', limit = 1L)), c(1L, 11L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"friends.id": 1}')), c(3L, 2L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": 2}', fields = '{"_id": 1}')), c(3L, 1L))
   expect_null(docdb_query(src = src, key = key, query = '{"friends.id": 9}', fields = '{"_id": 0, "notexisting": 1}'))
