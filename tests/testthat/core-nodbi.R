@@ -442,3 +442,19 @@ test_that("auto disconnect and shut down", {
     "nodbi: docdb_src 'tmp.' disconnected and shut down.")
 
 })
+
+test_that("internal functions", {
+
+  expect_error(assert(iris, c("character", "integer")))
+
+  .nodbi <- new.env()
+  expect_null(nodbi:::initTransformers())
+
+  expect_null(nodbi:::.onLoad())
+
+  expect_error(nodbi:::insObj("non-atomics like data frame /** iris **/ fail"))
+
+  tmp <- "xyz"
+  expect_equal(nodbi:::insObj("with /** 'tmp' **/ brackets"), "with 'xyz' brackets")
+
+})
