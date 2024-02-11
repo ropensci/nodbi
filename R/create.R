@@ -431,7 +431,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   if (inherits(result, "try-error")) {
     error <- trimws(sub(".+: (.*?):.+", "\\1", result))
     warning(
-      "Could not create some documents, reeason: ",
+      "Could not create some documents, reason: ",
       unique(error), call. = FALSE, immediate. = TRUE)
     result <- 0L
   }
@@ -541,7 +541,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
   if (inherits(result, "try-error")) {
     error <- trimws(sub(".+: (.*?):.+", "\\1", result))
     warning(
-      "Could not create some documents, reeason: ",
+      "Could not create some documents, reason: ",
       unique(error), call. = FALSE, immediate. = TRUE)
     result <- 0L
   }
@@ -697,7 +697,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
   if (inherits(result, "try-error")) {
     error <- trimws(sub(".+: (.*?):.+", "\\1", result))
     warning(
-      "Could not create some documents, reeason: ",
+      "Could not create some documents, reason: ",
       unique(error), call. = FALSE, immediate. = TRUE)
     result <- 0L
   }
