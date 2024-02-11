@@ -192,7 +192,7 @@ src <- src_couchdb(
 docdb_exists(src, key)
 # [1] FALSE
 
-# load data (here data frame, alternatively list or JSON)
+# load data (here data frame, alternatively a list, JSON or file with NSJSON)
 # into the container "my_container" specified in "key" parameter
 docdb_create(src, key, value = mtcars)
 # [1] 32
@@ -261,7 +261,7 @@ str(docdb_query(
 #   ..$ : chr  "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
 
 # such queries can also be used for updating (patching) selected documents 
-# with a new 'value'(s) from a JSON string, a data frame or a list
+# with a new 'value'(s) from a JSON string, a data frame a list or a file with NSJSON)
 docdb_update(src, key, value = '{"vs": 9, "xy": [1, 2]}', query = '{"carb": 3}')
 # [1] 3
 docdb_query(src, key, '{"carb": {"$in": [1,3]}}', fields = '{"vs": 1, "_id": 0}')[[1]]
@@ -359,7 +359,7 @@ result[rev(order(result$elapsed)), ]
 # 2     SQLite           10     1.5
 ```
 
-2## Testing {#testing}
+## Testing
 
 Every database backend is subjected to identical tests, see
 [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R).
