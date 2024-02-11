@@ -5,6 +5,9 @@
 # Changing language has no effect when envvar LANG='C'
 Sys.unsetenv("LANG")
 
+# test verbose messages
+options(verbose = TRUE)
+
 # for interactive testing:
 # devtools::load_all()
 # source("tests/testthat/helper.R")
