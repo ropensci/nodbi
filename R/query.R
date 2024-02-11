@@ -556,12 +556,17 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
   # - early return
   if (!any(grepl("[.]", fldQ$includeFields)) &&
-      !length(fldQ$excludeFields)) return(
-        do.call(
-          src$con$find,
-          c(list(query = query), params))
-      )
+      !length(fldQ$excludeFields)) {
 
+    # cannot use src$con$find because
+    # fields may have been specified
+    tmp <- do.call(
+      src$con$find,
+      c(list(query = query), params))
+
+    if (!nrow(tmp)) return(NULL)
+    return(tmp)
+  }
 
   # - jq to extract fields and subfields
   tfname <- tempfile()
@@ -1516,7 +1521,7 @@ processIncludeFields <- function(
 
   } else {
 
-    # postgres
+    # needed for postgres
 
     if (setequal(includeFields, extractedFields)) {
 
