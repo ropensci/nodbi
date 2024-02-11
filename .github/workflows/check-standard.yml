@@ -19,8 +19,8 @@ jobs:
           - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,  r: 'release'}
           - {os: ubuntu-latest,  r: 'oldrel-1'}
+        elasticsearch-version: 8
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
         run: sudo apt-get install -y libjq-dev
 
 
-      # generic workflow:
+      # generic R workflow:
 
       - uses: actions/checkout@v4
 
@@ -70,6 +70,11 @@ jobs:
 
       # https://github.com/ankane/setup-elasticsearch#setup-elasticsearch
       # Works on Linux, Mac, and Windows
+      - uses: actions/cache@v3
+        with:
+          path: ~/elasticsearch
+          key: ${{ runner.os }}-elasticsearch-${{ matrix.elasticsearch-version }}
+
       - name: ElasticSearch
         uses: ankane/setup-elasticsearch@v1
 
@@ -81,7 +86,7 @@ jobs:
           couchdb-version: '3.1'
 
 
-      # nodbi:
+      # for nodbi:
 
       - name: Install duckdb extension library
         run: |
