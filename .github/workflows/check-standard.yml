@@ -70,12 +70,8 @@ jobs:
 
       # https://github.com/ankane/setup-elasticsearch#setup-elasticsearch
       # Works on Linux, Mac, and Windows
-      - uses: actions/cache@v3
-        with:
-          path: ~/elasticsearch
-          key: ${{ runner.os }}-elasticsearch-${{ matrix.elasticsearch-version }}
-
       - name: ElasticSearch
+        if: matrix.config.os != 'windows-latest'
         uses: ankane/setup-elasticsearch@v1
 
       # https://github.com/iamssen/couchdb-github-action
