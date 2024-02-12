@@ -56,11 +56,11 @@ if (FALSE) {
 }
 
 # this example is run with
-src <- src_duckdb()
+src <- src_sqlite()
 
 # note additional parameters can be specified,
 # for example for local or remote MongoDb:
-help("src_mongo")
+# help("src_mongo")
 ```
 
 ### docdb_create

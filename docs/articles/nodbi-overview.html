@@ -136,11 +136,11 @@ of a container.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># this example is run with</span></span>
-<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># note additional parameters can be specified,</span></span>
 <span><span class="co"># for example for local or remote MongoDb:</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="st">"src_mongo"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># help("src_mongo")</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="docdb_create">docdb_create<a class="anchor" aria-label="anchor" href="#docdb_create"></a>
@@ -202,7 +202,7 @@ be created, or the number of the subset of documents in
 <code class="sourceCode R"><span><span class="co"># zero new documents created</span></span>
 <span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: container 'my_container' already exists</span></span>
-<span><span class="co">#&gt; Warning: Could not create some documents, reason: rapi_execute</span></span>
+<span><span class="co">#&gt; Warning: Could not create some documents, reason: UNIQUE constraint failed</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -218,34 +218,34 @@ be created, or the number of the subset of documents in
 <span><span class="co"># get all documents, irrespective of schema</span></span>
 <span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 137 × 31</span></span></span>
-<span><span class="co">#&gt;    `_id`        destination_addresses origin_addresses rows   status url   args </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;df[&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 0bb7fc02-36… <span style="color: #949494;">&lt;chr [3]&gt;</span>             <span style="color: #949494;">&lt;chr [1]&gt;</span>        <span style="color: #949494;">&lt;df&gt;</span>   OK     <span style="color: #BB0000;">NA</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 0d858814-d3… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 0ecf8ebd-2f… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 107e265b-aa… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 167dce66-b2… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 16a64675-6d… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1a08e625-df… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1c97cfbf-1b… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1d2c94da-91… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1eb26f68-1c… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #949494;">&lt;NULL&gt;</span>           <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
+<span><span class="co">#&gt;    `_id`     isActive balance   age eyeColor name  email about registered tags  </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 5cd67853… TRUE     $2,412…    20 blue     Kris… kris… <span style="color: #949494;">"</span>Sin… 2017-07-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 5cd67853… FALSE    $3,400…    20 brown    Rae … raec… <span style="color: #949494;">"</span>Nis… 2018-12-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 5cd67853… TRUE     $1,161…    22 brown    Pace… pace… <span style="color: #949494;">"</span>Eiu… 2018-08-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 5cd67853… FALSE    $2,579…    30 brown    Will… will… <span style="color: #949494;">"</span>Nul… 2018-02-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 5cd67853… FALSE    $3,808…    23 green    Lacy… lacy… <span style="color: #949494;">"</span>Sun… 2014-08-0… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> AMC Jave… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Cadillac… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Camaro Z… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Chrysler… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Datsun 7… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 127 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more variables: headers &lt;df[,4]&gt;, origin &lt;chr&gt;, id &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   isActive &lt;lgl&gt;, balance &lt;chr&gt;, age &lt;int&gt;, eyeColor &lt;chr&gt;, name &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   email &lt;chr&gt;, about &lt;chr&gt;, registered &lt;chr&gt;, tags &lt;list&gt;, friends &lt;list&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   mpg &lt;dbl&gt;, cyl &lt;int&gt;, disp &lt;dbl&gt;, hp &lt;int&gt;, drat &lt;dbl&gt;, wt &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   qsec &lt;dbl&gt;, vs &lt;int&gt;, am &lt;int&gt;, gear &lt;int&gt;, carb &lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 21 more variables: friends &lt;list&gt;, mpg &lt;dbl&gt;, cyl &lt;int&gt;, disp &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   hp &lt;int&gt;, drat &lt;dbl&gt;, wt &lt;dbl&gt;, qsec &lt;dbl&gt;, vs &lt;int&gt;, am &lt;int&gt;, gear &lt;int&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   carb &lt;int&gt;, url &lt;chr&gt;, args &lt;df[,0]&gt;, headers &lt;df[,4]&gt;, origin &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   id &lt;int&gt;, destination_addresses &lt;list&gt;, origin_addresses &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   rows &lt;list&gt;, status &lt;chr&gt;</span></span></span>
 <span></span>
 <span><span class="co"># get just 2 documents using limit and note that</span></span>
 <span><span class="co"># only fields for these documents are returned</span></span>
 <span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, limit <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 10</span></span></span>
-<span><span class="co">#&gt;   `_id`         destination_addresses origin_addresses rows   status url   args </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;df[&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0bb7fc02-364… <span style="color: #949494;">&lt;chr [3]&gt;</span>             New York, NY, U… <span style="color: #949494;">&lt;df&gt;</span>   OK     <span style="color: #BB0000;">NA</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 0d858814-d3c… <span style="color: #949494;">&lt;NULL&gt;</span>                <span style="color: #BB0000;">NA</span>               <span style="color: #949494;">&lt;NULL&gt;</span> <span style="color: #BB0000;">NA</span>     http…      </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: headers &lt;df[,4]&gt;, origin &lt;chr&gt;, id &lt;int&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
+<span><span class="co">#&gt;   `_id`       isActive balance   age eyeColor name  email about registered tags </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: friends &lt;list&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="docdb_query">docdb_query<a class="anchor" aria-label="anchor" href="#docdb_query"></a>
@@ -307,13 +307,13 @@ here.</p>
 <span>  query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$gt": 21}}, {"mpg": {"$gte": 30}}]}'</span>, </span>
 <span>  fields <span class="op">=</span> <span class="st">'{"name": 1, "disp": 1}'</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                        _id              name disp</span></span>
-<span><span class="co">#&gt; 1 5cd67853f841025e65ce0ce2         Lacy Chen   NA</span></span>
-<span><span class="co">#&gt; 2 5cd6785335b63cb19dfa8347 Williamson French   NA</span></span>
-<span><span class="co">#&gt; 3 5cd6785325ce3a94dfc54096         Pace Bell   NA</span></span>
-<span><span class="co">#&gt; 4                 Fiat 128              &lt;NA&gt; 78.7</span></span>
-<span><span class="co">#&gt; 5              Honda Civic              &lt;NA&gt; 75.7</span></span>
-<span><span class="co">#&gt; 6           Toyota Corolla              &lt;NA&gt; 71.1</span></span>
-<span><span class="co">#&gt; 7             Lotus Europa              &lt;NA&gt; 95.1</span></span></code></pre></div>
+<span><span class="co">#&gt; 1                 Fiat 128              &lt;NA&gt; 78.7</span></span>
+<span><span class="co">#&gt; 2              Honda Civic              &lt;NA&gt; 75.7</span></span>
+<span><span class="co">#&gt; 3           Toyota Corolla              &lt;NA&gt; 71.1</span></span>
+<span><span class="co">#&gt; 4             Lotus Europa              &lt;NA&gt; 95.1</span></span>
+<span><span class="co">#&gt; 5 5cd67853f841025e65ce0ce2         Lacy Chen   NA</span></span>
+<span><span class="co">#&gt; 6 5cd6785335b63cb19dfa8347 Williamson French   NA</span></span>
+<span><span class="co">#&gt; 7 5cd6785325ce3a94dfc54096         Pace Bell   NA</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="field-names">Field names<a class="anchor" aria-label="anchor" href="#field-names"></a>
@@ -328,23 +328,9 @@ documents selected with a query (or in all documents in the container if
 <code>query = "{}"</code> is specified).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"_id": {"$regex": "^[0-9]"}}'</span>, listfields <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "about"                            "age"                             </span></span>
-<span><span class="co">#&gt;  [3] "args"                             "balance"                         </span></span>
-<span><span class="co">#&gt;  [5] "destination_addresses"            "email"                           </span></span>
-<span><span class="co">#&gt;  [7] "eyeColor"                         "friends"                         </span></span>
-<span><span class="co">#&gt;  [9] "friends.id"                       "friends.name"                    </span></span>
-<span><span class="co">#&gt; [11] "headers"                          "headers.Accept"                  </span></span>
-<span><span class="co">#&gt; [13] "headers.Host"                     "headers.User-Agent"              </span></span>
-<span><span class="co">#&gt; [15] "headers.X-Amzn-Trace-Id"          "id"                              </span></span>
-<span><span class="co">#&gt; [17] "isActive"                         "name"                            </span></span>
-<span><span class="co">#&gt; [19] "origin"                           "origin_addresses"                </span></span>
-<span><span class="co">#&gt; [21] "registered"                       "rows"                            </span></span>
-<span><span class="co">#&gt; [23] "rows.elements"                    "rows.elements.distance"          </span></span>
-<span><span class="co">#&gt; [25] "rows.elements.distance.somevalue" "rows.elements.distance.text"     </span></span>
-<span><span class="co">#&gt; [27] "rows.elements.duration"           "rows.elements.duration.somevalue"</span></span>
-<span><span class="co">#&gt; [29] "rows.elements.duration.text"      "rows.elements.status"            </span></span>
-<span><span class="co">#&gt; [31] "status"                           "tags"                            </span></span>
-<span><span class="co">#&gt; [33] "url"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "about"        "age"          "balance"      "email"        "eyeColor"    </span></span>
+<span><span class="co">#&gt;  [6] "friends"      "friends.id"   "friends.name" "isActive"     "name"        </span></span>
+<span><span class="co">#&gt; [11] "registered"   "tags"</span></span></code></pre></div>
 <p>The dot notation is a path from a root field to the nested field, and
 this notation can be used in <code>query</code> and <code>fields</code>
 parameters of <code>docdb_query</code>.</p>
@@ -412,10 +398,15 @@ down connections as such as specific to the database, for example for
 DuckDB:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span></span>
-<span><span class="co">#&gt; src: duckdb</span></span>
-<span><span class="co">#&gt; Database: :memory:</span></span>
-<span><span class="co">#&gt; Size: 0 MB</span></span>
-<span><span class="co">#&gt; Version: v0.9.2</span></span>
+<span><span class="co">#&gt; src: sqlite</span></span>
+<span><span class="co">#&gt; SQLite library version: 3.45.0</span></span>
+<span><span class="co">#&gt;  size: NA kBytes</span></span>
+<span><span class="co">#&gt;  dbname: :memory:</span></span>
+<span><span class="co">#&gt; Warning: Database is only in memory, will not persist after R ends! Consider to copy it with </span></span>
+<span><span class="co">#&gt; RSQLite::sqliteCopyDatabase(</span></span>
+<span><span class="co">#&gt;   from = &lt;your nodbi::src_sqlite() object&gt;$con, </span></span>
+<span><span class="co">#&gt;   to = &lt;e.g. RSQLite::dbConnect(RSQLite::SQLite(), 'local_file.db')&gt;</span></span>
+<span><span class="co">#&gt;   )</span></span>
 <span></span>
 <span><span class="co"># shutdown</span></span>
 <span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">src</span><span class="op">$</span><span class="va">con</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">src</span><span class="op">)</span></span></code></pre></div>
