@@ -79,9 +79,6 @@ docdb_query <- function(src, key, query, ...) {
     query <- "{}"
   }
 
-  # jq script for extracting field names
-  jqFieldNames <- '[ path(..) | map(select(type == "string")) | join(".") ] | unique[] '
-
   # query can be empty but then fields should not be empty
   if (jsonlite::minify(query) == '{}') {
 

@@ -1,11 +1,14 @@
 # nodbi helper functions
 
-
+#### variables ####
 
 # provide private environment,
 # e.g. for initTransformers()
 #
 .nodbi <- new.env()
+
+# jq script for extracting field names
+jqFieldNames <- '[ path(..) | map(select(type == "string")) | join(".") ] | unique[] '
 
 
 

@@ -11,6 +11,7 @@
 ## Bug fix
 * docTyp'ed src.R
 * minify `JSON` with Elasticsearch in `docdb_update`
+* moved local variable out of UseMethod in `docdb_query`
 
 # nodbi 0.10.1
 
