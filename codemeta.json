@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.10.1.9000",
+  "version": "0.10.2",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.3.2 (2023-10-31 ucrt)",
+  "runtimePlatform": "R Under development (unstable) (2024-02-23 r85975)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -315,7 +315,7 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "671.236KB",
+  "fileSize": "655.251KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
   "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"],

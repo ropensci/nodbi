@@ -1,4 +1,4 @@
-# nodbi 0.10.1.9000
+# nodbi 0.10.2
 
 ## Changes
 * added vignette
