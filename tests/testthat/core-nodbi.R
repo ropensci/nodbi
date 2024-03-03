@@ -228,12 +228,20 @@ test_that("docdb_query", {
                    docdb_query(src = src, key = key, query = '          {"mpg": {"$lte": 18},   "gear": {"$gt": 3}}'))
   expect_equal(nrow(docdb_query(src = src, key = key, query = '{"$or": [{"cyl": {"$lte": 5}}, {"_id": {"$regex": "^F[a-z].*", "$options": ""}}]}')), 13L)
   # ^^^ 0.9.9 changed to test on integer column since duckdb json may not have decimals
-  #
+
   # listfields
   expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
   fields <- docdb_query(src = src, key = key, query = '{}', listfields = TRUE)
   expect_true(length(fields) == 23)
+  fields <- docdb_query(src = src, key = key, query = '{}', listfields = TRUE, limit = 999L)
+  expect_true(length(fields) == 23)
   fields <- docdb_query(src = src, key = key, query = '{"name": {"$regex": "^[LW].*"}}', listfields = TRUE)
+  expect_true(length(fields) == 12)
+  fields <- docdb_query(src = src, key = key, query = '{"age": 20}', listfields = TRUE, limit = 2L)
+  expect_true(length(fields) == 12) # query for top level element does not require jq query
+  fields <- docdb_query(src = src, key = key, query = '{"name": {"$regex": "^[LW].*"}}', listfields = TRUE, limit = 2L)
+  expect_true(length(fields) == 12)
+  fields <- docdb_query(src = src, key = key, query = '{"friends.name": {"$regex": "^[LW].*"}}', listfields = TRUE, limit = 2L)
   expect_true(length(fields) == 12)
 
   # clean up

@@ -206,24 +206,31 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
 
   }
 
-  # - add selector
-  query <- paste0('"selector": ', query)
-
-  # - add limit and close query
-  query <- paste0('{', query, ', "limit": ', limit, '}')
+  # - add selector, limit and close query
+  # TODO jqrWhere should, but cannot limit the number of documents
+  query <- paste0('{"selector": ', query, ', "limit": ', limit, '}')
 
 
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
+    if (length(fldQ$jqrWhere) && limit != 9999999L) {
+
+      # reset limit so as to retrieve fields from jqrWhere documents
+      query <- sub('"limit": *[0-9]+([ ,}])', '"limit": 9999999\\1', query)
+      message(
+        "couchdb: cannot apply 'limit' to this query; if 'limit' is required, ",
+        "try simple query of only root elements")
+    }
+
     fldQ$jqrWhere <- ifelse(
       length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
 
-    fields <- processDbGetQuery(
+    fields <- unique(processDbGetQuery(
       getData = 'jqr::jq(do.call(sofa::db_query, c(list(cushion = src$con,
                  dbname = key, query = query, as = "json"), params)),
                  ".docs[] | del(._rev)" )',
-      jqrWhere = fldQ$jqrWhere)[["out"]]
+      jqrWhere = fldQ$jqrWhere)[["out"]])
 
     # mangle "friends.0", "friends.0.id"
     fields <- unique(gsub("[.][0-9]+", "", fields))
@@ -385,9 +392,9 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
     fldQ$jqrWhere <- ifelse(
       length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
 
-    fields <- processDbGetQuery(
+    fields <- unique(processDbGetQuery(
       getData = sub(", source = fldQ\\$includeFields", "", getData),
-      jqrWhere = fldQ$jqrWhere)[["out"]]
+      jqrWhere = fldQ$jqrWhere)[["out"]])
 
     # mangle "friends.0", "friends.0.id"
     fields <- unique(gsub("[.][0-9]+", "", fields))
@@ -517,18 +524,37 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
       limit = n
       )[["_id"]]}, silent = TRUE)
 
-    # alternative approach
+    # alternative approach, e.g. if
+    # insufficient rights on server
     if (inherits(fields, "try-error")) {
 
-      # get files for
+      # get file and connection
       tf <- tempfile()
       on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+      con <- file(tf, open = "at")
+      on.exit(try(close(con), silent = TRUE), add = TRUE)
 
-      # NOTE mass export
-      src$con$export(con = file(tf), query = query)
+      # export all or limited number of documents
+      if (n == 0L) {
 
-      # use jq
-      fields <- as.character(jqr::jq(file(tf), jqFieldNames))
+        # NOTE mass export
+        src$con$export(con = con, query = query)
+
+      } else {
+
+        # selective export using find
+        src$con$find(
+          query = query, fields = '{}', limit = n,
+          handler = function(x) jsonlite::stream_out(x, con = con, verbose = FALSE),
+          pagesize = 100L)
+
+      }
+
+      # process
+      close(con)
+
+      # use jq programme and deduplicate strings
+      fields <- unique(as.character(jqr::jq(file(tf), jqFieldNames)))
 
     } # if try-error
 
@@ -644,9 +670,9 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       length(fldQ$includeFields) == 1L &&
       fldQ$includeFields == "_id") {
 
-    statement <- paste0(
-      "SELECT DISTINCT _id ",
-      "FROM \"", key, "\";")
+    statement <- insObj('
+    SELECT DISTINCT _id
+    FROM "/** key **/";')
 
     return(DBI::dbGetQuery(
       conn = src$con,
@@ -661,8 +687,12 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
     # statement
     statement <- insObj('
+    WITH extracted AS (
+      SELECT json
+      FROM "/** key **/"
+      LIMIT /** n **/ )
     SELECT DISTINCT fullkey AS flds
-    FROM "/** key **/", json_tree("/** key **/".json)
+    FROM extracted, json_tree(extracted.json)
     ORDER BY flds;')
 
     # get all fullkeys and types
@@ -803,15 +833,41 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    # jq function to obtain dot paths
-    fldQ$jqrWhere <- ifelse(
-      length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
+    if (length(fldQ$jqrWhere)) {
 
-    # process
-    fields <- unique(processDbGetQuery(
-      getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+      # jq function to obtain dot paths
+      fldQ$jqrWhere <- paste0(fldQ$jqrWhere, " | ", jqFieldNames)
+
+      # process
+      fields <- unique(processDbGetQuery(
+        getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                  statement = statement, n = n)[["json"]], "")',
-      jqrWhere = fldQ$jqrWhere)[["out"]])
+        jqrWhere = fldQ$jqrWhere)[["out"]])
+
+    } else {
+
+      # statement
+      statement <- insObj('
+      WITH extracted AS (
+        SELECT json FROM "/** key **/"
+        WHERE /** fldQ$jsonWhere **/
+        LIMIT /** n **/ )
+      SELECT DISTINCT fullkey AS flds
+      FROM extracted, json_tree(extracted.json)
+      ORDER BY flds;')
+
+      # get all fullkeys and types
+      fields <- DBI::dbGetQuery(
+        conn = src$con,
+        statement = statement,
+        n = -1L)[["flds"]]
+
+      # remove "$.", array elements "$.item[0]"
+      fields <- unique(stringi::stri_replace_all_regex(fields, "\\$[.]?|\\[[-#0-9]+\\]", ""))
+
+    }
+
+    # finalise
     fields <- fields[fields != "" & fields != "_id"]
 
     # return field names
@@ -995,12 +1051,13 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
     if (!length(fldQ$queryCondition)) fldQ$queryCondition <- "TRUE"
 
     # statement
-    statement <- insObj('
+    if (n == -1L) {
+      statement <- insObj('
       WITH RECURSIVE extracted (key, value, type) AS (
-        SELECT
+        (SELECT
           NULL AS key, json AS value, \'object\'
           FROM "/** key **/"
-          WHERE /** fldQ$queryCondition **/
+          WHERE /** fldQ$queryCondition **/)
           UNION ALL
           (
            WITH tpVal AS (
@@ -1022,12 +1079,42 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
       WHERE key IS NOT NULL
       ORDER BY key
       ;')
+    } else {
+      statement <- insObj('
+      WITH RECURSIVE extracted (key, value, type) AS (
+        (SELECT
+          NULL AS key, json AS value, \'object\'
+          FROM "/** key **/"
+          WHERE /** fldQ$queryCondition **/
+          LIMIT /** n **/)
+          UNION ALL
+          (
+           WITH tpVal AS (
+           SELECT key, jsonb_typeof(value) AS typeof, value
+           FROM extracted
+          )
+          SELECT CONCAT_WS(\'.\', t.key, v.key), v.value, jsonb_typeof(v.value)
+          FROM tpVal as t, LATERAL jsonb_each(value) v
+          WHERE typeof = \'object\'
+            UNION ALL
+          SELECT t.key, element.val, jsonb_typeof(element.val)
+          FROM tpVal as t, LATERAL
+          jsonb_array_elements(value) WITH ORDINALITY as element (val, n)
+          WHERE typeof = \'array\'
+        )
+      )
+      SELECT DISTINCT key
+      FROM extracted
+      WHERE key IS NOT NULL
+      ORDER BY key
+      ;')
+    }
 
+    # process
     return(sort(DBI::dbGetQuery(
       conn = src$con,
       statement = statement,
-      n = -1L
-    )[["key"]]))
+      n = -1L)[["key"]]))
 
   }
 
@@ -1250,7 +1337,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     WITH extracted AS (
     SELECT _id
     /** fldQ$extractFields **/
-    FROM "/** key **/" )
+    FROM "/** key **/")
     SELECT _id, json
     FROM extracted
     WHERE  (
@@ -1260,10 +1347,10 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     fldQ$jqrWhere <- ifelse(
       length(fldQ$jqrWhere), paste0(fldQ$jqrWhere, " | ", jqFieldNames), jqFieldNames)
 
-    fields <- processDbGetQuery(
+    fields <- unique(processDbGetQuery(
       getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                  statement = statement, n = n)[["json"]], "")',
-      jqrWhere = fldQ$jqrWhere)[["out"]]
+      jqrWhere = fldQ$jqrWhere)[["out"]])
 
     # mangle "friends.0", "friends.0.id"
     fields <- unique(gsub("[.][0-9]+", "", fields))
