@@ -17,7 +17,7 @@ database backend (corresponds to \code{collection} for MongoDB,
 a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{limit}{(integer) Maximum number of documents
-to return. If \code{NULL} or not set (default), 10,000 for
+to be returned. If \code{NULL} or not set (default), 10,000 for
 Elasticsearch and all documents for MongoDB, SQLite,
 CouchDB, PostgreSQL, and DuckDB.}
 

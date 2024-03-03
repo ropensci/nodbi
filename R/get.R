@@ -3,7 +3,7 @@
 #' @inheritParams docdb_create
 #'
 #' @param limit (integer) Maximum number of documents
-#'  to return. If `NULL` or not set (default), 10,000 for
+#'  to be returned. If `NULL` or not set (default), 10,000 for
 #'  Elasticsearch and all documents for MongoDB, SQLite,
 #'  CouchDB, PostgreSQL, and DuckDB.
 #'

@@ -21,8 +21,10 @@
 #' JSON document is returned. For `src_postgres()`, only fewer
 #' than 50 fields can be requested to be returned by the function.
 #'
-#' - Specify `limit` as integer for the maximum number of documents
-#' to be returned.
+#' - Specify `limit` (integer) for the maximum number of documents
+#'  to be returned. If `NULL` or not set (default), 10,000 for
+#'  Elasticsearch and all documents for MongoDB, SQLite,
+#'  CouchDB, PostgreSQL, and DuckDB.
 #'
 #' - Specify `listfields = TRUE` to return just the names of
 #' all fields, from all documents or from the maximum number of

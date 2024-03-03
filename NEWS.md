@@ -1,3 +1,8 @@
+# nodbi 0.10.2.9000
+
+## Bug fix
+* minor fixes to `limit` in `docdb_query(src, key, query, listfields = TRUE, limit = <integer>)` and speed up
+
 # nodbi 0.10.2
 
 ## Changes
@@ -8,7 +13,7 @@
 * more robust parameter checks in `docdb_query` and `docdb_update`
 * ensure `NULL` also for all MongoDB returns
 
-## Bug fix
+## Bug fixes
 * docTyp'ed src.R
 * minify `JSON` with Elasticsearch in `docdb_update`
 * moved local variable out of UseMethod in `docdb_query`

@@ -8,6 +8,15 @@
 .nodbi <- new.env()
 
 # jq script for extracting field names
+#
+# The unique function takes as input an array and
+# produces an array of the same elements, in sorted
+# order, with duplicates removed
+#
+# However, field names are generated for each
+# document in the input, they are not deduplicated
+# across documents. The latter would require jqr
+# to be able to handle jq's 'inputs' and flag "-n".
 jqFieldNames <- '[ path(..) | map(select(type == "string")) | join(".") ] | unique[] '
 
 
