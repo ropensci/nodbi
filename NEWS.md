@@ -1,4 +1,4 @@
-# nodbi 0.10.2.9000
+# nodbi 0.10.3
 
 ## Bug fix
 * minor fixes to `limit` in `docdb_query(src, key, query, listfields = TRUE, limit = <integer>)` and speed up

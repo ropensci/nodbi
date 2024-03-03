@@ -10,15 +10,16 @@
 |collate  |en_GB.UTF-8                                        |
 |ctype    |en_GB.UTF-8                                        |
 |tz       |Europe/Berlin                                      |
-|date     |2024-02-24                                         |
+|date     |2024-03-03                                         |
 |rstudio  |2023.12.1+402 Ocean Storm (desktop)                |
-|pandoc   |3.1.12.1 @ /usr/local/bin/pandoc                   |
+|pandoc   |3.1.12.2 @ /usr/local/bin/ (via rmarkdown)         |
 
 # Dependencies
 
 |package |old    |new    |Δ  |
 |:-------|:------|:------|:--|
-|nodbi   |0.10.1 |0.10.2 |*  |
+|nodbi   |0.10.2 |0.10.3 |*  |
+|curl    |NA     |5.2.1  |*  |
 
 # Revdeps
 
