@@ -98,6 +98,7 @@ jobs:
       # generic workflow:
 
       - uses: r-lib/actions/check-r-package@v2
+        if: !(matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'devel')
         with:
           upload-snapshots: true
 
@@ -105,7 +106,7 @@ jobs:
       # test coverage:
 
       - name: Test coverage
-        if: matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release'
+        if: matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'devel'
         # covr::codecov() uploads using environment variable CODECOV_TOKEN
         run: covr::codecov(quiet = FALSE)
         shell: Rscript {0}
