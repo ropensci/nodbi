@@ -98,7 +98,7 @@ jobs:
       # generic workflow:
 
       - uses: r-lib/actions/check-r-package@v2
-        if: !(matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'devel')
+        if: ${{ !(matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'devel') }}
         with:
           upload-snapshots: true
 
