@@ -20,7 +20,7 @@ nor listfields is specified, runs docdb_get()."><!-- mathjax --><script src="htt
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2.9000</span>
       </span>
     </div>
 
@@ -101,8 +101,10 @@ e.g. <code>fields  = '{"nameOfMy.SubFieldToInclude:" 1, "_id": 0}'</code>
 and see examples. If <code>fields</code> is not specified, the complete
 JSON document is returned. For <code><a href="src_postgres.html">src_postgres()</a></code>, only fewer
 than 50 fields can be requested to be returned by the function.</p></li>
-<li><p>Specify <code>limit</code> as integer for the maximum number of documents
-to be returned.</p></li>
+<li><p>Specify <code>limit</code> (integer) for the maximum number of documents
+to be returned. If <code>NULL</code> or not set (default), 10,000 for
+Elasticsearch and all documents for MongoDB, SQLite,
+CouchDB, PostgreSQL, and DuckDB.</p></li>
 <li><p>Specify <code>listfields = TRUE</code> to return just the names of
 all fields, from all documents or from the maximum number of
 documents as specified in <code>limit</code>.</p></li>
