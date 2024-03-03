@@ -702,7 +702,8 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       n = -1L)[["flds"]]
 
     # remove "$.", array elements "$.item[0]"
-    fields <- unique(stringi::stri_replace_all_regex(fields, "\\$[.]?|\\[[-#0-9]+\\]", ""))
+    fields <- unique(stringi::stri_replace_all_regex(
+      fields, "\"|\\$[.]?|\\[[-#0-9]+\\]", ""))
     fields <- sort(fields[fields != ""])
 
     # return field names
@@ -841,7 +842,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       # process
       fields <- unique(processDbGetQuery(
         getData = 'paste0(DBI::dbGetQuery(conn = src$con,
-                 statement = statement, n = n)[["json"]], "")',
+                   statement = statement, n = n)[["json"]], "")',
         jqrWhere = fldQ$jqrWhere)[["out"]])
 
     } else {
@@ -862,10 +863,11 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
         statement = statement,
         n = -1L)[["flds"]]
 
-      # remove "$.", array elements "$.item[0]"
-      fields <- unique(stringi::stri_replace_all_regex(fields, "\\$[.]?|\\[[-#0-9]+\\]", ""))
-
     }
+
+    # remove "$.", array elements "$.item[0]"
+    fields <- unique(stringi::stri_replace_all_regex(
+      fields, "\"|\\$[.]?|\\[[-#0-9]+\\]", ""))
 
     # finalise
     fields <- fields[fields != "" & fields != "_id"]
