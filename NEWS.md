@@ -1,3 +1,8 @@
+# nodbi 0.10.4
+
+## Bug fix
+* re-adding field formatting for `docdb_query(src, key, query, listfields = TRUE, limit = <integer>)`
+
 # nodbi 0.10.3
 
 ## Bug fix

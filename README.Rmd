@@ -333,13 +333,14 @@ result[rev(order(result$elapsed)), ]
 Every database backend is subjected to identical tests, see [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R). 
 
 ```{r testing_and_coverage}
-# 2024-03-03
+# 2024-03-04
 tmp <- testthat::test_local()
+# [...]
 # 
-# ══ Results ═══════════════════════════════════════════════════════════════════════════════════════════════
-# Duration: 258.9 s
+# ══ Results ═════════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 344.5 s
 # 
-# ── Skipped tests (7) ─────────────────────────────────────────────────────────────────────────────────────
+# ── Skipped tests (7) ───────────────────────────────────────────────────────────────────────────────────
 # • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,
 #   test-mongodb.R:24:3
 # • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3,
@@ -347,16 +348,16 @@ tmp <- testthat::test_local()
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1018 ]
 
-# 2024-03-03
+# 2024-03-04
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 95.57%
+# nodbi Coverage: 95.58%
 # R/src_duckdb.R: 76.92%
 # R/src_mongo.R: 91.30%
 # R/update.R: 92.95%
 # R/zzz.R: 94.77%
 # R/src_postgres.R: 95.65%
 # R/create.R: 96.09%
-# R/query.R: 96.43%
+# R/query.R: 96.44%
 # R/delete.R: 97.96%
 # R/get.R: 98.77%
 # R/exists.R: 100.00%
