@@ -1052,43 +1052,18 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
     # fallback but only for listfields
     if (!length(fldQ$queryCondition)) fldQ$queryCondition <- "TRUE"
 
+    # parameter use
+    limit <- ""
+    if (n != -1L) limit <- paste0("LIMIT ", n)
+
     # statement
-    if (n == -1L) {
-      statement <- insObj('
-      WITH RECURSIVE extracted (key, value, type) AS (
-        (SELECT
-          NULL AS key, json AS value, \'object\'
-          FROM "/** key **/"
-          WHERE /** fldQ$queryCondition **/)
-          UNION ALL
-          (
-           WITH tpVal AS (
-           SELECT key, jsonb_typeof(value) AS typeof, value
-           FROM extracted
-          )
-          SELECT CONCAT_WS(\'.\', t.key, v.key), v.value, jsonb_typeof(v.value)
-          FROM tpVal as t, LATERAL jsonb_each(value) v
-          WHERE typeof = \'object\'
-            UNION ALL
-          SELECT t.key, element.val, jsonb_typeof(element.val)
-          FROM tpVal as t, LATERAL
-          jsonb_array_elements(value) WITH ORDINALITY as element (val, n)
-          WHERE typeof = \'array\'
-        )
-      )
-      SELECT DISTINCT key
-      FROM extracted
-      WHERE key IS NOT NULL
-      ORDER BY key
-      ;')
-    } else {
-      statement <- insObj('
+    statement <- insObj('
       WITH RECURSIVE extracted (key, value, type) AS (
         (SELECT
           NULL AS key, json AS value, \'object\'
           FROM "/** key **/"
           WHERE /** fldQ$queryCondition **/
-          LIMIT /** n **/)
+          /** limit **/)
           UNION ALL
           (
            WITH tpVal AS (
@@ -1110,7 +1085,6 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
       WHERE key IS NOT NULL
       ORDER BY key
       ;')
-    }
 
     # process
     return(sort(DBI::dbGetQuery(
