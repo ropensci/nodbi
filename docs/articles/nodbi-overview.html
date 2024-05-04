@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>nodbi - package overview • nodbi</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nodbi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.4.9000</span>
       </span>
     </div>
 
@@ -134,8 +134,9 @@ holds the name of the relevant container.</p>
 <span>  <span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/src_postgres.html">src_postgres</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/src_elastic.html">src_elastic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span></span>
-<span>    user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_USER"</span><span class="op">)</span>, </span>
-<span>    pwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_PWD"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_USER"</span><span class="op">)</span>,</span>
+<span>    pwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_PWD"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># this example is run with</span></span>
@@ -162,7 +163,7 @@ pointing to <code>NDJSON</code>.</p>
 <span><span class="fu"><a href="../reference/docdb_exists.html">docdb_exists</a></span><span class="op">(</span>src <span class="op">=</span> <span class="va">src</span>, key <span class="op">=</span> <span class="va">key</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span>
 <span></span>
-<span><span class="co"># load data from a data frame with row names into </span></span>
+<span><span class="co"># load data from a data frame with row names into</span></span>
 <span><span class="co"># the container specified in "key" parameter</span></span>
 <span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span>src <span class="op">=</span> <span class="va">src</span>, key <span class="op">=</span> <span class="va">key</span>, value <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 32</span></span>
@@ -178,7 +179,7 @@ pointing to <code>NDJSON</code>.</p>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span></span>
 <span><span class="co"># show JSON structure of contacts</span></span>
-<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/prettify.html" class="external-link">minify</a></span><span class="op">(</span><span class="va">contacts</span><span class="op">)</span> </span>
+<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/prettify.html" class="external-link">minify</a></span><span class="op">(</span><span class="va">contacts</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [{"_id":"5cd67853f841025e65ce0ce2","isActive":false,"balance":"$3,808.45","age":23,"eyeColor":"green","name":"Lacy Chen","email":"lacychen@conjurica.com","about":"Sunt consequat ad dolore.\nExercitation nisi reprehenderit.","registered":"2014-08-03T12:11:54 -02:00","tags":["nulla","nisi","adipisicing","do","ad","ullamco","irure"],"friends":[{"id":0,"name":"Wooten Goodwin"},{"id":1,"name":"Brandie Woodward"},{"id":2,"name":"Angelique Britt"}]},{"_id":"5cd678531b423d5f04cfb0a1","isActive":false,"balance":"$3,400.50","age":20,"eyeColor":"brown","name":"Rae Colon","email":"raecolon@conjurica.com","about":"Nisi excepteur duis duis aliquip qui id consequat consequat.","registered":"2018-12-19T06:23:35 -01:00","tags":["nostrud","eu","consectetur","adipisicing","labore","ut","voluptate"],"friends":[{"id":0,"name":"Yang Yates"},{"id":1,"name":"Lacy Chen"}]},{"_id":"5cd6785335b63cb19dfa8347","isActive":false,"balance":"$2,579.09","age":30,"eyeColor":"brown","name":"Williamson French","email":"williamsonfrench@conjurica.com","about":"Nulla do sunt consectetur officia. Laboris pariatur incididunt.","registered":"2018-02-14T10:59:57 -01:00","tags":["exercitation","do","magna","ut","consectetur","ex","incididunt"],"friends":[{"id":0,"name":"Coleen Dunn"},{"id":1,"name":"Doris Phillips"},{"id":2,"name":"Concetta Turner"}]},{"_id":"5cd6785325ce3a94dfc54096","isActive":true,"balance":"$1,161.52","age":22,"eyeColor":"brown","name":"Pace Bell","email":"pacebell@conjurica.com","about":"Eiusmod sunt laborum ipsum do cupidatat qui id dolore do.","registered":"2018-08-17T12:23:42 -02:00","tags":["aliqua","consectetur","commodo","velit","cupidatat","duis","dolore"],"friends":[{"id":0,"name":"Baird Keller"},{"id":1,"name":"Francesca Reese"},{"id":2,"name":"Dona Bartlett"}]},{"_id":"5cd678530df22d3625ed8375","isActive":true,"balance":"$2,412.67","age":20,"eyeColor":"blue","name":"Krista Baxter","email":"kristabaxter@conjurica.com","about":"Sint quis nulla ea fugiat. Commodo nisi qui eu sit.","registered":"2017-07-19T05:03:47 -02:00","tags":["sit","cillum","commodo","labore","sint","in","exercitation"],"friends":[{"id":0,"name":"Pace Bell"}]}]</span></span>
 <span></span>
 <span><span class="co"># load additionally contacts JSON data</span></span>
@@ -220,41 +221,43 @@ created.</p>
 <p>All documents in a container can now be retrieved with
 <code><a href="../reference/docdb_get.html">docdb_get()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># load library for more </span></span>
+<code class="sourceCode R"><span><span class="co"># load library for more</span></span>
 <span><span class="co"># readable print output</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># get all documents, irrespective of schema</span></span>
 <span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 137 × 31</span></span></span>
-<span><span class="co">#&gt;    `_id`     isActive balance   age eyeColor name  email about registered tags  </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;list&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 5cd67853… TRUE     $2,412…    20 blue     Kris… kris… <span style="color: #949494;">"</span>Sin… 2017-07-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 5cd67853… FALSE    $3,400…    20 brown    Rae … raec… <span style="color: #949494;">"</span>Nis… 2018-12-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 5cd67853… TRUE     $1,161…    22 brown    Pace… pace… <span style="color: #949494;">"</span>Eiu… 2018-08-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 5cd67853… FALSE    $2,579…    30 brown    Will… will… <span style="color: #949494;">"</span>Nul… 2018-02-1… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 5cd67853… FALSE    $3,808…    23 green    Lacy… lacy… <span style="color: #949494;">"</span>Sun… 2014-08-0… <span style="color: #949494;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 94395602… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 94395620… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 9439562a… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 9439562b… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 94395634… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>         <span style="color: #949494;">&lt;NULL&gt;</span></span></span>
+<span><span class="co">#&gt;    `_id`             url   args  headers$Host origin    id destination_addresses</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;df[&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 075323e8-0a1c-11… http…       httpbin.org  143.1…     0 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 075323fc-0a1c-11… http…       httpbin.org  143.1…     1 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 07532406-0a1c-11… http…       httpbin.org  143.1…     2 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 07532410-0a1c-11… http…       httpbin.org  143.1…     3 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 07532411-0a1c-11… http…       httpbin.org  143.1…     4 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 0753241a-0a1c-11… http…       httpbin.org  143.1…     5 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 0753241b-0a1c-11… http…       httpbin.org  143.1…     6 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 07532424-0a1c-11… http…       httpbin.org  143.1…     7 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 07532425-0a1c-11… http…       httpbin.org  143.1…     8 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 0753242e-0a1c-11… http…       httpbin.org  143.1…     9 <span style="color: #949494;">&lt;NULL&gt;</span>               </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 127 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 21 more variables: friends &lt;list&gt;, url &lt;chr&gt;, args &lt;df[,0]&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   headers &lt;df[,4]&gt;, origin &lt;chr&gt;, id &lt;int&gt;, destination_addresses &lt;list&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   origin_addresses &lt;list&gt;, rows &lt;list&gt;, status &lt;chr&gt;, mpg &lt;dbl&gt;, cyl &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   disp &lt;dbl&gt;, hp &lt;int&gt;, drat &lt;dbl&gt;, wt &lt;dbl&gt;, qsec &lt;dbl&gt;, vs &lt;int&gt;, am &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   gear &lt;int&gt;, carb &lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 27 more variables: headers$`X-Amzn-Trace-Id` &lt;chr&gt;, $`User-Agent` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   $Accept &lt;chr&gt;, origin_addresses &lt;list&gt;, rows &lt;list&gt;, status &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   isActive &lt;lgl&gt;, balance &lt;chr&gt;, age &lt;int&gt;, eyeColor &lt;chr&gt;, name &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   email &lt;chr&gt;, about &lt;chr&gt;, registered &lt;chr&gt;, tags &lt;list&gt;, friends &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   mpg &lt;dbl&gt;, cyl &lt;int&gt;, disp &lt;dbl&gt;, hp &lt;int&gt;, drat &lt;dbl&gt;, wt &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   qsec &lt;dbl&gt;, vs &lt;int&gt;, am &lt;int&gt;, gear &lt;int&gt;, carb &lt;int&gt;</span></span></span>
 <span></span>
 <span><span class="co"># get just 2 documents using limit and note that</span></span>
 <span><span class="co"># only fields for these documents are returned</span></span>
 <span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_get.html">docdb_get</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, limit <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
-<span><span class="co">#&gt;   `_id`       isActive balance   age eyeColor name  email about registered tags </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: friends &lt;list&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
+<span><span class="co">#&gt;   `_id`                                url       args  headers$Host origin    id</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;df[&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 075323e8-0a1c-11ef-afe3-acbc328130bb https://…       httpbin.org  143.1…     0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 075323fc-0a1c-11ef-afe3-acbc328130bb https://…       httpbin.org  143.1…     1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: headers$`X-Amzn-Trace-Id` &lt;chr&gt;, $`User-Agent` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   $Accept &lt;chr&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="docdb_query">docdb_query<a class="anchor" aria-label="anchor" href="#docdb_query"></a>
@@ -274,7 +277,7 @@ select documents and to filter for fields of interest.</p>
 <code>fields</code> (optional) use, across all databases, MongoDB syntax
 such as documented for <a href="https://www.mongodb.com/docs/manual/crud/" class="external-link">queries</a> and <a href="https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/" class="external-link">fields</a>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># query some fields from some documents; 'query' is a mandatory </span></span>
+<code class="sourceCode R"><span><span class="co"># query some fields from some documents; 'query' is a mandatory</span></span>
 <span><span class="co"># parameter and is used here in its position in the signature</span></span>
 <span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="st">'{"mpg": {"$gte": 30}}'</span>, fields <span class="op">=</span> <span class="st">'{"wt": 1, "mpg": 1}'</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              _id    wt  mpg</span></span>
@@ -296,10 +299,11 @@ expression).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># query some subitem fields from some documents</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span></span>
-<span>  <span class="va">src</span>, <span class="va">key</span>, </span>
-<span>  query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$gt": 21}}, </span></span>
-<span><span class="st">           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}'</span>, </span>
-<span>  fields <span class="op">=</span> <span class="st">'{"age": 1, "friends.name": 1}'</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">src</span>, <span class="va">key</span>,</span>
+<span>  query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$gt": 21}},</span></span>
+<span><span class="st">           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}'</span>,</span>
+<span>  fields <span class="op">=</span> <span class="st">'{"age": 1, "friends.name": 1}'</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 'data.frame':    3 obs. of  3 variables:</span></span>
 <span><span class="co">#&gt;  $ _id         : chr  "5cd67853f841025e65ce0ce2" "5cd6785335b63cb19dfa8347" "5cd6785325ce3a94dfc54096"</span></span>
 <span><span class="co">#&gt;  $ age         : int  23 30 22</span></span>
@@ -312,9 +316,10 @@ here.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># query with results across documents</span></span>
 <span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span></span>
-<span>  <span class="va">src</span>, <span class="va">key</span>, </span>
-<span>  query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$gt": 21}}, {"mpg": {"$gte": 30}}]}'</span>, </span>
-<span>  fields <span class="op">=</span> <span class="st">'{"name": 1, "disp": 1}'</span><span class="op">)</span></span>
+<span>  <span class="va">src</span>, <span class="va">key</span>,</span>
+<span>  query <span class="op">=</span> <span class="st">'{"$or": [{"age": {"$gt": 21}}, {"mpg": {"$gte": 30}}]}'</span>,</span>
+<span>  fields <span class="op">=</span> <span class="st">'{"name": 1, "disp": 1}'</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt;                        _id              name disp</span></span>
 <span><span class="co">#&gt; 1                 Fiat 128              &lt;NA&gt; 78.7</span></span>
 <span><span class="co">#&gt; 2              Honda Civic              &lt;NA&gt; 75.7</span></span>
@@ -329,24 +334,23 @@ here.</p>
 </h3>
 <p>The <code>JSON</code> data handled by package <code>nodbi</code> may
 have a large number of field included nested fields in objects (see for
-example <code>name</code> within array <code>friends</code> above), and
-there is no simple function to list field names.</p>
-<p>Thus, an argument is provided for <code><a href="../reference/docdb_query.html">docdb_query()</a></code> so that
-the function returns only the comprehensive list of all field names in
+example <code>name</code> within array <code>friends</code> above).
+Thus, an argument is provided for <code><a href="../reference/docdb_query.html">docdb_query()</a></code> so that the
+function returns only the comprehensive list of all field names in
 documents selected with a query (or in all documents in the container if
 <code>query = "{}"</code> is specified).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"_id": {"$regex": "^[0-9]"}}'</span>, listfields <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "\"destination_addresses\""        "\"origin_addresses\""            </span></span>
-<span><span class="co">#&gt;  [3] "about"                            "age"                             </span></span>
-<span><span class="co">#&gt;  [5] "args"                             "balance"                         </span></span>
-<span><span class="co">#&gt;  [7] "email"                            "eyeColor"                        </span></span>
-<span><span class="co">#&gt;  [9] "friends"                          "friends.id"                      </span></span>
-<span><span class="co">#&gt; [11] "friends.name"                     "headers"                         </span></span>
-<span><span class="co">#&gt; [13] "headers.\"User-Agent\""           "headers.\"X-Amzn-Trace-Id\""     </span></span>
-<span><span class="co">#&gt; [15] "headers.Accept"                   "headers.Host"                    </span></span>
-<span><span class="co">#&gt; [17] "id"                               "isActive"                        </span></span>
-<span><span class="co">#&gt; [19] "name"                             "origin"                          </span></span>
+<span><span class="co">#&gt;  [1] "about"                            "age"                             </span></span>
+<span><span class="co">#&gt;  [3] "args"                             "balance"                         </span></span>
+<span><span class="co">#&gt;  [5] "destination_addresses"            "email"                           </span></span>
+<span><span class="co">#&gt;  [7] "eyeColor"                         "friends"                         </span></span>
+<span><span class="co">#&gt;  [9] "friends.id"                       "friends.name"                    </span></span>
+<span><span class="co">#&gt; [11] "headers"                          "headers.Accept"                  </span></span>
+<span><span class="co">#&gt; [13] "headers.Host"                     "headers.User-Agent"              </span></span>
+<span><span class="co">#&gt; [15] "headers.X-Amzn-Trace-Id"          "id"                              </span></span>
+<span><span class="co">#&gt; [17] "isActive"                         "name"                            </span></span>
+<span><span class="co">#&gt; [19] "origin"                           "origin_addresses"                </span></span>
 <span><span class="co">#&gt; [21] "registered"                       "rows"                            </span></span>
 <span><span class="co">#&gt; [23] "rows.elements"                    "rows.elements.distance"          </span></span>
 <span><span class="co">#&gt; [25] "rows.elements.distance.somevalue" "rows.elements.distance.text"     </span></span>
@@ -374,16 +378,16 @@ updated.</p>
 <code class="sourceCode R"><span><span class="co"># number of documents corresponding to query</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"carb": 3}'</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
-<span> </span>
+<span></span>
 <span><span class="co"># update all documents using JSON, replacing the previously existing values</span></span>
 <span><span class="fu"><a href="../reference/docdb_update.html">docdb_update</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="st">'{"vs": 9, "xy": [1, 2]}'</span>, query <span class="op">=</span> <span class="st">'{"carb": 3}'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span></span>
 <span><span class="co"># update with value that includes _id's</span></span>
-<span><span class="fu"><a href="../reference/docdb_update.html">docdb_update</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="st">'{"_id": "Merc 450SLC", "xy": 33}'</span>, query <span class="op">=</span> <span class="st">'{}'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/docdb_update.html">docdb_update</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, value <span class="op">=</span> <span class="st">'{"_id": "Merc 450SLC", "xy": 33}'</span>, query <span class="op">=</span> <span class="st">"{}"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
 <span></span>
-<span><span class="co"># show updated values </span></span>
+<span><span class="co"># show updated values</span></span>
 <span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"carb": 3}'</span>, fields <span class="op">=</span> <span class="st">'{"xy": 1}'</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           _id   xy</span></span>
 <span><span class="co">#&gt; 1  Merc 450SE 1, 2</span></span>
@@ -425,7 +429,7 @@ SQLite:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span></span>
 <span><span class="co">#&gt; src: sqlite</span></span>
-<span><span class="co">#&gt; SQLite library version: 3.45.0</span></span>
+<span><span class="co">#&gt; SQLite library version: 3.45.2</span></span>
 <span><span class="co">#&gt;  size: NA kBytes</span></span>
 <span><span class="co">#&gt;  dbname: :memory:</span></span>
 <span><span class="co">#&gt; Warning: Database is only in memory, will not persist after R ends! Consider to copy it with </span></span>
@@ -435,7 +439,8 @@ SQLite:</p>
 <span><span class="co">#&gt;   )</span></span>
 <span></span>
 <span><span class="co"># shutdown</span></span>
-<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">src</span><span class="op">$</span><span class="va">con</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">src</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">src</span><span class="op">$</span><span class="va">con</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">src</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </div>
@@ -457,7 +462,7 @@ SQLite:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

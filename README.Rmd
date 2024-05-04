@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 ⁠<!-- badges: end -->
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2024-03-03.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2024-05-04.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 | :--------------------- | :--------------------- | :--------------------- |
@@ -348,16 +348,16 @@ tmp <- testthat::test_local()
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1018 ]
 
-# 2024-03-04
+# 2024-05-04
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 95.58%
+# nodbi Coverage: 95.52%
 # R/src_duckdb.R: 76.92%
 # R/src_mongo.R: 91.30%
 # R/update.R: 92.95%
 # R/zzz.R: 94.77%
 # R/src_postgres.R: 95.65%
 # R/create.R: 96.09%
-# R/query.R: 96.44%
+# R/query.R: 96.32%
 # R/delete.R: 97.96%
 # R/get.R: 98.77%
 # R/exists.R: 100.00%

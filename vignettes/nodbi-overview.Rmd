@@ -11,8 +11,8 @@ editor_options:
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -53,8 +53,9 @@ if (FALSE) {
   src <- src_postgres()
   src <- src_elastic()
   src <- src_couchdb(
-    user = Sys.getenv("COUCHDB_TEST_USER"), 
-    pwd = Sys.getenv("COUCHDB_TEST_PWD"))
+    user = Sys.getenv("COUCHDB_TEST_USER"),
+    pwd = Sys.getenv("COUCHDB_TEST_PWD")
+  )
 }
 
 # this example is run with
@@ -75,7 +76,7 @@ The parameter `value` in any `nodbi` function can take a data frame, a list, a J
 # check if container already exists
 docdb_exists(src = src, key = key)
 
-# load data from a data frame with row names into 
+# load data from a data frame with row names into
 # the container specified in "key" parameter
 docdb_create(src = src, key = key, value = mtcars)
 
@@ -86,7 +87,7 @@ docdb_create(src, key, "https://httpbin.org/stream/98")
 docdb_create(src, key, jsonlite::fromJSON(mapdata, simplifyVector = FALSE))
 
 # show JSON structure of contacts
-jsonlite::minify(contacts) 
+jsonlite::minify(contacts)
 
 # load additionally contacts JSON data
 docdb_create(src, key, contacts)
@@ -120,7 +121,7 @@ For updating existing documents, see below function `docdb_update()`.
 All documents in a container can now be retrieved with `docdb_get()`. 
 
 ```{r}
-# load library for more 
+# load library for more
 # readable print output
 library(tibble)
 
@@ -144,7 +145,7 @@ docdb_query(src = src, key = key, query = '{"mpg": {"$gte": 30}}')
 Both parameters `query` (obligatory) and `fields` (optional) use, across all databases, MongoDB syntax such as documented for [queries](https://www.mongodb.com/docs/manual/crud/) and [fields](https://www.mongodb.com/docs/manual/tutorial/project-fields-from-query-results/). 
 
 ```{r}
-# query some fields from some documents; 'query' is a mandatory 
+# query some fields from some documents; 'query' is a mandatory
 # parameter and is used here in its position in the signature
 docdb_query(src, key, '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "mpg": 1}')
 ```
@@ -161,10 +162,11 @@ Queries can be more complex such as in this example, showing a dot notation of a
 ```{r}
 # query some subitem fields from some documents
 str(docdb_query(
-  src, key, 
-  query = '{"$or": [{"age": {"$gt": 21}}, 
-           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}', 
-  fields = '{"age": 1, "friends.name": 1}'))
+  src, key,
+  query = '{"$or": [{"age": {"$gt": 21}},
+           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}',
+  fields = '{"age": 1, "friends.name": 1}'
+))
 ```
 
 Queries work across documents of different structure such as here. 
@@ -172,16 +174,15 @@ Queries work across documents of different structure such as here.
 ```{r}
 # query with results across documents
 docdb_query(
-  src, key, 
-  query = '{"$or": [{"age": {"$gt": 21}}, {"mpg": {"$gte": 30}}]}', 
-  fields = '{"name": 1, "disp": 1}')
+  src, key,
+  query = '{"$or": [{"age": {"$gt": 21}}, {"mpg": {"$gte": 30}}]}',
+  fields = '{"name": 1, "disp": 1}'
+)
 ```
 
 ### Field names
 
-The `JSON` data handled by package `nodbi` may have a large number of field included nested fields in objects (see for example `name` within array `friends` above), and there is no simple function to list field names. 
-
-Thus, an argument is provided for `docdb_query()` so that the function returns only the comprehensive list of all field names in documents selected with a query (or in all documents in the container if `query = "{}"` is specified). 
+The `JSON` data handled by package `nodbi` may have a large number of field included nested fields in objects (see for example `name` within array `friends` above). Thus, an argument is provided for `docdb_query()` so that the function returns only the comprehensive list of all field names in documents selected with a query (or in all documents in the container if `query = "{}"` is specified). 
 
 ```{r}
 docdb_query(src, key, query = '{"_id": {"$regex": "^[0-9]"}}', listfields = TRUE)
@@ -198,14 +199,14 @@ This is another powerful function because `value` can come from a data frame, a 
 ```{r}
 # number of documents corresponding to query
 nrow(docdb_query(src, key, query = '{"carb": 3}'))
- 
+
 # update all documents using JSON, replacing the previously existing values
 docdb_update(src, key, value = '{"vs": 9, "xy": [1, 2]}', query = '{"carb": 3}')
 
 # update with value that includes _id's
-docdb_update(src, key, value = '{"_id": "Merc 450SLC", "xy": 33}', query = '{}')
+docdb_update(src, key, value = '{"_id": "Merc 450SLC", "xy": 33}', query = "{}")
 
-# show updated values 
+# show updated values
 docdb_query(src, key, query = '{"carb": 3}', fields = '{"xy": 1}')
 ```
 
@@ -237,5 +238,6 @@ Nevertheless, it is good practice to manually disconnect and shut down connectio
 src
 
 # shutdown
-DBI::dbDisconnect(src$con, shutdown = TRUE); rm(src)
+DBI::dbDisconnect(src$con, shutdown = TRUE)
+rm(src)
 ```

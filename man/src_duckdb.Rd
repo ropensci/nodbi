@@ -10,8 +10,8 @@ src_duckdb(drv = duckdb::duckdb(), dbdir = attr(drv, "dbdir"), ...)
 \item{drv}{Object returned by \code{duckdb()}}
 
 \item{dbdir}{Location for database files. Should be a path to an existing
-directory in the file system. With the default, all
-data is kept in RAM}
+directory in the file system. With the default (or \code{""}), all
+data is kept in RAM.}
 
 \item{...}{Additional named parameters passed on to \code{\link[DBI:dbConnect]{DBI::dbConnect()}}}
 }
