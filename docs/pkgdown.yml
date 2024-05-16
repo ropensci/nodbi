@@ -1,7 +1,7 @@
-pandoc: 3.1.13
+pandoc: '3.2'
 pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   nodbi-overview: nodbi-overview.html
-last_built: 2024-05-04T13:41Z
+last_built: 2024-05-16T13:04Z
 
