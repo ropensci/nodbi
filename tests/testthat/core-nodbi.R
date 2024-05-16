@@ -33,6 +33,7 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
   # - postgres does not maintain field order
   if (!inherits(src, "src_postgres")) expect_equal(
     docdb_get(src = src, key = key)[, -1], `rownames<-`(testDf[order(row.names(testDf)), ], NULL))
+  expect_error(docdb_delete(src = src, key = key, query = '{"invalidjson'))
   expect_true(docdb_delete(src = src, key = key))
   expect_false(docdb_exists(src = src, key = key))
   expect_false(any(docdb_list(src = src) == key))
@@ -141,6 +142,7 @@ test_that("docdb_query", {
   # testJson
   expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"friends.id": {"$gte": 0}}', limit = 1L)), c(1L, 11L))
+  expect_error(docdb_query(src = src, key = key, query = '{"invalidjson'))
   #
   # testJson2
   expect_equal(docdb_create(src = src, key = key, value = testJson2), 2L)
@@ -348,8 +350,6 @@ test_that("parallel writes", {
 
   ## sqlite
   if (cls == "src_sqlite") {
-
-    # tf <- tempfile(fileext = ".sqlite")
 
     tfF <- function(..., env = parent.frame()) {
       tfF <- tempfile(fileext = ".sqlite")

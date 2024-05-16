@@ -1,8 +1,10 @@
 # nodbi 0.10.4.9000
 
+## Bug fix
+* invalid query JSON in `docdb_delete()` does not risk deleting database
+
 ## Changes
-* code cleaning
-* parameter checking
+* code cleaning, parameters checking
 
 # nodbi 0.10.4
 

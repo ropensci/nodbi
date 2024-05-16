@@ -72,11 +72,9 @@ docdb_delete.src_elastic <- function(src, key, ...) {
   if (!is.null(params[["query"]])) {
 
     # get docids to be deleted
-    docids <- try(docdb_query(
+    docids <- docdb_query(
       src, key, query = params[["query"]],
-      fields = '{"_id": 1}')[, "_id", drop = TRUE],
-      silent = TRUE)
-    if (inherits(docids, "try-error")) return(FALSE)
+      fields = '{"_id": 1}')[, "_id", drop = TRUE]
 
     # early exit
     if (!length(docids)) return(FALSE)
@@ -116,8 +114,7 @@ docdb_delete.src_elastic <- function(src, key, ...) {
 docdb_delete.src_mongo <- function(src, key, ...) {
 
   params <- list(...)
-  if (!is.null(params$query) &&
-      jsonlite::validate(params$query)) {
+  if (!is.null(params$query)) {
     # count document(s)
     result <- src$con$count(
       query = params$query)
@@ -163,8 +160,7 @@ sqlDelete <- function(src, key, ...) {
   tmpdots <- list(...)
 
   # if valid query, delete document(s), not table
-  if (!is.null(tmpdots$query) &&
-      jsonlite::validate(tmpdots$query)) {
+  if (!is.null(tmpdots$query)) {
 
     # get _id's of document to be deleted
     tmpids <- docdb_query(
