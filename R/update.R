@@ -18,6 +18,7 @@
 #'  Can use comparisons / tests (`$lt`, `$lte`, `$gt`, `$gte`,
 #'  `$ne`, `$in`, `$regex`), with logic operators (`$and`,
 #'  `$or`, `(`, `)`), including nested queries, see examples.
+#'  Specify as `'{}'` if `value` includes `_id`'s.
 #'
 #' @param ... Passed on to functions [elastic::docs_bulk_update()],
 #' and [mongolite::mongo()]$update().

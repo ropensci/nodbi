@@ -2,6 +2,7 @@
 
 ## Changes
 * code cleaning
+* parameter checking
 
 # nodbi 0.10.4
 

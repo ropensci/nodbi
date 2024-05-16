@@ -23,7 +23,8 @@ file name or URL that points to NDJSON documents}
 \item{query}{(character) A JSON query string, see examples.
 Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
 \verb{$ne}, \verb{$in}, \verb{$regex}), with logic operators (\verb{$and},
-\verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.}
+\verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.
+Specify as \code{'{}'} if \code{value} includes \verb{_id}'s.}
 
 \item{...}{Passed on to functions \code{\link[elastic:docs_bulk_update]{elastic::docs_bulk_update()}},
 and \code{\link[mongolite:mongo]{mongolite::mongo()}}$update().}
