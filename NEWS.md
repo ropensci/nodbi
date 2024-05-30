@@ -2,6 +2,7 @@
 
 ## Bug fix
 * invalid query JSON in `docdb_delete()` does not risk deleting database
+* make sure some information is printed for MongoDB connection object
 
 ## Changes
 * code cleaning, parameters checking

@@ -50,8 +50,12 @@ print.src_mongo <- function(x, ...) {
   # hence try() block and fallback printout
   tmp <- try({
     srv <- con$info()
-    cat(sprintf("MongoDB %s (uptime: %ss)\nURL: %s\nDatabase: %s\nCollection: %s\n",
-                srv$server$version, srv$server$uptime, url, db, coll))
+    cat(
+      "MongoDB ",
+      # not all compatible server deployments return information
+      sprintf("%s (uptime: %ss)", srv$server$version, srv$server$uptime),
+      sprintf("\nURL: %s\nDatabase: %s\nCollection: %s\n", url, db, coll)
+    )
   }, silent = TRUE)
 
   if (inherits(tmp, "try-error")) {
