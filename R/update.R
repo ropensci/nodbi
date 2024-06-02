@@ -73,7 +73,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) && jsonlite::validate(value)
+      is.character(value) && yyjsonr::validate_json_str(value) # TODO jsonlite::validate(value)
   ) {
     # check format
     if (all(jqr::jq(value, " .[] | type ") == '"array"') && length(jqr::jq(value, " .[] ")) > 1L) stop(
@@ -89,20 +89,30 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
     # if value contains id's, split rows into documents of a vector
     row.names(value) <- NULL
     if (any(names(value) == "_id")) {
-      value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+      # TODO
+      # value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+      value <- yyjsonr::write_json_str(value, dataframe = "rows", opts = list(auto_unbox = TRUE))
       value <- jqr::jq(value, " .[] ")
     } else {
       # otherwise keep as single document
-      value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
+      # TODO
+      # value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
+      value <- yyjsonr::write_json_str(value, dataframe = "columns", opts = list(auto_unbox = TRUE))
     }
   }
+
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    # TODO
+    # value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    value <- yyjsonr::write_json_str(value, opts = list(auto_unbox = TRUE))
     # check if {"_id":["Valiant","Fiat 128"],"gear":[8,9]}
     if (all(jqr::jq(value, '._id | type' ) == '"array"')) {
-      value <- data.frame(jsonlite::fromJSON(value), check.names = FALSE)
-      value <- jsonlite::toJSON(value)
+      # TODO
+      # value <- data.frame(jsonlite::fromJSON(value), check.names = FALSE)
+      # value <- jsonlite::toJSON(value)
+      value <- data.frame(yyjsonr::read_json_str(value), check.names = FALSE)
+      value <- yyjsonr::write_json_str(value)
     }
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
@@ -126,15 +136,33 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   if (length(valueIds)) query <- paste0(
     '{"_id": {"$in": [', paste0('"', valueIds, '"', collapse = ", "), ']}}')
   #
-  input <- docdb_query(src, key, query)
-  if (!length(input)) return(0L)
-  if (!length(valueIds)) valueIds <- input[["_id"]]
-  #
-  ndjson <- NULL
-  jsonlite::stream_out(input, con = textConnection(
-    object = "ndjson", open = "w", local = TRUE), verbose = FALSE, digits = NA)
+  # input <- docdb_query(src, key, query)
+  # if (!length(input)) return(0L)
+  # if (!length(valueIds)) valueIds <- input[["_id"]]
 
-  # temporary file and connection
+  # TODO
+  # ndjson <- NULL
+  # jsonlite::stream_out(input, con = textConnection(
+  #   object = "ndjson", open = "w", local = TRUE), verbose = FALSE, digits = NA)
+  #
+  # temporary file for input docs
+  tiname <- tempfile()
+  on.exit(try(unlink(tiname), silent = TRUE), add = TRUE)
+  # yyjsonr cannot save complicated column structures
+  # yyjsonr::write_ndjson_file(
+  #   docdb_query(src, key, query),
+  #   filename = tiname,
+  #   opts = list(auto_unbox = TRUE))
+  jsonlite::stream_out(
+    docdb_query(src, key, query), con = file(tiname),
+    verbose = FALSE, digits = NA)
+
+  if (file.size(tiname) <= 2L) return(0L)
+
+  if (!length(valueIds)) valueIds <- as.vector(gsub(
+    '^"|"$', "", jqr::jq(file(tiname), " ._id ")))
+
+  # temporary file and connection for updated docs
   tfname <- tempfile()
   tfnameCon <- file(tfname, open = "at")
   # register to close and remove file after used for streaming
@@ -142,35 +170,36 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
 
   # check
-  if (length(value) > 1L && !identical(nrow(input), length(value))) stop(
-    "Unequal number of documents identified (", nrow(input),
+  if (length(value) > 1L && !identical(length(valueIds), length(value))) stop(
+    "Unequal number of documents identified (", length(valueIds),
     ") and of documents in 'value' (", length(value), ")"
   )
 
   # merge and append to file
   for (i in seq_along(valueIds)) {
 
-    idValue <- jqr::jq(
-      textConnection(value),
-      paste0('select(._id == "', valueIds[i], '")'))
+    # # get original doc
+    # origDoc <-
+    #
+    # if (!length(origDoc)) next
 
-    if (!length(idValue)) {
-      if (length(value) > 1L) {
-        idValue <- value[i]
-      } else {
-        idValue <- value
-      }
-    }
+    # if (length(origDoc) > 1L) {
+    #   idValue <- value[i]
+    # } else {
+    #   idValue <- value
+    # }
+
+    # increment value (new) with original data
+    ii <- ifelse(length(value) > 1L, i, 1)
 
     # merge input json with value
     jqr::jq(
       x = textConnection(paste0(
-        "[", jqr::jq(
-          textConnection(ndjson),
-          paste0("select(._id == \"", valueIds[i], "\")")),
-        ",", idValue, "]")),
+        "[", jqr::jq(file(tiname), paste0('select(._id == "', valueIds[i], '")')),
+        ",", value[ii], "]")),
       " reduce .[] as $item ({}; . * $item) ",
-      out = tfnameCon)
+      out = tfnameCon
+    )
 
   }
 
@@ -206,22 +235,57 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
 
   # json to data frame
   if (any(class(value) == "character")) {
-    if (isFile(value)) {
-      value <- jsonlite::stream_in(file(value), verbose = FALSE)
-    } else {
+    if (isFile(value) || isUrl(value)) {
+      # TODO
+      # value <- jsonlite::stream_in(file(value), verbose = FALSE)
+      # value <- yyjsonr::read_ndjson_file(filename = value)
+      # } else {
       if (isUrl(value)) {
-        value <- jsonlite::stream_in(url(value), verbose = FALSE)
-      } else {
-        if (length(value) == 1L) value <- jsonlite::minify(value)
-        value <- jsonlite::stream_in(textConnection(value), verbose = FALSE)
+        # TODO
+        # value <- jsonlite::stream_in(url(value), verbose = FALSE)
+        # temporary file
+        tfname <- tempfile()
+        on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+        cat(readLines(url(value)), file = tfname,sep = "\n")
+        value <- tfname
+        #
       }
+
+      value <- yyjsonr::read_ndjson_file(
+        filename = value, nprobe = -1, opts = list(
+          str_specials = "special", int64 = "double")
+      )
+
+    } else {
+
+      value <- sapply(value, jsonlite::minify, USE.NAMES = FALSE, simplify = TRUE)
+      value <- jsonlite::stream_in(textConnection(value), verbose = FALSE)
+
+      # if (length(value) == 1L) {
+      # TODO does not work with yyjsonr
+      #   value <- yyjsonr::read_json_str(
+      #     value, opts = list(
+      #       obj_of_arrs_to_df = FALSE,
+      #       arr_of_objs_to_df = FALSE,
+      #       str_specials = "special",
+      #       int64 = "double"))
+      # } else {
+      #   value <- yyjsonr::read_ndjson_str(
+      #     paste0(value, collapse = "\n"),
+      #     opts = list(str_specials = "special", int64 = "double"))
+      # }
     }
   }
 
   # list to data frame
   if (all(class(value) %in% "list")) {
-    value <- jsonlite::fromJSON(
-      jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA))
+    # TODO
+    # value <- jsonlite::fromJSON(
+    #   jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA))
+    value <- yyjsonr::read_json_str(
+      yyjsonr::write_json_str(value, opts = list(auto_unbox = TRUE)),
+      opts = list(str_specials = "special", int64 = "double")
+    )
     # if value is still simple list
     value <- as.data.frame(value, check.names = FALSE)
   }
@@ -250,9 +314,9 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
   # check
   if (!all(valueClass %in% "data.frame") &&
       nrow(value) > 1L && !identical(nrow(value), length(ids))) stop(
-    "Unequal number of documents identified (", length(ids),
-    ") and of documents in 'value' (", nrow(value), ")"
-  )
+        "Unequal number of documents identified (", length(ids),
+        ") and of documents in 'value' (", nrow(value), ")"
+      )
 
   # how to handle?
   if (nrow(value) != length(ids)) {
@@ -333,7 +397,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) && jsonlite::validate(value)
+      is.character(value) && yyjsonr::validate_json_str(value) # TODO jsonlite::validate(value)
   ) {
     # check format
     if (all(jqr::jq(value, " .[] | type ") == '"array"') && length(jqr::jq(value, " .[] ")) > 1L) stop(
