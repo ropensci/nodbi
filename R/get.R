@@ -3,7 +3,7 @@
 #' @inheritParams docdb_create
 #'
 #' @param limit (integer) Maximum number of documents
-#'  to be returned. If `NULL` or not set (default), 10,000 for
+#'  to be returned. If `NULL` or not set (default), 100,000 for
 #'  Elasticsearch and all documents for MongoDB, SQLite,
 #'  CouchDB, PostgreSQL, and DuckDB.
 #'
@@ -34,7 +34,7 @@ docdb_get <- function(src, key, limit = NULL, ...) {
   if (length(params[["fields"]]) ||
       length(params[["query"]]) ||
       length(params[["listfields"]])) stop(
-    "Use docdb_query() to specify fields or query parameters.")
+        "Use docdb_query() to specify fields or query parameters.")
 
   # dispatch
   UseMethod("docdb_get", src)
@@ -87,8 +87,20 @@ docdb_get.src_couchdb <- function(src, key, limit = NULL, ...) {
 #' @export
 docdb_get.src_elastic <- function(src, key, limit = NULL, ...) {
 
+  # default
+  limitDefault <- 10000L
+  limitHere <- 100000L
+
   # adjust parameter
-  if (is.null(limit)) limit <- 10000L
+  if (is.null(limit)) limit <- limitHere
+
+  if (limit > limitDefault || limitHere > limitDefault) {
+    elastic::index_settings_update(
+      conn = src$con,
+      index = key,
+      list(max_result_window = limit)
+    )
+  }
 
   # get all _id's
   docids <- elastic::Search(
