@@ -96,6 +96,7 @@ docdb_query <- function(src, key, query, ...) {
       if (is.list(params) &&
           !is.null(params$limit)) {
         limit <- params$limit
+        assert(limit, "integer")
         params$limit <- NULL
       } else {
         limit <- NULL
@@ -547,7 +548,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
           query = query, fields = '{}', limit = n,
           # cannot use yyjsonr as this cannot use a file connection
           handler = function(x) jsonlite::stream_out(x, con = con, verbose = FALSE),
-          pagesize = 100L)
+          pagesize = 10000L)
 
       }
 
@@ -584,8 +585,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   if (!any(grepl("[.]", fldQ$includeFields)) &&
       !length(fldQ$excludeFields)) {
 
-    # cannot use src$con$find because
-    # fields may have been specified
+    # call
     tmp <- do.call(
       src$con$find,
       c(list(query = query), params))
