@@ -64,7 +64,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
     if (grepl("already exists", result))
       existsMessage(key) else stop(result, call. = FALSE)}
 
-  # convert into target list
+  # TARGET: list
 
   # data frame
   if (inherits(value, "data.frame")) {
@@ -183,9 +183,12 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   # If you require sorting or aggregating on this field you should also include the id in the
   # body of your documents, and map this field as a keyword field that has [doc_values] enabled
 
+  # TARGET: list, extracted docids
+
   # data frame
   if (inherits(value, "data.frame")) {
     if (is.na(match("_id", names(value)))) {
+
       # if no _id column
       if (!identical(rownames(value),
                      as.character(seq_len(nrow(value))))) {
@@ -278,6 +281,8 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
   # special check for mongo
   chkSrcMongo(src, key)
   if (docdb_exists(src, key, value, ...)) existsMessage(key)
+
+  # TARGET: json or data frame
 
   # directly import ndjson file
   if ((all(class(value) %in% "character")) &&
@@ -408,6 +413,8 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   } else {
     existsMessage(key)
   }
+
+  # TARGET: data frame (_id, json)
 
   # convert lists to json
   if (inherits(value, "list")) {
@@ -546,6 +553,10 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     existsMessage(key)
   }
 
+  # TARGET: data frame (_id, json)
+
+  # vvv same as in docdb_create.src_sqlite
+
   # convert lists to json
   if (inherits(value, "list")) {
     # TODO
@@ -627,6 +638,8 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
   } # if data.frame
 
+  # ^^^ same as in docdb_create.src_sqlite
+
   # insert data
   result <- try(
     DBI::dbWithTransaction(
@@ -686,13 +699,16 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
   # https://duckdb.org/docs/api/r.html
   # Read-only mode is required if multiple R processes
-  # want to access the same database file at the same time.
+  # want to access the same database file at the same time
 
   # https://duckdb.org/docs/api/r.html#efficient-transfer
   # https://duckdb.org/docs/extensions/json#json-creation-functions
 
-  # if value is not a file name, convert value
-  # into ndjson and keep filename in value
+  # TARGET: value is filename of ndjson docs
+  #
+  # thus if value is not a file name, convert
+  # value into ndjson and keep filename in value
+
   if (!isFile(value)) {
 
     # temporary file and connection
