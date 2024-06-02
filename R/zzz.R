@@ -18,7 +18,7 @@
 # across documents. The latter would require jqr
 # to be able to handle jq's 'inputs' and flag "-n".
 jqFieldNames <- '[ path(..) | map(select(type == "string")) | join(".") ] | unique[] '
-
+jqFieldNames <- '{ out: [ path(..) | map(select(type == "string")) | join(".") ] | unique[] }'
 
 
 #' doc_wrap
@@ -245,6 +245,8 @@ digestFields <- function(f, q) {
          "; this was the query used: ", q)
   }
 
+  # notes
+  # - changes "gear IN (5.0, 4.0)" to "gear IN (5, 4)"
   sqlQ <- .nodbi$ct$call("mongo2sql", paste0("db.user.find(", q, ");"))
 
   # query mangling
