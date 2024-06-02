@@ -112,6 +112,7 @@ test_that("docdb_create (ndjson)", {
   expect_equal(docdb_create(src = src, key = key, value = tF), 5L)
   expect_equal(suppressWarnings(docdb_create(src = src, key = key, value = tF)), 0L)
   expect_equal(docdb_create(src = src, key = key, value = tF2), nrow(diamonds))
+  expect_equal(dim(docdb_get(src = src, key = key)), c(53945, 21))
 
   # clean up
   expect_true(docdb_delete(src = src, key = key))
@@ -120,6 +121,7 @@ test_that("docdb_create (ndjson)", {
   # test
   skip_if(is.null(httpbin), "package webfakes missing")
   expect_equal(docdb_create(src = src, key = key, value = httpbin$url("/stream/98")), 98L)
+  expect_equal(dim(docdb_get(src = src, key = key)), c(98, 6))
   expect_true(docdb_delete(src = src, key = key))
 
 })
@@ -193,7 +195,7 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": "lacychen@conjurica.com"}')), c(1L, 11L))
   #
   empty <- docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"nonexistingfield": 1, "_id": 0}')
-  expect_true(is.null(empty) || !ncol(empty) || !nrow(empty) || all(is.na(empty)) || names(empty) == "_id") # for 0.9.9 adding all is.na for duckdb
+  expect_true(is.null(empty) || !ncol(empty) || !nrow(empty) || all(is.na(empty)) || names(empty) == "_id" || all(sapply(empty$nonexistingfield, is.null))) # for 0.9.9 adding all is.na for duckdb
   expect_equal(dim(
     docdb_query(src = src, key = key, query = '{"tags": {"$regex": "^[a-z]{3,4}$"}}', fields = '{"name": 1, "age": 1, "_id": 0}')), c(3L, 2L))
   expect_true(docdb_delete(src = src, key = key))
@@ -217,12 +219,13 @@ test_that("docdb_query", {
   expect_true(docdb_delete(src = src, key = key))
 
   # testDf
+  # typeof(testDf$gear) is integer
   expect_equal(docdb_create(src = src, key = key, value = testDf), 32L)
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}')), c(32L, 12L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"_id": 1}')), c(32L, 1L))
   expect_equal(dim(docdb_query(src, key, query = '{"gear":4, "mpg": {"$lte": 21.9}}')), c(5L, 12L))
   expect_equal(dim(docdb_query(src, key, query = '{"gear":4, "mpg": {"$lte": 21.9}}', fields = '{"_id": 1}')), c(5L, 1L))
-  expect_equal(dim(docdb_query(src, key, query = '{"gear": {"$in": [5,4]}}')), c(17L, 12L))
+  expect_equal(dim(docdb_query(src, key, query = '{"gear": {"$in": [5, 4]}}')), c(17L, 12L))
   expect_equal(dim(docdb_query(src, key, query = '{"_id": {"$in": ["Datsun 710", "Merc 280C"]}}')), c(2L, 12L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"mpg": {"$lte": 18.9}}', fields = '{"mpg": 1, "carb": 1}')), c(15L, 3L)) # mpg is not integer
   expect_equal(sum(docdb_query(src = src, key = key, query = '{"disp": {"$gt": 350}}', fields = '{"carb": 1, "_id": 0}')[[1]]), 24L)

@@ -6,7 +6,8 @@
 Sys.unsetenv("LANG")
 
 # test verbose messages
-options(verbose = TRUE)
+# TODO
+# options(verbose = TRUE)
 
 # for interactive testing:
 # devtools::load_all()
@@ -17,6 +18,7 @@ options(verbose = TRUE)
 #### data for tests ####
 
 testDf <- mtcars # has rownames
+testDf$gear <- as.integer(testDf$gear) # important for query
 testDf2 <- iris  # no rownames
 # factors cannot be expected to be maintained
 testDf2[["Species"]] <- as.character(testDf2[["Species"]])

@@ -16,13 +16,13 @@ function parameters and return values across all database backends. Last
 updated 2024-05-04.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
-|:-----------------------------------------------------|:-------------------------------------------------|:---------------------|
-| MongoDB                                              | data.frame                                       | List, Exists         |
-| SQLite                                               | list                                             | Create               |
-| PostgreSQL                                           | JSON string                                      | Get                  |
-| DuckDB                                               | file name of NDJSON records                      | Query                |
-| Elasticsearch                                        | URL of NDJSON records                            | Update               |
-| CouchDB                                              |                                                  | Delete               |
+|:---|:---|:---|
+| MongoDB | data.frame | List, Exists |
+| SQLite | list | Create |
+| PostgreSQL | JSON string | Get |
+| DuckDB | file name of NDJSON records | Query |
+| Elasticsearch | URL of NDJSON records | Update |
+| CouchDB |  | Delete |
 
 For speed comparisons of database backends, see [benchmark](#benchmark)
 and [testing](#testing) below.
@@ -36,19 +36,19 @@ used as term to indicate where conceptually the backend holds the data,
 see [Database connections](#database-connections) below. The `key`
 parameter holds the name of a container.
 
-| Purpose                                                                                                                                                 | Function call                                                                                                                                         |
-|:--------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Create database connection (see below)                                                                                                                  | `src <- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(<see below for parameters>)`                                                   |
-| Load `my_data` (a data frame, list, JSON string, or file name or URL pointing to NDJSON records) into database, container `my_container`                | `nodbi::docdb_create(src = src, key = "my_container", value = my_data)`                                                                               |
-| Get all documents back into a data frame                                                                                                                | `nodbi::docdb_get(src = src, key = "my_container")`                                                                                                   |
-| Get documents selected with query (as MongoDB-compatible JSON) into a data frame                                                                        | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')`                                                                          |
-| Get selected fields (in MongoDB compatible JSON) from documents selected by query into a data frame                                                     | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": {"$gt": 20}}', fields = '{"friends.name": 1, "_id": 0, "age": 1}', limit = 2L)` |
-| Update (patch) documents selected by query with new data `my_data` (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records) | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')`                                                        |
-| Check if container exists                                                                                                                               | `nodbi::docdb_exists(src = src, key = "my_container")`                                                                                                |
-| List all containers in database                                                                                                                         | `nodbi::docdb_list(src = src)`                                                                                                                        |
-| Delete document(s) in container                                                                                                                         | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')`                                                                         |
-| Delete container                                                                                                                                        | `nodbi::docdb_delete(src = src, key = "my_container")`                                                                                                |
-| Close and remove database connection manually (when restarting R, connections are automatically closed and removed by `nodbi`)                          | `rm(src)`                                                                                                                                             |
+| Purpose | Function call |
+|:---|:---|
+| Create database connection (see below) | `src <- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(<see below for parameters>)` |
+| Load `my_data` (a data frame, list, JSON string, or file name or URL pointing to NDJSON records) into database, container `my_container` | `nodbi::docdb_create(src = src, key = "my_container", value = my_data)` |
+| Get all documents back into a data frame | `nodbi::docdb_get(src = src, key = "my_container")` |
+| Get documents selected with query (as MongoDB-compatible JSON) into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')` |
+| Get selected fields (in MongoDB compatible JSON) from documents selected by query into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": {"$gt": 20}}', fields = '{"friends.name": 1, "_id": 0, "age": 1}', limit = 2L)` |
+| Update (patch) documents selected by query with new data `my_data` (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records) | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
+| Check if container exists | `nodbi::docdb_exists(src = src, key = "my_container")` |
+| List all containers in database | `nodbi::docdb_list(src = src)` |
+| Delete document(s) in container | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')` |
+| Delete container | `nodbi::docdb_delete(src = src, key = "my_container")` |
+| Close and remove database connection manually (when restarting R, connections are automatically closed and removed by `nodbi`) | `rm(src)` |
 
 ## Install
 
@@ -348,15 +348,15 @@ result <- rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 
-# 2024-03-03 with 2015 mobile hardware, databases via homebrew, R unstable
+# 2024-06-02 with 2015 mobile hardware, databases via homebrew, R unstable
 result[rev(order(result$elapsed)), ]
 #         test replications elapsed
-# 4    CouchDB           10   652.9
-# 3    Elastic           10    36.3
-# 5 PostgreSQL           10     4.2
-# 2     SQLite           10     2.8
-# 6     DuckDB           10     2.7
-# 1    MongoDB           10     2.5
+# 4    CouchDB           10   515.1
+# 3    Elastic           10    29.4
+# 5 PostgreSQL           10     3.4
+# 1    MongoDB           10     2.4
+# 2     SQLite           10     2.4
+# 6     DuckDB           10     2.3
 ```
 
 ## Testing
@@ -365,33 +365,39 @@ Every database backend is subjected to identical tests, see
 [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R).
 
 ``` r
-# 2024-03-04
+# 2024-06-02
 tmp <- testthat::test_local()
-# [...]
+# ✔ | F W  S  OK | Context
+# ✔ |      2 174 | couchdb [121.8s]                                                                        
+# ✔ |      1 173 | duckdb [8.1s]                                                                           
+# ✔ |      2 172 | elastic [94.9s]                                                                         
+# ✔ |      2 172 | mongodb [8.5s]                                                                          
+# ✔ |        175 | postgres [11.7s]                                                                        
+# ✔ |        176 | sqlite [8.5s]                                                                           
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════════════════════
-# Duration: 344.5 s
+# ══ Results ══════════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 253.9 s
 # 
-# ── Skipped tests (7) ───────────────────────────────────────────────────────────────────────────────────
+# ── Skipped tests (7) ────────────────────────────────────────────────────────────────────────────────────
 # • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,
 #   test-mongodb.R:24:3
 # • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3,
 #   test-elastic.R:21:3, test-mongodb.R:24:3
 # 
-# [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1018 ]
+# [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1042 ]
 
-# 2024-05-04
+# 2024-06-02
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 95.52%
+# nodbi Coverage: 95.19%
 # R/src_duckdb.R: 76.92%
-# R/src_mongo.R: 91.30%
-# R/update.R: 92.95%
+# R/src_mongo.R: 92.31%
+# R/update.R: 93.02%
 # R/zzz.R: 94.77%
+# R/query.R: 94.83%
 # R/src_postgres.R: 95.65%
-# R/create.R: 96.09%
-# R/query.R: 96.32%
-# R/delete.R: 97.96%
-# R/get.R: 98.77%
+# R/create.R: 96.63%
+# R/delete.R: 98.94%
+# R/get.R: 99.04%
 # R/exists.R: 100.00%
 # R/list.R: 100.00%
 # R/src_couchdb.R: 100.00%

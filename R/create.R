@@ -69,6 +69,7 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
   # data frame
   if (inherits(value, "data.frame")) {
     if (is.na(match("_id", names(value)))) {
+
       # if no _id column
       if (!identical(rownames(value),
                      as.character(seq_len(nrow(value))))) {
@@ -78,30 +79,66 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
       }
     }
     row.names(value) <- NULL
-    value <- jsonlite::fromJSON(
+    # TODO
+    # each row becomes one list element
+    # value <- jsonlite::fromJSON(
+    #   jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA),
+    #   simplifyVector = FALSE)
+    value2 <- yyjsonr::read_json_str(
+      # yyjsonr cannot be used for this as it is
+      # picky about empty or nested columns in value
       jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA),
-      simplifyVector = FALSE)
+      opts = list(
+        obj_of_arrs_to_df = FALSE,
+        arr_of_objs_to_df = FALSE,
+        str_specials = "special",
+        int64 = "double")
+    )
+
   } # if data.frame
 
   # convert JSON string to list
   if (inherits(value, "character")) {
+
     if (all(class(value) %in% "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
-      # read ndjson file or url
-      if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
-      } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
+
+      if (isUrl(value)) {
+        # TODO
+        # value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
+        # temporary file
+        tfname <- tempfile()
+        on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+        cat(readLines(url(value)), file = tfname,sep = "\n")
+        value <- tfname
       }
+
+      value <- yyjsonr::read_ndjson_file(
+        filename = value, nprobe = -1, opts = list(
+          obj_of_arrs_to_df = FALSE, arr_of_objs_to_df = FALSE,
+          str_specials = "special", int64 = "double")
+      )
+
     } else {
+
       # read json string
-      value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
+      # TODO
+      # value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
+      value <- yyjsonr::read_json_str(
+        value,
+        opts = list(
+          obj_of_arrs_to_df = FALSE,
+          arr_of_objs_to_df = FALSE,
+          str_specials = "special",
+          int64 = "double")
+      )
     }
   }
 
   # mangle lists
   if (inherits(value, "list")) {
     if (all(sapply(lapply(value, "[[", "_id"), is.null))) {
+
       # add canonical _id's
       value <- lapply(value, function(i) c(
         "_id" = uuid::UUIDgenerate(use.time = TRUE), i))
@@ -167,6 +204,10 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   } # if data.frame
 
   # convert JSON string to list
+  #
+  # using jsonlite because yyjsonr does not
+  # ensure to output a list, with options set
+  #
   if (inherits(value, c("character", "json"))) {
     # convert ndjson file or json string to list
     if (all(class(value) %in% "character") && (length(value)  == 1L) &&
@@ -264,6 +305,9 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
 
     # since mongolite does not accept valid JSON strings
     # that come as an one-element array, convert to list
+    #
+    # using jsonlite because yyjsonr does not
+    # ensure to output a list, with options set
     if (inherits(value, "character")) {
       value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
     }
@@ -310,6 +354,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
           # loading either a dataframe or
           # vector of NDJSON (!) strings
           data = value,
+          pagesize = 10000L,
           auto_unbox = TRUE,
           digits = NA, ...))[["nInserted"]],
       silent = TRUE)
@@ -366,53 +411,83 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
   # convert lists to json
   if (inherits(value, "list")) {
-    value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    # TODO
+    # value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    value <- yyjsonr::write_json_str(value, opts = list(auto_unbox = TRUE))
   }
 
   # convert JSON string to data frame
   if (inherits(value, c("character", "json"))) {
+
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
     if (all(class(value) %in% "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
+
       if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+        # TODO
+        # value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+        value <- yyjsonr::read_ndjson_file(
+          filename = value, nprobe = -1, opts = list(
+          str_specials = "special", int64 = "double")
+        )
       } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+        # TODO
+        # value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+        # temporary file
+        tfname <- tempfile()
+        on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+        cat(readLines(url(value)), file = tfname,sep = "\n")
+        value <- yyjsonr::read_ndjson_file(
+          filename = tfname, nprobe = -1, opts = list(
+          str_specials = "special", int64 = "double"))
       }
+
     } else {
-      value <- jsonlite::fromJSON(value)
+      # TODO
+      # value <- jsonlite::fromJSON(value)
+      value <- yyjsonr::read_json_str(value, opts = list(
+        str_specials = "special", int64 = "double"))
     }
 
   }
 
   # data frame
   if (inherits(value, "data.frame")) {
-    #
+
+    # - early exit
+    if (!nrow(value)) return(0L)
+
+    # - generate _id column
     if (is.na(match("_id", names(value)))) {
+
       # if no _id column
       if (!identical(rownames(value),
                      as.character(seq_len(nrow(value))))) {
+
         # use rownames as _id's and remove rownames
         value[["_id"]] <- row.names(value)
-        # row.names(value) <- NULL
+        row.names(value) <- NULL
+
       } else {
+
         # add canonical _id's
         value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
+
       }
     } # if no _id column
-    #
-    if (ncol(value) > 2L || (ncol(value) == 2L &&
-                             !all(sort(names(value)) == c("_id", "json")))) {
+
+    if (!setequal(names(value), c("_id", "json"))) {
       # no json column, thus convert to df with ndjson in json column
       value <- items2ndjson(value)
     }
-    #
+
     if (all(class(value[["_id"]]) %in% "list")) {
-      # in case fromJSON created the _id column as list
+      # in case fromJSON() created the _id column as list
       value[["_id"]] <- unlist(value[["_id"]])
     }
+
   } # if data.frame
 
   # insert data
@@ -473,54 +548,83 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
   # convert lists to json
   if (inherits(value, "list")) {
-    value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    # TODO
+    # value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    value <- yyjsonr::write_json_str(value, opts = list(auto_unbox = TRUE))
   }
 
   # convert JSON string to data frame
   if (inherits(value, c("character", "json"))) {
+
     # target is data frame for next section
 
     # convert ndjson file or json string to data frame
     if (all(class(value) %in% "character") && (length(value)  == 1L) &&
         (isUrl(value) || isFile(value))) {
+
       if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+        # TODO
+        # value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+        value <- yyjsonr::read_ndjson_file(
+          filename = value, nprobe = -1, opts = list(
+          str_specials = "special", int64 = "double")
+        )
       } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+        # TODO
+        # value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+        # temporary file
+        tfname <- tempfile()
+        on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+        cat(readLines(url(value)), file = tfname,sep = "\n")
+        value <- yyjsonr::read_ndjson_file(
+          filename = tfname, nprobe = -1, opts = list(
+          str_specials = "special", int64 = "double"))
       }
+
     } else {
-      value <- jsonlite::fromJSON(value)
+      # TODO
+      # value <- jsonlite::fromJSON(value)
+      value <- yyjsonr::read_json_str(value, opts = list(
+        str_specials = "special", int64 = "double"))
     }
 
   }
 
   # data frame
   if (inherits(value, "data.frame")) {
-    #
+
+    # - early exit
+    if (!nrow(value)) return(0L)
+
+    # - generate _id column
     if (is.na(match("_id", names(value)))) {
+
       # if no _id column
       if (!identical(rownames(value),
                      as.character(seq_len(nrow(value))))) {
+
         # use rownames as _id's and remove rownames
         value[["_id"]] <- row.names(value)
-        # row.names(value) <- NULL
+        row.names(value) <- NULL
+
       } else {
+
         # add canonical _id's
         value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
+
       }
     } # if no _id column
-    #
-    if (ncol(value) > 2L ||
-        (ncol(value) == 2L &&
-         !all(sort(names(value)) == c("_id", "json")))) {
+
+    if (!setequal(names(value), c("_id", "json"))) {
       # no json column, thus convert to df with ndjson in json column
       value <- items2ndjson(value)
     }
-    #
+
     if (all(class(value[["_id"]]) %in% "list")) {
-      # in case fromJSON created the _id column as list
+      # in case fromJSON() created the _id column as list
       value[["_id"]] <- unlist(value[["_id"]])
     }
+
   } # if data.frame
 
   # insert data
@@ -598,79 +702,106 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
     on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
     on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
-    # if json in character vector
+    # handle json in character vector
     if ((all(class(value) %in% "character")) &&
-        (length(value)  == 1L) && jsonlite::validate(value)
+        (length(value)  == 1L) &&
+        # TODO # jsonlite::validate(value)
+        yyjsonr::validate_json_str(value)
     ) {
+      # TODO
       # convert to list
-      value <- jsonlite::fromJSON(value, simplifyVector = TRUE)
+      # value <- jsonlite::fromJSON(value, simplifyVector = TRUE)
+      # save as ndjson file
+      yyjsonr::write_ndjson_file(
+        yyjsonr::read_json_str(value, opts = list(str_specials = "special", int64 = "double")),
+        filename = tfname, opts = list(auto_unbox = TRUE))
     }
 
     # handle url
     if (isUrl(value)) {
+      # TODO
       # converts to list
-      value <- jsonlite::stream_in(url(value), verbose = FALSE)
+      # value <- jsonlite::stream_in(url(value), verbose = FALSE)
+      # save as ndjson file
+      cat(readLines(url(value)), file = tfname,sep = "\n")
     }
 
     # handle data frame
-    if (inherits(value, "data.frame") &&
-        is.na(match("_id", names(value))) &&
-        !identical(rownames(value),
-                   as.character(seq_len(nrow(value))))) {
-      # use rownames as _id's and remove rownames
-      value[["_id"]] <- row.names(value)
-      row.names(value) <- NULL
-    }
+    if (inherits(value, "data.frame")) {
 
-    # handle ready-made data frames
-    if (inherits(value, "data.frame") &&
-        identical(names(value),"json") &&
-        all(vapply(value[["json"]], jsonlite::validate,
-                   logical(1L), USE.NAMES = FALSE))) {
-
+      # - early exit
       if (!nrow(value)) return(0L)
 
-      writeLines(
-        text = stringi::stri_replace_all_fixed(
-          str = value[["json"]], pattern = "\n", replacement = "\\n"),
-        con = tfnameCon,
-        sep = "\n",
-        useBytes = TRUE)
+      # - handle row names in data frame
+      if (is.na(match("_id", names(value))) &&
+          !identical(rownames(value),
+                     as.character(seq_len(nrow(value))))) {
+        # use rownames as _id's and remove rownames
+        value[["_id"]] <- row.names(value)
+        row.names(value) <- NULL
+      }
 
-    } else
-
-      # handle ready-made data frames with _id's
-      if (inherits(value, "data.frame") &&
-          identical(names(value), c("_id", "json")) &&
-          all(vapply(value[["json"]], jsonlite::validate,
+      # - handle data frame with json column
+      if ((identical(names(value),"json") ||
+           setequal(names(value), c("_id", "json"))) &&
+          all(vapply(value[["json"]], yyjsonr::validate_json_str, # TODO jsonlite::validate,
                      logical(1L), USE.NAMES = FALSE))) {
 
-        if (!nrow(value)) return(0L)
+        # no id column
+        if (identical(names(value),"json")) {
+          # TODO verify if needed
+          writeLines(
+            text = stringi::stri_replace_all_fixed(
+              str = value[["json"]], pattern = "\n", replacement = "\\n"),
+            con = tfnameCon,
+            sep = "\n",
+            useBytes = TRUE)
 
-        writeLines(
-          text = sprintf(
-            '{"_id":%s, %s',
-            value[["_id"]],
-            # remove any _id's from json
-            gsub("(\"_id\":[^,]+?[,}])|(^[{])", "", value[["json"]])),
-          con = tfnameCon,
-          sep = "\n",
-          useBytes = TRUE)
+        } else {
+
+          # with _id's
+          writeLines(
+            text = sprintf(
+              '{"_id":%s, %s',
+              value[["_id"]],
+              # remove any _id's from json
+              gsub("(\"_id\":[^,]+?[,}])|(^[{])", "", value[["json"]])),
+            con = tfnameCon,
+            sep = "\n",
+            useBytes = TRUE)
+        }
 
       } else {
 
-        if (!length(value) || # testing list
-            (is.character(value) && !nchar(value)) ||
-            (is.data.frame(value)) && !nrow(value)) return(0L)
+        # other data frame
+        yyjsonr::write_ndjson_file(
+          x = value,
+          filename = tfname,
+          opts = list(auto_unbox = TRUE))
 
-        jsonlite::stream_out(
-          jsonlite::fromJSON(
-            jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
-          con = tfnameCon,
-          verbose = FALSE,
-          auto_unbox = TRUE)
+      } # handle data frame with json column
 
-      } # handle ready-made data frames
+    } # handle data frame
+
+    # handle list
+    if (!inherits(value, "data.frame") && is.list(value)) {
+
+      # - early exit
+      if (!length(value) || (is.character(value) && !nchar(value))) return(0L)
+
+      # TODO
+      # jsonlite::stream_out(
+      #   jsonlite::fromJSON(
+      #     jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
+      #   con = tfnameCon,
+      #   verbose = FALSE,
+      #   auto_unbox = TRUE)
+      yyjsonr::write_ndjson_file(
+        x = value,
+        filename = tfname,
+        opts = list(auto_unbox = TRUE))
+
+    } # handle list
 
     # close
     close(tfnameCon)
@@ -736,18 +867,23 @@ isFile <- function(x) {
 
 items2ndjson <- function(df, mergeIdCol = FALSE) {
 
-  # - function takes a data frame or list
-  # - if mergeIdCol, builds ndjson vector from df items
-  # - if not, builds ndjson from columns except _id
-  #   returns data frame with columns _id and json
+  # function takes a data frame or list;
+  # - if mergeIdCol, builds ndjson vector from df items,
+  # - if not, builds ndjson from columns except _id,
+  # returns data frame with columns _id and json
 
   if (!inherits(df, "data.frame") && !inherits(df, "list")) stop()
 
   if (inherits(df, "data.frame")) row.names(df) <- NULL
 
-  if (inherits(df, "list")) df <-
-      jsonlite::fromJSON(
-        jsonlite::toJSON(df, auto_unbox = TRUE, digits = NA))
+  # TODO
+  # if (inherits(df, "list")) df <-
+  #     jsonlite::fromJSON(
+  #       jsonlite::toJSON(df, auto_unbox = TRUE, digits = NA))
+  if (inherits(df, "list")) df <- yyjsonr::read_json_str(
+    yyjsonr::write_json_str(df, opts = list(auto_unbox = TRUE)),
+    opts = list(str_specials = "special", int64 = "double")
+  )
 
   # temporary file and connection
   tfname <- tempfile()
@@ -758,37 +894,61 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
 
   if (mergeIdCol) {
 
-    jsonlite::stream_out(
-      x = df,
-      con = tfnameCon,
-      verbose = FALSE,
-      auto_unbox = TRUE,
-      digits = NA)
+    # TODO
+    # jsonlite::stream_out(
+    #   x = df,
+    #   con = tfnameCon,
+    #   verbose = FALSE,
+    #   auto_unbox = TRUE,
+    #   digits = NA)
+    #
+    # close(tfnameCon)
+    # tfnameCon <- file(tfname, open = "rt")
+    # on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+    #
+    # return(readLines(tfnameCon))
 
-    close(tfnameCon)
-    tfnameCon <- file(tfname, open = "rt")
-    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-
-    return(readLines(tfnameCon))
+    return(
+      readLines(
+        con = textConnection(
+          yyjsonr::write_ndjson_str(
+            df, opts = list(auto_unbox = TRUE))
+        ))
+    )
 
   } else {
 
-    jsonlite::stream_out(
-      x = df[, -match("_id", names(df)), drop = FALSE],
-      con = tfnameCon,
-      verbose = FALSE,
-      auto_unbox = TRUE,
-      digits = NA)
-
-    close(tfnameCon)
-    tfnameCon <- file(tfname, open = "rt")
-    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+    # TODO
+    # jsonlite::stream_out(
+    #   x = df[, -match("_id", names(df)), drop = FALSE],
+    #   con = tfnameCon,
+    #   verbose = FALSE,
+    #   auto_unbox = TRUE,
+    #   pagesize = 1000L,
+    #   digits = NA)
+    #
+    # close(tfnameCon)
+    # tfnameCon <- file(tfname, open = "rt")
+    # on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+    #
+    # return(
+    #   data.frame(
+    #     "_id" = df[["_id"]],
+    #     "json" = readLines(tfnameCon),
+    #     check.names = FALSE
+    #   ))
 
     return(
       data.frame(
         "_id" = df[["_id"]],
-        "json" = readLines(tfnameCon),
+        "json" = readLines(
+          con = textConnection(
+            yyjsonr::write_ndjson_str(
+              df[, -match("_id", names(df)), drop = FALSE],
+              opts = list(auto_unbox = TRUE)
+            ))),
         check.names = FALSE
       ))
+
   }
 }

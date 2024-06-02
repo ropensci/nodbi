@@ -413,17 +413,23 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     # if value contains id's, split rows into documents of a vector
     row.names(value) <- NULL
     if (any(names(value) == "_id")) {
-      value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+      # TODO
+      # value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+      value <- yyjsonr::write_json_str(value, dataframe = "rows", opts = list(auto_unbox = TRUE))
       value <- jqr::jq(value, " .[] ")
     } else {
       # otherwise keep as single document
-      value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
+      # TODO
+      # value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
+      value <- yyjsonr::write_json_str(value, dataframe = "columns", opts = list(auto_unbox = TRUE))
     }
   }
 
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+    # TODO
+    # value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+    value <- yyjsonr::write_json_str(value, dataframe = "rows", opts = list(auto_unbox = TRUE))
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
@@ -581,7 +587,8 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) && jsonlite::validate(value)) {
+      is.character(value) && yyjsonr::validate_json_str(value) # TODO jsonlite::validate(value))
+  ) {
     # check format
     if (all(jqr::jq(value, " .[] | type ") == '"array"') && length(jqr::jq(value, " .[] ")) > 1L) stop(
       "Require JSON string that is an array of documents, not a set of fields that are arrays."
@@ -596,17 +603,23 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     # if value contains id's, split rows into documents of a vector
     row.names(value) <- NULL
     if (any(names(value) == "_id")) {
-      value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+      # TODO
+      # value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
+      value <- yyjsonr::write_json_str(value, dataframe = "rows", opts = list(auto_unbox = TRUE))
       value <- jqr::jq(value, " .[] ")
     } else {
       # otherwise keep as single document
-      value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
+      # TODO
+      # value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
+      value <- yyjsonr::write_json_str(value, dataframe = "columns", opts = list(auto_unbox = TRUE))
     }
   }
 
   # list to json
   if (all(class(value) %in% "list")) {
-    value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    # TODO
+    # value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+    value <- yyjsonr::write_json_str(value, opts = list(auto_unbox = TRUE))
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")

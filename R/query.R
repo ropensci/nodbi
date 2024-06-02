@@ -519,9 +519,9 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
                key = key.replace(/^[.]/, '');
                emit(key, 1);
       }}}}",
-      reduce = "function(i) {return i}",
-      query = query,
-      limit = n
+        reduce = "function(i) {return i}",
+        query = query,
+        limit = n
       )[["_id"]]}, silent = TRUE)
 
     # alternative approach, e.g. if
@@ -545,6 +545,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
         # selective export using find
         src$con$find(
           query = query, fields = '{}', limit = n,
+          # cannot use yyjsonr as this cannot use a file connection
           handler = function(x) jsonlite::stream_out(x, con = con, verbose = FALSE),
           pagesize = 100L)
 
@@ -640,9 +641,17 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   # - excludes
   return(
     processExcludeFields(
-      jsonlite::stream_in(
-        file(tfname),
-        verbose = FALSE),
+      # TODO
+      # jsonlite::stream_in(
+      #   file(tfname),
+      #   verbose = FALSE),
+      yyjsonr::read_ndjson_file(
+        filename = tfname,
+        nprobe = -1,
+        opts = list(
+          str_specials = "special",
+          int64 = "double")
+      ),
       fldQ$excludeFields)
   )
 
@@ -750,9 +759,9 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
   }  else {
 
-      # - have to write all json
-      fldQ$composeJson <-
-        'json(\'{"_id":"\' || _id || \'", \' || LTRIM(json(json), \'{\'))'
+    # - have to write all json
+    fldQ$composeJson <-
+      'json(\'{"_id":"\' || _id || \'", \' || LTRIM(json(json), \'{\'))'
 
   }
 
@@ -1385,7 +1394,7 @@ processDbGetQuery <- function(
     eval.parent(parse(text = 'if (exists("query")) message("\nDB: ", query, "\n")'))
   }
 
-  # temporary file and connection
+  # temporary file
   tfname <- tempfile()
   on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
@@ -1395,11 +1404,19 @@ processDbGetQuery <- function(
   # process and early exit
   if (!length(jqrWhere) &&
       !length(includeFields) &&
-      !length(excludeFields)) return(
-        jsonlite::stream_in(
-          textConnection(
-            eval.parent(parse(text = getData))),
-          verbose = FALSE))
+      !length(excludeFields)) {
+
+    return(
+      # TODO
+      # jsonlite::stream_in(
+      #   textConnection(
+      #     eval.parent(parse(text = getData))),
+      #   verbose = FALSE))
+      yyjsonr::read_ndjson_str(
+        paste0(eval.parent(parse(text = getData)), collapse = "\n"),
+        nprobe = -1, opts = list(str_specials = "special", int64 = "double"))
+    )
+  }
 
   # write out
   writeLines(
@@ -1427,11 +1444,31 @@ processDbGetQuery <- function(
 
     # process
     if (!length(includeFields) &&
-        !length(excludeFields)) return(
-          jsonlite::stream_in(
-            textConnection(
-              jqr::jq(file(tfname), jqrWhere)),
-            verbose = FALSE))
+        !length(excludeFields)) {
+
+      # # # temporary file and connection
+      # ofname <- tempfile()
+      # on.exit(try(unlink(ofname), silent = TRUE), add = TRUE)
+      # jqr::jq(file(tfname), jqrWhere, out = ofname)
+
+      return(
+        # TODO
+        # jsonlite::stream_in(
+        #   textConnection(
+        #     jqr::jq(file(tfname), jqrWhere)),
+        #   verbose = FALSE)
+        #
+        # yyjsonr::read_ndjson_file(
+        #   filename = ofname,
+        #   opts = list(str_specials = "special", int64 = "double"))
+        #
+        yyjsonr::read_ndjson_str(
+          paste0(jqr::jq(file(tfname), jqrWhere), collapse = "\n"),
+          nprobe = -1, opts = list(str_specials = "special", int64 = "double")
+        )
+
+      )
+    }
 
     # get another file name
     tjname <- tempfile()
@@ -1487,12 +1524,22 @@ processDbGetQuery <- function(
   #### .jq excludeFields ####
   if (length(excludeFields)) {
 
+    # TODO
     # process
+    # return(
+    #   processExcludeFields(
+    #     jsonlite::stream_in(
+    #       file(tfname),
+    #       verbose = FALSE),
+    #     excludeFields)
+    # )
+
     return(
       processExcludeFields(
-        jsonlite::stream_in(
-          file(tfname),
-          verbose = FALSE),
+        yyjsonr::read_ndjson_file(
+          filename = tfname,
+          nprobe = -1,
+          opts = list(str_specials = "special", int64 = "double")),
         excludeFields)
     )
 
@@ -1656,12 +1703,30 @@ processIncludeFields <- function(
     message("JQ processOutput: ", jqFields, "\n")
   }
 
+  # TODO
   # early return
-  if (is.null(tjname)) return(
-    jsonlite::stream_in(
-      textConnection(
-        jqr::jq(file(tfname), jqFields)),
-      verbose = FALSE))
+  # if (is.null(tjname)) return(
+  #   jsonlite::stream_in(
+  #     textConnection(
+  #       jqr::jq(file(tfname), jqFields)),
+  #     verbose = FALSE))
+
+  # early return
+  if (is.null(tjname)) {
+
+    # temporary file
+    tjname <- tempfile()
+    on.exit(try(unlink(tjname), silent = TRUE), add = TRUE)
+
+    jqr::jq(file(tfname), jqFields, out = tjname)
+
+    return(
+      yyjsonr::read_ndjson_file(
+        filename = tjname,
+        nprobe = -1,
+        opts = list(str_specials = "special", int64 = "double"))
+    )
+  }
 
   # write data for further processing
   jqr::jq(

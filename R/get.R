@@ -43,20 +43,44 @@ docdb_get <- function(src, key, limit = NULL, ...) {
 #' @export
 docdb_get.src_couchdb <- function(src, key, limit = NULL, ...) {
 
-  jsonlite::fromJSON(
-    # get data
-    sofa::db_alldocs(
-      cushion = src$con,
-      dbname = key,
-      as = "json",
-      include_docs = TRUE,
-      # sorting may not work
-      descending = FALSE,
-      limit = limit
-      # keep only data
-    ))[["rows"]][["doc"]][
+  # temporary file and connection
+  tfname <- tempfile()
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+
+  # get data
+  sofa::db_alldocs(
+    cushion = src$con,
+    dbname = key,
+    as = "json",
+    include_docs = TRUE,
+    descending = FALSE,
+    limit = limit,
+    disk = tfname)
+
+  # TODO
+  # jq throws stack protection error
+  # jqr::jq(
+  #   file(tfname),
+  #   # keep only data
+  #   ' .rows[] | .doc | del(._rev) ',
+  #   out = toname)
+  #
+  # options(expressions = 500000)
+  # options()[["expressions"]] # 5000
+  # Cstack_info()
+  #
+  # return(
+  #   yyjsonr::read_ndjson_file(
+  #     filename = tfname, nprobe = -1, opts = list(
+  #       str_specials = "special", int64 = "double")
+  #   )
+  # )
+
+  return(
+    jsonlite::fromJSON(file(tfname))[["rows"]][["doc"]][
       # remove _rev column
       , -2, drop = FALSE]
+  )
 
 }
 
@@ -69,7 +93,8 @@ docdb_get.src_elastic <- function(src, key, limit = NULL, ...) {
   # get all _id's
   docids <- elastic::Search(
     conn = src$con, index = key, source = FALSE,
-    size = limit, ...)[["hits"]][["hits"]]
+    size = limit,
+    ...)[["hits"]][["hits"]]
 
   # process id's
   if (!length(docids)) return(NULL)
@@ -80,17 +105,27 @@ docdb_get.src_elastic <- function(src, key, limit = NULL, ...) {
   # get results
   if (length(docids) == 1L) {
     result <- elastic::docs_get(
-      conn = src$con, index = key, id = docids, raw = FALSE,
+      conn = src$con, index = key, id = docids[1], raw = FALSE,
       verbose = FALSE, ...)
-    result <- c("_id" = docids, result[["_source"]])
-    result <- jsonlite::fromJSON(jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA))
+    result <- c("_id" = docids[1], result[["_source"]])
+    # TODO
+    # result <- jsonlite::fromJSON(jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA))
+    result <- yyjsonr::read_json_str(
+      yyjsonr::write_json_str(result, opts = list(auto_unbox = TRUE)),
+      opts = list(str_specials = "special", int64 = "double")
+    )
     result <- data.frame(t(result), stringsAsFactors = FALSE, check.names = FALSE)
   } else {
     result <- elastic::docs_mget(
       src$con, index = key, ids = docids,
       verbose = FALSE, ...)[["docs"]]
     result <- lapply(result, function(i) c("_id" = i[["_id"]], i[["_source"]]))
-    result <- jsonlite::fromJSON(jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA))
+    # TODO
+    # result <- jsonlite::fromJSON(jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA))
+    result <- yyjsonr::read_json_str(
+      yyjsonr::write_json_str(result, opts = list(auto_unbox = TRUE)),
+      opts = list(str_specials = "special", int64 = "double")
+    )
   }
 
   # output
@@ -165,24 +200,51 @@ sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
   on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
   on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
+  # TODO
   # get data, write to file in ndjson format
-  writeLines(
+  # writeLines(
+  #   stringi::stri_replace_all_fixed(
+  #     str = paste0(
+  #       "", # protect against empty query result
+  #       stats::na.omit(  # eliminate rows without json
+  #         DBI::dbGetQuery(
+  #           conn = src$con,
+  #           statement = statement,
+  #           n = n)[["json"]])),
+  #     pattern = "\n",
+  #     replacement = "\\n"),
+  #   con = tfnameCon,
+  #   sep = "\n",
+  #   useBytes = TRUE)
+  # close(tfnameCon)
+  #
+  # # stream in ndjson records
+  # return(jsonlite::stream_in(file(tfname), verbose = FALSE))
+
+  # TODO
+  # get data, write to file in ndjson format
+  res <- try(writeLines(
     stringi::stri_replace_all_fixed(
-      str = paste0(
-        "", # protect against empty query result
-        stats::na.omit(  # eliminate rows without json
-          DBI::dbGetQuery(
-            conn = src$con,
-            statement = statement,
-            n = n)[["json"]])),
+      DBI::dbGetQuery(
+        conn = src$con,
+        statement = statement,
+        n = n)[["json"]],
       pattern = "\n",
       replacement = "\\n"),
     con = tfnameCon,
     sep = "\n",
-    useBytes = TRUE)
+    useBytes = TRUE), silent = TRUE)
   close(tfnameCon)
 
+  if (inherits(res, "try-error") |
+      file.size(tfname) <= 2L) return(NULL)
+
   # stream in ndjson records
-  return(jsonlite::stream_in(file(tfname), verbose = FALSE))
+  return(
+    yyjsonr::read_ndjson_file(
+      filename = tfname, nprobe = -1, opts =
+        list(str_specials = "special", int64 = "double")
+    )
+  )
 
 }
