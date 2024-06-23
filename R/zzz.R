@@ -252,6 +252,9 @@ digestFields <- function(f, q) {
   queryFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     sqlQ, '"([-@._\\w]+?)"')[[1]][, 2, drop = TRUE]))
 
+  if (!length(queryFields) & q != "{}") stop(
+    "Parameter 'query' did not reference any fields:\n", q)
+
   queryRootFields <- gsub("[.].*", "", queryFields)
 
   queryPaths <- character(0L)
