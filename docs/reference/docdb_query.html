@@ -91,7 +91,8 @@ a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 <dd><p>(character) A JSON query string, see examples.
 Can use comparisons / tests (<code>$lt</code>, <code>$lte</code>, <code>$gt</code>, <code>$gte</code>,
 <code>$ne</code>, <code>$in</code>, <code>$regex</code>), with logic operators (<code>$and</code>,
-<code>$or</code>, <code>(</code>, <code>)</code>), including nested queries, see examples.</p></dd>
+<code>$or</code>, <code>(</code>, <code>)</code>), including nested queries, see examples.
+<code>$regex</code> is case-sensitive.</p></dd>
 
 
 <dt>...</dt>
@@ -141,7 +142,6 @@ the example.</p>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"mpg":21}'</span>, fields <span class="op">=</span> <span class="st">'{"_id":0, "mpg":1, "cyl":1}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"_id": {"$regex": "^.+0.*$"}}'</span>, fields <span class="op">=</span> <span class="st">'{"gear": 1}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># complex query, not supported for src_elastic and src_couchdb backends at this time:</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">docdb_query</span><span class="op">(</span><span class="va">src</span>, <span class="st">"myKey"</span>, query <span class="op">=</span> <span class="st">'{}'</span>, fields <span class="op">=</span> <span class="st">'{"_id":0, "mpg":1, "cyl":1}'</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

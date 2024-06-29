@@ -371,6 +371,8 @@ digestFields <- function(f, q) {
   }
 
   queryJq <- gsub(" ==* ", " == ", queryJq) # important
+  # https://jqlang.github.io/jq/manual/#test
+  # https://jqlang.github.io/jq/manual/#regular-expressions
   queryJq <- gsub("REGEXP \"(.+?)\"", '| test("\\1")', queryJq)
   queryJq <- gsub("( AND | NOT | OR )", "\\L\\1", queryJq, perl = TRUE)
 

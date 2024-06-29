@@ -19,7 +19,8 @@ a table name for DuckDB, SQLite and PostgreSQL)}
 \item{query}{(character) A JSON query string, see examples.
 Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
 \verb{$ne}, \verb{$in}, \verb{$regex}), with logic operators (\verb{$and},
-\verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.}
+\verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.
+\verb{$regex} is case-sensitive.}
 
 \item{...}{Optional parameters:
 \itemize{
@@ -68,7 +69,6 @@ docdb_query(src, "myKey", query = '{"mpg":21, "gear": {"$lte": 4}}')
 docdb_query(src, "myKey", query = '{"mpg":21}', fields = '{"_id":0, "mpg":1, "cyl":1}')
 docdb_query(src, "myKey", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
 
-# complex query, not supported for src_elastic and src_couchdb backends at this time:
 docdb_query(src, "myKey", query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}')
 docdb_query(src, "myKey", query = '{}', fields = '{"_id":0, "mpg":1, "cyl":1}')
 

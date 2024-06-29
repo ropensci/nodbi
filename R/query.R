@@ -11,6 +11,7 @@
 #'  Can use comparisons / tests (`$lt`, `$lte`, `$gt`, `$gte`,
 #'  `$ne`, `$in`, `$regex`), with logic operators (`$and`,
 #'  `$or`, `(`, `)`), including nested queries, see examples.
+#'  `$regex` is case-sensitive.
 #'
 #' @param ... Optional parameters:
 #'
@@ -53,7 +54,6 @@
 #' docdb_query(src, "myKey", query = '{"mpg":21}', fields = '{"_id":0, "mpg":1, "cyl":1}')
 #' docdb_query(src, "myKey", query = '{"_id": {"$regex": "^.+0.*$"}}', fields = '{"gear": 1}')
 #'
-#' # complex query, not supported for src_elastic and src_couchdb backends at this time:
 #' docdb_query(src, "myKey", query = '{"$and": [{"mpg": {"$lte": 18}}, {"gear": {"$gt": 3}}]}')
 #' docdb_query(src, "myKey", query = '{}', fields = '{"_id":0, "mpg":1, "cyl":1}')
 #'
@@ -805,6 +805,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       ii <- stringi::stri_split_regex(ii, ifelse(isString, "', ", ", "))[[1]]
       ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "")
 
+      # https://sqlite.org/src/file?filename=ext/misc/regexp.c
       ii <- paste0("\"$.", i, "\") REGEXP '", paste0(ii, collapse = "|"), "'")
       fldQ$queryCondition <- stringi::stri_replace_all_fixed(
         fldQ$queryCondition, ins, ii, vectorize_all = TRUE
@@ -1018,14 +1019,16 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
     }
 
     # special case REGEXP
+    # https://www.postgresql.org/docs/current/functions-matching.html#FUNCTIONS-POSIX-REGEXP
     fldQ$queryCondition <- gsub(
       paste0(i, '" REGEXP '),
-      paste0(i, '" like_regex '),
+      paste0(i, '" ~ '),
       fldQ$queryCondition)
 
   }
 
   # - mangle _id in query, since this does not use jsonb_path_exists syntax
+  #   https://www.postgresql.org/docs/current/functions-matching.html#FUNCTIONS-POSIX-REGEXP
   fldQ$queryCondition <- gsub('"_id" REGEXP ', '"_id" ~ ', fldQ$queryCondition)
   fldQ$queryCondition <- gsub('"_id" (~|!=|<=|>=|<>|=)=? "(.+?)"',
                               "\"_id\" \\1 '\\2'", fldQ$queryCondition)
@@ -1220,6 +1223,8 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
         # for ARRAY elements, strings (have to be in double quotes)
         if (i != "_id") ii <- gsub("\\^|\\$", '"', ii)
 
+        # https://duckdb.org/docs/sql/functions/regular_expressions.html#regexp_matchesstring-pattern-options
+        # https://duckdb.org/docs/sql/functions/regular_expressions.html#options-for-regular-expression-functions
         ii <- paste0("regexp_matches(", i, ", '", ii, "')")
 
         fldQ$queryCondition <- stringi::stri_replace_all_fixed(

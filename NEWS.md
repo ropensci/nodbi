@@ -1,12 +1,12 @@
 # nodbi 0.10.4.9000
 
 ## Bug fix
-* invalid query JSON in `docdb_delete()` does not risk deleting database
-* make sure some information is printed for MongoDB connection object
-* stop if query does not relate to any fields
+* stop if query is invalid even though JSON is valid JSON 
+* print information also for MongoDB connection object
 
 ## Changes
 * code cleaning, parameters checking
+* document that `$regex` in `docdb_query()` is case-sensitive
 
 # nodbi 0.10.4
 

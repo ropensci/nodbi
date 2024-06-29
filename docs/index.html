@@ -88,38 +88,38 @@
 <col width="33%">
 <col width="33%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th align="left">Currently, <code>nodbi</code> supports<br>as database backends</th>
 <th align="left">for an <code>R</code> object of any<br>of these data types</th>
 <th align="left">for these operations</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left">MongoDB</td>
 <td align="left">data.frame</td>
 <td align="left">List, Exists</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">SQLite</td>
 <td align="left">list</td>
 <td align="left">Create</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">PostgreSQL</td>
 <td align="left">JSON string</td>
 <td align="left">Get</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">DuckDB</td>
 <td align="left">file name of NDJSON records</td>
 <td align="left">Query</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">Elasticsearch</td>
 <td align="left">URL of NDJSON records</td>
 <td align="left">Update</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">CouchDB</td>
 <td align="left"></td>
 <td align="left">Delete</td>
@@ -136,53 +136,53 @@
 <col width="50%">
 <col width="50%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th align="left">Purpose</th>
 <th align="left">Function call</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left">Create database connection (see below)</td>
 <td align="left"><code>src &lt;- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(&lt;see below for parameters&gt;)</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">Load <code>my_data</code> (a data frame, list, JSON string, or file name or URL pointing to NDJSON records) into database, container <code>my_container</code>
 </td>
 <td align="left"><code>nodbi::docdb_create(src = src, key = "my_container", value = my_data)</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">Get all documents back into a data frame</td>
 <td align="left"><code>nodbi::docdb_get(src = src, key = "my_container")</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">Get documents selected with query (as MongoDB-compatible JSON) into a data frame</td>
 <td align="left"><code>nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">Get selected fields (in MongoDB compatible JSON) from documents selected by query into a data frame</td>
 <td align="left"><code>nodbi::docdb_query(src = src, key = "my_container", query = '{"age": {"$gt": 20}}', fields = '{"friends.name": 1, "_id": 0, "age": 1}', limit = 2L)</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">Update (patch) documents selected by query with new data <code>my_data</code> (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records)</td>
 <td align="left"><code>nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">Check if container exists</td>
 <td align="left"><code>nodbi::docdb_exists(src = src, key = "my_container")</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">List all containers in database</td>
 <td align="left"><code>nodbi::docdb_list(src = src)</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">Delete document(s) in container</td>
 <td align="left"><code>nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left">Delete container</td>
 <td align="left"><code>nodbi::docdb_delete(src = src, key = "my_container")</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left">Close and remove database connection manually (when restarting R, connections are automatically closed and removed by <code>nodbi</code>)</td>
 <td align="left"><code>rm(src)</code></td>
 </tr>
