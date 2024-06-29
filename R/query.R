@@ -1022,7 +1022,7 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
     # https://www.postgresql.org/docs/current/functions-matching.html#FUNCTIONS-POSIX-REGEXP
     fldQ$queryCondition <- gsub(
       paste0(i, '" REGEXP '),
-      paste0(i, '" ~ '),
+      paste0(i, '" LIKE_REGEX '),
       fldQ$queryCondition)
 
   }
