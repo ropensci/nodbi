@@ -1,0 +1,7 @@
+  Running ‘tinytest.R’
+
+See
+  ‘/Users/ralfherold/Daten/mak/r/emea/nodbi/revdep/ctrdata.Rcheck/00check.log’
+for details.
+
+
