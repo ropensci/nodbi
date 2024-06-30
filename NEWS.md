@@ -1,7 +1,7 @@
-# nodbi 0.10.4.9000
+# nodbi 0.10.5
 
 ## Bug fix
-* stop if query is invalid even though JSON is valid JSON 
+* stop if query is invalid even though JSON is valid 
 * print information also for MongoDB connection object
 
 ## Changes

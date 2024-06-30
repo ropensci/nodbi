@@ -47,7 +47,7 @@ in dot path notation.
 }
 \description{
 Complements the databases' native query and filtering functions
-by using \link{jqr}.
+by using \code{\link[jqr:jqr]{jqr::jqr()}}.
 If \code{query = "{}"} and neither \code{fields}
 nor \code{listfields} is specified, runs \code{\link[=docdb_get]{docdb_get()}}.
 }

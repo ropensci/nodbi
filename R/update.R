@@ -10,7 +10,7 @@
 #' SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`),
 #' Elasticsearch (`elastic::docs_bulk_update()`);
 #' a `plpgsql` function added when calling `src_postgres()`,
-#' and a [jqr] programme for CouchDB.
+#' and a [jqr::jqr()] programme for CouchDB.
 #'
 #' @inheritParams docdb_create
 #'

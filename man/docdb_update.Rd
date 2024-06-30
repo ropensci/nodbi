@@ -44,7 +44,7 @@ Uses native functions in MongoDB (\code{\link[mongolite:mongo]{mongolite::mongo(
 SQLite (\code{jsonb_update()}), DuckDB (\code{jsonb_merge_patch()}),
 Elasticsearch (\code{elastic::docs_bulk_update()});
 a \code{plpgsql} function added when calling \code{src_postgres()},
-and a \link{jqr} programme for CouchDB.
+and a \code{\link[jqr:jqr]{jqr::jqr()}} programme for CouchDB.
 }
 \examples{
 \dontrun{

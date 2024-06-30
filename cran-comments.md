@@ -2,9 +2,9 @@
 
 * Local: R Under development (unstable) (2024-02-23 r85975) using platform: x86_64-apple-darwin20; with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB (ok)
 
-* macOS builder: r-release-macosx-arm64|4.3.0|macosx|macOS 13.3.1 (22E261)|Mac mini|Apple M1||en_US.UTF-8|macOS 11.3|clang-1403.0.22.14.1|GNU Fortran (GCC) 12.2.0 (ok)
+* Win-builder: R version 4.4.1 (2024-06-14 ucrt) using platform: x86_64-w64-mingw32; R version 4.3.3 (2024-02-29 ucrt) using platform: x86_64-w64-mingw32 (64-bit); R Under development (unstable) (2024-06-29 r86852 ucrt) using platform: x86_64-w64-mingw32 (ok)
 
-* Win-builder: R Under development (unstable) (2024-03-03 r86036 ucrt) using platform: x86_64-w64-mingw32; R version 4.2.3 (2023-03-15 ucrt) using platform: x86_64-w64-mingw32 (64-bit); R version 4.3.3 (2024-02-29 ucrt) using platform: x86_64-w64-mingw32 (64-bit) (ok)
+* GitHub actions: windows-2022, r: 'release'; macOS-latest, r: 'release'; ubuntu-latest, r: 'oldrel-1'; ubuntu-latest, r: 'devel' (ok)
 
 
 ## R CMD check results
@@ -14,15 +14,13 @@
 
 ## Submission reason
 
-* re-adding field formatting for `docdb_query(src, key, query, listfields = TRUE, limit = <integer>)`
+* stop if query is invalid even though JSON is valid 
+* code cleaning, more parameters checks, docs update
 
 
-## revdepcheck results
+## Reverse dependency check results
 
-We checked 2 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
-
- * We saw 0 new problems
- * We failed to check 0 packages
+In total checked two reverse dependencies, no problems. 
 
 
 --------

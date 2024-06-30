@@ -1,7 +1,7 @@
 #' Get documents or parts with filtering query
 #'
 #' Complements the databases' native query and filtering functions
-#' by using [jqr].
+#' by using [jqr::jqr()].
 #' If \code{query = "{}"} and neither `fields`
 #' nor `listfields` is specified, runs [docdb_get()].
 #'
