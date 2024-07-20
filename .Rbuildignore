@@ -20,3 +20,4 @@ man-roxygen
 ^CRAN-SUBMISSION$
 ^docs
 \.vscode
+_pkhdown.yml
