@@ -363,7 +363,7 @@ digestFields <- function(f, q) {
              # no extra bracket here
              "( AND | NOT | OR |\\)*$)"),
       paste0(" (\\$f | with_entries(select( .key | match( \"^",
-             gsub('"[.]"', "#[0-9]+#", i),
+             gsub('"[.]"', "#[0-9]*#?", i),
              "\" ))) | map(select(. $2 )) | any ) $3"),
       vectorize_all = FALSE
     )
