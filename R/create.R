@@ -419,7 +419,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   result <- try(
     # dbAppendTable() uses transactions
     # since RSQLite 2.2.2 (2021-01-04)
-    RSQLite::dbAppendTable(
+    DBI::dbAppendTable(
       conn = src$con,
       name = key,
       # canonical value: a data frame
