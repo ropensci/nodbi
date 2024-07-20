@@ -1,0 +1,7 @@
+template:
+  bootstrap: 5
+  opengraph:
+    twitter:
+      creator: "@rfhb"
+      card: summary_large_image
+url: https://docs.ropensci.org/nodbi/
