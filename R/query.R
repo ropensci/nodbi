@@ -456,7 +456,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
 
     # $exists matches the documents that contain the field,
     # including documents where the field value is null
-    tf <- unique(c(fldQ$queryRootFields, fldQ$includeRootFields))
+    tf <- unique(c(fldQ$queryFields, fldQ$includeFields))
     addQuery <- paste0("{", paste0(
       '"', tf[tf != "_id"],
       '":{"$exists":true, "$ne": []}'), "}", collapse = ",")
