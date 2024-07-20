@@ -1,6 +1,7 @@
 # nodbi 0.10.5.9000
 
-* new development version
+## Bug fix
+* make `docdb_query()` work for cases when flattened dot path notation has no counts between fields
 
 # nodbi 0.10.5
 

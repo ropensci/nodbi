@@ -13,7 +13,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2024-06-23.
+updated 2024-07-20.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 |:---|:---|:---|
@@ -365,33 +365,39 @@ Every database backend is subjected to identical tests, see
 [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R).
 
 ``` r
-# 2024-03-04
-tmp <- testthat::test_local()
-# [...]
+# 2024-07-20
+suppressMessages(testthat::test_local())
+# ✔ | F W  S  OK | Context
+# ✔ |      2 172 | couchdb [116.9s]                                                                              
+# ✔ |      1 171 | duckdb [7.7s]                                                                                 
+# ✔ |      2 170 | elastic [97.9s]                                                                               
+# ✔ |      2 170 | mongodb [8.1s]                                                                                
+# ✔ |        173 | postgres [12.6s]                                                                              
+# ✔ |        174 | sqlite [10.0s]                                                                                
 # 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════════════════════
-# Duration: 344.5 s
+# ══ Results ═════════════════════════════════════════════════════════════════════════
+# Duration: 253.6 s
 # 
-# ── Skipped tests (7) ───────────────────────────────────────────────────────────────────────────────────
-# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,
-#   test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3,
+# ── Skipped tests (7) ───────────────────────────────────────────────────────────────
+# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, 
 #   test-elastic.R:21:3, test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, 
+#   test-duckdb.R:22:3, test-elastic.R:21:3, test-mongodb.R:24:3
 # 
-# [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1018 ]
+# [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1030 ]
 
-# 2024-05-04
+# 2024-07-20
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 95.52%
+# nodbi Coverage: 94.88%
 # R/src_duckdb.R: 76.92%
-# R/src_mongo.R: 91.30%
+# R/src_mongo.R: 92.31%
 # R/update.R: 92.95%
-# R/zzz.R: 94.77%
+# R/zzz.R: 93.55%
+# R/query.R: 94.74%
 # R/src_postgres.R: 95.65%
-# R/create.R: 96.09%
-# R/query.R: 96.32%
-# R/delete.R: 97.96%
+# R/create.R: 96.12%
 # R/get.R: 98.77%
+# R/delete.R: 98.96%
 # R/exists.R: 100.00%
 # R/list.R: 100.00%
 # R/src_couchdb.R: 100.00%
