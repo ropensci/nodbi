@@ -668,6 +668,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
             jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
           con = tfnameCon,
           verbose = FALSE,
+          pagesize = 5000L,
           auto_unbox = TRUE)
 
       } # handle ready-made data frames
@@ -763,6 +764,7 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       con = tfnameCon,
       verbose = FALSE,
       auto_unbox = TRUE,
+      pagesize = 5000L,
       digits = NA)
 
     close(tfnameCon)
@@ -778,6 +780,7 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       con = tfnameCon,
       verbose = FALSE,
       auto_unbox = TRUE,
+      pagesize = 5000L,
       digits = NA)
 
     close(tfnameCon)
