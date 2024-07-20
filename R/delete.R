@@ -162,7 +162,7 @@ sqlDelete <- function(src, key, ...) {
   # if valid query, delete document(s), not table
   if (!is.null(tmpdots$query)) {
 
-    # get _id's of document to be deleted
+    # get _id's of document(s) to be deleted
     tmpids <- docdb_query(
       src = src,
       key = key,
@@ -175,28 +175,30 @@ sqlDelete <- function(src, key, ...) {
       paste0("'", tmpids, "'", collapse = ","), ");")
 
     # do delete
-    return(docdb_exists(src, key) &&
-             as.logical(
-               DBI::dbWithTransaction(
-                 conn = src$con,
-                 code = {
-                   DBI::dbExecute(
-                     conn = src$con,
-                     statement = statement)
-                 })))
+    return(
+      docdb_exists(src, key) &&
+        as.logical(
+          DBI::dbWithTransaction(
+            conn = src$con,
+            code = {
+              DBI::dbExecute(
+                conn = src$con,
+                statement = statement)
+            })))
 
   } else {
 
-    return(docdb_exists(src, key) &&
-             # remove table
-             as.logical(
-               DBI::dbWithTransaction(
-                 conn = src$con,
-                 code = {
-                   DBI::dbRemoveTable(
-                     conn = src$con,
-                     name = key)
-                 })))
+    return(
+      docdb_exists(src, key) &&
+        # remove table
+        as.logical(
+          DBI::dbWithTransaction(
+            conn = src$con,
+            code = {
+              DBI::dbRemoveTable(
+                conn = src$con,
+                name = key)
+            })))
 
   }
 

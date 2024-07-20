@@ -6,7 +6,7 @@
 Sys.unsetenv("LANG")
 
 # test verbose messages
-options(verbose = TRUE)
+# options(verbose = TRUE)
 
 # for interactive testing:
 # devtools::load_all()
