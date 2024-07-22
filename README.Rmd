@@ -336,12 +336,12 @@ Every database backend is subjected to identical tests, see [core-nodbi.R](https
 # 2024-07-20
 suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
-# ✔ |      2 172 | couchdb [116.9s]                                                                              
-# ✔ |      1 171 | duckdb [7.7s]                                                                                 
-# ✔ |      2 170 | elastic [97.9s]                                                                               
-# ✔ |      2 170 | mongodb [8.1s]                                                                                
-# ✔ |        173 | postgres [12.6s]                                                                              
-# ✔ |        174 | sqlite [10.0s]                                                                                
+# ✔ |      2 172 | couchdb [116.9s]
+# ✔ |      1 171 | duckdb [7.7s]
+# ✔ |      2 170 | elastic [97.9s]
+# ✔ |      2 170 | mongodb [8.1s]
+# ✔ |        173 | postgres [12.6s]
+# ✔ |        174 | sqlite [10.0s]
 # 
 # ══ Results ═════════════════════════════════════════════════════════════════════════
 # Duration: 253.6 s

@@ -302,6 +302,8 @@ digestFields <- function(f, q) {
 
   # translate mongo query into jq script to filter and select:
 
+  # TODO new
+
   # {"$or": [{"rows.elements.status": "OK"},
   # {"$and": [{"age": {"$gt": 21}},
   #           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}
@@ -344,17 +346,45 @@ digestFields <- function(f, q) {
       # recompose
       xtr <- paste0(" . == ", xtr, collapse = " or ")
 
+      # # insert
+      # queryJq <- stringi::stri_replace_all_regex(
+      #   queryJq,
+      #   paste0("(\"", i, "\") IN (\\(.+?\\))", # brackets for IN
+      #          "( AND | NOT | OR |\\)*$)"),
+      #   paste0(" (\\$f | with_entries(select( .key | match( \"^",
+      #          gsub('"[.]"', "#[0-9]+#", i),
+      #          "\" ))) | map(select(", xtr, ")) | any ) $3"),
+      #   vectorize_all = FALSE
+      # )
+
+      # TODO new
+
       # insert
       queryJq <- stringi::stri_replace_all_regex(
         queryJq,
         paste0("(\"", i, "\") IN (\\(.+?\\))", # brackets for IN
                "( AND | NOT | OR |\\)*$)"),
-        paste0(" (\\$f | with_entries(select( .key | match( \"^",
-               gsub('"[.]"', "#[0-9]+#", i),
-               "\" ))) | map(select(", xtr, ")) | any ) $3"),
+        # select([ .friends | m1 | .id | m1 ] | map ( . > 1 ) | any )
+        paste0(" ([ .", gsub('"[.]"', " | m1 | .", i), " ] ",
+               "| map( . | m1 | ", xtr, " ) | any ) $3"),
         vectorize_all = FALSE
       )
+
     }
+
+    # # - default operator handling
+    # queryJq <- stringi::stri_replace_all_regex(
+    #   queryJq,
+    #   paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)",
+    #          # no extra bracket here
+    #          "( AND | NOT | OR |\\)*$)"),
+    #   paste0(" (\\$f | with_entries(select( .key | match( \"^",
+    #          gsub('"[.]"', "#[0-9]*#?", i),
+    #          "\" ))) | map(select(. $2 )) | any ) $3"),
+    #   vectorize_all = FALSE
+    # )
+
+    # TODO new
 
     # - default operator handling
     queryJq <- stringi::stri_replace_all_regex(
@@ -362,9 +392,9 @@ digestFields <- function(f, q) {
       paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)",
              # no extra bracket here
              "( AND | NOT | OR |\\)*$)"),
-      paste0(" (\\$f | with_entries(select( .key | match( \"^",
-             gsub('"[.]"', "#[0-9]*#?", i),
-             "\" ))) | map(select(. $2 )) | any ) $3"),
+      # select([ .friends | m1 | .id | m1 ] | map ( . > 1 ) | any )
+      paste0(" ([ .", gsub('"[.]"', " | m1 | .", i), " ] ",
+             "| map( . | m1 | . $2 ) | any ) $3"),
       vectorize_all = FALSE
     )
 
@@ -375,11 +405,18 @@ digestFields <- function(f, q) {
   # https://jqlang.github.io/jq/manual/#regular-expressions
   queryJq <- gsub("REGEXP \"(.+?)\"", '| test("\\1")', queryJq)
   queryJq <- gsub("( AND | NOT | OR )", "\\L\\1", queryJq, perl = TRUE)
+  # special case
+  queryJq <- gsub(" . != ", " . != null and . != ", queryJq)
 
+  # queryJq <- paste0('
+  #    def flatted: [paths(scalars) as $path | { ($path | map(tostring) | join("#")):
+  #    getpath($path) } ] | add; . | flatted as $f | select(', queryJq, ')')
+
+  # TODO new
   queryJq <- paste0('
-     def flatted: [paths(scalars) as $path | { ($path | map(tostring) | join("#")):
-     getpath($path) } ] | add; . | flatted as $f | select(', queryJq, ')')
-
+     def m1: . | (if (type == "array" or type == "object" or type == "string") and length == 0 then null else
+                 (if type == "array" then (.[] | m1) else [.][] end) end);
+     select(', queryJq, ')')
 
   # output
   return(list(

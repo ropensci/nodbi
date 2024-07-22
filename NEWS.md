@@ -1,7 +1,7 @@
 # nodbi 0.10.5.9000
 
 ## Bug fix
-* make `docdb_query()` work for cases when flattened dot path notation has no counts between fields
+* partial refactoring of `docdb_query()`, accelerating around 20-fold for SQLite, DuckDB
 
 # nodbi 0.10.5
 
