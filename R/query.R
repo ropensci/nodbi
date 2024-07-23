@@ -1575,8 +1575,8 @@ processIncludeFields <- function(
     #    if a field cannot be found, but takes care of boolean because
     #    "It is an error to use length on a boolean" and then goes
     #    recursively into arrays
-    'def m1: . | (if type != "boolean" and length == 0 then null else
-                 (if type == "array" then (.[] | m1) else [.][] end) end); ',
+    'def m1: . | (if (type == "array" or type == "object" or type == "string") and
+     length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end); ',
     # m2 provides a final scalar unless there are several elements
     'def m2: . | (if length > 1 then [.][] else .[] end); ')
 

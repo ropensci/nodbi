@@ -302,29 +302,20 @@ digestFields <- function(f, q) {
 
   # translate mongo query into jq script to filter and select:
 
-  # TODO new
-
-  # {"$or": [{"rows.elements.status": "OK"},
-  # {"$and": [{"age": {"$gt": 21}},
-  #           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}
-  #           {"_id": {"$in": ["5cd678531b423d5f04cfb0a1", "5cd678530df22d3625ed8375"]}]}]}
+  # {"$or": [
+  #   {"email": {"$regex": "lacychen@conjurica.com"}},
+  #   {"tags": {"$regex": "^duis$"}}
+  # ]}
   #
   # ->
   #
-  # def flatted: [paths(scalars) as $path | { ($path | map(tostring) | join("#")):
-  # getpath($path) } ] | add; . | flatted as $f | . | select(
-  #  ($f | with_entries( select( .key | match( "^rows#[0-9]+#elements#[0-9]+#status" ))) |
-  #        map(select( . == "OK" )) | any )
-  #  or
-  #  (
-  #   ($f | with_entries( select( .key | match( "^age" ))) | map(select(. > 20)) | any )
-  #  and
-  #   ($f | with_entries( select( .key | match( "^friends#[0-9]+#name" ))) |
-  #         map(select(. | test("^B[a-z]{3,9}.*"))) | any )
-  #  and
-  #   ($f | with_entries( select( .key | match( "^_id" ))) |
-  #    map(select( . | tostring | test("5|4") )) | any )
-  #  )
+  # def m1: . | (if (type == "array" or type == "object" or type == "string") and
+  # length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end);
+  #
+  # select(
+  #   ([ .email ] | map( . | m1 | test("lacychen@conjurica.com") ) | any )
+  #   or
+  #   ([ .tags ] | map( . | m1 | test("^duis$") ) | any )
   # )
 
   queryJq <- gsub("'", '"', queryCondition)
@@ -346,19 +337,6 @@ digestFields <- function(f, q) {
       # recompose
       xtr <- paste0(" . == ", xtr, collapse = " or ")
 
-      # # insert
-      # queryJq <- stringi::stri_replace_all_regex(
-      #   queryJq,
-      #   paste0("(\"", i, "\") IN (\\(.+?\\))", # brackets for IN
-      #          "( AND | NOT | OR |\\)*$)"),
-      #   paste0(" (\\$f | with_entries(select( .key | match( \"^",
-      #          gsub('"[.]"', "#[0-9]+#", i),
-      #          "\" ))) | map(select(", xtr, ")) | any ) $3"),
-      #   vectorize_all = FALSE
-      # )
-
-      # TODO new
-
       # insert
       queryJq <- stringi::stri_replace_all_regex(
         queryJq,
@@ -371,20 +349,6 @@ digestFields <- function(f, q) {
       )
 
     }
-
-    # # - default operator handling
-    # queryJq <- stringi::stri_replace_all_regex(
-    #   queryJq,
-    #   paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)",
-    #          # no extra bracket here
-    #          "( AND | NOT | OR |\\)*$)"),
-    #   paste0(" (\\$f | with_entries(select( .key | match( \"^",
-    #          gsub('"[.]"', "#[0-9]*#?", i),
-    #          "\" ))) | map(select(. $2 )) | any ) $3"),
-    #   vectorize_all = FALSE
-    # )
-
-    # TODO new
 
     # - default operator handling
     queryJq <- stringi::stri_replace_all_regex(
@@ -408,15 +372,10 @@ digestFields <- function(f, q) {
   # special case
   queryJq <- gsub(" . != ", " . != null and . != ", queryJq)
 
-  # queryJq <- paste0('
-  #    def flatted: [paths(scalars) as $path | { ($path | map(tostring) | join("#")):
-  #    getpath($path) } ] | add; . | flatted as $f | select(', queryJq, ')')
-
-  # TODO new
   queryJq <- paste0('
-     def m1: . | (if (type == "array" or type == "object" or type == "string") and length == 0 then null else
-                 (if type == "array" then (.[] | m1) else [.][] end) end);
-     select(', queryJq, ')')
+    def m1: . | (if (type == "array" or type == "object" or type == "string") and
+    length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end);
+    select(', queryJq, ')')
 
   # output
   return(list(
