@@ -1,7 +1,10 @@
 # nodbi 0.10.5.9000
 
+## Changes
+* partial refactoring of `docdb_query()`, accelerating queries up to 20-fold for SQLite, DuckDB, and accelerating `listfields = TRUE` several times for DuckDB
+
 ## Bug fix
-* partial refactoring of `docdb_query()`, accelerating around 20-fold for SQLite, DuckDB
+* address that `docdb_query()` did not work for cases when flattened dot path notation had no counts between fields
 
 # nodbi 0.10.5
 

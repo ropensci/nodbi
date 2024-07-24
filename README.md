@@ -334,6 +334,7 @@ testFunction <- function(src, key, value, query, fields) {
   suppressMessages(docdb_create(src, key, ndjs))
   head(docdb_get(src, key))
   docdb_query(src, key, query = query, fields = fields)
+  docdb_query(src, key, query = query, listfields = TRUE)
   docdb_update(src, key, value = value, query = query)
 }
 
@@ -348,15 +349,15 @@ result <- rbenchmark::benchmark(
   columns = c('test', 'replications', 'elapsed')
 )
 
-# 2024-07-20 with 2015 mobile hardware, databases via homebrew, R 4.4.1
+# 2024-07-24 with 2015 mobile hardware, databases via homebrew, R 4.4.1
 result[rev(order(result$elapsed)), ]
 #         test replications elapsed
-# 4    CouchDB           10   896.8
-# 3    Elastic           10    43.7
-# 5 PostgreSQL           10     5.4
-# 6     DuckDB           10     4.1
-# 2     SQLite           10     4.1
-# 1    MongoDB           10     3.0
+# 4    CouchDB           10   640.9
+# 3    Elastic           10    39.5
+# 5 PostgreSQL           10     4.3
+# 6     DuckDB           10     3.9
+# 1    MongoDB           10     3.2
+# 2     SQLite           10     3.0
 ```
 
 ## Testing
@@ -365,26 +366,25 @@ Every database backend is subjected to identical tests, see
 [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R).
 
 ``` r
-# 2024-07-23
+# 2024-07-24
 suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
-# ✔ |      2 172 | couchdb [147.3s]
-# ✔ |      1 171 | duckdb [11.0s]
-# ✔ |      2 170 | elastic [150.1s]
-# ✔ |      2 170 | mongodb [11.0s]
-# ✔ |        173 | postgres [18.8s]
-# ✔ |        174 | sqlite [14.0s]
+# ✔ |      2 172 | couchdb [117.5s]                                                                           
+# ✔ |      1 171 | duckdb [7.7s]                                                                              
+# ✔ |      2 170 | elastic [91.3s]                                                                            
+# ✔ |      2 170 | mongodb [8.7s]                                                                             
+# ✔ |        173 | postgres [12.4s]                                                                           
+# ✔ |        174 | sqlite [9.5s]                                                                              
 # 
-# ══ Results ═════════════════════════════════════════════════
-# Duration: 352.8 s
+# ══ Results ═══════════════════════════════════════
+# Duration: 247.8 s
 # 
-# ── Skipped tests (7) ───────────────────────────────────────
+# ── Skipped tests (7) ─────────────────────────────
 # • Testing for auto disconnect and shutdown not relevant (3): 
-#   test-couchdb.R:26:3, test-elastic.R:21:3,
-#   test-mongodb.R:24:3
+#   test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3
 # • Testing for parallel writes not possible or implemented (4): 
-#   test-couchdb.R:26:3, test-duckdb.R:22:3,
-#   test-elastic.R:21:3, test-mongodb.R:24:3
+#   test-couchdb.R:26:3, test-duckdb.R:22:3, test-elastic.R:21:3, 
+#   test-mongodb.R:24:3
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1030 ]
 
