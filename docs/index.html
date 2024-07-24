@@ -420,12 +420,12 @@
 <span><span class="co"># 2024-07-24 with 2015 mobile hardware, databases via homebrew, R 4.4.1</span></span>
 <span><span class="va">result</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">elapsed</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="co">#         test replications elapsed</span></span>
-<span><span class="co"># 4    CouchDB           10   640.9</span></span>
-<span><span class="co"># 3    Elastic           10    39.5</span></span>
+<span><span class="co"># 4    CouchDB           10   642.2</span></span>
+<span><span class="co"># 3    Elastic           10    41.5</span></span>
 <span><span class="co"># 5 PostgreSQL           10     4.3</span></span>
-<span><span class="co"># 6     DuckDB           10     3.9</span></span>
-<span><span class="co"># 1    MongoDB           10     3.2</span></span>
-<span><span class="co"># 2     SQLite           10     3.0</span></span></code></pre></div>
+<span><span class="co"># 6     DuckDB           10     4.0</span></span>
+<span><span class="co"># 1    MongoDB           10     3.3</span></span>
+<span><span class="co"># 2     SQLite           10     2.9</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
@@ -435,33 +435,32 @@
 <code class="sourceCode R"><span><span class="co"># 2024-07-24</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># ✔ | F W  S  OK | Context</span></span>
-<span><span class="co"># ✔ |      2 172 | couchdb [117.5s]                                                                           </span></span>
-<span><span class="co"># ✔ |      1 171 | duckdb [7.7s]                                                                              </span></span>
-<span><span class="co"># ✔ |      2 170 | elastic [91.3s]                                                                            </span></span>
-<span><span class="co"># ✔ |      2 170 | mongodb [8.7s]                                                                             </span></span>
-<span><span class="co"># ✔ |        173 | postgres [12.4s]                                                                           </span></span>
-<span><span class="co"># ✔ |        174 | sqlite [9.5s]                                                                              </span></span>
+<span><span class="co"># ✔ |      2 174 | couchdb [119.5s]                                                                        </span></span>
+<span><span class="co"># ✔ |      1 173 | duckdb [7.6s]                                                                           </span></span>
+<span><span class="co"># ✔ |      2 172 | elastic [87.3s]                                                                         </span></span>
+<span><span class="co"># ✔ |      2 172 | mongodb [8.0s]                                                                          </span></span>
+<span><span class="co"># ✔ |        175 | postgres [13.6s]                                                                        </span></span>
+<span><span class="co"># ✔ |        176 | sqlite [9.7s]                                                                           </span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ══ Results ═══════════════════════════════════════</span></span>
-<span><span class="co"># Duration: 247.8 s</span></span>
+<span><span class="co"># ══ Results ══════════════════════════════════════════════════════════════════════════════════════════════</span></span>
+<span><span class="co"># Duration: 246.2 s</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># ── Skipped tests (7) ─────────────────────────────</span></span>
-<span><span class="co"># • Testing for auto disconnect and shutdown not relevant (3): </span></span>
-<span><span class="co">#   test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
-<span><span class="co"># • Testing for parallel writes not possible or implemented (4): </span></span>
-<span><span class="co">#   test-couchdb.R:26:3, test-duckdb.R:22:3, test-elastic.R:21:3, </span></span>
+<span><span class="co"># ── Skipped tests (7) ────────────────────────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co"># • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3, test-elastic.R:21:3,</span></span>
 <span><span class="co">#   test-mongodb.R:24:3</span></span>
+<span><span class="co"># • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3, test-duckdb.R:22:3,</span></span>
+<span><span class="co">#   test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
 <span><span class="co"># </span></span>
-<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1030 ]</span></span>
+<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1042 ]</span></span>
 <span></span>
-<span><span class="co"># 2024-07-20</span></span>
+<span><span class="co"># 2024-07-24</span></span>
 <span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, type <span class="op">=</span> <span class="st">"tests"</span><span class="op">)</span></span>
-<span><span class="co"># nodbi Coverage: 94.88%</span></span>
+<span><span class="co"># nodbi Coverage: 94.91%</span></span>
 <span><span class="co"># R/src_duckdb.R: 76.92%</span></span>
 <span><span class="co"># R/src_mongo.R: 92.31%</span></span>
 <span><span class="co"># R/update.R: 92.95%</span></span>
-<span><span class="co"># R/zzz.R: 93.55%</span></span>
-<span><span class="co"># R/query.R: 94.74%</span></span>
+<span><span class="co"># R/zzz.R: 93.59%</span></span>
+<span><span class="co"># R/query.R: 94.81%</span></span>
 <span><span class="co"># R/src_postgres.R: 95.65%</span></span>
 <span><span class="co"># R/create.R: 96.12%</span></span>
 <span><span class="co"># R/get.R: 98.77%</span></span>
