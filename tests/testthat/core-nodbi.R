@@ -191,6 +191,8 @@ test_that("docdb_query", {
   expect_true(nrow(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 1}')) == 2L)
   expect_true(ncol(docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"_id": 1, "age": 1, "doesnotexist": 0}')) == 2L)
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"email": "lacychen@conjurica.com"}')), c(1L, 11L))
+  expect_equal(dim(docdb_query(src, key, query = '{"$or": [{"age": {"$lte": 20}}, {"age": {"$gte": 25}}]}')), c(3L, 11L))
+  expect_equal(dim(docdb_query(src, key, query = '{"$or": [{"friends.id": {"$lt": 1}}, {"friends.id": {"$in": [2,3]}}]}')), c(5L, 11L))
   #
   empty <- docdb_query(src = src, key = key, query = '{"age": 20}', fields = '{"nonexistingfield": 1, "_id": 0}')
   expect_true(is.null(empty) || !ncol(empty) || !nrow(empty) || all(is.na(empty)) || names(empty) == "_id") # for 0.9.9 adding all is.na for duckdb

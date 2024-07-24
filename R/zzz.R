@@ -364,14 +364,21 @@ digestFields <- function(f, q) {
 
   }
 
-  queryJq <- gsub(" ==* ", " == ", queryJq) # important
+  ## special cases
+
+  # important
+  queryJq <- gsub(" ==* ", " == ", queryJq)
+
   # https://jqlang.github.io/jq/manual/#test
   # https://jqlang.github.io/jq/manual/#regular-expressions
   queryJq <- gsub("REGEXP \"(.+?)\"", '| test("\\1")', queryJq)
   queryJq <- gsub("( AND | NOT | OR )", "\\L\\1", queryJq, perl = TRUE)
-  # special case
-  queryJq <- gsub(" . != ", " . != null and . != ", queryJq)
 
+  # null is less than anything https://jqplay.org/s/w-kmDHvfMfqVt3z
+  queryJq <- gsub(" . != ([^nul])", " . != null and . != \\1", queryJq)
+  queryJq <- gsub(" . (<=?) ([^nul])", " . != null and . \\1 \\2", queryJq)
+
+  # add function definition
   queryJq <- paste0('
     def m1: . | (if (type == "array" or type == "object" or type == "string") and
     length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end);
