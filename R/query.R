@@ -138,8 +138,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   # - where
   fldQ$jqrWhere <- character(0L)
   if (length(fldQ$queryCondition) &&
-      (!identical(fldQ$queryFields, fldQ$queryRootFields) ||
-       grepl("\"\\$[orinadegxlt]+\":", query))) {
+      !identical(fldQ$queryFields, fldQ$queryRootFields)) {
 
     fldQ$jqrWhere <- fldQ$queryJq
 
@@ -162,6 +161,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
       subQuery <- jqr::jq(query, paste0(" .. | .\"", i, "\"? | select (. != null) "))
       subQuery <- as.character(subQuery)
       subQueryIns <- gsub("^\\{|\\}$", "", subQuery)
+      # duplication is strange but needed
       subQueryMod <- paste0('{"$or":[{"$elemMatch":{', subQueryIns, '}},{', subQueryIns, '}]}')
 
       # integrate
@@ -207,7 +207,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   }
 
   # - add selector, limit and close query
-  # TODO jqrWhere should, but cannot limit the number of documents
+  # TODO jqrWhere step should limit the final number of documents
   query <- paste0('{"selector": ', query, ', "limit": ', limit, '}')
 
 
