@@ -1,8 +1,8 @@
 ## Test environments
 
-* Local: R Under development (unstable) (2024-02-23 r85975) using platform: x86_64-apple-darwin20; with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB (ok)
+* Local: R version 4.4.1 (2024-06-14) using platform: x86_64-apple-darwin20; with CouchDB, OpenSearch, MongoDB, SQLite, PostgreSQL, DuckDB (ok)
 
-* Win-builder: R version 4.4.1 (2024-06-14 ucrt) using platform: x86_64-w64-mingw32; R version 4.3.3 (2024-02-29 ucrt) using platform: x86_64-w64-mingw32 (64-bit); R Under development (unstable) (2024-06-29 r86852 ucrt) using platform: x86_64-w64-mingw32 (ok)
+* Win-builder: R Under development (unstable) (2024-07-24 r86924 ucrt); R version 4.3.3 (2024-02-29 ucrt); R version 4.4.1 (2024-06-14 ucrt) (ok)
 
 * GitHub actions: windows-2022, r: 'release'; macOS-latest, r: 'release'; ubuntu-latest, r: 'oldrel-1'; ubuntu-latest, r: 'devel' (ok)
 
@@ -14,14 +14,14 @@
 
 ## Submission reason
 
-* stop if query is invalid even though JSON is valid 
-* code cleaning, more parameters checks, docs update
+- bug fix: `docdb_query()` not working for cases when dot paths had no counts between fields
+- bug fix: wrong database information printed
+- bug fix: correct SQL to speed up `docdb_query()`
 
 
 ## Reverse dependency check results
 
-In total checked two reverse dependencies, no problems. 
-
+I checked two reverse dependencies locally and found no problems. 
 
 --------
 

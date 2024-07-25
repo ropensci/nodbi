@@ -1,4 +1,4 @@
-# nodbi 0.10.5.9000
+# nodbi 0.10.6
 
 ## Changes
 * partial refactoring of `docdb_query()`, accelerating queries up to 20-fold for SQLite, DuckDB, and accelerating `listfields = TRUE` several times for DuckDB
