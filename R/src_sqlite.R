@@ -57,14 +57,15 @@ src_sqlite <- function(dbname = ":memory:",
 
 #' @export
 print.src_sqlite <- function(x, ...) {
+  
   dbname <- x$dbname
   dbsize <- file.size(dbname)
   # RSQLite::rsqliteVersion() was introduced with
   # same version that introduced json1 extension
   srv <- rev(RSQLite::rsqliteVersion())[1]
   cat(sprintf(
-    "src: sqlite\nSQLite library version: %s\n size: %s kBytes\n dbname: %s\n",
-    srv, dbsize / 2^10, dbname))
+    "src: sqlite\nSQLite library version: %s\n size: %s MB\n dbname: %s\n",
+    srv, signif(dbsize / 10^6, digits = 3L), dbname))
 
   if (grepl(":memory:", dbname)) {
     warning(

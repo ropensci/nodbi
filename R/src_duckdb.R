@@ -73,7 +73,7 @@ src_duckdb <- function(
 print.src_duckdb <- function(x, ...) {
 
   dbdir <- attr(attr(x$con, "driver"), "dbdir")
-  size <- switch(dbdir,
+  dbsize <- switch(dbdir,
     ":memory:" = utils::object.size(x),
     file.size(dbdir))
   dbver <- try(DBI::dbGetQuery(x$con, "PRAGMA version;")[[
@@ -82,7 +82,7 @@ print.src_duckdb <- function(x, ...) {
 
   cat(sprintf(
     "src: duckdb\nDatabase: %s\nSize: %s MB\nVersion: %s",
-    dbdir, round(as.integer(size / 1000^6)), dbver
+    dbdir, signif(dbsize / 10^6, digits = 3L), dbver
   ))
 
 }
