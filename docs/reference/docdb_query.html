@@ -13,7 +13,7 @@ nor listfields is specified, runs docdb_get()."><meta name="twitter:card" conten
 
     <a class="navbar-brand me-2" href="../index.html">nodbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.6.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,9 @@ a table name for DuckDB, SQLite and PostgreSQL)</p></dd>
 Can use comparisons / tests (<code>$lt</code>, <code>$lte</code>, <code>$gt</code>, <code>$gte</code>,
 <code>$ne</code>, <code>$in</code>, <code>$regex</code>), with logic operators (<code>$and</code>,
 <code>$or</code>, <code>(</code>, <code>)</code>), including nested queries, see examples.
-<code>$regex</code> is case-sensitive.</p></dd>
+<code>$regex</code> is case-sensitive.
+Note that the query should target a field that holds a
+scalar or an array of scalars, not more complex objects.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -152,7 +154,7 @@ the example.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer></div>

@@ -20,7 +20,9 @@ a table name for DuckDB, SQLite and PostgreSQL)}
 Can use comparisons / tests (\verb{$lt}, \verb{$lte}, \verb{$gt}, \verb{$gte},
 \verb{$ne}, \verb{$in}, \verb{$regex}), with logic operators (\verb{$and},
 \verb{$or}, \code{(}, \verb{)}), including nested queries, see examples.
-\verb{$regex} is case-sensitive.}
+\verb{$regex} is case-sensitive.
+Note that the query should target a field that holds a
+scalar or an array of scalars, not more complex objects.}
 
 \item{...}{Optional parameters:
 \itemize{
