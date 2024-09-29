@@ -336,7 +336,6 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
 
   # - integrate
   if (grepl("^\\{\\}", query)) query <- sub("\\{\\}", "*", query)
-  if (query == "") query <- "*"
 
 
   # debug
@@ -429,7 +428,9 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
   query <- jsonlite::minify(query)
   params <- list(...)
   n <- 0L
-  if (!is.null(params$limit)) n <- params$limit
+  # - use limit but protect against values
+  #   not accepted by mongodb, such as -1
+  if (!is.null(params$limit)) n <- max(n, params$limit)
   # - necessary since params is passed to mongo$find
   if (is.null(params$fields)) params$fields <- "{}"
 
@@ -1052,9 +1053,6 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   # early return if listfields
   if (!is.null(params$listfields)) {
 
-    # fallback but only for listfields
-    if (!length(fldQ$queryCondition)) fldQ$queryCondition <- "TRUE"
-
     # parameter use
     limit <- ""
     if (n != -1L) limit <- paste0("LIMIT ", n)
@@ -1122,8 +1120,10 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
     includeFields = fldQ$includeFields,
-    excludeFields = fldQ$excludeFields,
-    extractedFields = extractedFields
+    # the extracted fields already
+    # follow the full dot notation
+    extractedFields = extractedFields,
+    excludeFields = fldQ$excludeFields
   ))
 
 }
