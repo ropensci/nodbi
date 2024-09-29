@@ -1163,149 +1163,185 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
   # fields
 
-  fldQ$extractFields <- unique(c(fldQ$includeRootFields, fldQ$queryRootFields))
+  # - extract from database
+  fldQ$extractFields <- unique(c(fldQ$includeFields, fldQ$queryFields))
   fldQ$extractFields <- fldQ$extractFields[fldQ$extractFields != "_id"]
 
   if (length(fldQ$extractFields)) {
 
     fldQ$extractFields <- paste0(
-      ", json_extract(json, ['",
-      paste0(fldQ$extractFields, collapse = "', '"),
-      "']) extracted_list, ",
-      paste0("extracted_list[", seq_along(fldQ$extractFields),
-             "] AS ", fldQ$extractFields, collapse = ", "
+      ", ",
+      paste0(
+        paste0(
+          # at top level, only use single dot
+          "json_extract(json, '$.",
+          # using double dot .. to obtain content
+          # from both .subfield and [*].subfield
+          gsub("[.]+", "..", fldQ$extractFields),
+          "') AS \"", fldQ$extractFields, '"'),
+        collapse = ', '
       ))
 
   }
 
-  fldQ$selectFields <- unique(c(fldQ$includeRootFields, fldQ$queryRootFields))
-  fldQ$selectFields <- paste0("json_object('_id', _id, ", paste0(
-    sprintf("'%s', %s", fldQ$selectFields, fldQ$selectFields), collapse = ", "), ")")
+  # - construct output json object
+  fldQ$selectFields <- unique(setdiff(fldQ$includeFields, fldQ$excludeFields))
+  if (length(fldQ$selectFields)) fldQ$selectFields <- paste0(
+    "json_object(", ifelse(!any(fldQ$excludeFields == "_id"), "'_id', \"_id\", ", ""), paste0(sprintf(
+      "'%s', \"%s\"", fldQ$selectFields, fldQ$selectFields), collapse = ", "), ")")
 
-  fldQ$selectCondition <- unique(c(fldQ$includeRootFields, fldQ$queryRootFields))
-  if (length(fldQ$selectCondition)) fldQ$selectCondition <-
-    paste0("(", fldQ$selectCondition, " <> '{}')", collapse = " OR ")
+  # - create criteria for where sql statement
+  fldQ$selectCondition <- unique(c(fldQ$includeFields, fldQ$queryFields))
+  if (any(fldQ$selectCondition == "_id") ||
+      !length(fldQ$selectCondition)) {
+    fldQ$selectCondition <- NULL
+  } else {
+    fldQ$selectCondition <-
+      paste0(
+        "( CASE WHEN json_type(\"",
+        fldQ$selectCondition,
+        "\") == 'ARRAY' THEN \"",
+        fldQ$selectCondition, "\" <> '[]' ELSE \"",
+        fldQ$selectCondition, "\" <> '{}' END )",
+        collapse = " OR ")
+  }
+
+  # - if not explicitly excluded, keep _id in output
+  if (!any(fldQ$excludeFields == "_id") && length(fldQ$includeFields)) fldQ$includeFields <-
+    unique(c(fldQ$includeFields, "_id"))
 
 
   # query
 
-  # - if all query fields are top level elements
-  if (length(fldQ$queryFields) &&
-      identical(fldQ$queryFields, fldQ$queryRootFields)) {
+  # - if query fields are top level elements
+  if (length(fldQ$queryFields)) {
 
-    # - duckdb expects quotes around string values
+    # remove internal quotes "a"."b" -> "a.b"
+    fldQ$queryCondition <- gsub('"[.]"', ".", fldQ$queryCondition)
+
+    # - 1. change query to use extracted json field
+    #   duckdb expects quotes around string values
     #   from json, type casting did not work / help
-    for (i in fldQ$queryFields) { #[fldQ$queryFields != "_id"]) {
+    for (i in fldQ$queryFields[fldQ$queryFields != "_id"]) {
 
       fldQ$queryCondition <- gsub(
         # '(.+?)' shall not capture numbers, not IN('A', 'B')
-        paste0("\"(", i, ")\" ([INOTREGXP=!<>']+) '(.+?)'( AND | NOT | OR |\\)*$)"),
-        paste0('\\1 \\2 \'', ifelse(i == "_id", '\\3', '"\\3"'), '\' \\4'),
+        paste0("\"(", i, ")\" ([INOTREGXP=!<>']+) ('?.+?'?)( AND | NOT | OR |\\)*$)"),
+        paste0('(LENGTH(list_filter(json(\'[\' || regexp_replace("', i,
+               '"::VARCHAR, \'\\\\[|\\\\]\', \'\', \'g\') || \']\')::JSON[], x -> x ',
+               '\\2 \\3 )) > 0) \\4'),
         fldQ$queryCondition
       )
-    }
 
-    # - regexp
-    for (i in fldQ$queryFields) {
+      # only for other than _id
+      fldQ$queryCondition <- gsub(
+        # '(.+?)' shall not capture numbers, not IN('A', 'B')
+        paste0(i, "(.+?) x == ('.+?')"),
+        paste0(i, '\\1 contains(x, \\2)'),
+        fldQ$queryCondition
+      )
+
+      # only for other than _id
+      fldQ$queryCondition <- gsub(
+        # '(.+?)' shall not capture numbers, not IN('A', 'B')
+        paste0(i, "(.+?) x != ('.+?')"),
+        paste0(i, '\\1 not contains(x, \\2)'),
+        fldQ$queryCondition
+      )
+
+    } # end 1.
+
+    # - 2. regexp
+    if (length(fldQ$queryFields)) {
 
       ins <- stringi::stri_extract_all_regex(
         # note subsequent to above no double quotes around i
-        fldQ$queryCondition, paste0("(", i, ") REGEXP '\"?([^\"]+?)\"?'"))[[1]]
+        fldQ$queryCondition, paste0("(\"_id\"| x) REGEXP '\"?([^\"]+?)\"?'"))[[1]]
 
-      if (!is.na(ins)) {
+      if (all(is.na(ins))) ins <- NULL
+
+      for (i in ins) {
 
         ii <- stringi::stri_replace_all_regex(
-          ins, paste0("(", i, ") REGEXP '\"?([^\"]+?)\"?'"), "$2")
+          i, paste0("(\"_id\"| x) REGEXP '\"?([^\"]+?)\"?'"), "$2")
 
         # special handling of _id as not coming from json
+        if (!grepl("^\"_id", i)) {
 
-        # replace anchors ^ and $ with double quotes as new anchors;
-        # for ARRAY elements, strings (have to be in double quotes)
-        if (i != "_id") ii <- gsub("\\^|\\$", '"', ii)
+          # replace anchors ^ and $ with double quotes as new anchors;
+          # for ARRAY elements, strings (have to be in double quotes)
+          ii <- gsub("\\^|\\$", '"', ii)
+          ii <- paste0(" regexp_matches(x, '", ii, "')")
 
-        # https://duckdb.org/docs/sql/functions/regular_expressions.html#regexp_matchesstring-pattern-options
-        # https://duckdb.org/docs/sql/functions/regular_expressions.html#options-for-regular-expression-functions
-        ii <- paste0("regexp_matches(", i, ", '", ii, "')")
+        } else {
+
+          # https://duckdb.org/docs/sql/functions/regular_expressions.html#regexp_matchesstring-pattern-options
+          # https://duckdb.org/docs/sql/functions/regular_expressions.html#options-for-regular-expression-functions
+          ii <- paste0("regexp_matches(\"_id\", '", ii, "')")
+
+        }
 
         fldQ$queryCondition <- stringi::stri_replace_all_fixed(
-          fldQ$queryCondition, ins, ii, vectorize_all = TRUE)
+          fldQ$queryCondition, i, ii, vectorize_all = TRUE)
 
-      }
-    }
+      } # end for
+    } # end 2.
 
-    # - in. mongo: the $in operator selects documents where the
+    # - 3. in. mongo: the $in operator selects documents where the
     #   value of a field equals any value in the specified array
-    for (i in fldQ$queryFields[fldQ$queryFields != "_id"]) {
+    #     for (i in fldQ$queryFields[fldQ$queryFields != "_id"]) {
+    if (length(fldQ$queryFields)) {
 
       ins <- stringi::stri_extract_all_regex(
-        fldQ$queryCondition, paste0("\"", i, "\" IN \\((.+?)\\)"))[[1]]
+        fldQ$queryCondition, " x IN \\('(.+?)'\\)")[[1]]
+      if (all(is.na(ins))) ins <- NULL
 
-      if (!is.na(ins)) {
+      for (i in ins) {
 
-        isString <- grepl("\\('", ins) # "5, 4" or "'a ,b', 'd, f'"
-        ii <- stringi::stri_replace_all_regex(ins, "\"(.+?)\" IN \\((.+?)\\)", "$2")
-        ii <- stringi::stri_split_regex(ii, ifelse(isString, "', ", ", "))[[1]]
+        ii <- stringi::stri_replace_all_regex(i, " x IN \\((.+?)\\)", "$1")
+        ii <- stringi::stri_split_regex(ii, "', ")[[1]]
         ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "")
-        ii <- paste0("json_contains(", i, ", '", ifelse(isString, '"', ""),
-                     ii, ifelse(isString, '"', ""), "')")
-        ii <- paste0("(", paste0(ii, collapse = " OR "), ")")
+        ii <- paste0(" x IN (", paste0('\'"', ii, '"\'', collapse = ", "), ")")
 
         fldQ$queryCondition <- stringi::stri_replace_all_fixed(
-          fldQ$queryCondition, ins, ii, vectorize_all = TRUE
+          fldQ$queryCondition, i, ii, vectorize_all = TRUE
         )
+
       }
-    }
+    } # end 3.
 
     # - integrate
-    fldQ$selectCondition <- paste0(
-      "( ( ", fldQ$selectCondition, " ) AND ", fldQ$queryCondition, ")")
+    fldQ$selectCondition <- ifelse(
+      length(fldQ$selectCondition),
+      paste0("( ", fldQ$selectCondition, " ) AND ", fldQ$queryCondition),
+      paste0(fldQ$queryCondition))
 
     # - reset
-    fldQ$queryCondition <- character(0L)
+    fldQ$queryCondition <- NULL
 
-  }
+  } # length(fldQ$queryFields)
 
   # - empty query
   if (!length(fldQ$queryCondition) &&
       !length(fldQ$selectCondition)) fldQ$selectCondition <- "TRUE"
 
-  # - if query needs jqr
-  fldQ$jqrWhere <- character(0L)
-  if (length(fldQ$queryCondition)) fldQ$jqrWhere <- fldQ$queryJq
 
+  # fields
 
-  # - query if fields == '{}' or
-  #   if jqrWhere is needed
-  if (!length(fldQ$includeFields) ||
-      length(fldQ$jqrWhere)) {
+  # - query if fields == '{}'
+  if (!length(fldQ$includeFields)) {
 
+    # - export all json
     fldQ$extractFields <- paste0(", json", fldQ$extractFields)
+    fldQ$selectFields <- "\'{\"_id\": \"\' || _id || \'\", \' || LTRIM(json, \'{\')"
 
-    if (length(fldQ$includeFields)) {
-
-      # - export only necessary fields
-      tmpFields <- unique(c("_id", fldQ$includeRootFields, fldQ$queryRootFields))
-      fldQ$selectFields <- paste0(
-        "json_object(", paste0(
-          paste0("'", tmpFields, "', ", tmpFields),
-          collapse = ", "), ")")
-
-    } else {
-
-      # - export all json
-      fldQ$selectFields <- "\'{\"_id\": \"\' || _id || \'\", \' || LTRIM(json, \'{\')"
-
-    }
   }
 
-  # - query if fields == '{"_id":1}' and
-  #   jqrWhere is not needed
+  # - query if fields == '{"_id":1}'
   if (length(fldQ$includeFields) == 1L &&
-      fldQ$includeFields == "_id" &&
-      !length(fldQ$jqrWhere)) {
+      fldQ$includeFields == "_id") {
 
     fldQ$selectFields <- "\'{\"_id\": \"\' || _id || \'\"}\'"
-    fldQ$includeFields <- character(0L)
 
   }
 
@@ -1313,45 +1349,25 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    if (!length(fldQ$jqrWhere)) {
-
-      statement <- insObj('
+    statement <- insObj('
         WITH extracted AS (
         SELECT _id
         /** fldQ$extractFields **/
         FROM "/** key **/")
-        SELECT json_structure(json)
+        SELECT DISTINCT json_structure(json)
         FROM extracted
         WHERE  (
         /** fldQ$selectCondition **/
         );')
 
-      fldQ$jqrWhere <- jqFieldNames
-
-    } else {
-
-      statement <- insObj('
-        WITH extracted AS (
-        SELECT _id
-        /** fldQ$extractFields **/
-        FROM "/** key **/")
-        SELECT json
-        FROM extracted
-        WHERE  (
-        /** fldQ$selectCondition **/
-       );')
-
-      fldQ$jqrWhere <- paste0(fldQ$jqrWhere, " | ", jqFieldNames)
-
-      n <- -1L
-
-    }
+    fldQ$jqrWhere <- jqFieldNames
 
     # process
     fields <- unique(processDbGetQuery(
       getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                  statement = statement, n = n)[[1]], "")',
-      jqrWhere = fldQ$jqrWhere)[["out"]])
+      jqrWhere = fldQ$jqrWhere
+    )[["out"]])
 
     # clean
     fields <- fields[fields != "_id" & fields != ""]
@@ -1373,14 +1389,18 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     /** fldQ$selectCondition **/
     );')
 
-
   # general processing
-  return(processDbGetQuery(
+  out <- processDbGetQuery(
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
-    jqrWhere = fldQ$jqrWhere,
     includeFields = fldQ$includeFields,
-    excludeFields = fldQ$excludeFields))
+    # similar to PostgreSQL, which extracts
+    # already the nested items thus here
+    # using jqr only to simplify
+    extractedFields = fldQ$includeFields,
+    excludeFields = fldQ$excludeFields)
+  if (is.null(out) || nrow(out) == 0L) return(NULL)
+  return(out)
 
 }
 
