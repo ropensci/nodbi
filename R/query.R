@@ -1409,10 +1409,6 @@ processDbGetQuery <- function(
     eval.parent(parse(text = 'if (exists("query")) message("\nDB: ", query, "\n")'))
   }
 
-  # temporary file and connection
-  tfname <- tempfile()
-  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
-
 
   #### .write dbGetQuery ####
 
@@ -1424,6 +1420,10 @@ processDbGetQuery <- function(
           textConnection(
             eval.parent(parse(text = getData))),
           verbose = FALSE))
+
+  # temporary file and connection
+  tfname <- tempfile()
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
 
   # write out
   writeLines(
