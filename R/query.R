@@ -12,6 +12,8 @@
 #'  `$ne`, `$in`, `$regex`), with logic operators (`$and`,
 #'  `$or`, `(`, `)`), including nested queries, see examples.
 #'  `$regex` is case-sensitive.
+#'  Note that the query should target a field that holds a
+#'  scalar or an array of scalars, not more complex objects.
 #'
 #' @param ... Optional parameters:
 #'
