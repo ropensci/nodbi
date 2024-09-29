@@ -66,10 +66,11 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
 
   # check other inputs
   if (isFile(value)) {
-    value <- jqr::jq(file(value), ".", flags = jqr::jq_flags(pretty = FALSE))
+    value <- readLines(file(value))
   } else if (isUrl(value)) {
-    value <- jqr::jq(url(value), ".", flags = jqr::jq_flags(pretty = FALSE))
+    value <- readLines(url(value))
   }
+  # value can now be a vector
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
@@ -326,10 +327,11 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
 
   # check other inputs
   if (isFile(value)) {
-    value <- jqr::jq(file(value), ".", flags = jqr::jq_flags(pretty = FALSE))
+    value <- readLines(file(value))
   } else if (isUrl(value)) {
-    value <- jqr::jq(url(value), ".", flags = jqr::jq_flags(pretty = FALSE))
+    value <- readLines(url(value))
   }
+  # value can now be a vector
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
@@ -508,12 +510,12 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
 sqlUpdate <- function(src, key, value, query, updFunction) {
 
   # check other inputs
-  # note value can now be a vector
   if (isFile(value)) {
-    value <- jqr::jq(file(value), ".", flags = jqr::jq_flags(pretty = FALSE))
+    value <- readLines(file(value))
   } else if (isUrl(value)) {
-    value <- jqr::jq(url(value), ".", flags = jqr::jq_flags(pretty = FALSE))
+    value <- readLines(url(value))
   }
+  # value can now be a vector
 
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
