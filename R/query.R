@@ -1356,7 +1356,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
         SELECT _id
         /** fldQ$extractFields **/
         FROM "/** key **/")
-        SELECT DISTINCT json_structure(json)
+        SELECT DISTINCT json_structure(json) AS json
         FROM extracted
         WHERE  (
         /** fldQ$selectCondition **/
@@ -1367,7 +1367,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     # process
     fields <- unique(processDbGetQuery(
       getData = 'paste0(DBI::dbGetQuery(conn = src$con,
-                 statement = statement, n = n)[[1]], "")',
+                 statement = statement, n = n)[["json"]], "")',
       jqrWhere = fldQ$jqrWhere
     )[["out"]])
 
