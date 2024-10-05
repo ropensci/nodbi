@@ -52,6 +52,13 @@ docdb_create <- function(src, key, value, ...) {
   assert(src, "docdb_src")
   assert(key, "character")
   assert(value, c("data.frame", "list", "character"))
+
+  if (is.data.frame(value) && any(grepl("[.]", names(value)))) {
+    message(
+      "Names of columns in data frame have dots, ",
+      "they will conflict with dot path notation.")
+  }
+
   UseMethod("docdb_create", src)
 }
 

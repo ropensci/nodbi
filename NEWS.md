@@ -1,3 +1,8 @@
+# nodbi 0.10.7.9000
+
+## Changes
+* Add message from `docdb_create()` if a data frame has column names with a dot(s) since dots in `nodbi` are used for `JSON` dot paths
+
 # nodbi 0.10.7
 
 ## Changes
