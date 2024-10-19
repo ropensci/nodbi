@@ -372,7 +372,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   }
 
   # turn value into ndjson file
-  on.exit(try(unlink(value), silent = TRUE), add = TRUE)
+  if (!isFile(value)) on.exit(try(unlink(value), silent = TRUE), add = TRUE)
   value <- value2ndjson(value)
   if (!isFile(value)) return(0L)
 
@@ -569,7 +569,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
   # if value is not a file name, convert value
   # into ndjson and keep filename in value
   # turn value into ndjson file
-  on.exit(try(unlink(value), silent = TRUE), add = TRUE)
+  if (!isFile(value)) on.exit(try(unlink(value), silent = TRUE), add = TRUE)
   value <- value2ndjson(value)
   if (!isFile(value)) return(0L)
 

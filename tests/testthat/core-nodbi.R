@@ -97,16 +97,17 @@ test_that("docdb_create (ndjson)", {
   tmp <- dbSrcKey()
   src <- tmp$testSrc
   key <- tmp$testKey
+  tF <- testFile()
   on.exit(try({
     docdb_delete(src = src, key = key)
     if (any(c(inherits(src, "src_sqlite"), inherits(src, "src_postgres")))) DBI::dbDisconnect(src$con, shutdown = TRUE)
     if (inherits(src, "src_duckdb")) duckdb::dbDisconnect(src$con, shutdown = TRUE)
-    rm(src, key, tmp)
+    rm(src, key, tmp, tF)
   }, silent = TRUE), add = TRUE)
 
   # tests
-  expect_equal(docdb_create(src = src, key = key, value = testFile()), 5L)
-  expect_equal(suppressWarnings(docdb_create(src = src, key = key, value = testFile())), 0L)
+  expect_equal(docdb_create(src = src, key = key, value = tF), 5L)
+  expect_equal(suppressWarnings(docdb_create(src = src, key = key, value = tF)), 0L)
   expect_equal(docdb_create(src = src, key = key, value = testFile2()), nrow(diamonds))
 
   # clean up
@@ -311,13 +312,15 @@ test_that("docdb_update", {
   expect_equal(docdb_query(src = src, key = key, query = '{"_id":"Valiant"}', fields = '{"vs":1}')[["vs"]], 79L)
   #
   # from file
-  expect_equal(docdb_create(src = src, key = key, value = testFile()), 5L)
-  expect_equal(docdb_update(src = src, key = key, value = testFile(), query = '{}'), 5L)
-  expect_equal(docdb_update(src = src, key = key, value = jqr::jq(file(testFile()), " del ( ._id) "), query = '{"email": {"$regex": ".+"}}'), 5L)
+  tF <- testFile()
+  #
+  expect_equal(docdb_create(src = src, key = key, value = tF), 5L)
+  expect_equal(docdb_update(src = src, key = key, value = tF, query = '{}'), 5L)
+  expect_equal(docdb_update(src = src, key = key, value = jqr::jq(file(tF), " del ( ._id) "), query = '{"email": {"$regex": ".+"}}'), 5L)
 
   # warnings and errors
   expect_warning(docdb_update(src = src, key = key, value = testJson, query = ""), "deprecated")
-  expect_warning(docdb_update(src = src, key = key, value = testFile(), query = '{"_id": {"$regex": "[f-z]"}}'), "Ignoring the specified")
+  expect_warning(docdb_update(src = src, key = key, value = tF, query = '{"_id": {"$regex": "[f-z]"}}'), "Ignoring the specified")
   expect_error(docdb_update(src = src, key = key, value = testJson2, query = '{"_id": {"$regex": "[f-z]"}}'), "Unequal number of documents")
 
   # from url
