@@ -388,7 +388,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     name = tblName,
     value = value,
     field.types = c("json" = "JSONB"),
-    sep = "~|§", # should not occur in input
+    sep = "@@~~@||", # should not occur in input
     header = FALSE,
     skip = 0L,
     append = FALSE

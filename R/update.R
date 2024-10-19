@@ -52,7 +52,7 @@ docdb_update <- function(src, key, value, query, ...) {
 #' @export
 docdb_update.src_couchdb <- function(src, key, value, query, ...) {
 
-  # If you want to change a document in CouchDB, you don’t tell it to go and
+  # If you want to change a document in CouchDB, you don't tell it to go and
   # find a field in a specific document and insert a new value. Instead,
   # you load the full document out of CouchDB, make your changes in the
   # JSON structure (or object, when you are doing actual programming),
@@ -463,7 +463,7 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
       name = tblName,
       value = value,
       field.types = c("json" = "JSONB"),
-      sep = "~|§", # should not occur in input
+      sep = "@@~~@||", # should not occur in input
       header = FALSE,
       skip = 0L,
       append = FALSE
