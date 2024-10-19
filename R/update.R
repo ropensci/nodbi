@@ -446,6 +446,47 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
+  # TODO turn all kind of values into ndjson files?
+
+  # use file based approach
+  if (isFile(value) && (query == "{}")) {
+
+    # import into temporary table
+    tblName <- uuid::UUIDgenerate()
+    try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
+    on.exit(DBI::dbRemoveTable(src$con, tblName), add = TRUE)
+
+    # for parameters see
+    # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R
+    RSQLite::dbWriteTable(
+      conn = src$con,
+      name = tblName,
+      value = value,
+      field.types = c("json" = "JSONB"),
+      sep = "~|§", # should not occur in input
+      header = FALSE,
+      skip = 0L,
+      append = FALSE
+    )
+
+    statement <- paste0(
+      'UPDATE "', key, '"
+       SET json = jsonb_patch(json, injson)
+       FROM (SELECT
+        json->>\'$._id\' AS in_id,
+        jsonb_patch(json, \'{\"_id\": null}\') AS injson
+        FROM \'', tblName, '\'
+      ) WHERE "', key, '"._id = in_id;'
+    )
+
+    result <- DBI::dbExecute(
+      conn = src$con,
+      statement = statement
+    )
+
+    return(result)
+  }
+
   # SQL for patching, see https://www.sqlite.org/json1.html#jpatch
   updFunction <- "jsonb_patch"
 
@@ -474,6 +515,8 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
+
+  # TODO turn all kind of values into ndjson files?
 
   # use file based approach
   if (isFile(value) && (query == "{}")) {

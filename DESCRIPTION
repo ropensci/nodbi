@@ -38,7 +38,7 @@ Suggests:
     sofa (>= 0.3.0),
     elastic (>= 1.0.0),
     mongolite (>= 1.6),
-    RSQLite (>= 2.3.5),
+    RSQLite (>= 2.3.7.9014),
     duckdb (>= 1.1.0),
     RPostgres,
     testthat,
@@ -48,6 +48,7 @@ Suggests:
     knitr,
     rmarkdown,
     tibble
+Remotes: r-dbi/RSQLite
 RoxygenNote: 7.3.2.9000
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents

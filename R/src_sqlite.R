@@ -37,6 +37,9 @@ src_sqlite <- function(dbname = ":memory:",
   # enable regular expressions
   RSQLite::initRegExp(db = con)
 
+  # enable uuid and lines
+  RSQLite::initExtension(db = con, extension = "uuid")
+
   # set timeout for concurrency to 10s
   DBI::dbExecute(con, "PRAGMA busy_timeout = 10000;")
 
@@ -57,7 +60,7 @@ src_sqlite <- function(dbname = ":memory:",
 
 #' @export
 print.src_sqlite <- function(x, ...) {
-  
+
   dbname <- x$dbname
   dbsize <- file.size(dbname)
   # RSQLite::rsqliteVersion() was introduced with

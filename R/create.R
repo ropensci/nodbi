@@ -371,68 +371,40 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     existsMessage(key)
   }
 
-  # convert lists to json
-  if (inherits(value, "list")) {
-    value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
-  }
+  # turn value into ndjson file
+  on.exit(try(unlink(value), silent = TRUE), add = TRUE)
+  value <- value2ndjson(value)
+  if (!isFile(value)) return(0L)
 
-  # convert JSON string to data frame
-  if (inherits(value, c("character", "json"))) {
-    # target is data frame for next section
+  # import into temporary table
+  tblName <- uuid::UUIDgenerate()
+  try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
+  on.exit(DBI::dbRemoveTable(src$con, tblName), add = TRUE)
 
-    # convert ndjson file or json string to data frame
-    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
-        (isUrl(value) || isFile(value))) {
-      if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
-      } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
-      }
-    } else {
-      value <- jsonlite::fromJSON(value)
-    }
+  # for parameters see
+  # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R
+  RSQLite::dbWriteTable(
+    conn = src$con,
+    name = tblName,
+    value = value,
+    field.types = c("json" = "JSONB"),
+    sep = "~|§", # should not occur in input
+    header = FALSE,
+    skip = 0L,
+    append = FALSE
+  )
 
-  }
-
-  # data frame
-  if (inherits(value, "data.frame")) {
-    #
-    if (is.na(match("_id", names(value)))) {
-      # if no _id column
-      if (!identical(rownames(value),
-                     as.character(seq_len(nrow(value))))) {
-        # use rownames as _id's and remove rownames
-        value[["_id"]] <- row.names(value)
-        # row.names(value) <- NULL
-      } else {
-        # add canonical _id's
-        value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
-      }
-    } # if no _id column
-    #
-    if (ncol(value) > 2L || (ncol(value) == 2L &&
-                             !all(sort(names(value)) == c("_id", "json")))) {
-      # no json column, thus convert to df with ndjson in json column
-      value <- items2ndjson(value)
-    }
-    #
-    if (all(class(value[["_id"]]) %in% "list")) {
-      # in case fromJSON created the _id column as list
-      value[["_id"]] <- unlist(value[["_id"]])
-    }
-  } # if data.frame
-
-  # insert data
+  # import from ndjson file
   result <- try(
-    # dbAppendTable() uses transactions
-    # since RSQLite 2.2.2 (2021-01-04)
-    DBI::dbAppendTable(
+    DBI::dbExecute(
       conn = src$con,
-      name = key,
-      # canonical value: a data frame
-      # with 2 columns, _id and json
-      value = value),
-    silent = TRUE)
+      statement = paste0(
+        "INSERT INTO \"", key, "\"",
+        " SELECT CASE WHEN length(json->>'$._id') > 0 THEN",
+        " json->>'$._id' ELSE uuid() END AS _id,",
+        " jsonb_patch(json, '{\"_id\": null}') AS json",
+        " FROM '", tblName, "';")
+    ), silent = TRUE)
 
   # prepare returns
   if (inherits(result, "try-error")) {
@@ -596,97 +568,10 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
   # if value is not a file name, convert value
   # into ndjson and keep filename in value
-  if (!isFile(value)) {
-
-    # temporary file and connection
-    tfname <- tempfile()
-    tfnameCon <- file(tfname, open = "wt")
-    # register to close and remove file after used for streaming
-    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
-
-    # if json in character vector
-    if ((all(class(value) %in% "character")) &&
-        (length(value)  == 1L) && jsonlite::validate(value)
-    ) {
-      # convert to list
-      value <- jsonlite::fromJSON(value, simplifyVector = TRUE)
-    }
-
-    # handle url
-    if (isUrl(value)) {
-      # converts to list
-      value <- jsonlite::stream_in(url(value), verbose = FALSE)
-    }
-
-    # handle data frame
-    if (inherits(value, "data.frame") &&
-        is.na(match("_id", names(value))) &&
-        !identical(rownames(value),
-                   as.character(seq_len(nrow(value))))) {
-      # use rownames as _id's and remove rownames
-      value[["_id"]] <- row.names(value)
-      row.names(value) <- NULL
-    }
-
-    # handle ready-made data frames
-    if (inherits(value, "data.frame") &&
-        identical(names(value),"json") &&
-        all(vapply(value[["json"]], jsonlite::validate,
-                   logical(1L), USE.NAMES = FALSE))) {
-
-      if (!nrow(value)) return(0L)
-
-      writeLines(
-        text = stringi::stri_replace_all_fixed(
-          str = value[["json"]], pattern = "\n", replacement = "\\n"),
-        con = tfnameCon,
-        sep = "\n",
-        useBytes = TRUE)
-
-    } else
-
-      # handle ready-made data frames with _id's
-      if (inherits(value, "data.frame") &&
-          identical(names(value), c("_id", "json")) &&
-          all(vapply(value[["json"]], jsonlite::validate,
-                     logical(1L), USE.NAMES = FALSE))) {
-
-        if (!nrow(value)) return(0L)
-
-        writeLines(
-          text = sprintf(
-            '{"_id":%s, %s',
-            value[["_id"]],
-            # remove any _id's from json
-            gsub("(\"_id\":[^,]+?[,}])|(^[{])", "", value[["json"]])),
-          con = tfnameCon,
-          sep = "\n",
-          useBytes = TRUE)
-
-      } else {
-
-        if (!length(value) || # testing list
-            (is.character(value) && !nchar(value)) ||
-            (is.data.frame(value)) && !nrow(value)) return(0L)
-
-        jsonlite::stream_out(
-          jsonlite::fromJSON(
-            jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
-          con = tfnameCon,
-          verbose = FALSE,
-          pagesize = 5000L,
-          auto_unbox = TRUE)
-
-      } # handle ready-made data frames
-
-    # close
-    close(tfnameCon)
-
-    # make value the file name
-    value <- tfname
-
-  } # !isFile(value)
+  # turn value into ndjson file
+  on.exit(try(unlink(value), silent = TRUE), add = TRUE)
+  value <- value2ndjson(value)
+  if (!isFile(value)) return(0L)
 
   # import from ndjson file
   result <- try(
@@ -801,4 +686,145 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
         check.names = FALSE
       ))
   }
+}
+
+# sqliteImportFromFile <- function(src, key, value, ...) {
+#
+#   # import into temporary table
+#
+#   tblName <- uuid::UUIDgenerate()
+#   try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
+#   on.exit(DBI::dbRemoveTable(src$con, tblName), add = TRUE)
+#
+#   # for parameters see
+#   # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R
+#   value <- (RSQLite::dbWriteTable(
+#     conn = src$con,
+#     name = tblName,
+#     value = value,
+#     field.types = c("json" = "JSONB"),
+#     sep = "~", # a symbol that should not occur in the input
+#     header = FALSE,
+#     skip = 0L,
+#     append = FALSE
+#   ))
+#
+#   # TODO check
+#   # DBI::dbGetQuery(db, paste0("PRAGMA table_info('", tblName, "');"))
+#
+#   # process
+#   result <- try(
+#     DBI::dbExecute(
+#       conn = src$con,
+#       statement = paste0(
+#         "INSERT INTO \"", key, "\"",
+#         " SELECT CASE WHEN length(json->>'$._id') > 0 THEN",
+#         " json->>'$._id' ELSE uuid() END AS _id,",
+#         " jsonb_patch(json, '{\"_id\": null}') AS json",
+#         " FROM '", tblName, "';")
+#     ), silent = TRUE)
+#
+#   # return
+#   return(result)
+#
+# }
+
+value2ndjson <- function(value) {
+
+  # if value is not a file name, convert value
+  # into ndjson and keep filename in value
+  if (!isFile(value)) {
+
+    # temporary file and connection
+    tfname <- tempfile()
+    tfnameCon <- file(tfname, open = "wt")
+    # register to close and remove file after used for streaming
+    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+
+    # if json in character vector
+    if ((all(class(value) %in% "character")) &&
+        (length(value)  == 1L) &&
+        jsonlite::validate(value)
+    ) {
+      # convert to list
+      value <- jsonlite::fromJSON(value, simplifyVector = TRUE)
+    }
+
+    # handle url
+    if (isUrl(value)) {
+      # converts to list
+      value <- jsonlite::stream_in(url(value), verbose = FALSE)
+    }
+
+    # handle data frame
+    if (inherits(value, "data.frame") &&
+        is.na(match("_id", names(value))) &&
+        !identical(rownames(value),
+                   as.character(seq_len(nrow(value))))) {
+      # use rownames as _id's and remove rownames
+      value[["_id"]] <- row.names(value)
+      row.names(value) <- NULL
+    }
+
+    # handle ready-made data frames
+    if (inherits(value, "data.frame") &&
+        identical(names(value),"json") &&
+        all(vapply(value[["json"]], jsonlite::validate,
+                   logical(1L), USE.NAMES = FALSE))) {
+
+      if (!nrow(value)) return(0L)
+
+      writeLines(
+        text = stringi::stri_replace_all_fixed(
+          str = value[["json"]], pattern = "\n", replacement = "\\n"),
+        con = tfnameCon,
+        sep = "\n",
+        useBytes = TRUE)
+
+    } else
+
+      # handle ready-made data frames with _id's
+      if (inherits(value, "data.frame") &&
+          identical(names(value), c("_id", "json")) &&
+          all(vapply(value[["json"]], jsonlite::validate,
+                     logical(1L), USE.NAMES = FALSE))) {
+
+        if (!nrow(value)) return(0L)
+
+        writeLines(
+          text = sprintf(
+            '{"_id":%s, %s',
+            value[["_id"]],
+            # remove any _id's from json
+            gsub("(\"_id\":[^,]+?[,}])|(^[{])", "", value[["json"]])),
+          con = tfnameCon,
+          sep = "\n",
+          useBytes = TRUE)
+
+      } else {
+
+        if (!length(value) || # testing list
+            (is.character(value) && !nchar(value)) ||
+            (is.data.frame(value)) && !nrow(value)) return(0L)
+
+        jsonlite::stream_out(
+          jsonlite::fromJSON(
+            jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
+          con = tfnameCon,
+          verbose = FALSE,
+          pagesize = 5000L,
+          auto_unbox = TRUE)
+
+      } # handle ready-made data frames
+
+    # close
+    close(tfnameCon)
+
+    # make value the file name
+    value <- tfname
+
+  } # !isFile(value)
+
+  return(value)
+
 }
