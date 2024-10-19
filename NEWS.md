@@ -1,7 +1,7 @@
 # nodbi 0.10.7.9000
 
 ## Changes
-* `docdb_create()` and `docdb_update()` for SQLite now import directly and fast from `ndjson` files, in analogy to DuckDB (needs RSQLite >= 2.3.7.9014)
+* `docdb_create()` and `docdb_update()` for PostgreSQL and SQLite now import directly and fast from `ndjson` files, in analogy to DuckDB (needs RSQLite >= 2.3.7.9014)
 * Add message from `docdb_create()` if a data frame has column names with a dot(s) since dots in `nodbi` are used for `JSON` dot paths
 
 # nodbi 0.10.7
