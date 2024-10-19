@@ -379,7 +379,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
   # import into temporary table
   tblName <- uuid::UUIDgenerate()
   try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
-  on.exit(DBI::dbRemoveTable(src$con, tblName), add = TRUE)
+  on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
 
   # for parameters see
   # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R
@@ -687,47 +687,6 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       ))
   }
 }
-
-# sqliteImportFromFile <- function(src, key, value, ...) {
-#
-#   # import into temporary table
-#
-#   tblName <- uuid::UUIDgenerate()
-#   try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
-#   on.exit(DBI::dbRemoveTable(src$con, tblName), add = TRUE)
-#
-#   # for parameters see
-#   # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R
-#   value <- (RSQLite::dbWriteTable(
-#     conn = src$con,
-#     name = tblName,
-#     value = value,
-#     field.types = c("json" = "JSONB"),
-#     sep = "~", # a symbol that should not occur in the input
-#     header = FALSE,
-#     skip = 0L,
-#     append = FALSE
-#   ))
-#
-#   # TODO check
-#   # DBI::dbGetQuery(db, paste0("PRAGMA table_info('", tblName, "');"))
-#
-#   # process
-#   result <- try(
-#     DBI::dbExecute(
-#       conn = src$con,
-#       statement = paste0(
-#         "INSERT INTO \"", key, "\"",
-#         " SELECT CASE WHEN length(json->>'$._id') > 0 THEN",
-#         " json->>'$._id' ELSE uuid() END AS _id,",
-#         " jsonb_patch(json, '{\"_id\": null}') AS json",
-#         " FROM '", tblName, "';")
-#     ), silent = TRUE)
-#
-#   # return
-#   return(result)
-#
-# }
 
 value2ndjson <- function(value) {
 

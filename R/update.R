@@ -454,7 +454,7 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
     # import into temporary table
     tblName <- uuid::UUIDgenerate()
     try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
-    on.exit(DBI::dbRemoveTable(src$con, tblName), add = TRUE)
+    on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
 
     # for parameters see
     # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R
