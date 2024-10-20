@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 ⁠<!-- badges: end -->
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2024-09-29.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2024-10-19.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 | :--------------------- | :--------------------- | :--------------------- |
@@ -290,14 +290,15 @@ srcCouchdb <- src_couchdb(
   pwd = Sys.getenv("COUCHDB_TEST_PWD"))
 
 key <- "test"
-query <- '{"clarity": {"$in": ["SI1", "VS1"]}}'
-fields <- '{"cut": 1, "_id": 1, "clarity": "1"}'
+query <- '{"clarity": {"$in": ["NOTME", "VS1"]}}'
+fields <- '{"cut": 1, "_id": 1, "clarity": 1}'
 value <- '{"clarity": "XYZ", "new": ["ABC", "DEF"]}'
-data <- as.data.frame(diamonds)[1:1000, ]
+data <- diamonds[1:1000, ]
 ndjs <- tempfile()
-jsonlite::stream_out(iris, con = file(ndjs), verbose = FALSE)
+jsonlite::stream_out(diamonds[1:10000, ], con = file(ndjs), verbose = FALSE)
 
 testFunction <- function(src, key, value, query, fields) {
+  try(docdb_delete(src, key), silent = TRUE)
   on.exit(docdb_delete(src, key))
   suppressMessages(docdb_create(src, key, data))
   suppressMessages(docdb_create(src, key, ndjs))
@@ -314,18 +315,18 @@ result <- rbenchmark::benchmark(
   CouchDB = testFunction(src = srcCouchdb, key, value, query, fields),
   PostgreSQL = testFunction(src = srcPostgres, key, value, query, fields),
   DuckDB = testFunction(src = srcDuckdb, key, value, query, fields),
-  replications = 10L
+  replications = 3L
 )
 
-# 2024-09-29 with 2015 mobile hardware, databases via homebrew, R 4.4.1
+# 2024-10-19 with 2015 hardware, databases via homebrew on localhost, R 4.4.1
 result[rev(order(result$elapsed)), c('test', 'replications', 'elapsed')]
 #         test replications elapsed
-# 4    CouchDB           10   660.9
-# 3    Elastic           10    35.7
-# 5 PostgreSQL           10     4.4
-# 6     DuckDB           10     3.6
-# 1    MongoDB           10     3.4
-# 2     SQLite           10     3.1
+# 4    CouchDB            3   211.8
+# 3    Elastic            3    75.9
+# 5 PostgreSQL            3     4.2
+# 1    MongoDB            3     3.8
+# 6     DuckDB            3     2.9
+# 2     SQLite            3     2.1
 ```
 
 ## Testing {#testing}
@@ -333,38 +334,38 @@ result[rev(order(result$elapsed)), c('test', 'replications', 'elapsed')]
 Every database backend is subjected to identical tests, see [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R). 
 
 ```{r testing_and_coverage}
-# 2024-09-29
-suppressMessages(testthat::test_local())
+# 2024-10-19
+# suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
-# ✔ |      2 174 | couchdb [113.0s]                                                                              
-# ✔ |      1 173 | duckdb [8.9s]                                                                                 
-# ✔ |      2 172 | elastic [87.0s]                                                                               
-# ✔ |      2 172 | mongodb [7.9s]                                                                                
-# ✔ |        175 | postgres [12.3s]                                                                              
-# ✔ |        176 | sqlite [10.0s]                                                                                
+# ✔ |      2 174 | couchdb [122.9s]
+# ✔ |      1 173 | duckdb [9.8s]
+# ✔ |      2 172 | elastic [92.2s]
+# ✔ |      2 172 | mongodb [8.4s]
+# ✔ |        175 | postgres [12.2s]
+# ✔ |        176 | sqlite [8.7s]
 # 
-# ══ Results ═════════════════════════════════════════════════════
-# Duration: 239.5 s
+# ══ Results ══════════════════════════════════════════════════════════════════════════════════════════════════
+# Duration: 254.5 s
 # 
-# ── Skipped tests (7) ───────────────────────────────────────────
+# ── Skipped tests (7) ────────────────────────────────────────────────────────────────────────────────────────
 # • Testing for auto disconnect and shutdown not relevant (3): 
-#    test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): 
+#   test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4):
 #   test-couchdb.R:26:3, test-duckdb.R:22:3, test-elastic.R:21:3, 
 #   test-mongodb.R:24:3
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1042 ]
 
-# 2024-09-29
+# 2024-10-19
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 95.02%
+# nodbi Coverage: 92.71%
 # R/src_duckdb.R: 76.92%
+# R/create.R: 85.23%
 # R/src_mongo.R: 92.31%
-# R/update.R: 92.95%
 # R/zzz.R: 93.59%
-# R/query.R: 95.10%
+# R/update.R: 94.33%
+# R/query.R: 94.65%
 # R/src_postgres.R: 95.65%
-# R/create.R: 96.12%
 # R/get.R: 98.77%
 # R/delete.R: 98.96%
 # R/exists.R: 100.00%
