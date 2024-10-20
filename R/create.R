@@ -805,13 +805,26 @@ isUrl <- function(x) {
 #' @keywords internal
 #' @noRd
 isFile <- function(x) {
+
   # check if x is the name of a readable file
-  if (length(x) != 1L || !is.atomic(x) || !inherits(x, "character")) return(FALSE)
+
+  if (length(x) != 1L ||
+      !is.atomic(x) ||
+      !inherits(x, "character")) return(FALSE)
+
+  x <- normalizePath(x)
+
+  if (!file.exists(x)) return(FALSE)
+
   out <- try(
     suppressWarnings(
-      file.access(x, mode = 4)) == 0L,
+      file.access(x, mode = 4)[[1]]) == 0L,
     silent = TRUE)
-  return(!inherits(out, "try-error") && out)
+
+  if (inherits(out, "try-error") || !out) return(FALSE)
+
+  return(file.size(x) > 10L)
+
 }
 
 items2ndjson <- function(df, mergeIdCol = FALSE) {
