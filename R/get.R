@@ -30,6 +30,9 @@ docdb_get <- function(src, key, limit = NULL, ...) {
   assert(key, "character")
   assert(limit, "integer")
 
+  # early return
+  if (!any(docdb_list(src) == key)) return(NULL)
+
   params <- list(...)
   if (length(params[["fields"]]) ||
       length(params[["query"]]) ||
