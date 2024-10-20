@@ -525,7 +525,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
   ## localhost may be able to import from file,
   ## depending on postgres process rights
-  copyWorked <- TRUE
+  copyWorked <- 0L
   if (isFile(value) && grepl("^localhost$", src$host)) {
 
     value <- normalizePath(value)
@@ -638,8 +638,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
         }),
       silent = TRUE)
 
-
-  } # if localhost and file
+  } # if localhost and file and copyWorked
 
 
   # prepare returns
@@ -816,8 +815,6 @@ isFile <- function(x) {
   if (length(x) != 1L ||
       !is.atomic(x) ||
       !inherits(x, "character")) return(FALSE)
-
-  x <- normalizePath(x)
 
   if (!file.exists(x)) return(FALSE)
 
