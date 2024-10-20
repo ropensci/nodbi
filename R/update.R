@@ -512,6 +512,49 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
+  # use file based approach
+  if (grepl("^localhost$", src$host) &&
+      isFile(value) &&
+      (query == "{}")) {
+
+    # import into temporary table
+    tblName <- uuid::UUIDgenerate()
+    try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
+    on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
+
+    # need to read in as text to avoid the error
+    # Character with value 0x0a must be escaped
+    DBI::dbCreateTable(
+      conn =  src$con,
+      name = tblName,
+      fields = c("json" = "JSONB")
+    )
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0(
+        "COPY \"", tblName, '" ',
+        "FROM '", value, "' ",
+        "CSV QUOTE e'\x01' DELIMITER e'\x02';")
+    )
+
+    statement <- paste0(
+      'UPDATE "', key, '"
+       SET json = jsonb_merge_patch(json, injson)
+       FROM (SELECT
+        json->>\'_id\' AS in_id,
+        jsonb_merge_patch(json, \'{\"_id\": null}\') AS injson
+        FROM "', tblName, '"
+      ) AS tmp WHERE "', key, '"._id = tmp.in_id;'
+    )
+
+    result <- DBI::dbExecute(
+      conn = src$con,
+      statement = statement
+    )
+
+    return(result)
+  }
+
   # Since PostgreSQL has no internal function,
   # uses function inserted by nodbi::src_postgres
   updFunction <- "jsonb_merge_patch"
