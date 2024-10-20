@@ -816,10 +816,12 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       ii <- stringi::stri_replace_all_regex(ins, "\"(.+?)\"\\) IN \\((.+?) \\)", "$2")
       ii <- trimws(ii)
       ii <- stringi::stri_split_regex(ii, ifelse(isString, "', ", ", "))[[1]]
-      ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "")
+      ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "") # start or end delimiters
+      # strings are compared at their full length, cannot use anchors, see above
+      if (any(is.na(suppressWarnings(as.numeric(ii))))) ii <- paste0('(\\["|,")', ii, '(",|"\\])')
 
       # https://sqlite.org/src/file?filename=ext/misc/regexp.c
-      ii <- paste0("\"$.", i, "\") REGEXP '", paste0(ii, collapse = "|"), "'")
+      ii <- paste0("\"$.", i, "\") REGEXP '", paste0("(", ii, ")", collapse = "|"), "'")
       fldQ$queryCondition <- stringi::stri_replace_all_fixed(
         fldQ$queryCondition, ins, ii, vectorize_all = TRUE
       )
