@@ -83,11 +83,13 @@ docdb_query <- function(src, key, query, ...) {
     query <- "{}"
   }
 
+  # mangle parameters
+  params <- list(...)
+
   # query can be empty but then fields should not be empty
   if (jsonlite::minify(query) == '{}') {
 
-    # mangle parameters
-    params <- list(...)
+     # divert to docdb_get
     if (is.null(params$listfields) &&
         (is.null(params$fields) ||
          jsonlite::minify(params$fields) == '{}')) {
@@ -107,14 +109,22 @@ docdb_query <- function(src, key, query, ...) {
       # dispatch
       return(do.call(docdb_get, list(src = src, key = key, limit = limit, params)))
 
-    }}
+    }
+  }
+
+  # check field formats
+  if (!is.null(params$fields) &&
+      (jsonlite::minify(params$fields) != '{}') &&
+      (any(sapply(jsonlite::fromJSON(params$fields), typeof) != "integer"))) {
+    warning(
+      "Parameter fields should only have 0 or 1, as integers (not characters)",
+      call. = FALSE)
+  }
 
   # dispatch
   UseMethod("docdb_query", src)
 
 }
-
-
 
 #' @export
 docdb_query.src_couchdb <- function(src, key, query, ...) {
