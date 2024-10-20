@@ -326,7 +326,7 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
   # generate user info
   if (inherits(result, "try-error") ||
       any(grepl("error", result))) {
-    error <- result[grepl("rror", result)]
+    error <- result[grepl("rror", result)][[1]]
     error <- trimws(sub(".+E[0-9]+(.*?):.+", "\\1", error))
     warning(
       "Could not create some documents, reason: ",
@@ -873,104 +873,4 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
         check.names = FALSE
       ))
   }
-}
-
-value2ndjson <- function(value) {
-
-  # if value is not a file name, convert value
-  # into ndjson and keep filename in value
-  if (!isFile(value)) {
-
-    # temporary file and connection
-    tfname <- tempfile()
-    tfnameCon <- file(tfname, open = "wt")
-    # register to close and remove file after used for streaming
-    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-
-    # if json in character vector
-    if ((all(class(value) %in% "character")) &&
-        (length(value)  == 1L) &&
-        jsonlite::validate(value)
-    ) {
-      # convert to list
-      value <- jsonlite::fromJSON(value, simplifyVector = TRUE)
-    }
-
-    # handle url
-    if (isUrl(value)) {
-      # converts to list
-      value <- jsonlite::stream_in(url(value), verbose = FALSE)
-    }
-
-    # handle data frame
-    if (inherits(value, "data.frame") &&
-        is.na(match("_id", names(value))) &&
-        !identical(rownames(value),
-                   as.character(seq_len(nrow(value))))) {
-      # use rownames as _id's and remove rownames
-      value[["_id"]] <- row.names(value)
-      row.names(value) <- NULL
-    }
-
-    # handle ready-made data frames
-    if (inherits(value, "data.frame") &&
-        identical(names(value),"json") &&
-        all(vapply(value[["json"]], jsonlite::validate,
-                   logical(1L), USE.NAMES = FALSE))) {
-
-      if (!nrow(value)) return(0L)
-
-      writeLines(
-        text = stringi::stri_replace_all_fixed(
-          str = value[["json"]], pattern = "\n", replacement = "\\n"),
-        con = tfnameCon,
-        sep = "\n",
-        useBytes = TRUE)
-
-    } else
-
-      # handle ready-made data frames with _id's
-      if (inherits(value, "data.frame") &&
-          identical(names(value), c("_id", "json")) &&
-          all(vapply(value[["json"]], jsonlite::validate,
-                     logical(1L), USE.NAMES = FALSE))) {
-
-        if (!nrow(value)) return(0L)
-
-        writeLines(
-          text = sprintf(
-            '{"_id":%s, %s',
-            value[["_id"]],
-            # remove any _id's from json
-            gsub("(\"_id\":[^,]+?[,}])|(^[{])", "", value[["json"]])),
-          con = tfnameCon,
-          sep = "\n",
-          useBytes = TRUE)
-
-      } else {
-
-        if (!length(value) || # testing list
-            (is.character(value) && !nchar(value)) ||
-            (is.data.frame(value)) && !nrow(value)) return(0L)
-
-        jsonlite::stream_out(
-          jsonlite::fromJSON(
-            jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)),
-          con = tfnameCon,
-          verbose = FALSE,
-          pagesize = 5000L,
-          auto_unbox = TRUE)
-
-      } # handle ready-made data frames
-
-    # close
-    close(tfnameCon)
-
-    # make value the file name
-    value <- tfname
-
-  } # !isFile(value)
-
-  return(value)
-
 }

@@ -211,7 +211,9 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{"rows.elements.distance.somevalue": 1}')), c(2L, 2L))
   expect_equal(nrow(docdb_query(src = src, key = key, query = '{}', fields = '{"destination_addresses": 1}')), 2L)
   expect_equal(length(unlist(docdb_query(
-    src = src, key = key, query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA"]}}', fields = '{"destination_addresses": 1, "_id": 0}'))), 3L)
+    src = src, key = key,
+    query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA"]}}',
+    fields = '{"destination_addresses": 1, "_id": 0}'))), 3L)
   # note: str, typeof differ by database backend
   expect_true(docdb_delete(src = src, key = key))
 

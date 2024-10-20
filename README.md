@@ -390,14 +390,14 @@ Every database backend is subjected to identical tests, see
 
 # 2024-10-19
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 92.71%
+# nodbi Coverage: 95.02%
 # R/src_duckdb.R: 76.92%
-# R/create.R: 85.23%
 # R/src_mongo.R: 92.31%
 # R/zzz.R: 93.59%
 # R/update.R: 94.33%
 # R/query.R: 94.65%
 # R/src_postgres.R: 95.65%
+# R/create.R: 95.96%
 # R/get.R: 98.77%
 # R/delete.R: 98.96%
 # R/exists.R: 100.00%

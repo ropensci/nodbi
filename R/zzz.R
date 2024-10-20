@@ -344,7 +344,7 @@ digestFields <- function(f, q) {
                "( AND | NOT | OR |\\)*$)"),
         # select([ .friends | m1 | .id | m1 ] | map ( . > 1 ) | any )
         paste0(" ([ .", gsub('"[.]"', " | m1 | .", i), " ] ",
-               "| map( . | m1 | ", xtr, " ) | any ) $3"),
+               "| map( . | m1 | (", xtr, " ) ) | any ) $3"),
         vectorize_all = FALSE
       )
 

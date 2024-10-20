@@ -73,16 +73,20 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   # value can now be a vector
 
   # handle potential json string input
-  if (length(value) == 1 && is.atomic(value) &&
-      is.character(value) && jsonlite::validate(value)
+  if (length(value) == 1 &&
+      is.atomic(value) &&
+      is.character(value) &&
+      jsonlite::validate(value)
   ) {
     # check format
-    if (all(jqr::jq(value, " .[] | type ") == '"array"') && length(jqr::jq(value, " .[] ")) > 1L) stop(
-      "Require JSON string that is an array of documents, not a set of fields that are arrays."
-    )
+    if (all(jqr::jq(value, " .[] | type ") == '"array"') &&
+        (length(jqr::jq(value, " .[] ")) > 1L)) stop(
+          "Require JSON string that is an array of documents, not a set of fields that are arrays."
+        )
     # check if top level is an array
     chk <- jqr::jq(value, " type ")
-    if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
+    if ((length(chk) == 1L) &&
+        (chk == '"array"')) value <- jqr::jq(value, " .[] ")
   }
 
   # data frame to json
@@ -116,7 +120,8 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
     )))
 
   # early return if none found
-  if (query == "{}" && !length(valueIds)) return(0L)
+  if (query == "{}" &&
+      !length(valueIds)) return(0L)
 
   # check
   if (query != "{}" && length(valueIds)) warning(
@@ -262,9 +267,9 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
   # check
   if (!all(valueClass %in% "data.frame") &&
       nrow(value) > 1L && !identical(nrow(value), length(ids))) stop(
-    "Unequal number of documents identified (", length(ids),
-    ") and of documents in 'value' (", nrow(value), ")"
-  )
+        "Unequal number of documents identified (", length(ids),
+        ") and of documents in 'value' (", nrow(value), ")"
+      )
 
   # how to handle?
   if (nrow(value) != length(ids)) {
@@ -457,10 +462,9 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
-  # TODO turn all kind of values into ndjson files?
-
   # use file based approach
-  if (isFile(value) && (query == "{}")) {
+  if (isFile(value) &&
+      (query == "{}")) {
 
     # import into temporary table
     tblName <- uuid::UUIDgenerate()
@@ -570,10 +574,9 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
-  # TODO turn all kind of values into ndjson files?
-
   # use file based approach
-  if (isFile(value) && (query == "{}")) {
+  if (isFile(value) &&
+      (query == "{}")) {
 
     statement <- paste0(
       'UPDATE "', key, '"

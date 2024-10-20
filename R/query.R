@@ -219,7 +219,7 @@ docdb_query.src_couchdb <- function(src, key, query, ...) {
   }
 
   # - add selector, limit and close query
-  # TODO jqrWhere step should limit the final number of documents
+  # TODO jqrWhere should be the step to limit the final number of documents
   query <- paste0('{"selector": ', query, ', "limit": ', limit, '}')
 
 
@@ -1506,6 +1506,11 @@ processDbGetQuery <- function(
     # early exit
     if (file.size(tjname) <= 2L) return(NULL)
 
+    # debug
+    if (options()[["verbose"]]) {
+      message("NDJSON lines: ", R.utils::countLines(tjname), "\n")
+    }
+
     # swap file name
     tfname <- tjname
 
@@ -1627,7 +1632,7 @@ processIncludeFields <- function(
     # m1 replaces missing values with null to allow further processing
     #    if a field cannot be found, but takes care of boolean because
     #    "It is an error to use length on a boolean" and then goes
-    #    recursively into arrays
+    #    recursively into arrays; same as in digestFields() in zzz.R
     'def m1: . | (if (type == "array" or type == "object" or type == "string") and
      length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end); ',
     # m2 provides a final scalar unless there are several elements
