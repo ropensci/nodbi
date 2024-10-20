@@ -516,6 +516,10 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
+  ## localhost may be able to import from file,
+  ## depending on postgres process rights
+  copyWorked <- 0L
+
   # use file based approach
   if (grepl("^localhost$", src$host) &&
       isFile(value) &&
@@ -533,13 +537,20 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
       name = tblName,
       fields = c("json" = "JSONB")
     )
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0(
-        "COPY \"", tblName, '" ',
-        "FROM '", value, "' ",
-        "CSV QUOTE e'\x01' DELIMITER e'\x02';")
-    )
+
+    copyWorked <- try(
+      DBI::dbExecute(
+        conn = src$con,
+        statement = paste0(
+          "COPY \"", tblName, '" ',
+          "FROM '", value, "' ",
+          "CSV QUOTE e'\x01' DELIMITER e'\x02';")
+      ), silent = TRUE)
+
+  }
+
+  if (!inherits(copyWorked, "try-error") &&
+      (copyWorked >= 1L)) {
 
     statement <- paste0(
       'UPDATE "', key, '"
@@ -557,6 +568,7 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
     )
 
     return(result)
+
   }
 
   # Since PostgreSQL has no internal function,

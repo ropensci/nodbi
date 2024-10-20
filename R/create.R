@@ -526,7 +526,8 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
   ## localhost may be able to import from file,
   ## depending on postgres process rights
   copyWorked <- 0L
-  if (isFile(value) && grepl("^localhost$", src$host)) {
+  if (isFile(value) &&
+      grepl("^localhost$", src$host)) {
 
     value <- normalizePath(value)
 
@@ -554,7 +555,8 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
 
   }
 
-  if (!inherits(copyWorked, "try-error") && (copyWorked >= 1L)) {
+  if (!inherits(copyWorked, "try-error") &&
+      (copyWorked >= 1L)) {
 
     # import from ndjson file
     result <- try(
