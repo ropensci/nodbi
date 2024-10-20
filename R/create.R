@@ -523,12 +523,11 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     existsMessage(key)
   }
 
-
-  # localhost can import from file
+  ## localhost may be able to import from file,
+  ## depending on postgres process rights
+  copyWorked <- TRUE
   if (isFile(value) && grepl("^localhost$", src$host)) {
 
-
-    # turn value into ndjson file
     value <- normalizePath(value)
 
     # import into temporary table
@@ -543,13 +542,19 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
       name = tblName,
       fields = c("json" = "JSONB")
     )
-    DBI::dbExecute(
-      conn = src$con,
-      statement = paste0(
-        "COPY \"", tblName, '" ',
-        "FROM '", value, "' ",
-        "CSV QUOTE e'\x01' DELIMITER e'\x02';")
-    )
+
+    copyWorked <- try(
+      DBI::dbExecute(
+        conn = src$con,
+        statement = paste0(
+          "COPY \"", tblName, '" ',
+          "FROM '", value, "' ",
+          "CSV QUOTE e'\x01' DELIMITER e'\x02';")
+      ), silent = TRUE)
+
+  }
+
+  if (!inherits(copyWorked, "try-error") && (copyWorked >= 1L)) {
 
     # import from ndjson file
     result <- try(
@@ -564,9 +569,9 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
           " FROM \"", tblName, "\";")
       ), silent = TRUE)
 
+  } else {
 
-  } else { # regular import
-
+    ## regular import
 
     # convert lists to json
     if (inherits(value, "list")) {
@@ -823,7 +828,7 @@ isFile <- function(x) {
 
   if (inherits(out, "try-error") || !out) return(FALSE)
 
-  return(file.size(x) > 10L)
+  return(file.size(x) > 5L)
 
 }
 

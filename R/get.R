@@ -30,7 +30,7 @@ docdb_get <- function(src, key, limit = NULL, ...) {
   assert(key, "character")
   assert(limit, "integer")
 
-  # early return
+  # early return if container does not exist
   if (!any(docdb_list(src) == key)) return(NULL)
 
   params <- list(...)
