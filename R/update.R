@@ -129,7 +129,13 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   #
   input <- docdb_query(src, key, query)
   if (!length(input)) return(0L)
-  if (!length(valueIds)) valueIds <- input[["_id"]]
+  #
+  # check
+  if (length(value) > 1L &&
+      !identical(nrow(input), length(value))) stop(
+        "Unequal number of documents identified (", nrow(input),
+        ") and of documents in 'value' (", length(value), ")"
+      )
   #
   ndjson <- NULL
   jsonlite::stream_out(input, con = textConnection(
@@ -142,51 +148,56 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
   on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
 
-  # check
-  if (length(value) > 1L && !identical(nrow(input), length(value))) stop(
-    "Unequal number of documents identified (", nrow(input),
-    ") and of documents in 'value' (", length(value), ")"
-  )
-
   # merge and append to file
-  for (i in seq_along(valueIds)) {
-
-    idValue <- jqr::jq(
-      textConnection(value),
-      paste0('select(._id == "', valueIds[i], '")'))
-
-    if (!length(idValue)) {
-      if (length(value) > 1L) {
-        idValue <- value[i]
-      } else {
-        idValue <- value
-      }
-    }
-
-    # merge input json with value
+  if (!length(valueIds)) {
+    #
     jqr::jq(
       x = textConnection(paste0(
-        "[", jqr::jq(
-          textConnection(ndjson),
-          paste0("select(._id == \"", valueIds[i], "\")")),
-        ",", idValue, "]")),
+        "[", ndjson, ",", value, "]")),
       " reduce .[] as $item ({}; . * $item) ",
       out = tfnameCon)
-
+    #
+  } else {
+    #
+    # iterate over _ids to be updated
+    for (i in seq_len(nrow(input))) {
+      #
+      idValue <- jqr::jq(
+        value, paste0('select(._id == "', input[["_id"]][i], '")'))
+      #
+      # merge input json with value
+      jqr::jq(
+        x = textConnection(paste0(
+          "[", jqr::jq(
+            textConnection(ndjson),
+            paste0("select(._id == \"", input[["_id"]][i], "\")")),
+          ",", idValue, "]")),
+        " reduce .[] as $item ({}; . * $item) ",
+        out = tfnameCon)
+      #
+    }
+    #
   }
-
   close(tfnameCon)
 
-  # note: sofa::db_bulk_update would change all
-  # documents in the container, therefore do:
-  # - delete documents
-  invisible(docdb_delete(src, key, query = query, ...))
-  # - create documents
-  result <- suppressMessages(
-    docdb_create(src, key, tfname, ...))
+  # update documents
+  docids <- as.character(jqr::jq(file(tfname), " ._id "))
+  docids <- gsub('"', "", docids)
+  docs <- jqr::jq(file(tfname), " del (._id) ")
+
+  result <- sapply(seq_along(docids), function(i) {
+    sofa::doc_upsert(
+      cushion = src$con,
+      dbname = key,
+      doc = docs[i],
+      docid = docids[i]
+    )[["ok"]]}
+  )
 
   # return
-  return(result)
+  return(sum(result))
+
+  # 165s for 4355 docs = 0.038 s/doc
 
 }
 
