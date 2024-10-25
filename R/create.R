@@ -354,14 +354,16 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
         code = {
           DBI::dbExecute(
             conn = src$con,
-            statement = paste0("CREATE TABLE \"", key, "\"",
-                               " ( _id TEXT PRIMARY_KEY NOT NULL,",
-                               "  json JSONB);"))
+            statement = paste0(
+              "CREATE TABLE \"", key, "\"",
+              " ( _id TEXT PRIMARY_KEY NOT NULL,",
+              "  json JSONB);"))
           DBI::dbExecute(
             conn = src$con,
-            statement = paste0("CREATE UNIQUE INDEX ",
-                               "\"", key, "_index\" ON ",
-                               "\"", key, "\" ( _id );"))
+            statement = paste0(
+              "CREATE UNIQUE INDEX ",
+              "\"", key, "_index\" ON ",
+              "\"", key, "\" ( _id );"))
         }), silent = TRUE)
 
     if (inherits(out, "try-error") &&
@@ -505,15 +507,16 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
       # dbiWithTransaction does not work
       DBI::dbExecute(
         conn = src$con,
-        statement = paste0("CREATE TABLE \"", key, "\"",
-                           " ( _id TEXT PRIMARY KEY,",
-                           "  json JSONB);"))
+        statement = paste0(
+          "CREATE TABLE \"", key, "\"",
+          " ( _id TEXT PRIMARY KEY,",
+          "  json JSONB);"))
       DBI::dbExecute(
         conn = src$con,
-        statement = paste0("CREATE UNIQUE INDEX ",
-                           "\"", key, "_index\" ON ",
-                           "\"", key, "\" ( _id );"))
-
+        statement = paste0(
+          "CREATE UNIQUE INDEX ",
+          "\"", key, "_index\" ON ",
+          "\"", key, "\" ( _id );"))
     }, silent = TRUE)
 
     if (inherits(out, "try-error") &&
@@ -669,14 +672,16 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
         code = {
           DBI::dbExecute(
             conn = src$con,
-            statement = paste0("CREATE TABLE \"", key, "\"",
-                               " ( _id TEXT PRIMARY KEY NOT NULL,",
-                               "  json JSON);"))
+            statement = paste0(
+              "CREATE TABLE \"", key, "\"",
+              " ( _id TEXT PRIMARY KEY NOT NULL,",
+              "  json JSON);"))
           DBI::dbExecute(
             conn = src$con,
-            statement = paste0("CREATE UNIQUE INDEX ",
-                               "\"", key, "_index\" ON ",
-                               "\"", key, "\" ( _id );"))
+            statement = paste0(
+              "CREATE UNIQUE INDEX ",
+              "\"", key, "_index\" ON ",
+              "\"", key, "\" ( _id );"))
         }), silent = TRUE)
 
     if (inherits(out, "try-error") &&
