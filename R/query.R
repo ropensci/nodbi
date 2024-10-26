@@ -89,7 +89,7 @@ docdb_query <- function(src, key, query, ...) {
   # query can be empty but then fields should not be empty
   if (jsonlite::minify(query) == '{}') {
 
-     # divert to docdb_get
+    # divert to docdb_get
     if (is.null(params$listfields) &&
         (is.null(params$fields) ||
          jsonlite::minify(params$fields) == '{}')) {
@@ -369,6 +369,13 @@ docdb_query.src_elastic <- function(src, key, query, ...) {
   docids <- docids[sapply(docids, "[[", "_score") >= 1.0]
   docids <- sort(sapply(docids, "[[", "_id"))
   if (is.null(docids)) return(NULL)
+  if ((query == "*") &&
+      (length(fldQ$includeFields) == 1) &&
+      (fldQ$includeFields == "_id")) return(
+        data.frame(
+          `_id` = docids,
+          check.names = FALSE,
+          stringsAsFactors = FALSE))
 
   # - debug
   if (options()[["verbose"]]) {
@@ -1634,9 +1641,8 @@ processIncludeFields <- function(
     #    "It is an error to use length on a boolean" and then goes
     #    recursively into arrays; same as in digestFields() in zzz.R
     'def m1: . | (if (type == "array" or type == "object" or type == "string") and
-     length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end); ',
-    # m2 provides a final scalar unless there are several elements
-    'def m2: . | (if length > 1 then [.][] else .[] end); ')
+     length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end); '
+  )
 
   if (!length(extractedFields)) {
 
@@ -1681,21 +1687,17 @@ processIncludeFields <- function(
 
   # keep _id even if not specified, can be
   # removed with _id:0 in subsequent step
-  jqFields <- '"_id"'
-
-  if (length(subFields)) jqFields <-
-    paste0(jqFields, ", ", collapse = "")
-
   jqFields <- paste0(
-    jqFcts, "{",
-    paste0(c(jqFields, paste0(
-      sapply(
-        subFields,
+    jqFcts,
+    paste0(c(
+      '{"_id\": ."_id"',
+      paste0(sapply(
+        subFields[subFields != "_id"],
         function(s) {
           # used for postgres which already
           # extracts nested fields by SQL
           if (length(s) == 1L) return(paste0(
-            '"', s, '": [."', s, '" | m1 ] | m2 '
+            '"', s, '": [."', s, '" | m1 ] '
           ))
           # other cases
           # -first item
@@ -1708,32 +1710,99 @@ processIncludeFields <- function(
           }
           # - last item
           k <- paste0(k, '.', s[length(s)], '": ')
-          v <- paste0(v, '."', s[length(s)], '" | m1 ] | m2 ')
+          v <- paste0(v, '."', s[length(s)], '" | m1 ] ')
           # - combine items
           return(paste0(k, v))
         }, USE.NAMES = FALSE),
-      collapse = ", ")), collapse = ""), "}")
+        collapse = ", ")),
+      collapse = ", "),
+    "}")
 
   # debug
   if (options()[["verbose"]]) {
     message("JQ processOutput: ", jqFields, "\n")
   }
 
-  # early return
-  if (is.null(tjname)) return(
-    jsonlite::stream_in(
-      textConnection(
-        jqr::jq(file(tfname), jqFields)),
-      verbose = FALSE))
+  # get another file name
+  txname <- tempfile()
+  on.exit(try(unlink(txname), silent = TRUE), add = TRUE)
 
   # write data for further processing
   jqr::jq(
     file(tfname),
     jqFields,
-    out = tjname
+    out = txname
   )
 
-  # early exit
-  if (file.size(tjname) <= 2L) return(NULL)
+  # get lengths to see for which variables m2 has to be applied
+  subFields <- sapply(subFields, function(i) paste0(i, collapse = "."))
+  subFields <- subFields[subFields != "_id"]
+  fieldsLength <- NULL
+
+  if (length(subFields)){
+
+    fieldsLength <- jqr::jq(
+      file(txname),
+      paste0('{', paste0('"', subFields, '": ."', subFields, '" | length ', collapse = ", "), '}')
+    )
+
+    fieldsLength <- jsonlite::stream_in(textConnection(fieldsLength), verbose = FALSE)
+    fieldsLength <- sapply(fieldsLength, function(i) all(i == 1L))
+    fieldsLength <- names(fieldsLength[fieldsLength])
+  }
+
+  # need to apply m2
+  if (length(fieldsLength)) {
+
+    jqFcts <- paste0(
+      # m2 provides a final scalar unless there are several elements
+      'def m2: . | (if length > 1 then [.][] else .[] end); '
+    )
+
+    jqFields <- paste0(
+      jqFcts,
+      '{ "_id": ."_id", ',
+      paste0(
+        '"', subFields, '": ."', subFields, '"',
+        ifelse(subFields == fieldsLength, ' | m2 ', ''),
+        collapse = ", "),
+      '}')
+
+    # debug
+    if (options()[["verbose"]]) {
+      message("JQ processOutput: ", jqFields, "\n")
+    }
+
+    # early return
+    if (is.null(tjname)) return(
+      jsonlite::stream_in(
+        textConnection(
+          jqr::jq(file(txname), jqFields)),
+        verbose = FALSE))
+
+    # write data for further processing
+    jqr::jq(
+      file(txname),
+      jqFields,
+      out = tjname
+    )
+
+    # early exit
+    if (file.size(tjname) <= 2L) return(NULL)
+
+  } else {
+
+    # early return
+    if (is.null(tjname)) return(
+      jsonlite::stream_in(file(txname),
+                          verbose = FALSE))
+
+    # early exit
+    if (file.size(txname) <= 2L) return(NULL)
+
+    # tjname is not null, thus
+    file.rename(txname, tjname)
+
+  }
 
 } # processIncludeFields
