@@ -150,6 +150,7 @@ test_that("docdb_query", {
   expect_warning(docdb_query(src = src, key = key, query = "", fields = '{"_id":1}'), "deprecated")
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}')), c(7L, 15L))
   expect_equal(nrow(docdb_query(src = src, key = key, query = '{}', limit = 3L)), 3L)
+  expect_message(docdb_query(src = src, key = key, query = '{}'), "calling docdb_get")
   #
   expect_error(docdb_query(src = src, key = key, query = '{}', fields = "NOTJSON"))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{}', fields = '{}')), c(7L, 15L))
