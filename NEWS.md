@@ -1,7 +1,9 @@
 # nodbi 0.10.7.9000
 
+## Potentially breaking changes
+* `docdb_query()` modified so that a type (atomic, list) is returned that is the same across all rows (previously, e.g. a mix of single-item lists simplified to atomic values and of multi-item lists were returned)
+
 ## Changes
-* `docdb_query()` slightly modified so that a type (atomic, list) is returned that is the same across all rows (previously, e.g. a mix of single-item lists simplified to atomic values and of multi-item lists were returned)
 * `docdb_create()` and `docdb_update()` for SQLite and PostgreSQL (only if on localhost) now import directly and fast from `ndjson` files, in analogy to DuckDB (needs RSQLite >= 2.3.7.9014)
 * Refactored `docdb_update()` for `src_couchdb()`
 * Add message from `docdb_create()` if a data frame has column names with a dot(s) since dots in `nodbi` are used for `JSON` dot paths
