@@ -29,6 +29,10 @@ src_duckdb <- function(
     dbdir = attr(drv, "dbdir"),
     ...) {
 
+  # check minimum version
+  pkgNeeded("duckdb", "1.1.0")
+  
+  # create connection
   con <- duckdb::dbConnect(
     drv = drv,
     dbdir = dbdir,
@@ -46,9 +50,8 @@ src_duckdb <- function(
   xtmsg <- function() {
     try(DBI::dbDisconnect(con, shutdown = TRUE), silent = TRUE)
     stop(
-    "DuckDB extension JSON not loadable. To install it, run ",
-    "DBI::dbExecute(duckdb::dbConnect(duckdb::duckdb()), 'INSTALL json;') or ",
-    "install.packages('duckdb', repos = 'https://duckdb.r-universe.dev')",
+    "DuckDB extension JSON not loadable. To install it, run \n",
+    "DBI::dbExecute(duckdb::dbConnect(duckdb::duckdb()), 'INSTALL json;')",
     call. = FALSE)
   }
   #

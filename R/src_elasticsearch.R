@@ -39,9 +39,14 @@
 src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
   transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...) {
 
+  # check minimum version
+  pkgNeeded("elastic", "1.0.0")
+  
+  # create connection
   x <- elastic::connect(host = host, port = port, path = path,
     transport_schema = transport_schema, user = user,
     pwd = pwd, force = force, ...)
+  
   dbs <- names(elastic::aliases_get(x))
   structure(list(con = x, info = x$ping(), dbs = dbs),
             class = c("src_elastic", "docdb_src"),

@@ -54,6 +54,30 @@ assert <- function(x, y) {
 
 
 
+#' pkgNeeded
+#'
+#' helps to manage database backends
+#'
+#' @keywords internal
+#' @noRd
+#'
+pkgNeeded <- function(pkg, minV) {
+  
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(
+      "Package '", pkg, 
+      "' must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+  
+  return(utils::packageVersion(pkg) >= 
+    package_version(minV))
+  
+}
+
+
+
 #' closeNodbiConnections
 #'
 #' ensure closing database connection(s)
@@ -62,10 +86,10 @@ assert <- function(x, y) {
 #' @noRd
 #'
 closeNodbiConnections <- function(e) {
-
+  
   # this function is called by .onLoad, .onUnload, and
   # from reg.finalizer in src_{sqlite,postgres,duckdb}
-
+  
   # search environment for docdb_src connections
   objIsNodbiConnection <- sapply(
     ls(e), function(i)
@@ -74,18 +98,18 @@ closeNodbiConnections <- function(e) {
   )
   if (!length(objIsNodbiConnection)) return(invisible(NULL))
   objIsNodbiConnection <- objIsNodbiConnection[objIsNodbiConnection]
-
+  
   # disconnect helper function
   nodbiDisconnect <- function(objName) {
-
+    
     # get duckdb driver information
     ddbdrv <- attr(eval(parse(text = objName))$con, "driver")
-
+    
     # close valid, and also invalid connections such as
     # needed for DuckDB where then driver is not null
     if (DBI::dbIsValid(eval(parse(text = objName))$con) ||
         (!is.null(ddbdrv) && DBI::dbIsValid(ddbdrv))) {
-
+      
       # disconnect and shutdown if needed
       res <- try(suppressWarnings(
         DBI::dbDisconnect(
@@ -94,20 +118,20 @@ closeNodbiConnections <- function(e) {
           # does not adversely affect other backends
           shutdown = TRUE)),
         silent = TRUE)
-
+      
       # inform user
       if (!inherits(res, "try-error") && res)
         message("nodbi: docdb_src '", objName, "' disconnected and shut down. ")
-
+      
     }
   }
-
+  
   # iterate over connections
   for (i in seq_along(objIsNodbiConnection)) {
-
+    
     # get name of connection object
     objName <- names(objIsNodbiConnection[i])
-
+    
     # run disconnect
     switch(
       # class is e.g., src_duckdb docdb_src
@@ -118,7 +142,7 @@ closeNodbiConnections <- function(e) {
       NULL
     )
   }
-
+  
 }
 
 
@@ -132,17 +156,17 @@ closeNodbiConnections <- function(e) {
 #' @noRd
 #'
 .onLoad <- function(libname, pkgname) {
-
+  
   # register closing our connections
   reg.finalizer(
     e = globalenv(),
     f = closeNodbiConnections,
     onexit = TRUE
   )
-
+  
   # load javascript
   initTransformers()
-
+  
 }
 
 
@@ -155,9 +179,9 @@ closeNodbiConnections <- function(e) {
 #' @noRd
 #'
 .onUnload <- function(libpath) {
-
+  
   closeNodbiConnections(e = globalenv())
-
+  
 }
 
 
@@ -176,30 +200,30 @@ closeNodbiConnections <- function(e) {
 #' @noRd
 #'
 initTransformers <- function() {
-
+  
   # early exit
   if (length(.nodbi)) return(NULL)
-
+  
   # prepare V8, see ./inst/js/
   ct <- V8::v8()
-
+  
   # get javascript
   ct$source(system.file("js/bundle.js", package = "nodbi"))
-
+  
   # expects mdb to be db.user.find('{}')
   ct$assign("mongo2sql", V8::JS("function(mdb) {out = injs.convertToSQL(mdb); return out;}"))
-
+  
   # assign into package private environment, see zzz.R
   assign("ct", ct, envir = .nodbi)
-
+  
   # debug
   if (options()[["verbose"]]) {
     message("\nJS initiated\n")
   }
-
+  
   # exit
   invisible(NULL)
-
+  
 }
 
 
@@ -217,25 +241,25 @@ initTransformers <- function() {
 #' @noRd
 #'
 digestFields <- function(f, q) {
-
+  
   # check parameter
   if (is.null(f)) f <- "{}"
   f <- jsonlite::minify(f)
-
+  
   # translate q into SQL query syntax using mongo2sql
   initTransformers()
-
+  
   # - used:
   # $gt, $gte, $lt, $lte, $ne
   # $nin, $in, $regex,
   # $not, $and, $or, $nor
-
+  
   # - not used:
   # $geoIntersects, $geoWithin,
   # $mod, $exists, $size, $nearSphere, $near
   # $text, $all, $where, $comment,
   # $meta, $slice, $elemMatch
-
+  
   # stop if unused operators are in query
   usedOps <- c("$options", "$eq", "$gt", "$gte", "$lt", "$lte",
                "$ne", "$in", "$regex", "$and", "$or", "$nor")
@@ -244,47 +268,47 @@ digestFields <- function(f, q) {
     stop("nodbi only supports: ", paste0(usedOps[-1], collapse = " / "),
          "; this was the query used: ", q)
   }
-
+  
   sqlQ <- .nodbi$ct$call("mongo2sql", paste0("db.user.find(", q, ");"))
-
+  
   # query mangling
-
+  
   queryFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     sqlQ, '"([-@._\\w]+?)"')[[1]][, 2, drop = TRUE]))
-
+  
   if (!length(queryFields) & q != "{}") stop(
     "Parameter 'query' did not reference any fields:\n", q)
-
+  
   queryRootFields <- gsub("[.].*", "", queryFields)
-
+  
   queryPaths <- character(0L)
   queryCondition <- character(0L)
-
+  
   if (length(queryFields)) {
-
+    
     # SELECT * FROM user WHERE <extract this>;
     queryCondition <- sub(".+? WHERE (.+);", "\\1", sqlQ)
-
+    
     # "a.b" to "a"."b"
     queryCondition <- stringi::stri_replace_all_fixed(
       queryCondition, queryFields, gsub("[.]", '"."', queryFields),
       vectorize_all = FALSE
     )
     queryPaths <- gsub("[.]", '"."', queryFields)
-
+    
     # = to ==
     queryCondition <- sub(" = ", " == ", queryCondition)
-
+    
   }
-
+  
   # fields mangling
-
+  
   includeFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     f, '"([-@._\\w]+?)":[ ]*1')[[1]][, 2, drop = TRUE]))
-
+  
   includeRootFields <- unique(gsub("[.].*", "", includeFields))
   includeRootFields <- includeRootFields[includeRootFields != "_id"]
-
+  
   includeMaxCharFields <- sapply(
     includeFields, function(i) {
       if (!grepl(".", i, fixed = TRUE)) return(i)
@@ -294,14 +318,14 @@ digestFields <- function(f, q) {
       locDot <- stringi::stri_locate_last_fixed(locDot, ".")[1, "start", drop = TRUE]
       substring(i, 1L, locDot - 1L)
     }, USE.NAMES = FALSE)
-
+  
   excludeFields <- unique(stats::na.omit(stringi::stri_match_all_regex(
     f, '"([-@._\\w]+?)":[ ]*0')[[1]][, 2, drop = TRUE]))
-
+  
   fieldStrings <- unique(c(includeFields, excludeFields))
-
+  
   # translate mongo query into jq script to filter and select:
-
+  
   # {"$or": [
   #   {"email": {"$regex": "lacychen@conjurica.com"}},
   #   {"tags": {"$regex": "^duis$"}}
@@ -317,26 +341,26 @@ digestFields <- function(f, q) {
   #   or
   #   ([ .tags ] | map( . | m1 | test("^duis$") ) | any )
   # )
-
+  
   queryJq <- gsub("'", '"', queryCondition)
   # ugly but robust
   for (i in queryPaths) {
-
+    
     # - handle IN since this uses brackets around argument
     xtr <- stringi::stri_extract_all_regex(
       queryJq, paste0("(\"", i, "\") IN (\\(.+?\\))"))[[1]]
-
+    
     if (!all(is.na(xtr))) {
-
+      
       xtr <- stringi::stri_replace_all_regex(
         xtr, paste0("(\"", i, "\") IN \\((.+?)\\)"), "$2")[[1]]
-
+      
       # split on comma after number or double quote, avoid splitting on comma in string
       xtr <- strsplit(gsub("([0-9\"]),", "\\1@", xtr), "@")[[1]]
-
+      
       # recompose
       xtr <- paste0(" . == ", xtr, collapse = " or ")
-
+      
       # insert
       queryJq <- stringi::stri_replace_all_regex(
         queryJq,
@@ -347,9 +371,9 @@ digestFields <- function(f, q) {
                "| map( . | m1 | (", xtr, " ) ) | any ) $3"),
         vectorize_all = FALSE
       )
-
+      
     }
-
+    
     # - default operator handling
     queryJq <- stringi::stri_replace_all_regex(
       queryJq,
@@ -361,29 +385,29 @@ digestFields <- function(f, q) {
              "| map( . | m1 | . $2 ) | any ) $3"),
       vectorize_all = FALSE
     )
-
+    
   }
-
+  
   ## special cases
-
+  
   # important
   queryJq <- gsub(" ==* ", " == ", queryJq)
-
+  
   # https://jqlang.github.io/jq/manual/#test
   # https://jqlang.github.io/jq/manual/#regular-expressions
   queryJq <- gsub("REGEXP \"(.+?)\"", '| test("\\1")', queryJq)
   queryJq <- gsub("( AND | NOT | OR )", "\\L\\1", queryJq, perl = TRUE)
-
+  
   # null is less than anything https://jqplay.org/s/w-kmDHvfMfqVt3z
   queryJq <- gsub(" . != ([^nul])", " . != null and . != \\1", queryJq)
   queryJq <- gsub(" . (<=?) ([^nul])", " . != null and . \\1 \\2", queryJq)
-
+  
   # add function definition
   queryJq <- paste0('
     def m1: . | (if (type == "array" or type == "object" or type == "string") and
     length == 0 then null else (if type == "array" then (.[] | m1) else [.][] end) end);
     select(', queryJq, ')')
-
+  
   # output
   return(list(
     # vector of fields
@@ -397,7 +421,7 @@ digestFields <- function(f, q) {
     queryCondition = queryCondition,
     queryJq = queryJq
   ))
-
+  
 }
 
 
@@ -413,22 +437,22 @@ digestFields <- function(f, q) {
 #' @noRd
 #'
 insObj <- function(x, p = parent.frame(), e = NULL) {
-
+  
   x <- gsub("\n+", " ", x)
   x <- gsub("  +", " ", x)
-
+  
   allFound <- stringi::stri_extract_all_regex(x, "(/[*][*].*?[*][*]/)", simplify = FALSE)[[1]]
-
+  
   if (setequal(allFound, e)) return(x)
   if (all(is.na(allFound))) return(x)
-
+  
   for (oneFound in unique(allFound)) {
-
+    
     i <- stringi::stri_replace_all_fixed(oneFound, c("/**", "**/"), "", vectorize_all = FALSE)
     i <- trimws(i)
     b <- stringi::stri_extract_all_fixed(i, c("'", '"'), simplify = FALSE)
     b <- unique(stats::na.omit(unlist(b)))
-
+    
     i <- gsub("'|\"", "", i)
     if (grepl("[$]", i)) { # handle list
       ii <- sub(".+[$](.+)", "\\1", i)
@@ -436,7 +460,7 @@ insObj <- function(x, p = parent.frame(), e = NULL) {
     } else {
       c <- get(i, envir = p)
     }
-
+    
     if (!is.null(c) && length(c)) {
       if (length(c) > 1L) stop(
         call. = FALSE,
@@ -445,7 +469,7 @@ insObj <- function(x, p = parent.frame(), e = NULL) {
       x <- stringi::stri_replace_all_fixed(x, oneFound, c)
     }
   }
-
+  
   # recurse
   insObj(x = x, p = p, e = allFound)
 }

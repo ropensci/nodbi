@@ -7,6 +7,7 @@
 * `docdb_create()` and `docdb_update()` for SQLite and PostgreSQL (only if on localhost) now import directly and fast from `ndjson` files, in analogy to DuckDB (needs RSQLite >= 2.3.7.9014)
 * Refactored `docdb_update()` for `src_couchdb()`
 * Add message from `docdb_create()` if a data frame has column names with a dot(s) since dots in `nodbi` are used for `JSON` dot paths
+* Add code to check database backend version requirements
 
 # nodbi 0.10.7
 

@@ -28,6 +28,9 @@
 src_sqlite <- function(dbname = ":memory:",
                        ...) {
 
+  # check minimum version
+  featUuid <- pkgNeeded("RSQLite", "2.3.7.9000")
+  
   # open connection
   con <- DBI::dbConnect(
     drv = RSQLite::SQLite(),
@@ -36,9 +39,9 @@ src_sqlite <- function(dbname = ":memory:",
 
   # enable regular expressions
   RSQLite::initRegExp(db = con)
-
+  
   # enable uuid and lines
-  RSQLite::initExtension(db = con, extension = "uuid")
+  if (featUuid) RSQLite::initExtension(db = con, extension = "uuid")
 
   # set timeout for concurrency to 10s
   DBI::dbExecute(con, "PRAGMA busy_timeout = 10000;")
@@ -51,11 +54,13 @@ src_sqlite <- function(dbname = ":memory:",
   )
 
   # return standard nodbi structure
-  structure(list(con = con,
-                 dbname = dbname,
-                 ...),
-            class = c("src_sqlite", "docdb_src"))
-
+  structure(list(
+    con = con,
+    dbname = dbname,
+    featUuid = featUuid,
+    ...),
+    class = c("src_sqlite", "docdb_src"))
+  
 }
 
 #' @export

@@ -13,16 +13,16 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2024-10-19.
+updated 2024-11-06.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
-|:---|:---|:---|
-| MongoDB | data.frame | List, Exists |
-| SQLite | list | Create |
-| PostgreSQL | JSON string | Get |
-| DuckDB | file name of NDJSON records | Query |
-| Elasticsearch | URL of NDJSON records | Update |
-| CouchDB |  | Delete |
+|:-----------------------------------------------------|:-------------------------------------------------|:---------------------|
+| MongoDB                                              | data.frame                                       | List, Exists         |
+| SQLite                                               | list                                             | Create               |
+| PostgreSQL                                           | JSON string                                      | Get                  |
+| DuckDB                                               | file name of NDJSON records                      | Query                |
+| Elasticsearch                                        | URL of NDJSON records                            | Update               |
+| CouchDB                                              |                                                  | Delete               |
 
 For speed comparisons of database backends, see [benchmark](#benchmark)
 and [testing](#testing) below.
@@ -36,19 +36,19 @@ used as term to indicate where conceptually the backend holds the data,
 see [Database connections](#database-connections) below. The `key`
 parameter holds the name of a container.
 
-| Purpose | Function call |
-|:---|:---|
-| Create database connection (see below) | `src <- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(<see below for parameters>)` |
-| Load `my_data` (a data frame, list, JSON string, or file name or URL pointing to NDJSON records) into database, container `my_container` | `nodbi::docdb_create(src = src, key = "my_container", value = my_data)` |
-| Get all documents back into a data frame | `nodbi::docdb_get(src = src, key = "my_container")` |
-| Get documents selected with query (as MongoDB-compatible JSON) into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')` |
-| Get selected fields (in MongoDB compatible JSON) from documents selected by query into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": {"$gt": 20}}', fields = '{"friends.name": 1, "_id": 0, "age": 1}', limit = 2L)` |
-| Update (patch) documents selected by query with new data `my_data` (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records) | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
-| Check if container exists | `nodbi::docdb_exists(src = src, key = "my_container")` |
-| List all containers in database | `nodbi::docdb_list(src = src)` |
-| Delete document(s) in container | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')` |
-| Delete container | `nodbi::docdb_delete(src = src, key = "my_container")` |
-| Close and remove database connection manually (when restarting R, connections are automatically closed and removed by `nodbi`) | `rm(src)` |
+| Purpose                                                                                                                                                 | Function call                                                                                                                                         |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Create database connection (see below)                                                                                                                  | `src <- nodbi::src_{duckdb, postgres, mongo, sqlite, couchdb, elastic}(<see below for parameters>)`                                                   |
+| Load `my_data` (a data frame, list, JSON string, or file name or URL pointing to NDJSON records) into database, container `my_container`                | `nodbi::docdb_create(src = src, key = "my_container", value = my_data)`                                                                               |
+| Get all documents back into a data frame                                                                                                                | `nodbi::docdb_get(src = src, key = "my_container")`                                                                                                   |
+| Get documents selected with query (as MongoDB-compatible JSON) into a data frame                                                                        | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')`                                                                          |
+| Get selected fields (in MongoDB compatible JSON) from documents selected by query into a data frame                                                     | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": {"$gt": 20}}', fields = '{"friends.name": 1, "_id": 0, "age": 1}', limit = 2L)` |
+| Update (patch) documents selected by query with new data `my_data` (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records) | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')`                                                        |
+| Check if container exists                                                                                                                               | `nodbi::docdb_exists(src = src, key = "my_container")`                                                                                                |
+| List all containers in database                                                                                                                         | `nodbi::docdb_list(src = src)`                                                                                                                        |
+| Delete document(s) in container                                                                                                                         | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')`                                                                         |
+| Delete container                                                                                                                                        | `nodbi::docdb_delete(src = src, key = "my_container")`                                                                                                |
+| Close and remove database connection manually (when restarting R, connections are automatically closed and removed by `nodbi`)                          | `rm(src)`                                                                                                                                             |
 
 ## Install
 
