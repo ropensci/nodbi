@@ -25,12 +25,11 @@
 #' print(con)
 #' }
 #'
-src_sqlite <- function(dbname = ":memory:",
-                       ...) {
+src_sqlite <- function(dbname = ":memory:", ...) {
 
   # check minimum version
-  featUuid <- pkgNeeded("RSQLite", "2.3.7.9000")
-  
+  pkgNeeded("RSQLite", "2.3.6")
+
   # open connection
   con <- DBI::dbConnect(
     drv = RSQLite::SQLite(),
@@ -40,7 +39,8 @@ src_sqlite <- function(dbname = ":memory:",
   # enable regular expressions
   RSQLite::initRegExp(db = con)
   
-  # enable uuid and lines
+  # enable uuid for csv lines import
+  featUuid <- pkgNeeded("RSQLite", "2.3.7.9014", FALSE)
   if (featUuid) RSQLite::initExtension(db = con, extension = "uuid")
 
   # set timeout for concurrency to 10s

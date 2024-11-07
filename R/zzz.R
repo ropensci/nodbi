@@ -61,7 +61,7 @@ assert <- function(x, y) {
 #' @keywords internal
 #' @noRd
 #'
-pkgNeeded <- function(pkg, minV) {
+pkgNeeded <- function(pkg, minV, minVneeded = TRUE) {
   
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop(
@@ -71,8 +71,19 @@ pkgNeeded <- function(pkg, minV) {
     )
   }
   
-  return(utils::packageVersion(pkg) >= 
-    package_version(minV))
+  minVavailable <- utils::packageVersion(pkg) >= 
+    package_version(minV)
+  
+  if (!minVavailable && minVneeded) {
+    stop(
+      "Package '", pkg, 
+      "' must be updated to at least version ",
+      minV, " to use this function.",
+      call. = FALSE
+    )
+  }
+  
+  return(minVavailable)
   
 }
 

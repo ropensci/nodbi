@@ -35,16 +35,16 @@ Imports:
     V8,
     R.utils
 Suggests:
-    sofa (>= 0.3.0),
-    elastic (>= 1.0.0),
-    mongolite (>= 1.6),
-    RSQLite (>= 2.3.7.9014),
-    duckdb (>= 1.1.0),
+    sofa,
+    elastic,
+    mongolite,
+    RSQLite,
+    duckdb,
     RPostgres,
     testthat,
     withr,
     callr,
-    webfakes (>= 1.2.0),
+    webfakes,
     knitr,
     rmarkdown,
     tibble
