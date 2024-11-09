@@ -52,69 +52,32 @@ docdb_create <- function(src, key, value, ...) {
   assert(src, "docdb_src")
   assert(key, "character")
   assert(value, c("data.frame", "list", "character"))
-  
+
   if (is.data.frame(value) && any(grepl("[.]", names(value)))) {
     message(
       "Names of columns in data frame have dots, ",
       "they will conflict with dot path notation.")
   }
-  
+
   UseMethod("docdb_create", src)
 }
 
 #' @export
 docdb_create.src_couchdb <- function(src, key, value, ...) {
-  
+
   # create database if not yet existing
   result <- try(sofa::db_create(src$con, dbname = key, delifexists = FALSE), silent = TRUE)
   if (inherits(result, "try-error")) {
     if (grepl("already exists", result))
       existsMessage(key) else stop(result, call. = FALSE)}
-  
-  # convert into target list
-  
-  # data frame
-  if (inherits(value, "data.frame")) {
-    if (is.na(match("_id", names(value)))) {
-      # if no _id column
-      if (!identical(rownames(value),
-                     as.character(seq_len(nrow(value))))) {
-        # use rownames as _id's and remove rownames
-        value[["_id"]] <- row.names(value)
-        row.names(value) <- NULL
-      }
-    }
-    row.names(value) <- NULL
-    value <- jsonlite::fromJSON(
-      jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA),
-      simplifyVector = FALSE)
-  } # if data.frame
-  
-  # convert JSON string to list
-  if (inherits(value, "character")) {
-    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
-        (isUrl(value) || isFile(value))) {
-      # read ndjson file or url
-      if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
-      } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
-      }
-    } else {
-      # read json string
-      value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
-    }
-  }
-  
-  # mangle lists
-  if (inherits(value, "list")) {
-    if (all(sapply(lapply(value, "[[", "_id"), is.null))) {
-      # add canonical _id's
-      value <- lapply(value, function(i) c(
-        "_id" = uuid::UUIDgenerate(use.time = TRUE), i))
-    }
-  }
-  
+
+  ## convert into target list
+  value <- value2list(value)
+
+  # early exit and avoid errors when
+  # attempting to insert into elastic
+  if (!length(value)) return(0L)
+
   # insert data but do not use docid because
   # this is not used by sofa. however, sofa
   # does use _id's that are in the doc
@@ -125,87 +88,43 @@ docdb_create.src_couchdb <- function(src, key, value, ...) {
     doc = value,
     ...
   )
-  
+
   # prepare return value
   result <- unlist(result)
   errors <- result[names(result) == "error"]
   oks <- result[names(result) == "ok"] == "TRUE"
-  
+
   if (length(errors)) {
     warning("Could not create ", length(errors),
             " documents, reason: ", unique(errors),
             call. = FALSE, immediate. = TRUE)
   }
-  
+
   # return
   return(length(oks))
 }
 
 #' @export
 docdb_create.src_elastic <- function(src, key, value, ...) {
-  
+
+  # create database if not yet existing
   result <- try(elastic::index_create(src$con, index = key, verbose = FALSE), silent = TRUE)
   if (inherits(result, "try-error")) {
     if (grepl("already exists", result))
       existsMessage(key) else stop(result, call. = FALSE)}
-  
-  # Loading the fielddata on the _id field is deprecated and will be removed in future versions.
-  # If you require sorting or aggregating on this field you should also include the id in the
-  # body of your documents, and map this field as a keyword field that has [doc_values] enabled
-  
-  # data frame
-  if (inherits(value, "data.frame")) {
-    if (is.na(match("_id", names(value)))) {
-      # if no _id column
-      if (!identical(rownames(value),
-                     as.character(seq_len(nrow(value))))) {
-        # use rownames as _id's and remove rownames
-        docids <- row.names(value)
-        row.names(value) <- NULL
-      } else {
-        # add canonical _id's
-        docids <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
-      }
-    } else {
-      # use _id column as _id's and remove it
-      docids <- value[["_id"]]
-      value <- value[, -match("_id", names(value))]
-    } # _id column
-  } # if data.frame
-  
-  # convert JSON string to list
-  if (inherits(value, c("character", "json"))) {
-    # convert ndjson file or json string to list
-    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
-        (isUrl(value) || isFile(value))) {
-      # since document IDs cannot be passed in
-      # with files, create list from file
-      if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
-      } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
-      }
-    } else {
-      if (length(value) == 1L) {
-        value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
-      } else {
-        value <- jsonlite::stream_in(textConnection(value), simplifyVector = FALSE, verbose = FALSE)
-      }
-    }
-  }
-  
-  # mangle lists
-  if (all(class(value) %in% "list")) {
-    if (all(sapply(lapply(value, "[[", "_id"), is.null))) {
-      # add canonical _id's
-      docids <- uuid::UUIDgenerate(use.time = TRUE, n = length(value))
-    } else {
-      docids <- sapply(value, "[[", "_id", USE.NAMES = FALSE, simplify = TRUE)
-      # remove _id's from list
-      value <- lapply(value, function(i) {i[["_id"]] <- NULL; i})
-    }
-  }
-  
+
+  ## convert into target list
+  value <- value2list(value)
+
+  # extract docid's
+  docids <- sapply(value, "[[", "_id", USE.NAMES = FALSE, simplify = TRUE)
+  # remove _id's from list
+  value <- lapply(value, function(i) {i[["_id"]] <- NULL; i})
+
+  # early exit and avoid errors when
+  # attempting to insert into elastic
+  if (!length(value)) return(0L)
+
   # create using rownames as _id's
   result <- elastic::docs_bulk(
     conn = src$con,
@@ -217,7 +136,7 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
     query = list(refresh = TRUE),
     ...
   )
-  
+
   # prepare return value
   if (inherits(result, "try-error") || any(sapply(result, "[[", "errors"))) {
     error <- unlist(result, use.names = TRUE)
@@ -234,29 +153,29 @@ docdb_create.src_elastic <- function(src, key, value, ...) {
   }
   result <- sum(result == "created")
   return(result)
-  
+
 }
 
 
 #' @export
 docdb_create.src_mongo <- function(src, key, value, ...) {
-  
+
   # special check for mongo
   chkSrcMongo(src, key)
   if (docdb_exists(src, key, value, ...)) existsMessage(key)
-  
+
   # directly import ndjson file
   if ((all(class(value) %in% "character")) &&
       (length(value)  == 1L) &&
       (isUrl(value) || isFile(value))) {
-    
+
     # turn into connection
     if (isFile(value)) {
       value <- file(value)
     } else if (isUrl(value)) {
       value <- url(value)
     }
-    
+
     # import
     result <- try(
       suppressWarnings(
@@ -266,15 +185,15 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
           con = value
         )),
       silent = TRUE)
-    
+
   } else {
-    
+
     # since mongolite does not accept valid JSON strings
     # that come as an one-element array, convert to list
     if (inherits(value, "character")) {
       value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
     }
-    
+
     # mongolite uses _id columns in dataframes as object _id's:
     if (inherits(value, "data.frame")) {
       if (is.na(match("_id", names(value)))) {
@@ -286,7 +205,8 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
           # row.names(value) <- NULL
         } else {
           # add canonical _id's
-          value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
+          value[["_id"]] <- uuid::UUIDgenerate(
+            use.time = TRUE, n = nrow(value))
         }
       } # if no _id column
       # early return if no data
@@ -295,11 +215,12 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       # if names (keys) had problematic characters such as . or $
       value <- items2ndjson(value, mergeIdCol = TRUE)
     } # if data.frame
-    
+
     # convert lists (incl. from previous step) to NDJSON
     if (inherits(value, "list")) {
       # add canonical _id's
-      if (((!is.null(names(value)) && !any(names(value) == "_id")) &&
+      if (((!is.null(names(value)) &&
+            !any(names(value) == "_id")) &&
            !any(sapply(value, function(i) any(names(i) == "_id")))) ||
           !any(names(unlist(value)) == "_id")
       ) {
@@ -309,20 +230,20 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
       # split list into vector of ndjson records
       value <- items2ndjson(value, mergeIdCol = TRUE)
     }
-    
+
     # insert data.frame or JSON
     result <- try(
       suppressWarnings(
         src$con$insert(
-          # loading either a dataframe or
-          # vector of NDJSON (!) strings
+          # loading either a dataframe
+          # or vector of NDJSON strings
           data = value,
           auto_unbox = TRUE,
           digits = NA, ...))[["nInserted"]],
       silent = TRUE)
-    
+
   } # if file access directly import ndjson file
-  
+
   # generate user info
   if (inherits(result, "try-error") ||
       any(grepl("error", result))) {
@@ -335,17 +256,17 @@ docdb_create.src_mongo <- function(src, key, value, ...) {
     result <- min(0, as.integer(result))
   }
   return(sum(result))
-  
+
 }
 
 #' @export
 docdb_create.src_sqlite <- function(src, key, value, ...) {
-  
+
   # reference: https://www.sqlite.org/json1.html
-  
+
   # if table does not exist, create one
   if (!docdb_exists(src, key, ...)) {
-    
+
     # standard for a nodbi json table in sqlite
     # standard: columns _id and json
     out <- try(
@@ -365,28 +286,28 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
               "\"", key, "_index\" ON ",
               "\"", key, "\" ( _id );"))
         }), silent = TRUE)
-    
+
     if (inherits(out, "try-error") &&
         !grepl(" already exists", out)) stop(out)
-    
+
   } else {
     existsMessage(key)
   }
-  
-  
-  # check as per feature
-  if (src$featUuid && 
+
+
+  ## check features
+  if (src$featUuid &&
       isFile(value)) {
-    
-    
+
+
     # turn value into ndjson file
     value <- normalizePath(value)
-    
+
     # import into temporary table
     tblName <- uuid::UUIDgenerate()
     try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
     on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
-    
+
     # for parameters see
     # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R#L58
     RSQLite::dbWriteTable(
@@ -399,7 +320,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
       skip = 0L,
       append = FALSE
     )
-    
+
     # import from ndjson file
     result <- try(
       DBI::dbExecute(
@@ -411,78 +332,16 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
           " jsonb_patch(json, '{\"_id\": null}') AS json",
           " FROM '", tblName, "';")
       ), silent = TRUE)
-    
-    
+
+
   } else {
-    
-    
-    # convert lists to json
-    if (inherits(value, "list")) {
-      value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
-    }
-    
-    # convert JSON string to data frame
-    if (inherits(value, c("character", "json"))) {
-      # target is data frame for next section
-      
-      # convert ndjson file or json string to data frame
-      if (all(class(value) %in% "character") && (length(value)  == 1L) &&
-          (isUrl(value) || isFile(value))) {
-        if (isFile(value)) {
-          value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
-        } else if (isUrl(value)) {
-          value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
-        }
-      } else {
-        value <- jsonlite::fromJSON(value)
-      }
-      
-    }
-    
-    # data frame
-    if (inherits(value, "data.frame")) {
-      #
-      if (is.na(match("_id", names(value)))) {
-        # if no _id column
-        if (!identical(rownames(value),
-                       as.character(seq_len(nrow(value))))) {
-          # use rownames as _id's and remove rownames
-          value[["_id"]] <- row.names(value)
-          # row.names(value) <- NULL
-        } else {
-          # add canonical _id's
-          value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
-        }
-      } # if no _id column
-      #
-      if (ncol(value) > 2L || (ncol(value) == 2L &&
-                               !all(sort(names(value)) == c("_id", "json")))) {
-        # no json column, thus convert to df with ndjson in json column
-        value <- items2ndjson(value)
-      }
-      #
-      if (all(class(value[["_id"]]) %in% "list")) {
-        # in case fromJSON created the _id column as list
-        value[["_id"]] <- unlist(value[["_id"]])
-      }
-    } # if data.frame
-    
-    # insert data
-    result <- try(
-      # dbAppendTable() uses transactions
-      # since RSQLite 2.2.2 (2021-01-04)
-      DBI::dbAppendTable(
-        conn = src$con,
-        name = key,
-        # canonical value: a data frame
-        # with 2 columns, _id and json
-        value = value),
-      silent = TRUE)
-    
-    
+
+    # regular import using DBI::dbAppendTable
+    result <- appendTable(src, key, value, ...)
+
   } # if file
-  
-  
+
+
   # prepare returns
   if (inherits(result, "try-error")) {
     error <- trimws(sub(".+: (.*?):.+", "\\1", result[[1]]))
@@ -492,17 +351,17 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
     result <- 0L
   }
   return(sum(result))
-  
+
 }
 
 #' @export
 docdb_create.src_postgres <- function(src, key, value, ...) {
-  
+
   # reference: https://www.postgresql.org/docs/current/datatype-json.html
-  
+
   # if table does not exist, create one
   if (!docdb_exists(src, key, ...)) {
-    
+
     # standard for a nodbi json table in PostgreSQL
     # standard: columns _id and json
     out <- try({
@@ -520,27 +379,27 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
           "\"", key, "_index\" ON ",
           "\"", key, "\" ( _id );"))
     }, silent = TRUE)
-    
+
     if (inherits(out, "try-error") &&
         !grepl(" already exists", out)) stop(out)
-    
+
   } else {
     existsMessage(key)
   }
-  
+
   ## localhost may be able to import from file,
   ## depending on postgres process rights
   copyWorked <- 0L
   if (isFile(value) &&
       grepl("^localhost$", src$host)) {
-    
+
     value <- normalizePath(value)
-    
+
     # import into temporary table
     tblName <- uuid::UUIDgenerate()
     try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
     on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
-    
+
     # need to read with options to avoid the error
     # Character with value 0x0a must be escaped
     DBI::dbCreateTable(
@@ -548,7 +407,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
       name = tblName,
       fields = c("json" = "JSONB")
     )
-    
+
     copyWorked <- try(
       DBI::dbExecute(
         conn = src$con,
@@ -557,12 +416,12 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
           "FROM '", value, "' ",
           "CSV QUOTE e'\x01' DELIMITER e'\x02';")
       ), silent = TRUE)
-    
+
   }
-  
+
   if (!inherits(copyWorked, "try-error") &&
       (copyWorked >= 1L)) {
-    
+
     # import from ndjson file
     result <- try(
       DBI::dbExecute(
@@ -575,79 +434,15 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
           " jsonb_merge_patch(json, '{\"_id\": null}') ELSE json END AS json",
           " FROM \"", tblName, "\";")
       ), silent = TRUE)
-    
+
   } else {
-    
-    ## regular import
-    
-    # convert lists to json
-    if (inherits(value, "list")) {
-      value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
-    }
-    
-    # convert JSON string to data frame
-    if (inherits(value, c("character", "json"))) {
-      # target is data frame for next section
-      
-      # convert ndjson file or json string to data frame
-      if (all(class(value) %in% "character") && (length(value)  == 1L) &&
-          (isUrl(value) || isFile(value))) {
-        if (isFile(value)) {
-          value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
-        } else if (isUrl(value)) {
-          value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
-        }
-      } else {
-        value <- jsonlite::fromJSON(value)
-      }
-    }
-    
-    # data frame
-    if (inherits(value, "data.frame")) {
-      #
-      if (is.na(match("_id", names(value)))) {
-        # if no _id column
-        if (!identical(rownames(value),
-                       as.character(seq_len(nrow(value))))) {
-          # use rownames as _id's and remove rownames
-          value[["_id"]] <- row.names(value)
-          # row.names(value) <- NULL
-        } else {
-          # add canonical _id's
-          value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
-        }
-      } # if no _id column
-      #
-      if (ncol(value) > 2L ||
-          (ncol(value) == 2L &&
-           !all(sort(names(value)) == c("_id", "json")))) {
-        # no json column, thus convert to df with ndjson in json column
-        value <- items2ndjson(value)
-      }
-      #
-      if (all(class(value[["_id"]]) %in% "list")) {
-        # in case fromJSON created the _id column as list
-        value[["_id"]] <- unlist(value[["_id"]])
-      }
-    } # if data.frame
-    
-    # insert data
-    result <- try(
-      DBI::dbWithTransaction(
-        conn = src$con,
-        code = {
-          DBI::dbAppendTable(
-            conn = src$con,
-            name = key,
-            # canonical value: a data frame
-            # with 2 columns, _id and json
-            value = value)
-        }),
-      silent = TRUE)
-    
+
+    # regular import using DBI::dbAppendTable
+    result <- appendTable(src, key, value, ...)
+
   } # if localhost and file and copyWorked
-  
-  
+
+
   # prepare returns
   if (inherits(result, "try-error")) {
     error <- trimws(sub(".+ERROR: (.*?)[:\"].+", "\\1", result[[1]]))
@@ -657,15 +452,15 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
     result <- 0L
   }
   return(sum(result))
-  
+
 }
 
 #' @export
 docdb_create.src_duckdb <- function(src, key, value, ...) {
-  
+
   # if table does not exist, create one
   if (!docdb_exists(src, key, ...)) {
-    
+
     # standard for a nodbi json table in duckdb
     # columns _id and json
     out <- try(
@@ -685,25 +480,25 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
               "\"", key, "_index\" ON ",
               "\"", key, "\" ( _id );"))
         }), silent = TRUE)
-    
+
     if (inherits(out, "try-error") &&
         !grepl(" already exists", out)) stop(out)
-    
+
   } else {
     existsMessage(key)
   }
-  
+
   # https://duckdb.org/docs/api/r.html
   # Read-only mode is required if multiple R processes
   # want to access the same database file at the same time.
-  
+
   # https://duckdb.org/docs/api/r.html#efficient-transfer
   # https://duckdb.org/docs/extensions/json#json-creation-functions
-  
+
   if (isFile(value)) {
-    
+
     value <- normalizePath(value)
-    
+
     # import from ndjson file
     result <- try(
       DBI::dbExecute(
@@ -716,76 +511,16 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
           " FROM read_ndjson_objects('",
           value, "');")
       ), silent = TRUE)
-    
-    
+
+
   } else {
-    
-    
-    # convert lists to json
-    if (inherits(value, "list")) {
-      value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
-    }
-    
-    # convert JSON string to data frame
-    if (inherits(value, c("character", "json"))) {
-      # target is data frame for next section
-      
-      # convert ndjson file or json string to data frame
-      if (all(class(value) %in% "character") && (length(value)  == 1L) &&
-          (isUrl(value) || isFile(value))) {
-        if (isFile(value)) {
-          value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
-        } else if (isUrl(value)) {
-          value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
-        }
-      } else {
-        value <- jsonlite::fromJSON(value)
-      }
-      
-    }
-    
-    # data frame
-    if (inherits(value, "data.frame")) {
-      #
-      if (is.na(match("_id", names(value)))) {
-        # if no _id column
-        if (!identical(rownames(value),
-                       as.character(seq_len(nrow(value))))) {
-          # use rownames as _id's and remove rownames
-          value[["_id"]] <- row.names(value)
-          # row.names(value) <- NULL
-        } else {
-          # add canonical _id's
-          value[["_id"]] <- uuid::UUIDgenerate(use.time = TRUE, n = nrow(value))
-        }
-      } # if no _id column
-      #
-      if (ncol(value) > 2L || (ncol(value) == 2L &&
-                               !all(sort(names(value)) == c("_id", "json")))) {
-        # no json column, thus convert to df with ndjson in json column
-        value <- items2ndjson(value)
-      }
-      #
-      if (all(class(value[["_id"]]) %in% "list")) {
-        # in case fromJSON created the _id column as list
-        value[["_id"]] <- unlist(value[["_id"]])
-      }
-    } # if data.frame
-    
-    # insert data
-    result <- try(
-      DBI::dbAppendTable(
-        conn = src$con,
-        name = key,
-        # canonical value: a data frame
-        # with 2 columns, _id and json
-        value = value),
-      silent = TRUE)
-    
-    
+
+    # regular import using DBI::dbAppendTable
+    result <- appendTable(src, key, value, ...)
+
   } # if
-  
-  
+
+
   # prepare returns
   if (inherits(result, "try-error")) {
     error <- trimws(sub(".+: (.*?):.+", "\\1", result[[1]]))
@@ -795,7 +530,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
     result <- 0L
   }
   return(result)
-  
+
 }
 
 
@@ -810,62 +545,64 @@ existsMessage <- function(k) {
 #' @keywords internal
 #' @noRd
 isUrl <- function(x) {
-  
+
   # check if x is may be an url
-  if (length(x) != 1L || 
-      !is.atomic(x) || 
+  if (length(x) != 1L ||
+      !is.atomic(x) ||
       !inherits(x, "character")) return(FALSE)
-  
+
   return(grepl("^https?://", x))
 }
 
 #' @keywords internal
 #' @noRd
 isFile <- function(x) {
-  
+
   # check if x is the name of a readable file
-  
+
   if (length(x) != 1L ||
       !is.atomic(x) ||
       !inherits(x, "character")) return(FALSE)
-  
+
   if (!file.exists(x)) return(FALSE)
-  
+
   out <- try(
     suppressWarnings(
       file.access(x, mode = 4)[[1]]) == 0L,
     silent = TRUE)
-  
+
   if (inherits(out, "try-error") || !out) return(FALSE)
-  
+
   return(file.size(x) > 5L)
-  
+
 }
 
+#' @keywords internal
+#' @noRd
 items2ndjson <- function(df, mergeIdCol = FALSE) {
-  
+
   # - function takes a data frame or list
   # - if mergeIdCol, builds ndjson vector from df items
   # - if not, builds ndjson from columns except _id
   #   returns data frame with columns _id and json
-  
+
   if (!inherits(df, "data.frame") && !inherits(df, "list")) stop()
-  
+
   if (inherits(df, "data.frame")) row.names(df) <- NULL
-  
+
   if (inherits(df, "list")) df <-
       jsonlite::fromJSON(
         jsonlite::toJSON(df, auto_unbox = TRUE, digits = NA))
-  
+
   # temporary file and connection
   tfname <- tempfile()
   on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
-  
+
   tfnameCon <- file(tfname, open = "wt")
   on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-  
+
   if (mergeIdCol) {
-    
+
     jsonlite::stream_out(
       x = df,
       con = tfnameCon,
@@ -873,15 +610,15 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       auto_unbox = TRUE,
       pagesize = 5000L,
       digits = NA)
-    
+
     close(tfnameCon)
     tfnameCon <- file(tfname, open = "rt")
     on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-    
+
     return(readLines(tfnameCon))
-    
+
   } else {
-    
+
     jsonlite::stream_out(
       x = df[, -match("_id", names(df)), drop = FALSE],
       con = tfnameCon,
@@ -889,11 +626,11 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       auto_unbox = TRUE,
       pagesize = 5000L,
       digits = NA)
-    
+
     close(tfnameCon)
     tfnameCon <- file(tfname, open = "rt")
     on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-    
+
     return(
       data.frame(
         "_id" = df[["_id"]],
@@ -902,3 +639,130 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       ))
   }
 }
+
+#' @keywords internal
+#' @noRd
+appendTable <- function(src, key, value, ...) {
+
+  ## regular import using DBI::dbAppendTable
+
+  # convert lists to json
+  if (inherits(value, "list")) {
+    value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
+  }
+
+  # convert JSON string to data frame
+  if (inherits(value, c("character", "json"))) {
+    # target is data frame for next section
+
+    # convert ndjson file or json string to data frame
+    if (all(class(value) %in% "character") &&
+        (length(value)  == 1L) &&
+        (isUrl(value) || isFile(value))) {
+
+      if (isFile(value)) {
+        value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+      } else if (isUrl(value)) {
+        value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+      }
+
+    } else {
+      value <- jsonlite::fromJSON(value)
+    }
+
+  }
+
+  # data frame
+  if (inherits(value, "data.frame")) {
+    #
+    if (is.na(match("_id", names(value)))) {
+      # if no _id column
+      if (!identical(
+        rownames(value),
+        as.character(seq_len(nrow(value))))) {
+        # use rownames as _id's and remove rownames
+        value[["_id"]] <- row.names(value)
+      } else {
+        # add canonical _id's
+        value[["_id"]] <- uuid::UUIDgenerate(
+          use.time = TRUE, n = nrow(value))
+      }
+    } # if no _id column
+    #
+    if (ncol(value) > 2L ||
+        (ncol(value) == 2L &&
+         !all(sort(names(value)) == c("_id", "json")))) {
+      # no json column; convert to df with ndjson in json column
+      value <- items2ndjson(value)
+    }
+    #
+    if (all(class(value[["_id"]]) %in% "list")) {
+      # in case fromJSON created the _id column as list
+      value[["_id"]] <- unlist(value[["_id"]])
+    }
+  } # if data.frame
+
+  # insert data
+  return(try(
+    DBI::dbAppendTable(
+      conn = src$con,
+      name = key,
+      # canonical 'value': a data frame
+      # with 2 columns, _id and json
+      value = value,
+      ...),
+    silent = TRUE))
+
+}
+
+#' @keywords internal
+#' @noRd
+value2list <- function(value) {
+
+  # convert data frame to list
+  if (inherits(value, "data.frame")) {
+    if (is.na(match("_id", names(value)))) {
+      # if no _id column
+      if (!identical(rownames(value),
+                     as.character(seq_len(nrow(value))))) {
+        # use rownames as _id's and remove rownames
+        value[["_id"]] <- row.names(value)
+        row.names(value) <- NULL
+      }
+    }
+    row.names(value) <- NULL
+    value <- jsonlite::fromJSON(
+      jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA),
+      simplifyVector = FALSE)
+  } # if data.frame
+
+  # convert JSON string to list
+  if (inherits(value, "character")) {
+    if (all(class(value) %in% "character") && (length(value)  == 1L) &&
+        (isUrl(value) || isFile(value))) {
+      # read ndjson file or url
+      if (isFile(value)) {
+        value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
+      } else if (isUrl(value)) {
+        value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
+      }
+    } else {
+      # read json string
+      value <- jsonlite::fromJSON(value, simplifyVector = FALSE)
+    }
+  }
+
+  # mangle lists
+  if (inherits(value, "list")) {
+    if (all(sapply(lapply(value, "[[", "_id"), is.null))) {
+      # add canonical _id's
+      value <- lapply(value, function(i) c(
+        "_id" = uuid::UUIDgenerate(use.time = TRUE), i))
+    }
+  }
+
+  # return
+  return(value)
+}
+
+
