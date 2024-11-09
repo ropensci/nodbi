@@ -49,7 +49,7 @@ Suggests:
     rmarkdown,
     tibble
 Remotes: r-dbi/RSQLite
-RoxygenNote: 7.3.2.9000
+RoxygenNote: 7.3.2
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org

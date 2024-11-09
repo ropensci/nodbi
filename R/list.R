@@ -4,7 +4,7 @@
 #'
 #' @param ... Passed to function [DBI::dbListTables()]
 #'
-#' @return (vector) Names of containers that can be
+#' @return Vector of names of containers that can be
 #' used as parameter `key` with other functions such as
 #' [docdb_create()].
 #'

@@ -15,7 +15,7 @@
 #' - PostgreSQL: ignored
 #' - DuckDB: ignored
 #'
-#' @return A data frame, one document per row
+#' @return Data frame, one document per row
 #'
 #' @export
 #'

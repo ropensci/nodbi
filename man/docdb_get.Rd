@@ -32,7 +32,7 @@ CouchDB, PostgreSQL, and DuckDB.}
 }}
 }
 \value{
-A data frame, one document per row
+Data frame, one document per row
 }
 \description{
 Get all documents from container in database

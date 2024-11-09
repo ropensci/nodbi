@@ -14,7 +14,7 @@ docdb_list(src, ...)
 \item{...}{Passed to function \code{\link[DBI:dbListTables]{DBI::dbListTables()}}}
 }
 \value{
-(vector) Names of containers that can be
+Vector of names of containers that can be
 used as parameter \code{key} with other functions such as
 \code{\link[=docdb_create]{docdb_create()}}.
 }

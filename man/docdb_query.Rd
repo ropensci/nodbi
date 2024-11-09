@@ -42,9 +42,10 @@ documents as specified in \code{limit}.
 }}
 }
 \value{
-Data frame with requested documents, may have nested
-lists in columns; \code{NULL} if no documents could be found.
-If \code{listfields} is specified: a vector of all field names
+Data frame with requested documents, one per row,
+may have nested lists in columns;
+\code{NULL} if no documents could be found.
+If \code{listfields} is specified: vector of all field names
 in dot path notation.
 }
 \description{

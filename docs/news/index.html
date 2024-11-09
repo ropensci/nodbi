@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">nodbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.7.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,26 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.10.7" id="nodbi-0107">nodbi 0.10.7<a class="anchor" aria-label="anchor" href="#nodbi-0107"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.10.7.9000" id="nodbi-01079000">nodbi 0.10.7.9000<a class="anchor" aria-label="anchor" href="#nodbi-01079000"></a></h2>
+<div class="section level3">
+<h3 id="potentially-breaking-changes-0-10-7-9000">Potentially breaking changes<a class="anchor" aria-label="anchor" href="#potentially-breaking-changes-0-10-7-9000"></a></h3>
+<ul><li>
+<code><a href="../reference/docdb_query.html">docdb_query()</a></code> modified so that it returns a data frame, in which each column has just one type (atomic or list) across all the rows of the respective column (previously, e.g. a mix of single-item lists simplified to atomic values and of multi-item lists were returned)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-0-10-7-9000">Changes<a class="anchor" aria-label="anchor" href="#changes-0-10-7-9000"></a></h3>
+<ul><li>
+<code><a href="../reference/docdb_create.html">docdb_create()</a></code> and <code><a href="../reference/docdb_update.html">docdb_update()</a></code> for SQLite and PostgreSQL (only if on localhost) now import directly and fast from <code>ndjson</code> files, in analogy to DuckDB (needs RSQLite &gt;= 2.3.7.9014)</li>
+<li>Refactored <code><a href="../reference/docdb_update.html">docdb_update()</a></code> for <code><a href="../reference/src_couchdb.html">src_couchdb()</a></code>
+</li>
+<li>Add message from <code><a href="../reference/docdb_create.html">docdb_create()</a></code> if a data frame has column names with a dot(s) since dots in <code>nodbi</code> are used for <code>JSON</code> dot paths</li>
+<li>Add code to check database backend version requirements</li>
+<li>Adding info if PostgreSQL database is not yet created</li>
+<li>Factored out further code</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.10.7" id="nodbi-0107">nodbi 0.10.7<a class="anchor" aria-label="anchor" href="#nodbi-0107"></a></h2><p class="text-muted">CRAN release: 2024-09-29</p>
 <div class="section level3">
 <h3 id="changes-0-10-7">Changes<a class="anchor" aria-label="anchor" href="#changes-0-10-7"></a></h3>
 <ul><li>uses new features of <code>duckdb</code> 1.11.0 for refactoring of <code><a href="../reference/docdb_query.html">docdb_query()</a></code>, accelerating queries</li>
@@ -438,7 +457,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

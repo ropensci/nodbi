@@ -13,7 +13,7 @@ nor listfields is specified, runs docdb_get()."><meta name="twitter:card" conten
 
     <a class="navbar-brand me-2" href="../index.html">nodbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.7.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,9 +101,10 @@ documents as specified in <code>limit</code>.</p></li>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Data frame with requested documents, may have nested
-lists in columns; <code>NULL</code> if no documents could be found.
-If <code>listfields</code> is specified: a vector of all field names
+    <p>Data frame with requested documents, one per row,
+may have nested lists in columns;
+<code>NULL</code> if no documents could be found.
+If <code>listfields</code> is specified: vector of all field names
 in dot path notation.</p>
     </div>
     <div class="section level2">
@@ -154,7 +155,7 @@ the example.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
