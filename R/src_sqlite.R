@@ -38,10 +38,17 @@ src_sqlite <- function(dbname = ":memory:", ...) {
 
   # enable regular expressions
   RSQLite::initRegExp(db = con)
-  
+
   # enable uuid for csv lines import
   featUuid <- pkgNeeded("RSQLite", "2.3.7.9014", FALSE)
-  if (featUuid) RSQLite::initExtension(db = con, extension = "uuid")
+  if (featUuid) {
+    RSQLite::initExtension(db = con, extension = "uuid")
+    message(
+      "RSQLite version has enabled accelerating ",
+      "docdb_create() and docdb_update() functions ",
+      "when used with value = <NDJSON file name>."
+    )
+  }
 
   # set timeout for concurrency to 10s
   DBI::dbExecute(con, "PRAGMA busy_timeout = 10000;")
@@ -60,7 +67,7 @@ src_sqlite <- function(dbname = ":memory:", ...) {
     featUuid = featUuid,
     ...),
     class = c("src_sqlite", "docdb_src"))
-  
+
 }
 
 #' @export

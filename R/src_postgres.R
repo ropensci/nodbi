@@ -43,12 +43,28 @@ src_postgres <- function(dbname = "test",
                          ...) {
 
   # open connection
-  con <- DBI::dbConnect(
+  con <- try(DBI::dbConnect(
     drv = RPostgres::Postgres(),
     dbname = dbname,
     host = host,
     port = port,
-    ...)
+    ...),
+    silent = TRUE)
+
+  # inform user on missing database
+  if (inherits(con, "try-error")) {
+    if (grepl("database .+ does not exist", con)) {
+      con <- paste0(
+        "Database '", dbname, "' has to be created first, see here ",
+        "https://www.postgresql.org/docs/current/manage-ag-createdb.html. ",
+        "Possibly, from within this R session, this might work: ",
+        'system2("createdb", "', dbname, '") Note that Homebrew installs ',
+        'may need system2("createdb-<major PostgreSQL version number>", "',
+        dbname, '")'
+      )
+    }
+    stop(con, call. = FALSE)
+  }
 
   # Manually disconnecting a connection is not necessary with RPostgres,
   # but still recommended; if you delete the object containing the connection,
