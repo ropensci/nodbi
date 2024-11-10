@@ -4,7 +4,7 @@ Description: Simplified JSON document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.10.7.9000
+Version: 0.11.0
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -48,7 +48,6 @@ Suggests:
     knitr,
     rmarkdown,
     tibble
-Remotes: r-dbi/RSQLite
 RoxygenNote: 7.3.2
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents

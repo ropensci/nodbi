@@ -1,4 +1,4 @@
-# nodbi 0.10.7.9000
+# nodbi 0.11.0
 
 ## Potentially breaking changes
 * `docdb_query()` modified so that it returns a data frame, in which each column has just one type (atomic or list) across all the rows of the respective column (previously, e.g. a mix of single-item lists simplified to atomic values and of multi-item lists were returned)

@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.10.7",
+  "version": "0.11.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.1 (2024-06-14)",
+  "runtimePlatform": "R version 4.4.2 (2024-10-31)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -60,7 +60,6 @@
       "@type": "SoftwareApplication",
       "identifier": "sofa",
       "name": "sofa",
-      "version": ">= 0.3.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -73,7 +72,6 @@
       "@type": "SoftwareApplication",
       "identifier": "elastic",
       "name": "elastic",
-      "version": ">= 1.0.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -86,7 +84,6 @@
       "@type": "SoftwareApplication",
       "identifier": "mongolite",
       "name": "mongolite",
-      "version": ">= 1.6",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -99,7 +96,6 @@
       "@type": "SoftwareApplication",
       "identifier": "RSQLite",
       "name": "RSQLite",
-      "version": ">= 2.3.5",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -112,7 +108,6 @@
       "@type": "SoftwareApplication",
       "identifier": "duckdb",
       "name": "duckdb",
-      "version": ">= 1.1.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -173,7 +168,6 @@
       "@type": "SoftwareApplication",
       "identifier": "webfakes",
       "name": "webfakes",
-      "version": ">= 1.2.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -315,7 +309,7 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "665.971KB",
+  "fileSize": "666.253KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
   "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"],
