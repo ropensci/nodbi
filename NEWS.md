@@ -1,3 +1,8 @@
+# nodbi 0.11.0.9000
+
+## Bug fixes
+* Removing message about RSQLite handling NDJSON file name as value
+
 # nodbi 0.11.0
 
 ## Potentially breaking changes

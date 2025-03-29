@@ -40,30 +40,30 @@ docdb_update <- function(src, key, value, query, ...) {
   assert(key, "character")
   assert(value, c("data.frame", "list", "character"))
   assert(query, c("json", "character"))
-  
+
   if (query == "") {
     warning('query = "" is deprecated, use query = "{}"')
     query <- "{}"
   }
-  
+
   UseMethod("docdb_update", src)
 }
 
 #' @export
 docdb_update.src_couchdb <- function(src, key, value, query, ...) {
-  
+
   # If you want to change a document in CouchDB, you don't tell it to go and
   # find a field in a specific document and insert a new value. Instead,
   # you load the full document out of CouchDB, make your changes in the
   # JSON structure (or object, when you are doing actual programming),
   # and save the entire new revision (or version) of that document back into CouchDB.
-  
+
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
-  
+
   # process value, target is json strings in file
-  
+
   # check other inputs
   if (isFile(value)) {
     value <- readLines(file(value))
@@ -71,7 +71,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
     value <- readLines(url(value))
   }
   # value can now be a vector
-  
+
   # handle potential json string input
   if (length(value) == 1 &&
       is.atomic(value) &&
@@ -88,7 +88,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
     if ((length(chk) == 1L) &&
         (chk == '"array"')) value <- jqr::jq(value, " .[] ")
   }
-  
+
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
     # if value contains id's, split rows into documents of a vector
@@ -113,21 +113,21 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
   }
-  
+
   # get _id's of docs to be updated
   valueIds <- gsub(
     '"', "", as.character(jqr::jq(textConnection(value), '._id | select(. != null)'
     )))
-  
+
   # early return if none found
   if (query == "{}" &&
       !length(valueIds)) return(0L)
-  
+
   # check
   if (query != "{}" && length(valueIds)) warning(
     "Ignoring the specified 'query' parameter, using _id's ",
     "found in 'value' to identify documents to be updated")
-  
+
   # get docs to be updated
   if (length(valueIds)) query <- paste0(
     '{"_id": {"$in": [', paste0('"', valueIds, '"', collapse = ", "), ']}}')
@@ -145,14 +145,14 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   ndjson <- NULL
   jsonlite::stream_out(input, con = textConnection(
     object = "ndjson", open = "w", local = TRUE), verbose = FALSE, digits = NA)
-  
+
   # temporary file and connection
   tfname <- tempfile()
   tfnameCon <- file(tfname, open = "at")
   # register to close and remove file after used for streaming
   on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
   on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-  
+
   # merge and append to file
   if (!length(valueIds)) {
     #
@@ -184,12 +184,12 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
     #
   }
   close(tfnameCon)
-  
+
   # update documents
   docids <- as.character(jqr::jq(file(tfname), " ._id "))
   docids <- gsub('"', "", docids)
   docs <- jqr::jq(file(tfname), " del (._id) ")
-  
+
   result <- sapply(seq_along(docids), function(i) {
     sofa::doc_upsert(
       cushion = src$con,
@@ -198,29 +198,29 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
       docid = docids[i]
     )[["ok"]]}
   )
-  
+
   # return
   return(sum(result))
-  
+
   # 165s for 4355 docs = 0.038 s/doc
-  
+
 }
 
 #' @export
 docdb_update.src_elastic <- function(src, key, value, query, ...) {
-  
+
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
-  
+
   # process value, target is data frame
-  
+
   # needed because target is data frame
   # but data frame could be serialised
   # into a single json string line, in
   # contrast to other inputs
   valueClass <- class(value)
-  
+
   # json to data frame
   if (any(class(value) == "character")) {
     if (isFile(value)) {
@@ -234,7 +234,7 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
       }
     }
   }
-  
+
   # list to data frame
   if (all(class(value) %in% "list")) {
     value <- jsonlite::fromJSON(
@@ -242,35 +242,35 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
     # if value is still simple list
     value <- as.data.frame(value, check.names = FALSE)
   }
-  
+
   # data frame
   row.names(value) <- NULL
   if (any(names(value) == "X_id")) names(value)[names(value) == "X_id"] <- "_id"
-  
+
   # _id in data frame?
   if (any(names(value) == "_id")) {
-    
+
     ids <- value[, "_id", drop = TRUE]
     value <- value[, -match("_id", names(value)), drop = FALSE]
-    
+
     if (query != '{}') warning(
       "Ignoring the specified 'query' parameter, using _id's ",
       "found in 'value' to identify documents to be updated")
-    
+
   } else {
-    
+
     ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
     if (!length(ids)) return(0L)
-    
+
   }
-  
+
   # check
   if (!all(valueClass %in% "data.frame") &&
       nrow(value) > 1L && !identical(nrow(value), length(ids))) stop(
         "Unequal number of documents identified (", length(ids),
         ") and of documents in 'value' (", nrow(value), ")"
       )
-  
+
   # how to handle?
   if (nrow(value) != length(ids)) {
     # expanding data frame as needed to match _id's
@@ -291,7 +291,7 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
       value <- as.data.frame(value)
     }
   }
-  
+
   # Error: no 'docs_bulk_update' method for list
   # therefore using only data frame for update
   result <- elastic::docs_bulk_update(
@@ -304,7 +304,7 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
     query = list(refresh = TRUE),
     ...
   )
-  
+
   # prepare return value
   if (inherits(result, "try-error") || any(sapply(result, "[[", "errors"))) {
     error <- unlist(result, use.names = TRUE)
@@ -322,25 +322,25 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
   }
   result <- sum(result == "updated" | result == "noop")
   return(result)
-  
+
 }
 
 #' @export
 docdb_update.src_mongo <- function(src, key, value, query, ...) {
-  
+
   # special check for mongo
   chkSrcMongo(src, key)
-  
+
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
-  
+
   # if regexp query lacks options, add them in
   if (grepl('"[$]regex" *: *"[^,$:}]+?" *}', query)) query <-
     sub('("[$]regex" *: *"[^,$:}]+?" *)', '\\1, "$options": ""', query)
-  
+
   # process value, target is json string
-  
+
   # check other inputs
   if (isFile(value)) {
     value <- readLines(file(value))
@@ -348,7 +348,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     value <- readLines(url(value))
   }
   # value can now be a vector
-  
+
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
       is.character(value) && jsonlite::validate(value)
@@ -361,7 +361,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
   }
-  
+
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
     # if value contains id's, split rows into documents of a vector
@@ -374,7 +374,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
       value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
     }
   }
-  
+
   # list to json
   if (all(class(value) %in% "list")) {
     value <- jsonlite::toJSON(value, dataframe = "rows", auto_unbox = TRUE, digits = NA)
@@ -382,7 +382,7 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
   }
-  
+
   # get doc ids to update
   # bulk update: if ids are in value, query is ignored
   ids <- try(jqr::jq(value, " ._id "), silent = TRUE)
@@ -405,24 +405,24 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
       ids <- query
     }
   }
-  
+
   # check
   if (length(value) > 1L && (length(value) != length(ids))) stop(
     "Unequal number of documents identified (", length(ids),
     ") and of documents in 'value' (", length(value), ")"
   )
-  
+
   # turn into json set
   value <- vapply(
     X = value,
     function(i) {paste0('{"$set":', i, "}")},
     FUN.VALUE = character(1L),
     USE.NAMES = FALSE)
-  
+
   # iterate over data
   result <- 0L
   for (i in seq_along(value)) {
-    
+
     # do update
     res <- try(
       suppressWarnings(
@@ -433,12 +433,12 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
           multiple = TRUE,
           ...))[c("matchedCount", "upsertedCount")],
       silent = TRUE)
-    
+
     # accumulate
     result <- c(result, res)
-    
+
   }
-  
+
   # generate user info
   result <- unlist(result)
   if (inherits(result, "try-error") ||
@@ -452,26 +452,26 @@ docdb_update.src_mongo <- function(src, key, value, query, ...) {
     result <- min(0, as.integer(result))
   }
   return(sum(result))
-  
+
 }
 
 #' @export
 docdb_update.src_sqlite <- function(src, key, value, query, ...) {
-  
+
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
-  
+
   # use file based approach
-  if (src$featUuid && 
+  if (src$featUuid &&
       isFile(value) &&
       (query == "{}")) {
-    
+
     # import into temporary table
     tblName <- uuid::UUIDgenerate()
     try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
     on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
-    
+
     # for parameters see
     # https://github.com/r-dbi/RSQLite/blob/main/R/dbWriteTable_SQLiteConnection_character_character.R#L58
     RSQLite::dbWriteTable(
@@ -484,7 +484,7 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
       skip = 0L,
       append = FALSE
     )
-    
+
     statement <- paste0(
       'UPDATE "', key, '"
        SET json = jsonb_patch(json, injson)
@@ -494,43 +494,43 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
         FROM \'', tblName, '\'
       ) WHERE "', key, '"._id = in_id;'
     )
-    
+
     result <- DBI::dbExecute(
       conn = src$con,
       statement = statement
     )
-    
+
     return(result)
   }
-  
+
   # SQL for patching, see https://www.sqlite.org/json1.html#jpatch
   updFunction <- "jsonb_patch"
-  
+
   return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
-  
+
 }
 
 #' @export
 docdb_update.src_postgres <- function(src, key, value, query, ...) {
-  
+
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
-  
+
   ## localhost may be able to import from file,
   ## depending on postgres process rights
   copyWorked <- 0L
-  
+
   # use file based approach
   if (grepl("^localhost$", src$host) &&
       isFile(value) &&
       (query == "{}")) {
-    
+
     # import into temporary table
     tblName <- uuid::UUIDgenerate()
     try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
     on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
-    
+
     # need to read in as text to avoid the error
     # Character with value 0x0a must be escaped
     DBI::dbCreateTable(
@@ -538,7 +538,7 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
       name = tblName,
       fields = c("json" = "JSONB")
     )
-    
+
     copyWorked <- try(
       DBI::dbExecute(
         conn = src$con,
@@ -547,50 +547,50 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
           "FROM '", value, "' ",
           "CSV QUOTE e'\x01' DELIMITER e'\x02';")
       ), silent = TRUE)
-    
+
   }
-  
+
   if (!inherits(copyWorked, "try-error") &&
       (copyWorked >= 1L)) {
-    
+
     statement <- paste0(
       'UPDATE "', key, '"
-       SET json = jsonb_merge_patch(json, injson)
+       SET json = jsonb_patch(json, injson)
        FROM (SELECT
         json->>\'_id\' AS in_id,
-        jsonb_merge_patch(json, \'{\"_id\": null}\') AS injson
+        jsonb_patch(json, \'{\"_id\": null}\') AS injson
         FROM "', tblName, '"
       ) AS tmp WHERE "', key, '"._id = tmp.in_id;'
     )
-    
+
     result <- DBI::dbExecute(
       conn = src$con,
       statement = statement
     )
-    
+
     return(result)
-    
+
   }
-  
+
   # Since PostgreSQL has no internal function,
   # uses function inserted by nodbi::src_postgres
-  updFunction <- "jsonb_merge_patch"
-  
+  updFunction <- "jsonb_patch"
+
   return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
-  
+
 }
 
 #' @export
 docdb_update.src_duckdb <- function(src, key, value, query, ...) {
-  
+
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
-  
+
   # use file based approach
   if (isFile(value) &&
       (query == "{}")) {
-    
+
     statement <- paste0(
       'UPDATE "', key, '"
        SET json = json_merge_patch(json, injson)
@@ -600,20 +600,20 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
         FROM read_ndjson_objects("', value, '")
       ) WHERE "', key, '"._id = in_id;'
     )
-    
+
     result <- DBI::dbExecute(
       conn = src$con,
       statement = statement
     )
-    
+
     return(result)
   }
-  
+
   # see https://duckdb.org/docs/extensions/json#json-creation-functions
   updFunction <- "json_merge_patch"
-  
+
   return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
-  
+
 }
 
 ## helpers --------------------------------------
@@ -621,7 +621,7 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
 #' @keywords internal
 #' @noRd
 sqlUpdate <- function(src, key, value, query, updFunction) {
-  
+
   # check other inputs
   if (isFile(value)) {
     value <- readLines(file(value))
@@ -629,7 +629,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     value <- readLines(url(value))
   }
   # value can now be a vector
-  
+
   # handle potential json string input
   if (length(value) == 1 && is.atomic(value) &&
       is.character(value) && jsonlite::validate(value)) {
@@ -641,7 +641,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
   }
-  
+
   # data frame to json
   if (all(class(value) %in% "data.frame")) {
     # if value contains id's, split rows into documents of a vector
@@ -654,7 +654,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
       value <- jsonlite::toJSON(value, dataframe = "columns", auto_unbox = TRUE, digits = NA)
     }
   }
-  
+
   # list to json
   if (all(class(value) %in% "list")) {
     value <- jsonlite::toJSON(value, auto_unbox = TRUE, digits = NA)
@@ -662,7 +662,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     chk <- jqr::jq(value, " type ")
     if (length(chk) == 1L && chk == '"array"') value <- jqr::jq(value, " .[] ")
   }
-  
+
   # get doc ids to update
   # bulk update: if ids are in value, query is ignored
   ids <- try(jqr::jq(value, " ._id "), silent = TRUE)
@@ -677,30 +677,30 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
   } else {
     ids <- docdb_query(src, key, query, fields = '{"_id": 1}')[["_id"]]
   }
-  
+
   # check
   if (!length(ids)) return(0L)
   if (length(value) > 1L && (length(value) != length(ids))) stop(
     "Unequal number of documents identified (", (length(ids)),
     ") and of documents in 'value' (", length(value), ")"
   )
-  
+
   # default case, update with one set:
   # replace ids vector with atomic ids string
   if (length(value) == 1L) ids <- sub(
     "'(.+)'", "\\1", paste0(
       "'", ids, "'", collapse = ","))
-  
+
   # iterate over data
   result <- 0L
   for (i in seq_along(value)) {
-    
+
     # compose statement
     statement <- paste0(
       'UPDATE "', key, '" SET json = ', updFunction, '(json,\'',
       value[i], '\') WHERE _id IN (\'', ids[i], '\');'
     )
-    
+
     # update data
     if (inherits(src, "src_duckdb")) {
       tmpRes <- try(
@@ -724,7 +724,7 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
         silent = TRUE
       )
     } # if
-    
+
     if (!inherits(tmpRes, "try-error")) {
       result <- result + tmpRes
     } else {
@@ -733,10 +733,10 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
         paste0(ids[i], collapse = " / "),
         ", reason: ", tmpRes)
     }
-    
+
   } # for
-  
+
   # return
   return(result)
-  
+
 }

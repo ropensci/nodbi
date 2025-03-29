@@ -73,28 +73,29 @@ src_postgres <- function(dbname = "test",
   # add plpgsql function for docdb_update(), which should only raise
   # an error if the plpgsql extension is not installed in dbname
   out <- try(
-    # credits: Joao Haas, https://stackoverflow.com/a/65093455
-    DBI::dbExecute(conn = con, statement = 'CREATE OR REPLACE FUNCTION
-     jsonb_merge_patch("target" jsonb, "patch" jsonb)
-     RETURNS jsonb AS $$
-    BEGIN
-     RETURN COALESCE(jsonb_object_agg(
-      COALESCE("tkey", "pkey"),
-      CASE
-       WHEN "tval" ISNULL THEN "pval"
-       WHEN "pval" ISNULL THEN "tval"
-       WHEN jsonb_typeof("tval") != \'object\'
-        OR jsonb_typeof("pval") != \'object\' THEN "pval"
-       ELSE jsonb_merge_patch("tval", "pval")
-     END
-     ), \'{}\'::jsonb)
-    FROM jsonb_each("target") e1("tkey", "tval")
-    FULL JOIN jsonb_each("patch") e2("pkey", "pval")
-     ON "tkey" = "pkey"
-     WHERE jsonb_typeof("pval") != \'null\' OR "pval" ISNULL;
-    END;
-   $$ LANGUAGE plpgsql;
-  '), silent = TRUE)
+    DBI::dbExecute(conn = con, statement = '
+      CREATE OR REPLACE FUNCTION
+      jsonb_patch("injsn" jsonb, "delta" jsonb)
+      RETURNS jsonb LANGUAGE plpgsql AS $$
+        BEGIN
+          RETURN
+          COALESCE(
+            JSONB_OBJECT_AGG(
+              COALESCE("keyInjsn", "keyDelta"),
+              CASE
+                WHEN "valInjsn" IS NULL THEN "valDelta"
+                WHEN "valDelta" IS NULL THEN "valInjsn"
+                WHEN (jsonb_typeof("valInjsn") <> \'object\') OR
+                     (jsonb_typeof("valDelta") <> \'object\') THEN "valDelta"
+                ELSE jsonb_patch("valInjsn", "valDelta")
+              END
+              ), \'{}\'::jsonb)
+          FROM jsonb_each(injsn) AS fromInjsn("keyInjsn", "valInjsn")
+          FULL JOIN jsonb_each(delta) AS fromDelta("keyDelta", "valDelta")
+          ON "keyInjsn" = "keyDelta"
+          WHERE (jsonb_typeof("valDelta") <> \'null\') OR ("valDelta" ISNULL);
+        END;
+      $$;'), silent = TRUE)
 
   if (inherits(out, "try-error") &&
       !grepl("tuple concurrently updated", out)) {

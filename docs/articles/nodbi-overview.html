@@ -8,8 +8,8 @@
 <title>nodbi - package overview • nodbi</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="nodbi - package overview">
 </head>
 <body>
@@ -118,7 +118,6 @@ holds the name of the relevant container.</p>
 <span></span>
 <span><span class="co"># this example is run with</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; RSQLite version has enabled accelerating docdb_create() and docdb_update() functions when used with value = &lt;NDJSON file name&gt;.</span></span>
 <span></span>
 <span><span class="co"># note additional parameters can be specified,</span></span>
 <span><span class="co"># for example for local or remote MongoDb:</span></span>
@@ -153,12 +152,12 @@ pointing to <code>NDJSON</code>.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># load additionally mapdata as list</span></span>
-<span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">mapdata</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">mapdata</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: container 'my_container' already exists</span></span>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span></span>
 <span><span class="co"># show JSON structure of contacts</span></span>
-<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/prettify.html" class="external-link">minify</a></span><span class="op">(</span><span class="va">contacts</span><span class="op">)</span></span>
+<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/prettify.html" class="external-link">minify</a></span><span class="op">(</span><span class="va">contacts</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [{"_id":"5cd67853f841025e65ce0ce2","isActive":false,"balance":"$3,808.45","age":23,"eyeColor":"green","name":"Lacy Chen","email":"lacychen@conjurica.com","about":"Sunt consequat ad dolore.\nExercitation nisi reprehenderit.","registered":"2014-08-03T12:11:54 -02:00","tags":["nulla","nisi","adipisicing","do","ad","ullamco","irure"],"friends":[{"id":0,"name":"Wooten Goodwin"},{"id":1,"name":"Brandie Woodward"},{"id":2,"name":"Angelique Britt"}]},{"_id":"5cd678531b423d5f04cfb0a1","isActive":false,"balance":"$3,400.50","age":20,"eyeColor":"brown","name":"Rae Colon","email":"raecolon@conjurica.com","about":"Nisi excepteur duis duis aliquip qui id consequat consequat.","registered":"2018-12-19T06:23:35 -01:00","tags":["nostrud","eu","consectetur","adipisicing","labore","ut","voluptate"],"friends":[{"id":0,"name":"Yang Yates"},{"id":1,"name":"Lacy Chen"}]},{"_id":"5cd6785335b63cb19dfa8347","isActive":false,"balance":"$2,579.09","age":30,"eyeColor":"brown","name":"Williamson French","email":"williamsonfrench@conjurica.com","about":"Nulla do sunt consectetur officia. Laboris pariatur incididunt.","registered":"2018-02-14T10:59:57 -01:00","tags":["exercitation","do","magna","ut","consectetur","ex","incididunt"],"friends":[{"id":0,"name":"Coleen Dunn"},{"id":1,"name":"Doris Phillips"},{"id":2,"name":"Concetta Turner"}]},{"_id":"5cd6785325ce3a94dfc54096","isActive":true,"balance":"$1,161.52","age":22,"eyeColor":"brown","name":"Pace Bell","email":"pacebell@conjurica.com","about":"Eiusmod sunt laborum ipsum do cupidatat qui id dolore do.","registered":"2018-08-17T12:23:42 -02:00","tags":["aliqua","consectetur","commodo","velit","cupidatat","duis","dolore"],"friends":[{"id":0,"name":"Baird Keller"},{"id":1,"name":"Francesca Reese"},{"id":2,"name":"Dona Bartlett"}]},{"_id":"5cd678530df22d3625ed8375","isActive":true,"balance":"$2,412.67","age":20,"eyeColor":"blue","name":"Krista Baxter","email":"kristabaxter@conjurica.com","about":"Sint quis nulla ea fugiat. Commodo nisi qui eu sit.","registered":"2017-07-19T05:03:47 -02:00","tags":["sit","cillum","commodo","labore","sint","in","exercitation"],"friends":[{"id":0,"name":"Pace Bell"}]}]</span></span>
 <span></span>
 <span><span class="co"># load additionally contacts JSON data</span></span>
@@ -385,7 +384,7 @@ SQLite:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span></span>
 <span><span class="co">#&gt; src: sqlite</span></span>
-<span><span class="co">#&gt; SQLite library version: 3.47.0</span></span>
+<span><span class="co">#&gt; SQLite library version: 3.47.1</span></span>
 <span><span class="co">#&gt;  size: NA MB</span></span>
 <span><span class="co">#&gt;  dbname: :memory:</span></span>
 <span><span class="co">#&gt; Warning: Database is only in memory, will not persist after R ends! Consider to copy it with </span></span>
