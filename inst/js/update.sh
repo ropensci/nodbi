@@ -7,6 +7,7 @@
 # git diff > ../update.patch
 # rm -rf mongo-to-sql-converter
 #
+# Ivan Tarbakou, MIT License
 module="mongo-to-sql-converter"
 cd inst/js
 npm install $module

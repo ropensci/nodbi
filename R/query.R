@@ -1464,14 +1464,43 @@ processDbGetQuery <- function(
             eval.parent(parse(text = getData))),
           verbose = FALSE))
 
-  # temporary file and connection
-  tfname <- tempfile()
-  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+  # TODO
 
-  # write out
-  writeLines(
-    eval.parent(parse(text = getData)),
-    con = tfname)
+  # use duckdb internal function
+  if (inherits(eval.parent(parse(text = "src")), "src_duckdb")) {
+
+    # get data
+    statement <- eval.parent(parse(text = "statement"))
+    n <- eval.parent(parse(text = "n"))
+
+    # temporary file for streaming
+    tfname <- tempfile()
+    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+
+    # modify statement to export as file
+    statement <- paste0(
+      "COPY (", sub(";$", "", statement),
+      ifelse(n == -1L, "", paste0(" LIMIT ", n)),
+      ") TO '", tfname, "' (HEADER false, QUOTE '');"
+    )
+
+    # write ndjson
+    DBI::dbExecute(
+      conn = eval.parent(parse(text = "src"))$con,
+      statement = statement)
+
+  } else {
+
+    # temporary file and connection
+    tfname <- tempfile()
+    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+
+    # write out
+    writeLines(
+      eval.parent(parse(text = getData)),
+      con = tfname)
+
+  }
 
   # early exit
   if (file.size(tfname) <= 2L) return(NULL)

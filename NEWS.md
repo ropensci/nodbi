@@ -1,6 +1,7 @@
 # nodbi 0.11.0.9000
 
-## Bug fixes
+## Improvements
+* Use `duckdb` internal function for writing NDJSON to file
 * Removing message about RSQLite handling NDJSON file name as value
 
 # nodbi 0.11.0

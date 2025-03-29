@@ -35,7 +35,6 @@ Each row in the table represents a \code{JSON} document.
 Any root-level \verb{_id} is extracted from the document(s) and used
 for column \verb{_id}, otherwise a UUID is created as \verb{_id}.
 The table is indexed on \verb{_id}. A custom \code{plpgsql} function
-\href{https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60}{jsonb_merge_patch()}
 is used for \code{docdb_update()}.
 The order of variables in data frames returned by \code{docdb_get()}
 and \code{docdb_query()} can differ from their order the input to

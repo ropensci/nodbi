@@ -85,7 +85,6 @@ Each row in the table represents a <code>JSON</code> document.
 Any root-level <code>_id</code> is extracted from the document(s) and used
 for column <code>_id</code>, otherwise a UUID is created as <code>_id</code>.
 The table is indexed on <code>_id</code>. A custom <code>plpgsql</code> function
-<a href="https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60" class="external-link">jsonb_merge_patch()</a>
 is used for <code><a href="docdb_update.html">docdb_update()</a></code>.
 The order of variables in data frames returned by <code><a href="docdb_get.html">docdb_get()</a></code>
 and <code><a href="docdb_query.html">docdb_query()</a></code> can differ from their order the input to

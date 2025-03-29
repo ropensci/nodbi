@@ -34,7 +34,7 @@ docdb_get <- function(src, key, limit = NULL, ...) {
   if (length(params[["fields"]]) ||
       length(params[["query"]]) ||
       length(params[["listfields"]])) stop(
-    "Use docdb_query() to specify fields or query parameters.")
+        "Use docdb_query() to specify fields or query parameters.")
 
   # dispatch
   UseMethod("docdb_get", src)
@@ -167,29 +167,52 @@ sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
     # canonical sorting in nodbi
     "ORDER BY _id ASC;")
 
-  # temporary file for streaming
-  tfname <- tempfile()
-  tfnameCon <- file(description = tfname, open = "wt")
-  # register to remove file after used for streaming
-  on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+  # use duckdb internal function
+  if (inherits(src, "src_duckdb")) {
 
-  # get data, write to file in ndjson format
-  writeLines(
-    stringi::stri_replace_all_fixed(
-      str = paste0(
-        "", # protect against empty query result
-        stats::na.omit(  # eliminate rows without json
-          DBI::dbGetQuery(
-            conn = src$con,
-            statement = statement,
-            n = n)[["json"]])),
-      pattern = "\n",
-      replacement = "\\n"),
-    con = tfnameCon,
-    sep = "\n",
-    useBytes = TRUE)
-  close(tfnameCon)
+    # temporary file for streaming
+    tfname <- tempfile()
+    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+
+    # modify statement to export as file
+    statement <- paste0(
+      "COPY (", sub(";$", "", statement),
+      ifelse(n == -1L, "", paste0(" LIMIT ", n)),
+      ") TO '", tfname, "' (HEADER false, QUOTE '');"
+    )
+
+    # write ndjson
+    DBI::dbExecute(
+      conn = src$con,
+      statement = statement)
+
+  } else {
+
+    # temporary file for streaming
+    tfname <- tempfile()
+    tfnameCon <- file(description = tfname, open = "wt")
+    # register to remove file after used for streaming
+    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+
+    # get data, write to file in ndjson format
+    writeLines(
+      stringi::stri_replace_all_fixed(
+        str = paste0(
+          "", # protect against empty query result
+          stats::na.omit(  # eliminate rows without json
+            DBI::dbGetQuery(
+              conn = src$con,
+              statement = statement,
+              n = n)[["json"]])),
+        pattern = "\n",
+        replacement = "\\n"),
+      con = tfnameCon,
+      sep = "\n",
+      useBytes = TRUE)
+    close(tfnameCon)
+
+  }
 
   # stream in ndjson records
   return(jsonlite::stream_in(file(tfname), verbose = FALSE))

@@ -325,14 +325,14 @@ result <- rbenchmark::benchmark(
 )
 
 # 2025-03-29 with M3 hardware, databases via homebrew
-result[rev(order(result$elapsed)), c("test", "replications", "elapsed")]
+# result[rev(order(result$elapsed)), c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 4    CouchDB            3   69.69
-# 3    Elastic            3   26.79
-# 1    MongoDB            3    1.61
+# 4    CouchDB            3   61.22
+# 3    Elastic            3   27.79
 # 5 PostgreSQL            3    1.52
-# 6     DuckDB            3    1.12
-# 2     SQLite            3    0.67
+# 1    MongoDB            3    1.51
+# 6     DuckDB            3    1.01
+# 2     SQLite            3    0.65
 
 message(R.version$version.string)
 # R Under development (unstable) (2025-03-10 r87922)
