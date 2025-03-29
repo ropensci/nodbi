@@ -431,7 +431,7 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
           " CASE WHEN length(json->>'_id') > 0 THEN",
           " json->>'_id' ELSE gen_random_uuid()::TEXT END AS _id,",
           " CASE WHEN length(json->>'_id') > 0 THEN",
-          " jsonb_merge_patch(json, '{\"_id\": null}') ELSE json END AS json",
+          " jsonb_patch(json, '{\"_id\": null}') ELSE json END AS json",
           " FROM \"", tblName, "\";")
       ), silent = TRUE)
 

@@ -7,14 +7,12 @@ editor_options:
 # nodbi
 
 ```{r echo=FALSE}
-
 knitr::opts_chunk$set(
   collapse = TRUE,
   eval = FALSE,
   comment = "#",
   out.width = "100%"
 )
-
 ```
 
 ⁠<!-- badges: start -->
@@ -24,7 +22,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 ⁠<!-- badges: end -->
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2024-11-10.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2025-03-29.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 | :--------------------- | :--------------------- | :--------------------- |
@@ -96,7 +94,8 @@ src <- nodbi::src_duckdb(dbdir = ":memory:", ...)
 ```{r}
 src <- nodbi::src_mongo(
   collection = "my_container", db = "my_database",
-  url = "mongodb://localhost", ...)
+  url = "mongodb://localhost", ...
+)
 ```
 
 ### SQLite
@@ -114,7 +113,8 @@ src <- nodbi::src_sqlite(dbname = ":memory:", ...)
 ```{r}
 src <- nodbi::src_couchdb(
   host = "127.0.0.1", port = 5984L, path = NULL,
-  transport = "http", user = NULL, pwd = NULL, headers = NULL)
+  transport = "http", user = NULL, pwd = NULL, headers = NULL
+)
 ```
 
 ### Elasticsearch
@@ -124,7 +124,8 @@ src <- nodbi::src_couchdb(
 ```{r}
 src <- nodbi::src_elastic(
   host = "127.0.0.1", port = 9200L, path = NULL,
-  transport_schema = "http", user = NULL, pwd = NULL, ...)
+  transport_schema = "http", user = NULL, pwd = NULL, ...
+)
 ```
 
 ### PostgreSQL
@@ -133,7 +134,8 @@ src <- nodbi::src_elastic(
 
 ```{r}
 src <- nodbi::src_postgres(
-  dbname = "my_database", host = "127.0.0.1", port = 5432L, ...)
+  dbname = "my_database", host = "127.0.0.1", port = 5432L, ...
+)
 ```
 
 ## Walk-through {#walk-through}
@@ -154,8 +156,9 @@ src <- src_sqlite()
 src <- src_postgres()
 src <- src_elastic()
 src <- src_couchdb(
-  user = Sys.getenv("COUCHDB_TEST_USER"), 
-  pwd = Sys.getenv("COUCHDB_TEST_PWD"))
+  user = Sys.getenv("COUCHDB_TEST_USER"),
+  pwd = Sys.getenv("COUCHDB_TEST_PWD")
+)
 
 # check if container already exists
 docdb_exists(src, key)
@@ -180,17 +183,17 @@ docdb_create(src, key, contacts)
 dplyr::tibble(docdb_get(src, key))
 # # A tibble: 135 × 27
 #    `_id` isActive balance   age eyeColor name  email about registered tags   friends
-#    <chr> <lgl>    <chr>   <int> <chr>    <chr> <chr> <chr> <chr>      <list> <list> 
-#  1 5cd6… TRUE     $2,412…    20 blue     Kris… kris… "Sin… 2017-07-1… <chr>  <df>   
-#  2 5cd6… FALSE    $3,400…    20 brown    Rae … raec… "Nis… 2018-12-1… <chr>  <df>   
-#  3 5cd6… TRUE     $1,161…    22 brown    Pace… pace… "Eiu… 2018-08-1… <chr>  <df>   
-#  4 5cd6… FALSE    $2,579…    30 brown    Will… will… "Nul… 2018-02-1… <chr>  <df>   
-#  5 5cd6… FALSE    $3,808…    23 green    Lacy… lacy… "Sun… 2014-08-0… <chr>  <df>   
-#  6 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL> 
-#  7 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL> 
-#  8 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL> 
-#  9 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL> 
-# 10 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL> 
+#    <chr> <lgl>    <chr>   <int> <chr>    <chr> <chr> <chr> <chr>      <list> <list>
+#  1 5cd6… TRUE     $2,412…    20 blue     Kris… kris… "Sin… 2017-07-1… <chr>  <df>
+#  2 5cd6… FALSE    $3,400…    20 brown    Rae … raec… "Nis… 2018-12-1… <chr>  <df>
+#  3 5cd6… TRUE     $1,161…    22 brown    Pace… pace… "Eiu… 2018-08-1… <chr>  <df>
+#  4 5cd6… FALSE    $2,579…    30 brown    Will… will… "Nul… 2018-02-1… <chr>  <df>
+#  5 5cd6… FALSE    $3,808…    23 green    Lacy… lacy… "Sun… 2014-08-0… <chr>  <df>
+#  6 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL>
+#  7 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL>
+#  8 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL>
+#  9 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL>
+# 10 69bc… NA       NA         NA NA       NA    NA     NA   NA         <NULL> <NULL>
 # # ℹ 125 more rows
 # # ℹ 16 more variables: url <chr>, args <df[,0]>, headers <df[,4]>, origin <chr>,
 # #   id <int>, mpg <dbl>, cyl <int>, disp <dbl>, hp <int>, drat <dbl>, wt <dbl>,
@@ -206,7 +209,7 @@ docdb_query(src, key, query = '{"mpg": {"$gte": 30}}')
 # 3 Toyota Corolla  34   4   71  65  4.2 1.8   20  1  1    4    1
 # 4   Lotus Europa  30   4   95 113  3.8 1.5   17  1  1    5    2
 
-# query some fields from some documents; 'query' is a mandatory 
+# query some fields from some documents; 'query' is a mandatory
 # parameter and is used here in its position in the signature
 docdb_query(src, key, '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "mpg": 1}')
 #              _id  wt mpg
@@ -217,10 +220,11 @@ docdb_query(src, key, '{"mpg": {"$gte": 30}}', fields = '{"wt": 1, "mpg": 1}')
 
 # query some subitem fields from some documents
 str(docdb_query(
-  src, key, 
-  query = '{"$or": [{"age": {"$gt": 21}}, 
-           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}', 
-  fields = '{"age": 1, "friends.name": 1}'))
+  src, key,
+  query = '{"$or": [{"age": {"$gt": 21}},
+           {"friends.name": {"$regex": "^B[a-z]{3,9}.*"}}]}',
+  fields = '{"age": 1, "friends.name": 1}'
+))
 # 'data.frame':	3 obs. of  3 variables:
 #  $ _id         : chr  "5cd6785325ce3a94dfc54096" "5cd6785335b63cb19dfa8347" "5cd67853f841025e65ce0ce2"
 #  $ age         : int  22 30 23
@@ -229,7 +233,7 @@ str(docdb_query(
 #   ..$ : chr  "Coleen Dunn" "Doris Phillips" "Concetta Turner"
 #   ..$ : chr  "Wooten Goodwin" "Brandie Woodward" "Angelique Britt"
 
-# such queries can also be used for updating (patching) selected documents 
+# such queries can also be used for updating (patching) selected documents
 # with a new 'value'(s) from a JSON string, a data frame a list or a file with NSJSON)
 docdb_update(src, key, value = '{"vs": 9, "xy": [1, 2]}', query = '{"carb": 3}')
 # [1] 3
@@ -246,7 +250,7 @@ docdb_get(src, key)[c(3, 109, 130, 101), c("_id", "xy", "url", "email")]
 # *note* that dplyr includes a (deprecated) function src_sqlite
 # which would mask nodbi's src_sqlite, so it is excluded here
 library("dplyr", exclude = c("src_sqlite", "src_postgres"))
-# 
+#
 docdb_get(src, key) %>%
   group_by(gear) %>%
   summarise(mean_mpg = mean(mpg))
@@ -256,9 +260,9 @@ docdb_get(src, key) %>%
 # 1     3     16.1
 # 2     4     24.5
 # 3     5     21.4
-# 4    NA     NA 
+# 4    NA     NA
 
-# delete documents; query is optional parameter and has to be 
+# delete documents; query is optional parameter and has to be
 # specified for deleting documents instead of deleting the container
 dim(docdb_query(src, key, query = '{"$or": [{"age": {"$lte": 20}}, {"age": {"$gte": 25}}]}'))
 # [1] 3 11
@@ -270,9 +274,10 @@ nrow(docdb_get(src, key))
 # delete container from database
 docdb_delete(src, key)
 # [1] TRUE
-# 
+#
 # shutdown
-DBI::dbDisconnect(src$con, shutdown = TRUE); rm(src)
+DBI::dbDisconnect(src$con, shutdown = TRUE)
+rm(src)
 ```
 
 ## Benchmark {#benchmark}
@@ -286,8 +291,9 @@ srcPostgres <- src_postgres()
 srcDuckdb <- src_duckdb()
 srcElastic <- src_elastic()
 srcCouchdb <- src_couchdb(
-  user = Sys.getenv("COUCHDB_TEST_USER"), 
-  pwd = Sys.getenv("COUCHDB_TEST_PWD"))
+  user = Sys.getenv("COUCHDB_TEST_USER"),
+  pwd = Sys.getenv("COUCHDB_TEST_PWD")
+)
 
 key <- "test"
 query <- '{"clarity": {"$in": ["NOTME", "VS1"]}}'
@@ -318,25 +324,25 @@ result <- rbenchmark::benchmark(
   replications = 3L
 )
 
-# 2024-11-10 with M3 hardware, databases via homebrew
-result[rev(order(result$elapsed)), c('test', 'replications', 'elapsed')]
+# 2025-03-29 with M3 hardware, databases via homebrew
+result[rev(order(result$elapsed)), c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 4    CouchDB            3   52.81
-# 3    Elastic            3   27.76
-# 5 PostgreSQL            3    1.59
-# 1    MongoDB            3    1.41
-# 6     DuckDB            3    1.10
-# 2     SQLite            3    0.71
+# 4    CouchDB            3   69.69
+# 3    Elastic            3   26.79
+# 1    MongoDB            3    1.61
+# 5 PostgreSQL            3    1.52
+# 6     DuckDB            3    1.12
+# 2     SQLite            3    0.67
 
 message(R.version$version.string)
-# R version 4.4.2 (2024-10-31)
+# R Under development (unstable) (2025-03-10 r87922)
 
 pkgs <- c("RSQLite", "duckdb", "RPostgres", "mongolite", "elastic", "sofa")
 for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
-# RSQLite: 2.3.7.9017
-# duckdb: 1.1.2
-# RPostgres: 1.4.7
-# mongolite: 2.8.1
+# RSQLite: 2.3.9
+# duckdb: 1.2.1
+# RPostgres: 1.4.8
+# mongolite: 3.1.2
 # elastic: 1.2.0
 # sofa: 0.4.0
 ```
@@ -346,33 +352,34 @@ for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
 Every database backend is subjected to identical tests, see [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R). 
 
 ```{r testing_and_coverage}
-# 2024-11-10
+# 2025-03-29
+
 suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
-# ✔ |      2 175 | couchdb [47.9s]
-# ✔ |      1 174 | duckdb [3.5s]
-# ✔ |      2 173 | elastic [38.3s]
-# ✔ |      2 173 | mongodb [3.6s]
-# ✔ |        176 | postgres [4.3s]
-# ✔ |        177 | sqlite [3.5s]
-# 
-# ══ Results ══════════════════════════
-# Duration: 101.2 s
-# 
-# ── Skipped tests (7) ────────────────
-# • Testing for auto disconnect and shutdown not relevant (3): 
-#   test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): 
-#   test-couchdb.R:26:3, test-duckdb.R:22:3, 
+# ✔ |      2 175 | couchdb [46.4s]
+# ✔ |      1 174 | duckdb [3.7s]
+# ✔ |      2 173 | elastic [40.5s]
+# ✔ |      2 173 | mongodb [3.9s]
+# ✔ |        176 | postgres [4.7s]
+# ✔ |        177 | sqlite [3.6s]
+#
+# ══ Results ═════════════════════════════════════════════════
+# Duration: 102.8 s
+#
+# ── Skipped tests (7) ───────────────────────────────────────
+# • Testing for auto disconnect and shutdown not relevant (3):
+#   test-couchdb.R:26:3, test-elastic.R:21:3,
+#   test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4):
+#   test-couchdb.R:26:3, test-duckdb.R:22:3,
 #   test-elastic.R:21:3, test-mongodb.R:24:3
-# 
+#
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1048 ]
 
-# 2024-11-10
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 94.07%
-# R/src_postgres.R: 79.31%
+# nodbi Coverage: 94.06%
 # R/src_duckdb.R: 79.49%
+# R/src_postgres.R: 80.00%
 # R/zzz.R: 87.79%
 # R/src_mongo.R: 92.59%
 # R/update.R: 94.40%
