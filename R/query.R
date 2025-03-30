@@ -1464,8 +1464,6 @@ processDbGetQuery <- function(
             eval.parent(parse(text = getData))),
           verbose = FALSE))
 
-  # TODO
-
   # use duckdb internal function
   if (inherits(eval.parent(parse(text = "src")), "src_duckdb")) {
 

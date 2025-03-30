@@ -1,4 +1,4 @@
-# nodbi 0.11.0.9000
+# nodbi 0.12.0
 
 ## Improvements
 * Use `duckdb` internal function for writing NDJSON to file

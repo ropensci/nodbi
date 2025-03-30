@@ -22,13 +22,13 @@ are independent of the backend (e.g., see \code{\link[=docdb_query]{docdb_query(
 
 Documentation details for each database:
 \itemize{
-\item MongoDB - \url{https://docs.mongodb.com/}
+\item MongoDB - \url{https://www.mongodb.com/docs/manual/crud/}
 \item SQLite/JSON1 - \url{https://www.sqlite.org/json1.html}
 \item Elasticsearch -
 \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
-\item CouchDB - \url{http://docs.couchdb.org/}
+\item CouchDB - \url{https://docs.couchdb.org/en/stable/api/index.html}
 \item PostgreSQL - \url{https://www.postgresql.org/docs/current/functions-json.html}
-\item DuckDB - \url{https://duckdb.org/docs/extensions/json}
+\item DuckDB - \url{https://duckdb.org/docs/stable/data/json/overview.html}
 }
 
 Documentation of R packages used by \code{nodbi} for the databases:

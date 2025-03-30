@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   nodbi-overview: nodbi-overview.html
-last_built: 2025-03-29T18:05Z
+last_built: 2025-03-30T12:06Z
 urls:
   reference: https://docs.ropensci.org/nodbi/reference
   article: https://docs.ropensci.org/nodbi/articles
