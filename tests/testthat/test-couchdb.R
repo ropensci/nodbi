@@ -19,7 +19,7 @@ test_that("Source", {
   expect_is(tmp$testSrc, "src_couchdb")
   expect_equal(attr(tmp$testSrc, "type"), "couchdb")
   expect_equal(attr(tmp$testSrc, "info")$couchdb, "Welcome")
-  expect_output(print(tmp$testSrc), "src: couchdb")
+  expect_output(print(tmp$testSrc), "src: CouchDB")
   rm(tmp)
 
   # run generic (database independent) tests

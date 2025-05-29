@@ -101,7 +101,7 @@ skip_if_no_mongo <- function() {
 skip_if_no_sqlite <- function() {
   testthat::skip_if_not_installed("RSQLite")
   if (inherits(try(
-    RSQLite::dbDisconnect(src_sqlite()$con),
+    RSQLite::dbDisconnect(suppressWarnings(src_sqlite()$con)),
     silent = TRUE), "try-error")) {
     skip("sqlite is not available")
   }
@@ -126,7 +126,7 @@ skip_if_no_postgres <- function() {
 skip_if_no_duckdb <- function() {
   testthat::skip_if_not_installed("duckdb")
   if (inherits(try(
-    duckdb::dbDisconnect(src_duckdb()$con, shutdown = TRUE),
+    duckdb::dbDisconnect(suppressWarnings(src_duckdb()$con), shutdown = TRUE),
     silent = TRUE), "try-error")) {
     skip("duckdb or its JSON extension is not available")
   }

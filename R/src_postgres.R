@@ -111,21 +111,37 @@ src_postgres <- function(dbname = "test",
   )
 
   # return standard nodbi structure
-  structure(list(con = con,
-                 dbname = dbname,
-                 host = host,
-                 port = port,
-                 ...),
-            class = c("src_postgres", "docdb_src"))
+  structure(
+    list(
+      con = con,
+      dbname = dbname,
+      host = host,
+      port = port,
+      ...),
+    class = c("src_postgres", "docdb_src"))
 
 }
 
 #' @export
 print.src_postgres <- function(x, ...) {
 
-  # provide short info
-  cat(sprintf(
-    "src: PostgreSQL\ndbname: %s\n",
-    x$dbname))
+  dbver <- try(DBI::dbGetQuery(
+    conn = x$con,
+    statement = "SELECT version();"
+  ), silent = TRUE)
+  if (inherits(dbver, "try-error")) {
+    dbver <- "NA"
+  } else {
+    dbver <- sub("^PostgreSQL ([0-9]+[.][0-9]+).*$", "\\1", dbver)
+  }
+
+  dbsize <- try(DBI::dbGetQuery(
+    conn = x$con,
+    statement = paste0(
+      "SELECT pg_total_relation_size('", x$dbname,"');"
+    )), silent = TRUE)
+  if (inherits(dbsize, "try-error")) dbsize <- 0.0
+
+  srcInfo("PostgreSQL", dbver, x$dbname, dbsize)
 
 }

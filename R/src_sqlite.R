@@ -41,12 +41,14 @@ src_sqlite <- function(dbname = ":memory:", ...) {
 
   # enable uuid for csv lines import
   featUuid <- pkgNeeded("RSQLite", "2.3.7.9014", FALSE)
-  if (featUuid) {
-    RSQLite::initExtension(db = con, extension = "uuid")
-  }
+  if (featUuid) RSQLite::initExtension(db = con, extension = "uuid")
 
   # set timeout for concurrency to 10s
   DBI::dbExecute(con, "PRAGMA busy_timeout = 10000;")
+
+  # RSQLite::rsqliteVersion() was introduced with
+  # same version that introduced json1 extension
+  dbver <- rev(RSQLite::rsqliteVersion())[1]
 
   # ensure disconnect
   reg.finalizer(
@@ -55,12 +57,25 @@ src_sqlite <- function(dbname = ":memory:", ...) {
     onexit = TRUE
   )
 
+  # user info
+  if (grepl(":memory:", dbname)) {
+    warning(
+      "Database is only in memory, will not persist after R ends! Consider copying ",
+      "it with \nRSQLite::sqliteCopyDatabase(\n",
+      "  from = <your nodbi::src_sqlite() object>$con, \n",
+      "  to = <e.g. RSQLite::dbConnect(RSQLite::SQLite(), 'local_file.sqlite')>\n",
+      "  )",
+      call. = FALSE)
+  }
+
   # return standard nodbi structure
-  structure(list(
-    con = con,
-    dbname = dbname,
-    featUuid = featUuid,
-    ...),
+  structure(
+    list(
+      con = con,
+      dbname = dbname,
+      dbver = dbver,
+      featUuid = featUuid,
+      ...),
     class = c("src_sqlite", "docdb_src"))
 
 }
@@ -69,22 +84,11 @@ src_sqlite <- function(dbname = ":memory:", ...) {
 print.src_sqlite <- function(x, ...) {
 
   dbname <- x$dbname
-  dbsize <- file.size(dbname)
-  # RSQLite::rsqliteVersion() was introduced with
-  # same version that introduced json1 extension
-  srv <- rev(RSQLite::rsqliteVersion())[1]
-  cat(sprintf(
-    "src: sqlite\nSQLite library version: %s\n size: %s MB\n dbname: %s\n",
-    srv, signif(dbsize / 10^6, digits = 3L), dbname))
+  dbsize <- switch(
+    dbname,
+    ":memory:" = utils::object.size(x),
+    file.size(dbname))
 
-  if (grepl(":memory:", dbname)) {
-    warning(
-      "Database is only in memory, will not persist after R ends! Consider to copy ",
-      "it with \nRSQLite::sqliteCopyDatabase(\n",
-      "  from = <your nodbi::src_sqlite() object>$con, \n",
-      "  to = <e.g. RSQLite::dbConnect(RSQLite::SQLite(), 'local_file.db')>\n",
-      "  )",
-      call. = FALSE)
-  }
+  srcInfo("SQLite", x$dbver, dbname, dbsize)
 
 }

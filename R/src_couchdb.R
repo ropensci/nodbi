@@ -36,7 +36,7 @@ src_couchdb <- function(host = "127.0.0.1", port = 5984, path = NULL,
 
   # check minimum version
   pkgNeeded("sofa", "0.3.0")
-  
+
   # create connection
   x <- sofa::Cushion$new(
     host = host,
@@ -46,21 +46,26 @@ src_couchdb <- function(host = "127.0.0.1", port = 5984, path = NULL,
     user = user,
     pwd = pwd,
     headers = headers)
-  
+
   info <- sofa::ping(x)
   dbs <- sofa::db_list(x)
 
-  structure(list(con = x),
-            class = c("src_couchdb", "docdb_src"),
-            type = "couchdb",
-            info = info, dbs = dbs)
+  structure(
+    list(con = x),
+    type = "couchdb",
+    info = info,
+    dbs = dbs,
+    class = c("src_couchdb", "docdb_src")
+  )
 }
 
 #' @export
 print.src_couchdb <- function(x, ...) {
+
   info <- attr(x, "info")
-  cat(sprintf("src: %s %s [%s/%s]", attr(x, "type"), info$version,
-              x[[1]]$host, x[[1]]$port), sep = "\n")
-  cat(doc_wrap("databases: ", paste0(attr(x, "dbs"), collapse = ", "),
-               width = 80), "\n", sep = "")
+  dbname <- sofa::db_list(x$con)
+  dbsize <- sapply(dbname, function(i) sofa::db_info(x$con, dbname = i)$sizes$file)
+
+  srcInfo("CouchDB", info$version, dbname, dbsize)
+
 }

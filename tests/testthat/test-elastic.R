@@ -14,7 +14,7 @@ test_that("Source", {
   tmp <- dbSrcKey()
   expect_is(tmp$testSrc, "docdb_src")
   expect_is(tmp$testSrc, "src_elastic")
-  expect_output(print(tmp$testSrc), "src: elasticsearch")
+  expect_output(print(tmp$testSrc), "src: Elastic")
   rm(tmp)
 
   # run generic (database independent) tests

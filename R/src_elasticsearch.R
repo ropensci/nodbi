@@ -37,27 +37,37 @@
 #' print(con)
 #' }
 src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
-  transport_schema = "http", user = NULL, pwd = NULL, force = FALSE, ...) {
+                        transport_schema = "http", user = NULL, pwd = NULL,
+                        force = FALSE, ...) {
 
   # check minimum version
   pkgNeeded("elastic", "1.0.0")
-  
+
   # create connection
-  x <- elastic::connect(host = host, port = port, path = path,
+  x <- elastic::connect(
+    host = host, port = port, path = path,
     transport_schema = transport_schema, user = user,
     pwd = pwd, force = force, ...)
-  
-  dbs <- names(elastic::aliases_get(x))
-  structure(list(con = x, info = x$ping(), dbs = dbs),
-            class = c("src_elastic", "docdb_src"),
-            type = "elasticsearch")
+
+  dbs <- names(elastic::index_stats(x)$indices)
+
+  structure(
+    list(
+      con = x,
+      info = x$ping(),
+      dbs = dbs),
+    type = "elasticsearch",
+    class = c("src_elastic", "docdb_src")
+  )
+
 }
 
 #' @export
 print.src_elastic <- function(x, ...) {
-  cat(sprintf("src: elasticsearch %s [%s:%s]",
-              x$info$version$number,
-              x$con$host, x$con$port), sep = "\n")
-  cat(doc_wrap("databases: ", paste0(x$dbs, collapse = ", "),
-               width = 80), "\n", sep = "")
+
+  dbs <- names(elastic::index_stats(x$con)$indices)
+  dbsize <- sapply(dbs, function(i) elastic::index_stats(x$con)$indices[[i]]$total$store$size_in_bytes)
+
+  srcInfo("Elasticsearch", x$info$version$number, paste0(dbs, collapse = " / "), dbsize)
+
 }

@@ -14,7 +14,7 @@ test_that("Source", {
   tmp <- dbSrcKey()
   expect_is(tmp$testSrc, "docdb_src")
   expect_is(tmp$testSrc, "src_mongo")
-  expect_output(print(tmp$testSrc), "MongoDB")
+  expect_output(print(tmp$testSrc), "src: MongoDB")
   expect_warning(
     docdb_get(tmp$testSrc, key = uuid::UUIDgenerate()),
     "differ.*using")
