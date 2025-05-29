@@ -493,6 +493,9 @@ utils::globalVariables("jqFieldNames")
 # print database information
 srcInfo <- function(srcSrc, srcVer, srcDb, srcSize) {
 
+  if (!length(srcDb)) srcDb <- NA
+  if (!length(srcSize)) srcSize <- NA
+
   cat(sprintf(
     "src: %s\nver: %s\ndb(s): %s\nsize(s): %s MB",
     srcSrc, srcVer,

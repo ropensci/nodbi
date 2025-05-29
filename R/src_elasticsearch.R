@@ -68,6 +68,6 @@ print.src_elastic <- function(x, ...) {
   dbs <- names(elastic::index_stats(x$con)$indices)
   dbsize <- sapply(dbs, function(i) elastic::index_stats(x$con)$indices[[i]]$total$store$size_in_bytes)
 
-  srcInfo("Elasticsearch", x$info$version$number, paste0(dbs, collapse = " / "), dbsize)
+  srcInfo("Elasticsearch", x$info$version$number, dbs, dbsize)
 
 }
