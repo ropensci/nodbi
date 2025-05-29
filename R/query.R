@@ -79,6 +79,7 @@ docdb_query <- function(src, key, query, ...) {
   assert(key, "character")
   assert(query, c("json", "character"))
 
+  # mangle parameters
   if (query == "") {
     warning('query = "" is deprecated, use query = "{}"')
     query <- "{}"
@@ -108,7 +109,8 @@ docdb_query <- function(src, key, query, ...) {
       if (!length(names(params))) params <- NULL
 
       # dispatch
-      return(do.call(docdb_get, list(src = src, key = key, limit = limit, params)))
+      return(do.call(docdb_get, list(
+        src = src, key = key, limit = limit, params)))
 
     }
   }
@@ -682,7 +684,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   if (!is.null(params$limit)) n <- params$limit
 
 
-  # digest
+  # digest and mangle
   fldQ <- digestFields(f = params$fields, q = query)
 
 
@@ -693,7 +695,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
     statement <- insObj('
     SELECT DISTINCT _id
-    FROM "/** key **/";')
+    FROM "/** key **/" GROUP BY _id;')
 
     return(DBI::dbGetQuery(
       conn = src$con,
@@ -712,7 +714,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       SELECT json
       FROM "/** key **/"
       LIMIT /** n **/ )
-    SELECT DISTINCT fullkey AS flds
+    SELECT DISTINCT LTRIM(fullkey, \'$.\') AS flds
     FROM extracted, json_tree(extracted.json)
     ORDER BY flds;')
 
@@ -722,10 +724,10 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       statement = statement,
       n = -1L)[["flds"]]
 
-    # remove "$.", array elements "$.item[0]"
+    # remove array elements "$.item[0].another[0]"
     fields <- unique(stringi::stri_replace_all_regex(
-      fields, "\"|\\$[.]?|\\[[-#0-9]+\\]", ""))
-    fields <- sort(fields[fields != ""])
+      fields, "\"|\\[[-#0-9]+\\]", ""))
+    fields <- fields[fields != "_id" & fields != ""]
 
     # return field names
     return(fields)
@@ -877,7 +879,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
         SELECT json FROM "/** key **/"
         WHERE /** fldQ$jsonWhere **/
         LIMIT /** n **/ )
-      SELECT DISTINCT fullkey AS flds
+      SELECT DISTINCT LTRIM(fullkey, \'$.\') AS flds
       FROM extracted, json_tree(extracted.json)
       ORDER BY flds;')
 
@@ -889,9 +891,9 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
     }
 
-    # remove "$.", array elements "$.item[0]"
+    # remove array elements "$.item[0].another[0]"
     fields <- unique(stringi::stri_replace_all_regex(
-      fields, "\"|\\$[.]?|\\[[-#0-9]+\\]", ""))
+      fields, "\"|\\[[-#0-9]+\\]", ""))
 
     # finalise
     fields <- fields[fields != "" & fields != "_id"]
@@ -1161,6 +1163,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   params <- list(...)
   n <- -1L
   if (!is.null(params$limit)) n <- params$limit
+  sqlLimit <- ifelse(n > -1L, paste0(" LIMIT ", n), "")
 
 
   # digest and mangle
@@ -1172,9 +1175,9 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
       length(fldQ$includeFields) == 1L &&
       fldQ$includeFields == "_id") {
 
-    statement <- paste0(
-      "SELECT DISTINCT ON (_id) _id ",
-      "FROM \"", key, "\" GROUP BY _id;")
+    statement <- insObj('
+    SELECT DISTINCT ON (_id) _id
+    FROM "/** key **/" GROUP BY _id;')
 
     return(DBI::dbGetQuery(
       conn = src$con,
@@ -1250,9 +1253,13 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
       fldQ$queryCondition <- gsub(
         # '(.+?)' shall not capture numbers, not IN('A', 'B')
         paste0("\"(", i, ")\" ([INOTREGXP=!<>']+) ('?.+?'?)( AND | NOT | OR |\\)*$)"),
+        #
+        # since 1.3.0 single quotes [\x27\x22ABC\x22\x27, \x27\x22DEF...
         paste0('(LENGTH(list_filter(json(\'[\' || regexp_replace("', i,
-               '"::VARCHAR, \'\\\\[|\\\\]\', \'\', \'g\') || \']\')::JSON[], x -> x ',
-               '\\2 \\3 )) > 0) \\4'),
+               '"::VARCHAR, \'\\\\[|\\\\]|\\\\x27\', \'\', \'g\') || \']\')::JSON[], ',
+               ifelse(package_version(src$dbver) >= package_version("1.3.0"),
+                      'lambda x : x \\2 \\3 )) > 0) \\4',
+                      'x -> x \\2 \\3 )) > 0) \\4')),
         fldQ$queryCondition
       )
 
@@ -1372,7 +1379,31 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    statement <- insObj('
+    # TODO
+    if (package_version(src$dbver) >= package_version("1.3.0")) {
+
+      statement <- insObj('
+      WITH extracted AS (
+        SELECT _id
+        /** fldQ$extractFields **/
+        FROM "/** key **/"
+        WHERE /** fldQ$selectCondition **/
+        /** sqlLimit **/ )
+      SELECT DISTINCT regexp_replace(LTRIM(fullkey,
+        \'$.\'), \'\\[[0-9]+\\]\', \'\') AS flds
+      FROM extracted
+      AS extracted, json_tree(extracted.json)
+      ORDER BY flds;')
+
+      # get all fullkeys and types
+      fields <- DBI::dbGetQuery(
+        conn = src$con,
+        statement = statement,
+        n = -1L)[["flds"]]
+
+    } else {
+
+      statement <- insObj('
         WITH extracted AS (
         SELECT _id
         /** fldQ$extractFields **/
@@ -1383,20 +1414,22 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
         /** fldQ$selectCondition **/
         );')
 
-    fldQ$jqrWhere <- jqFieldNames
+      fldQ$jqrWhere <- jqFieldNames
 
-    # process
-    fields <- unique(processDbGetQuery(
-      getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+      # process
+      fields <- unique(processDbGetQuery(
+        getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                  statement = statement, n = n)[["json"]], "")',
-      jqrWhere = fldQ$jqrWhere
-    )[["out"]])
+        jqrWhere = fldQ$jqrWhere
+      )[["out"]])
+
+    }
 
     # clean
     fields <- fields[fields != "_id" & fields != ""]
 
     # return field names
-    return(sort(fields))
+    return(fields)
 
   }
 

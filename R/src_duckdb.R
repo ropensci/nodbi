@@ -31,7 +31,7 @@ src_duckdb <- function(
 
   # check minimum version
   pkgNeeded("duckdb", "1.1.0")
-  
+
   # create connection
   con <- duckdb::dbConnect(
     drv = drv,
@@ -63,12 +63,32 @@ src_duckdb <- function(
       silent = TRUE), "try-error"))  xtmsg()
   }
 
-  # potential security concern with
-  # storing the full connection string
-  structure(list(con = con,
-                 dbdir = dbdir,
-                 ...),
-            class = c("src_duckdb", "docdb_src"))
+  # version
+  dbver <- try(DBI::dbGetQuery(con, "PRAGMA version;")[[
+    "library_version"]], silent = TRUE)
+  if (inherits(dbver, "try-error")) dbver <- "unknown"
+  dbver <- sub("^v", "", dbver)
+
+  # user info
+  if (grepl(":memory:", dbdir)) {
+    warning(
+      "Database is only in memory, will not persist after R ends! Consider copying ",
+      "it with \nDBI::dbExecute(\n",
+      " conn = <your nodbi::src_duckdb() object>$con,\n",
+      " statement = \n  \"ATTACH 'local_file.duckdb';\n",
+      "   COPY FROM DATABASE memory TO local_file;\n",
+      "   DETACH local_file;\")",
+      call. = FALSE)
+  }
+
+  # create structure
+  structure(
+    list(
+      con = con,
+      dbdir = dbdir,
+      dbver = dbver,
+      ...),
+    class = c("src_duckdb", "docdb_src"))
 
 }
 
@@ -76,17 +96,12 @@ src_duckdb <- function(
 print.src_duckdb <- function(x, ...) {
 
   dbdir <- attr(attr(x$con, "driver"), "dbdir")
-  dbsize <- switch(dbdir,
+  dbsize <- switch(
+    dbdir,
     ":memory:" = utils::object.size(x),
     file.size(dbdir))
-  dbver <- try(DBI::dbGetQuery(x$con, "PRAGMA version;")[[
-    "library_version"]], silent = TRUE)
-  if (inherits(dbver, "try-error")) dbver <- "unknown"
 
-  cat(sprintf(
-    "src: duckdb\nDatabase: %s\nSize: %s MB\nVersion: %s",
-    dbdir, signif(dbsize / 10^6, digits = 3L), dbver
-  ))
+  srcInfo("DuckDB", x$dbver, dbdir, dbsize)
 
 }
 
