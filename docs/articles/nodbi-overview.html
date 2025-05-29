@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">nodbi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,6 +118,11 @@ holds the name of the relevant container.</p>
 <span></span>
 <span><span class="co"># this example is run with</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Database is only in memory, will not persist after R ends! Consider copying it with </span></span>
+<span><span class="co">#&gt; RSQLite::sqliteCopyDatabase(</span></span>
+<span><span class="co">#&gt;   from = &lt;your nodbi::src_sqlite() object&gt;$con, </span></span>
+<span><span class="co">#&gt;   to = &lt;e.g. RSQLite::dbConnect(RSQLite::SQLite(), 'local_file.sqlite')&gt;</span></span>
+<span><span class="co">#&gt;   )</span></span>
 <span></span>
 <span><span class="co"># note additional parameters can be specified,</span></span>
 <span><span class="co"># for example for local or remote MongoDb:</span></span>
@@ -212,12 +217,11 @@ created.</p>
 <span>  </span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Loading required package: tibble</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
-<span><span class="co">#&gt;   `_id`       isActive balance   age eyeColor name  email about registered tags </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: friends &lt;list&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
+<span><span class="co">#&gt;   `_id`                      destination_addresses origin_addresses rows  status</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 32a70f92-3cb5-11f0-bf05-6… <span style="color: #949494;">&lt;chr [3]&gt;</span>             <span style="color: #949494;">&lt;chr [2]&gt;</span>        <span style="color: #949494;">&lt;df&gt;</span>  OK    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 32a70f9c-3cb5-11f0-bf05-6… <span style="color: #949494;">&lt;chr [3]&gt;</span>             <span style="color: #949494;">&lt;chr [1]&gt;</span>        <span style="color: #949494;">&lt;df&gt;</span>  OK</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="docdb_query">docdb_query<a class="anchor" aria-label="anchor" href="#docdb_query"></a>
@@ -383,15 +387,10 @@ down connections as specific to the database, for example for
 SQLite:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span></span>
-<span><span class="co">#&gt; src: sqlite</span></span>
-<span><span class="co">#&gt; SQLite library version: 3.49.1</span></span>
-<span><span class="co">#&gt;  size: NA MB</span></span>
-<span><span class="co">#&gt;  dbname: :memory:</span></span>
-<span><span class="co">#&gt; Warning: Database is only in memory, will not persist after R ends! Consider to copy it with </span></span>
-<span><span class="co">#&gt; RSQLite::sqliteCopyDatabase(</span></span>
-<span><span class="co">#&gt;   from = &lt;your nodbi::src_sqlite() object&gt;$con, </span></span>
-<span><span class="co">#&gt;   to = &lt;e.g. RSQLite::dbConnect(RSQLite::SQLite(), 'local_file.db')&gt;</span></span>
-<span><span class="co">#&gt;   )</span></span>
+<span><span class="co">#&gt; src: SQLite</span></span>
+<span><span class="co">#&gt; ver: 3.49.1</span></span>
+<span><span class="co">#&gt; db(s): :memory:</span></span>
+<span><span class="co">#&gt; size(s): 0.00338 MB</span></span>
 <span></span>
 <span><span class="co"># shutdown</span></span>
 <span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">src</span><span class="op">$</span><span class="va">con</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -409,7 +408,7 @@ SQLite:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
