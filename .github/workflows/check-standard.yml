@@ -38,7 +38,7 @@ jobs:
 
       - name: Install development libraries
         if: ${{ (matrix.config.os == 'macos-latest' && matrix.config.r == 'devel') }}
-        run: brew: libgit2
+        run: brew install libgit2
 
 
       # generic R workflow:
