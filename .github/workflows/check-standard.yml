@@ -36,6 +36,10 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get install -y libjq-dev
 
+      - name: Install development libraries
+        if: ${{ (matrix.config.os == 'macos-latest' && matrix.config.r == 'devel') }}
+        run: brew: libgit2
+
 
       # generic R workflow:
 
