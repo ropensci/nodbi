@@ -55,12 +55,12 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
 
       - name: Install dev DuckDB
-        if: ${{ !(matrix.config.os == 'macos-latest' && matrix.config.r == 'devel') }}
+        if: ${{ (matrix.config.os == 'macos-latest' && matrix.config.r == 'devel') }}
         run: install.packages("duckdb", repos = "https://duckdb.r-universe.dev", type = "source")
         shell: Rscript {0}
 
       - name: Install dev SQLite
-        if: ${{ !(matrix.config.os == 'macos-latest' && matrix.config.r == 'devel') }}
+        if: ${{ (matrix.config.os == 'macos-latest' && matrix.config.r == 'devel') }}
         run: remotes::install_github("r-dbi/RSQLite")
         shell: Rscript {0}
 
