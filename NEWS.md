@@ -1,8 +1,8 @@
-# nodbi 0.12.0.9000
+# nodbi 0.13.0
 
 ## Improvements
 * Prepare `docdb_query()` for `duckdb` 1.3.0 (e.g., use new `json_tree` function)
-* Move warning for non-persitent connections to `src_sqlite`, `src_duckdb` calls
+* Move warning for non-persistent connections to `src_sqlite`, `src_duckdb` calls
 * Harmomise printing connections
 
 # nodbi 0.12.0

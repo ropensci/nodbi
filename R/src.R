@@ -16,8 +16,7 @@
 #'
 #' - MongoDB - \url{https://www.mongodb.com/docs/manual/crud/}
 #' - SQLite/JSON1 - \url{https://www.sqlite.org/json1.html}
-#' - Elasticsearch -
-#'  \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html}
+#' - Elasticsearch - \url{https://www.elastic.co/docs/get-started}
 #' - CouchDB - \url{https://docs.couchdb.org/en/stable/api/index.html}
 #' - PostgreSQL - \url{https://www.postgresql.org/docs/current/functions-json.html}
 #' - DuckDB - \url{https://duckdb.org/docs/stable/data/json/overview.html}
