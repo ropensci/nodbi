@@ -60,14 +60,15 @@ src_duckdb <- function(
   if (!tmp$installed) xtmsg()
   if (!tmp$loaded) {
     if (inherits(try(DBI::dbExecute(con, "LOAD json;"),
-      silent = TRUE), "try-error"))  xtmsg()
+      silent = TRUE), "try-error")) xtmsg()
   }
 
   # version
   dbver <- try(DBI::dbGetQuery(con, "PRAGMA version;")[[
     "library_version"]], silent = TRUE)
-  if (inherits(dbver, "try-error")) dbver <- "unknown"
-  dbver <- sub("^v", "", dbver)
+  if (inherits(dbver, "try-error")) dbver <- "0.0"
+  # remove non-numbers
+  dbver <- gsub("[^-0-9.]", "", dbver)
 
   # user info
   if (grepl(":memory:", dbdir)) {
