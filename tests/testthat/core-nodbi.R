@@ -326,6 +326,13 @@ test_that("docdb_update", {
   expect_warning(docdb_update(src = src, key = key, value = tF, query = '{"_id": {"$regex": "[f-z]"}}'), "Ignoring the specified")
   expect_error(docdb_update(src = src, key = key, value = testJson2, query = '{"_id": {"$regex": "[f-z]"}}'), "Unequal number of documents")
 
+  # TODO
+
+  # non-ascii characters
+  docdb_update(src = src, key = key, value = '{"_id": "Fiat 128", "a": "≥•", "b": "\\n•\\tióiño"}', query = '{}')
+  docdb_update(src = src, key = key, query = '{"_id": "Fiat 128"}', value = '{"b": "≥•", "a": "\\n•\\tióiño"}')
+  docdb_query(src = src, key = key, query = '{"_id": "Fiat 128"}', fields = '{"a":1, "b":1}')
+
   # from url
   skip_if(is.null(httpbin), "package webfakes missing")
   #
