@@ -1379,7 +1379,6 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    # TODO
     if (package_version(src$dbver) >= package_version("1.3.0")) {
 
       statement <- insObj('
@@ -1390,7 +1389,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
         WHERE /** fldQ$selectCondition **/
         /** sqlLimit **/ )
       SELECT DISTINCT regexp_replace(LTRIM(fullkey,
-        \'$.\'), \'\\[[0-9]+\\]\', \'\') AS flds
+        \'$.\'), \'\\[[0-9]+\\]\', \'\', \'g\') AS flds
       FROM extracted
       AS extracted, json_tree(extracted.json)
       ORDER BY flds;')
