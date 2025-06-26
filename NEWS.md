@@ -1,3 +1,8 @@
+# nodbi 0.13.1
+
+* Improve mangling DuckDB version number
+* Correct `listfields = TRUE` for `src_duckdb`
+
 # nodbi 0.13.0
 
 ## Improvements
