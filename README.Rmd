@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 ⁠<!-- badges: end -->
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2025-05-29.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2025-07-12.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 | :--------------------- | :--------------------- | :--------------------- |
@@ -324,24 +324,24 @@ result <- rbenchmark::benchmark(
   replications = 3L
 )
 
-# 2025-05-29 with M3 hardware, databases via homebrew
+# 2025-07-12 with M3 hardware, databases via homebrew
 result[rev(order(result$elapsed)), c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 4    CouchDB            3   49.53
-# 3    Elastic            3   25.77
-# 1    MongoDB            3    3.48
-# 5 PostgreSQL            3    1.50
-# 6     DuckDB            3    0.93
-# 2     SQLite            3    0.64
+# 4    CouchDB            3   48.93
+# 3    Elastic            3   25.00
+# 1    MongoDB            3    2.11
+# 5 PostgreSQL            3    1.51
+# 6     DuckDB            3    0.92
+# 2     SQLite            3    0.65
 
 message(R.version$version.string)
-# R version 4.5.0 (2025-04-11)
+# R version 4.5.1 RC (2025-06-05 r88281)
 
 pkgs <- c("nodbi", "RSQLite", "duckdb", "RPostgres", "mongolite", "elastic", "sofa")
 for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
-# nodbi: 0.12.0
-# RSQLite: 2.3.11
-# duckdb: 1.3.0.9000
+# nodbi: 0.13.1
+# RSQLite: 2.4.1
+# duckdb: 1.3.2
 # RPostgres: 1.4.8
 # mongolite: 4.0.0
 # elastic: 1.2.0
@@ -353,33 +353,33 @@ for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
 Every database backend is subjected to identical tests, see [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R). 
 
 ```{r testing_and_coverage}
-# 2025-05-29
+# 2025-07-12
 
 suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
-# ✔ |      2 175 | couchdb [44.9s]                                                                    
-# ✔ |      1 174 | duckdb [3.6s]                                                                      
-# ✔ |      2 173 | elastic [37.2s]                                                                    
-# ✔ |      2 173 | mongodb [3.8s]                                                                     
-# ✔ |        176 | postgres [4.9s]                                                                    
-# ✔ |        177 | sqlite [4.0s]                                                                      
-# 
-# ══ Results ═════════════════════════════════════════════════════════════════════════════════════════
-# Duration: 98.4 s
-# 
-# ── Skipped tests (7) ───────────────────────────────────────────────────────────────────────────────
-# • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3,
+# ✔ |      2 175 | couchdb [46.0s]
+# ✔ |      1 174 | duckdb [3.8s]
+# ✔ |      2 173 | elastic [37.9s]
+# ✔ |      2 173 | mongodb [3.9s]
+# ✔ |        176 | postgres [4.8s]
+# ✔ |        177 | sqlite [3.7s]
+# ══ Results ═══════════════════════════════
+# Duration: 100.2 s
+# ── Skipped tests (7) ─────────────────────
+# • Testing for auto disconnect and shutdown not relevant (3): 
+#   test-couchdb.R:26:3, test-elastic.R:21:3,
+#   test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4): 
+#   test-couchdb.R:26:3, test-duckdb.R:22:3,
 #   test-elastic.R:21:3, test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3,
-#   test-duckdb.R:22:3, test-elastic.R:21:3, test-mongodb.R:24:3
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1048 ]
 
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 93.37%
-# R/src_postgres.R: 80.82%
+# nodbi Coverage: 93.42%
+# R/src_postgres.R: 82.19%
 # R/src_duckdb.R: 84.00%
-# R/zzz.R: 86.52%
+# R/zzz.R: 86.67%
 # R/query.R: 92.92%
 # R/update.R: 94.40%
 # R/src_mongo.R: 95.00%
@@ -389,7 +389,7 @@ covr::package_coverage(path = ".", type = "tests")
 # R/exists.R: 100.00%
 # R/list.R: 100.00%
 # R/src_couchdb.R: 100.00%
-# R/src_elasticsearch.R: 100.00%
+# R/src_elastic.R: 100.00%
 # R/src_sqlite.R: 100.00%
 ```
 

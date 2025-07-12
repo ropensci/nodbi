@@ -56,7 +56,7 @@
 <div class="page-header"><h1 id="nodbi">nodbi<a class="anchor" aria-label="anchor" href="#nodbi"></a>
 </h1></div>
 <p>⁠<!-- badges: start --> <a href="https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/rfhb/nodbi" class="external-link"><img src="https://codecov.io/gh/rfhb/nodbi/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://CRAN.R-project.org/package=nodbi" class="external-link"><img src="https://www.r-pkg.org/badges/version/nodbi" alt="CRAN status"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a> ⁠<!-- badges: end --></p>
-<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2025-05-29.</p>
+<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2025-07-12.</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -422,24 +422,24 @@
 <span>  replications <span class="op">=</span> <span class="fl">3L</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2025-05-29 with M3 hardware, databases via homebrew</span></span>
+<span><span class="co"># 2025-07-12 with M3 hardware, databases via homebrew</span></span>
 <span><span class="va">result</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">elapsed</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"test"</span>, <span class="st">"replications"</span>, <span class="st">"elapsed"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#         test replications elapsed</span></span>
-<span><span class="co"># 4    CouchDB            3   49.53</span></span>
-<span><span class="co"># 3    Elastic            3   25.77</span></span>
-<span><span class="co"># 1    MongoDB            3    3.48</span></span>
-<span><span class="co"># 5 PostgreSQL            3    1.50</span></span>
-<span><span class="co"># 6     DuckDB            3    0.93</span></span>
-<span><span class="co"># 2     SQLite            3    0.64</span></span>
+<span><span class="co"># 4    CouchDB            3   48.93</span></span>
+<span><span class="co"># 3    Elastic            3   25.00</span></span>
+<span><span class="co"># 1    MongoDB            3    2.11</span></span>
+<span><span class="co"># 5 PostgreSQL            3    1.51</span></span>
+<span><span class="co"># 6     DuckDB            3    0.92</span></span>
+<span><span class="co"># 2     SQLite            3    0.65</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">R.version</span><span class="op">$</span><span class="va">version.string</span><span class="op">)</span></span>
-<span><span class="co"># R version 4.5.0 (2025-04-11)</span></span>
+<span><span class="co"># R version 4.5.1 RC (2025-06-05 r88281)</span></span>
 <span></span>
 <span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nodbi"</span>, <span class="st">"RSQLite"</span>, <span class="st">"duckdb"</span>, <span class="st">"RPostgres"</span>, <span class="st">"mongolite"</span>, <span class="st">"elastic"</span>, <span class="st">"sofa"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">pkg</span> <span class="kw">in</span> <span class="va">pkgs</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">pkg</span>, <span class="st">": "</span>, <span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="va">pkg</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># nodbi: 0.12.0</span></span>
-<span><span class="co"># RSQLite: 2.3.11</span></span>
-<span><span class="co"># duckdb: 1.3.0.9000</span></span>
+<span><span class="co"># nodbi: 0.13.1</span></span>
+<span><span class="co"># RSQLite: 2.4.1</span></span>
+<span><span class="co"># duckdb: 1.3.2</span></span>
 <span><span class="co"># RPostgres: 1.4.8</span></span>
 <span><span class="co"># mongolite: 4.0.0</span></span>
 <span><span class="co"># elastic: 1.2.0</span></span>
@@ -450,33 +450,33 @@
 </h2>
 <p>Every database backend is subjected to identical tests, see <a href="https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R" class="external-link">core-nodbi.R</a>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 2025-05-29</span></span>
+<code class="sourceCode R"><span><span class="co"># 2025-07-12</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># ✔ | F W  S  OK | Context</span></span>
-<span><span class="co"># ✔ |      2 175 | couchdb [44.9s]                                                                    </span></span>
-<span><span class="co"># ✔ |      1 174 | duckdb [3.6s]                                                                      </span></span>
-<span><span class="co"># ✔ |      2 173 | elastic [37.2s]                                                                    </span></span>
-<span><span class="co"># ✔ |      2 173 | mongodb [3.8s]                                                                     </span></span>
-<span><span class="co"># ✔ |        176 | postgres [4.9s]                                                                    </span></span>
-<span><span class="co"># ✔ |        177 | sqlite [4.0s]                                                                      </span></span>
-<span><span class="co"># </span></span>
-<span><span class="co"># ══ Results ═════════════════════════════════════════════════════════════════════════════════════════</span></span>
-<span><span class="co"># Duration: 98.4 s</span></span>
-<span><span class="co"># </span></span>
-<span><span class="co"># ── Skipped tests (7) ───────────────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co"># • Testing for auto disconnect and shutdown not relevant (3): test-couchdb.R:26:3,</span></span>
+<span><span class="co"># ✔ |      2 175 | couchdb [46.0s]</span></span>
+<span><span class="co"># ✔ |      1 174 | duckdb [3.8s]</span></span>
+<span><span class="co"># ✔ |      2 173 | elastic [37.9s]</span></span>
+<span><span class="co"># ✔ |      2 173 | mongodb [3.9s]</span></span>
+<span><span class="co"># ✔ |        176 | postgres [4.8s]</span></span>
+<span><span class="co"># ✔ |        177 | sqlite [3.7s]</span></span>
+<span><span class="co"># ══ Results ═══════════════════════════════</span></span>
+<span><span class="co"># Duration: 100.2 s</span></span>
+<span><span class="co"># ── Skipped tests (7) ─────────────────────</span></span>
+<span><span class="co"># • Testing for auto disconnect and shutdown not relevant (3): </span></span>
+<span><span class="co">#   test-couchdb.R:26:3, test-elastic.R:21:3,</span></span>
+<span><span class="co">#   test-mongodb.R:24:3</span></span>
+<span><span class="co"># • Testing for parallel writes not possible or implemented (4): </span></span>
+<span><span class="co">#   test-couchdb.R:26:3, test-duckdb.R:22:3,</span></span>
 <span><span class="co">#   test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
-<span><span class="co"># • Testing for parallel writes not possible or implemented (4): test-couchdb.R:26:3,</span></span>
-<span><span class="co">#   test-duckdb.R:22:3, test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
 <span><span class="co"># </span></span>
 <span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1048 ]</span></span>
 <span></span>
 <span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, type <span class="op">=</span> <span class="st">"tests"</span><span class="op">)</span></span>
-<span><span class="co"># nodbi Coverage: 93.37%</span></span>
-<span><span class="co"># R/src_postgres.R: 80.82%</span></span>
+<span><span class="co"># nodbi Coverage: 93.42%</span></span>
+<span><span class="co"># R/src_postgres.R: 82.19%</span></span>
 <span><span class="co"># R/src_duckdb.R: 84.00%</span></span>
-<span><span class="co"># R/zzz.R: 86.52%</span></span>
+<span><span class="co"># R/zzz.R: 86.67%</span></span>
 <span><span class="co"># R/query.R: 92.92%</span></span>
 <span><span class="co"># R/update.R: 94.40%</span></span>
 <span><span class="co"># R/src_mongo.R: 95.00%</span></span>
@@ -486,7 +486,7 @@
 <span><span class="co"># R/exists.R: 100.00%</span></span>
 <span><span class="co"># R/list.R: 100.00%</span></span>
 <span><span class="co"># R/src_couchdb.R: 100.00%</span></span>
-<span><span class="co"># R/src_elasticsearch.R: 100.00%</span></span>
+<span><span class="co"># R/src_elastic.R: 100.00%</span></span>
 <span><span class="co"># R/src_sqlite.R: 100.00%</span></span></code></pre></div>
 </div>
 <div class="section level2">
