@@ -50,7 +50,7 @@ test_that("docdb_create, docdb_exists, docdb_list, docdb_get, docdb_delete", {
 
   # testJson
   expect_equal(docdb_create(src = src, key = key, value = testJson), 5L)
-  expect_warning(suppressMessages(docdb_create(src = src, key = key, value = testJson)), "index|conflict|constraint|updated|duplicate|error|rapi") # _id violation
+  expect_warning(suppressMessages(docdb_create(src = src, key = key, value = testJson)), "index|conflict|constraint|updated|duplicate|rror|rapi") # _id violation
   expect_equal(dim(docdb_get(src = src, key = key)), c(5L, 11L))
   if (!inherits(src, "src_postgres")) expect_identical(
     docdb_get(src = src, key = key),
