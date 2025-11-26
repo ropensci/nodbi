@@ -817,21 +817,22 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
     ins <- stringi::stri_extract_all_regex(
       # keep space before \\)"
-      fldQ$queryCondition, paste0("\"\\$.", i, "\"\\) IN \\((.+?) \\)"))[[1]]
+      fldQ$queryCondition, paste0("\"\\$.", i, "\"\\) IN \\((.+?)\\)"))[[1]]
 
     if (!is.na(ins)) {
 
       isString <- grepl("\\('", ins) # "5, 4" or "'a ,b', 'd, f'"
-      # keep space before \\)"
-      ii <- stringi::stri_replace_all_regex(ins, "\"(.+?)\"\\) IN \\((.+?) \\)", "$2")
+      ii <- stringi::stri_replace_all_regex(ins, "\"(.+?)\"\\) IN \\((.+?)\\)", "$2")
       ii <- trimws(ii)
       ii <- stringi::stri_split_regex(ii, ifelse(isString, "', ", ", "))[[1]]
       ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "") # start or end delimiters
-      # strings are compared at their full length, cannot use anchors, see above
-      if (any(is.na(suppressWarnings(as.numeric(ii))))) ii <- paste0('(\\["|,")', ii, '(",|"\\])')
+      # strings to be compared at their full length, because IN is about full elements
+      if (any(is.na(suppressWarnings(as.numeric(ii))))) ii <- paste0('(\\["|,"|^)', ii, '(",|"\\]|$)')
 
       # https://sqlite.org/src/file?filename=ext/misc/regexp.c
       ii <- paste0("\"$.", i, "\") REGEXP '", paste0("(", ii, ")", collapse = "|"), "'")
+      # json_extract(\"db\".json,\"$.fld\") REGEXP '"ABC"|"DEF"'
+
       fldQ$queryCondition <- stringi::stri_replace_all_fixed(
         fldQ$queryCondition, ins, ii, vectorize_all = TRUE
       )
@@ -1014,9 +1015,9 @@ docdb_query.src_postgres <- function(src, key, query, ...) {
   for (i in fldQ$queryPaths[fldQ$queryPaths != "_id"]) {
 
     fldQ$queryCondition <- gsub(
-      paste0("(\"", i, "\" [INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
+      paste0("(?<![.])(\"", i, "\" [INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
       "jsonb_path_exists(json, \'$[*] ? (@.\\1)')\\2", # keep $[*]
-      fldQ$queryCondition)
+      fldQ$queryCondition, perl = TRUE)
 
     # - special case IN
     if (grepl(paste0("\"", i, "\" IN \\("), fldQ$queryCondition)) {

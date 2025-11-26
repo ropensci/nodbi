@@ -169,6 +169,7 @@ test_that("docdb_query", {
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"name": {"$regex": "^[a-zA-Z]{3,4} "}}', fields = '{"name": 1, "age": 1, "_id": 0}')), c(3L, 2L))
   #
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"$and": [{"email": {"$regex": "ac"}}, {"friends.name": "Dona Bartlett"}]}')), c(1L, 11L))
+  expect_equal(dim(docdb_query(src = src, key = key, query = '{"$or": [{"name": {"$in": ["Lacy Chen", "Rae Colon"]}}, {"friends.name": "Dona Bartlett"}]}')), c(3L, 11L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"$and": [{"_id": {"$regex": "53"}}, {"friends.name": "Dona Bartlett"}]}')), c(1L, 11L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"$and": [{"_id": {"$regex": "53"}}, {"friends.name": {"$regex": "Ba|La"}}]}')), c(2L, 11L))
   expect_equal(dim(docdb_query(src = src, key = key, query = '{"$and": [{"_id": {"$regex": "53"}}, {"friends.name": "Dona Bartlett"}]}')), c(1L, 11L))
@@ -216,6 +217,15 @@ test_that("docdb_query", {
     query = '{"origin_addresses": {"$in": ["Santa Barbara, CA, USA"]}}',
     fields = '{"destination_addresses": 1, "_id": 0}'))), 3L)
   # note: str, typeof differ by database backend
+  expect_true(docdb_delete(src = src, key = key))
+
+  # testFile2
+  expect_equal(docdb_create(src = src, key = key, value = testFile2()), nrow(diamonds))
+  expect_equal(dim(docdb_query(
+    src = src, key = key,
+    query = "{\"clarity\": {\"$in\": [\"NOTME\", \"VS1\"]}}",
+    fields = "{\"cut\": 1, \"_id\": 1, \"clarity\": 1}"
+  )), c(ifelse(inherits(src, "src_elastic"), 1195L, 8171L), 3L)) # src_elastic currently limited to search in 10000L
   expect_true(docdb_delete(src = src, key = key))
 
   # testDf

@@ -383,12 +383,13 @@ digestFields <- function(f, q) {
         vectorize_all = FALSE
       )
 
-    }
+    } # handled IN
 
     # - default operator handling
     queryJq <- stringi::stri_replace_all_regex(
       queryJq,
-      paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)",
+      paste0("(?<![.])(\"", i, "\") ([INOTREGXP=!<>']+ .+?)",
+             # ^. to avoid matching parts of dot notated field
              # no extra bracket here
              "( AND | NOT | OR |\\)*$)"),
       # select([ .friends | m1 | .id | m1 ] | map ( . > 1 ) | any )
