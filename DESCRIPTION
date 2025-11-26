@@ -40,7 +40,7 @@ Suggests:
     sofa,
     elastic,
     mongolite,
-    RSQLite,
+    RSQLite (>= 2.4.4),
     duckdb,
     RPostgres,
     testthat,

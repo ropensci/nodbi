@@ -715,7 +715,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
       FROM "/** key **/"
       LIMIT /** n **/ )
     SELECT DISTINCT LTRIM(fullkey, \'$.\') AS flds
-    FROM extracted, json_tree(extracted.json)
+    FROM extracted, jsonb_tree(extracted.json)
     ORDER BY flds;')
 
     # get all fullkeys and types
@@ -880,7 +880,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
         WHERE /** fldQ$jsonWhere **/
         LIMIT /** n **/ )
       SELECT DISTINCT LTRIM(fullkey, \'$.\') AS flds
-      FROM extracted, json_tree(extracted.json)
+      FROM extracted, jsonb_tree(extracted.json)
       ORDER BY flds;')
 
       # get all fullkeys and types

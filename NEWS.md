@@ -1,3 +1,8 @@
+# nodbi 0.13.1.9000
+
+* Fix `docdb_query` for `src_sqlite` when using `$in` with strings in query
+* Use `jsonb_tree` as available since `RSQLite` version 2.4.4
+
 # nodbi 0.13.1
 
 * Improve mangling DuckDB version number
