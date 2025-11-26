@@ -221,11 +221,14 @@ test_that("docdb_query", {
 
   # testFile2
   expect_equal(docdb_create(src = src, key = key, value = testFile2()), nrow(diamonds))
-  expect_equal(dim(docdb_query(
-    src = src, key = key,
-    query = "{\"clarity\": {\"$in\": [\"NOTME\", \"VS1\"]}}",
-    fields = "{\"cut\": 1, \"_id\": 1, \"clarity\": 1}"
-  )), c(ifelse(inherits(src, "src_elastic"), 1195L, 8171L), 3L)) # src_elastic currently limited to search in 10000L
+  if (!inherits(src, "src_elastic")) expect_equal(dim(
+    docdb_query(
+      # src_elastic currently limited to search in 10000L
+      # sequence of results cannot be predicted thus not tested
+      src = src, key = key,
+      query = "{\"clarity\": {\"$in\": [\"NOTME\", \"VS1\"]}}",
+      fields = "{\"cut\": 1, \"_id\": 1, \"clarity\": 1}"
+    )), c(8171L, 3L))
   expect_true(docdb_delete(src = src, key = key))
 
   # testDf
