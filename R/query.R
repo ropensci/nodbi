@@ -1374,6 +1374,9 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
   }
 
+  # - if only root fields to be included, these are in SQL extractFields
+  if (!any(grepl("[.]", fldQ$includeFields))) fldQ$includeFields <- character(0L)
+
 
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
