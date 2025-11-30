@@ -67,6 +67,7 @@
       "@type": "SoftwareApplication",
       "identifier": "sofa",
       "name": "sofa",
+      "version": ">= 0.4.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -79,6 +80,7 @@
       "@type": "SoftwareApplication",
       "identifier": "elastic",
       "name": "elastic",
+      "version": ">= 1.2.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -91,6 +93,7 @@
       "@type": "SoftwareApplication",
       "identifier": "mongolite",
       "name": "mongolite",
+      "version": ">= 4.0.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -103,7 +106,7 @@
       "@type": "SoftwareApplication",
       "identifier": "RSQLite",
       "name": "RSQLite",
-      "version": ">= 2.4.4",
+      "version": ">= 2.4.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -116,6 +119,7 @@
       "@type": "SoftwareApplication",
       "identifier": "duckdb",
       "name": "duckdb",
+      "version": ">= 1.4.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -128,6 +132,7 @@
       "@type": "SoftwareApplication",
       "identifier": "RPostgres",
       "name": "RPostgres",
+      "version": ">= 1.4.8",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -317,7 +322,7 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "668.573KB",
+  "fileSize": "668.236KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/main/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
   "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"],

@@ -5,6 +5,8 @@
 - Fix `docdb_query` for `src_sqlite` when using `$in` with strings in
   query
 - Use `jsonb_tree` as available since `RSQLite` version 2.4.4
+- Update database version requirements, cleanup version-dependent code
+- Avoid time-costly `json_tree` for `src_duckdb` for `listfields = TRUE`
 
 ## nodbi 0.13.1
 
