@@ -30,7 +30,7 @@ src_duckdb <- function(
     ...) {
 
   # check minimum version
-  pkgNeeded("duckdb", "1.1.0")
+  pkgNeeded("duckdb", "1.4.0")
 
   # create connection
   con <- duckdb::dbConnect(

@@ -37,12 +37,12 @@ Imports:
     V8,
     R.utils
 Suggests:
-    sofa,
-    elastic,
-    mongolite,
-    RSQLite (>= 2.4.4),
-    duckdb,
-    RPostgres,
+    sofa (>= 0.4.0),
+    elastic (>= 1.2.0),
+    mongolite (>= 4.0.0),
+    RSQLite (>= 2.4.0),
+    duckdb (>= 1.4.0),
+    RPostgres (>= 1.4.8),
     testthat,
     withr,
     callr,

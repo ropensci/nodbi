@@ -28,7 +28,7 @@ src_mongo <- function(collection = "test", db = "test",
                       url = "mongodb://localhost", ...) {
 
   # check minimum version
-  pkgNeeded("mongolite", "1.6")
+  pkgNeeded("mongolite", "4.0.0")
 
   # create connection
   con <- mongolite::mongo(collection, db, url, ...)

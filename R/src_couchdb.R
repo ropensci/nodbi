@@ -35,7 +35,7 @@ src_couchdb <- function(host = "127.0.0.1", port = 5984, path = NULL,
                         headers = NULL) {
 
   # check minimum version
-  pkgNeeded("sofa", "0.3.0")
+  pkgNeeded("sofa", "0.4.0")
 
   # create connection
   x <- sofa::Cushion$new(

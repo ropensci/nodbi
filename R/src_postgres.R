@@ -50,6 +50,9 @@ src_postgres <- function(dbname = "test",
     ...),
     silent = TRUE)
 
+  # check minimum version
+  pkgNeeded("RPostgres", "1.4.8")
+
   # inform user on missing database
   if (inherits(con, "try-error")) {
     if (grepl("database .+ does not exist", con)) {

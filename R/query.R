@@ -1258,9 +1258,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
         # since 1.3.0 single quotes [\x27\x22ABC\x22\x27, \x27\x22DEF...
         paste0('(LENGTH(list_filter(json(\'[\' || regexp_replace("', i,
                '"::VARCHAR, \'\\\\[|\\\\]|\\\\x27\', \'\', \'g\') || \']\')::JSON[], ',
-               ifelse(package_version(src$dbver) >= package_version("1.3.0"),
-                      'lambda x : x \\2 \\3 )) > 0) \\4',
-                      'x -> x \\2 \\3 )) > 0) \\4')),
+               'lambda x : x \\2 \\3 )) > 0) \\4'),
         fldQ$queryCondition
       )
 
@@ -1380,53 +1378,28 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
   # special case: return all fields if listfields != NULL
   if (!is.null(params$listfields)) {
 
-    if (package_version(src$dbver) >= package_version("1.3.0")) {
-
-      statement <- insObj('
+    statement <- insObj('
       WITH extracted AS (
-        SELECT _id
-        /** fldQ$extractFields **/
-        FROM "/** key **/"
-        WHERE /** fldQ$selectCondition **/
-        /** sqlLimit **/ )
-      SELECT DISTINCT regexp_replace(LTRIM(fullkey,
-        \'$.\'), \'\\[[0-9]+\\]\', \'\', \'g\') AS flds
+      SELECT _id
+      /** fldQ$extractFields **/
+      FROM "/** key **/")
+      SELECT DISTINCT json_structure(json) AS json
       FROM extracted
-      AS extracted, json_tree(extracted.json)
-      ORDER BY flds;')
+      WHERE (
+      /** fldQ$selectCondition **/
+    );')
 
-      # get all fullkeys and types
-      fields <- DBI::dbGetQuery(
-        conn = src$con,
-        statement = statement,
-        n = -1L)[["flds"]]
+    fldQ$jqrWhere <- jqFieldNames
 
-    } else {
-
-      statement <- insObj('
-        WITH extracted AS (
-        SELECT _id
-        /** fldQ$extractFields **/
-        FROM "/** key **/")
-        SELECT DISTINCT json_structure(json) AS json
-        FROM extracted
-        WHERE  (
-        /** fldQ$selectCondition **/
-        );')
-
-      fldQ$jqrWhere <- jqFieldNames
-
-      # process
-      fields <- unique(processDbGetQuery(
-        getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+    # process
+    fields <- unique(processDbGetQuery(
+      getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                  statement = statement, n = n)[["json"]], "")',
-        jqrWhere = fldQ$jqrWhere
-      )[["out"]])
-
-    }
+      jqrWhere = fldQ$jqrWhere
+    )[["out"]])
 
     # clean
-    fields <- fields[fields != "_id" & fields != ""]
+    fields <- sort(fields[fields != "_id" & fields != ""])
 
     # return field names
     return(fields)
@@ -1441,9 +1414,9 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
     FROM "/** key **/" )
     SELECT /** fldQ$selectFields **/
     AS json FROM extracted
-    WHERE  (
+    WHERE (
     /** fldQ$selectCondition **/
-    );')
+  );')
 
   # general processing
   out <- processDbGetQuery(
