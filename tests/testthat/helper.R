@@ -61,6 +61,16 @@ testFile2 <- function(..., env = parent.frame()) {
   testFile2
 }
 
+testFile3 <- function(..., env = parent.frame()) {
+  testFile3 <- tempfile(fileext = ".ndjson")
+  ndjsonMod <- sort(c(
+    jqr::jq(ndjson, ' { _id: ._id, name: "OldName" } '),
+    jqr::jq(ndjson[1:2], ' { _id: ._id, name: "NewName" } ')))
+  cat(ndjsonMod, file = testFile3, sep = "\n")
+  withr::defer(try(unlink(testFile3), silent = TRUE), envir = env)
+  testFile3
+}
+
 if (require("webfakes", quietly = TRUE) &&
     packageVersion("webfakes") >= package_version("1.2.0")) {
   app <- webfakes::new_app()

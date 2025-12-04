@@ -61,13 +61,16 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   # handle parameters
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
+  valueType <- "other"
 
   # process value, target is json strings in file
 
   # check other inputs
   if (isFile(value)) {
+    valueType <- "file"
     value <- readLines(file(value))
   } else if (isUrl(value)) {
+    valueType <- "url"
     value <- readLines(url(value))
   }
   # value can now be a vector
@@ -137,6 +140,7 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   #
   # check
   if (length(value) > 1L &&
+      valueType != "file" &&
       !identical(nrow(input), length(value))) stop(
         "Unequal number of documents identified (", nrow(input),
         ") and of documents in 'value' (", length(value), ")"
@@ -598,7 +602,7 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
         json->>\'$._id\' AS in_id,
         json_merge_patch(json, \'{\"_id\": null}\') AS injson
         FROM read_ndjson_objects("', value, '")
-      ) WHERE "', key, '"._id = in_id;'
+      ) AS tmp WHERE "', key, '"._id = tmp.in_id;'
     )
 
     result <- DBI::dbExecute(

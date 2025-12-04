@@ -333,6 +333,10 @@ test_that("docdb_update", {
   expect_equal(docdb_create(src = src, key = key, value = tF), 5L)
   expect_equal(docdb_update(src = src, key = key, value = tF, query = '{}'), 5L)
   expect_equal(docdb_update(src = src, key = key, value = jqr::jq(file(tF), " del ( ._id) "), query = '{"email": {"$regex": ".+"}}'), 5L)
+  #
+  # with 2 duplicates in file
+  expect_true(docdb_update(src = src, key = key, value = testFile3(), query = '{}') %in% c(5L, 7L))
+  expect_true(all(unique(docdb_query(src = src, key = key, query = '{"_id": {"$regex": "^5cd"}}', fields = '{"_id":1, "name":1}')[[2]]) %in% c("NewName", "OldName")))
 
   # warnings and errors
   expect_warning(docdb_update(src = src, key = key, value = testJson, query = ""), "deprecated")
@@ -340,9 +344,9 @@ test_that("docdb_update", {
   expect_error(docdb_update(src = src, key = key, value = testJson2, query = '{"_id": {"$regex": "[f-z]"}}'), "Unequal number of documents")
 
   # non-ascii characters
-  docdb_update(src = src, key = key, value = '{"_id": "Fiat 128", "a": "≥•", "b": "\\n•\\tióiño"}', query = '{}')
-  docdb_update(src = src, key = key, query = '{"_id": "Fiat 128"}', value = '{"b": "≥•", "a": "\\n•\\tióiño"}')
-  docdb_query(src = src, key = key, query = '{"_id": "Fiat 128"}', fields = '{"a":1, "b":1}')
+  expect_equal(docdb_update(src = src, key = key, value = '{"_id": "Fiat 128", "a": "≥•", "b": "\\n•\\tióiño"}', query = '{}'), 1L)
+  expect_equal(docdb_update(src = src, key = key, query = '{"_id": "Fiat 128"}', value = '{"b": "≥•", "a": "\\n•\\tióiño"}'), 1L)
+  expect_equal(docdb_query(src = src, key = key, query = '{"_id": "Fiat 128"}', fields = '{"a":1, "b":1}')[[2]], "\n•\tióiño")
 
   # from url
   skip_if(is.null(httpbin), "package webfakes missing")
