@@ -53,7 +53,7 @@ src_elastic(
 - ...:
 
   Further args passed on to
-  [`elastic::connect()`](https://docs.ropensci.org/elastic/reference/connect.html)
+  [`elastic::connect()`](https://rdrr.io/pkg/elastic/man/connect.html)
 
 ## Value
 

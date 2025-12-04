@@ -32,7 +32,7 @@ docdb_exists(src, key, ...)
 
   Passed to functions
   [`DBI::dbListTables()`](https://dbi.r-dbi.org/reference/dbListTables.html),
-  [`elastic::index_exists()`](https://docs.ropensci.org/elastic/reference/indices.html),
+  [`elastic::index_exists()`](https://rdrr.io/pkg/elastic/man/indices.html),
   and
   [`sofa::db_info()`](https://docs.ropensci.org/sofa/reference/db_info.html)
 

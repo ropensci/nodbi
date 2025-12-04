@@ -46,7 +46,7 @@ docdb_update(src, key, value, query, ...)
 - ...:
 
   Passed on to functions
-  [`elastic::docs_bulk_update()`](https://docs.ropensci.org/elastic/reference/docs_bulk_update.html),
+  [`elastic::docs_bulk_update()`](https://rdrr.io/pkg/elastic/man/docs_bulk_update.html),
   and
   [`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)\$update().
 
@@ -59,7 +59,7 @@ docdb_update(src, key, value, query, ...)
 Uses native functions in MongoDB
 ([`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)\$update()),
 SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`), Elasticsearch
-([`elastic::docs_bulk_update()`](https://docs.ropensci.org/elastic/reference/docs_bulk_update.html));
+([`elastic::docs_bulk_update()`](https://rdrr.io/pkg/elastic/man/docs_bulk_update.html));
 a `plpgsql` function added when calling
 [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md),
 and a [`jqr::jqr()`](https://docs.ropensci.org/jqr/reference/jqr.html)

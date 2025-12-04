@@ -44,7 +44,7 @@ docdb_get(src, key, limit = NULL, ...)
   - SQLite: ignored
 
   - Elasticsearch:
-    [`elastic::Search()`](https://docs.ropensci.org/elastic/reference/Search.html)
+    [`elastic::Search()`](https://rdrr.io/pkg/elastic/man/Search.html)
 
   - CouchDB:
     [`sofa::db_alldocs()`](https://docs.ropensci.org/sofa/reference/db_alldocs.html)

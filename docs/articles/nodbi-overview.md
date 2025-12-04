@@ -165,12 +165,11 @@ if (require(tibble)) {
   
 }
 #> Loading required package: tibble
-#> # A tibble: 2 × 11
-#>   `_id`       isActive balance   age eyeColor name  email about registered tags 
-#>   <chr>       <lgl>    <chr>   <int> <chr>    <chr> <chr> <chr> <chr>      <lis>
-#> 1 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <chr>
-#> 2 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <chr>
-#> # ℹ 1 more variable: friends <list>
+#> # A tibble: 2 × 5
+#>   `_id`                      destination_addresses origin_addresses rows  status
+#>   <chr>                      <list>                <list>           <lis> <chr> 
+#> 1 5ad2be50-d150-11f0-9173-6… <chr [3]>             <chr [2]>        <df>  OK    
+#> 2 5ad2be5a-d150-11f0-9173-6… <chr [3]>             <chr [1]>        <df>  OK
 ```
 
 ### docdb_query
@@ -274,9 +273,18 @@ container if `query = "{}"` is specified).
 ``` r
 
 docdb_query(src, key, query = '{"_id": {"$regex": "^[0-9]"}}', listfields = TRUE)
-#>  [1] "about"        "age"          "balance"      "email"        "eyeColor"    
-#>  [6] "friends"      "friends.id"   "friends.name" "isActive"     "name"        
-#> [11] "registered"   "tags"
+#>  [1] "about"                            "age"                             
+#>  [3] "balance"                          "destination_addresses"           
+#>  [5] "email"                            "eyeColor"                        
+#>  [7] "friends"                          "friends.id"                      
+#>  [9] "friends.name"                     "isActive"                        
+#> [11] "name"                             "origin_addresses"                
+#> [13] "registered"                       "rows"                            
+#> [15] "rows.elements"                    "rows.elements.distance"          
+#> [17] "rows.elements.distance.somevalue" "rows.elements.distance.text"     
+#> [19] "rows.elements.duration"           "rows.elements.duration.somevalue"
+#> [21] "rows.elements.duration.text"      "rows.elements.status"            
+#> [23] "status"                           "tags"
 ```
 
 The dot notation is a path from a root field to the nested field, and
@@ -355,7 +363,7 @@ connections as specific to the database, for example for SQLite:
 
 src
 #> src: SQLite
-#> ver: 3.51.0
+#> ver: 3.51.1
 #> db(s): :memory:
 #> size(s): 0.00338 MB
 

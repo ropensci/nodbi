@@ -4,6 +4,7 @@
 * Use `jsonb_tree` as available since `RSQLite` version 2.4.4
 * Update database version requirements, cleanup version-dependent code
 * Avoid time-costly `json_tree` for `src_duckdb` for `listfields = TRUE`
+* Handle `docdb_update` for `ndjson` files with duplicate _id's or target rows
 
 # nodbi 0.13.1
 
