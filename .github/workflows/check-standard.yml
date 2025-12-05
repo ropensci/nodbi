@@ -49,7 +49,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache-version: 1
-          extra-packages: remotes, DBI, duckdb, sofa, elastic, rcmdcheck, covr
+          extra-packages: remotes, DBI, duckdb, sofa, elastic, rcmdcheck, covr, RSQLite
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -59,6 +59,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Install dev SQLite
+        if: success() || failure()
         if: ${{ (matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'devel') }}
         run: remotes::install_github("r-dbi/RSQLite")
         shell: Rscript {0}
@@ -68,6 +69,7 @@ jobs:
       # https://github.com/ankane/setup-postgres#setup-postgres
       # Works on Linux, Mac, and Windows
       - name: PostgreSQL
+        if: success() || failure()
         uses: ankane/setup-postgres@v1
         with:
           database: test
