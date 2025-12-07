@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.13.1.9000",
+  "version": "0.14.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -322,7 +322,7 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "669.167KB",
+  "fileSize": "669.157KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/main/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
   "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"],

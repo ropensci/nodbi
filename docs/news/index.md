@@ -1,6 +1,6 @@
 # Changelog
 
-## nodbi 0.13.1.9000
+## nodbi 0.14.0
 
 - Fix `docdb_query` for `src_sqlite` when using `$in` with strings in
   query
