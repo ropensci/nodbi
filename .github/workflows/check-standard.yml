@@ -64,6 +64,10 @@ jobs:
         run: install.packages("duckdb", repos = "https://duckdb.r-universe.dev", type = "source")
         shell: Rscript {0}
 
+      - name: Install archived package elastic
+        run: remotes::install_github("ropensci-archive/elastic")
+        shell: Rscript {0}
+
 
       # databases:
 

@@ -174,8 +174,8 @@ src <- nodbi::src_elastic(
 
 As of 2026-01-17, the future availability and development of package
 elastic is not clear after it was recently archived, see also
-<https://github.com/opensci-archive/elastic>; at this time, it can still
-be installed as follows.
+<https://github.com/ropensci-archive/elastic>; at this time, it can
+still be installed as follows.
 
 ``` r
 remotes::install_github("ropensci-archive/elastic")

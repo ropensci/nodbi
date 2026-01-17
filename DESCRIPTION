@@ -34,7 +34,6 @@ Imports:
     R.utils
 Suggests:
     sofa (>= 0.4.0),
-    elastic (>= 1.2.1),
     mongolite (>= 4.0.0),
     RSQLite (>= 2.4.0),
     duckdb (>= 1.4.0),
@@ -46,7 +45,6 @@ Suggests:
     knitr,
     rmarkdown,
     tibble
-Remotes: github::ropensci-archive/elastic
 RoxygenNote: 7.3.3
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
