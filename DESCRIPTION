@@ -4,7 +4,7 @@ Description: Simplified JSON document database access and manipulation,
      providing a common API across supported 'NoSQL' databases 
      'Elasticsearch', 'CouchDB', 'MongoDB' as well as 
      'SQLite/JSON1', 'PostgreSQL', and 'DuckDB'.
-Version: 0.14.0
+Version: 0.14.0.9000
 Authors@R: c(
     person(given = "Ralf",
            family = "Herold",
@@ -25,7 +25,7 @@ LazyData: true
 URL: https://docs.ropensci.org/nodbi/, https://github.com/ropensci/nodbi
 BugReports: https://github.com/ropensci/nodbi/issues
 Roxygen: list(markdown = TRUE)
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.5.0)
 Encoding: UTF-8
 Language: en-US
 Imports:
@@ -38,7 +38,7 @@ Imports:
     R.utils
 Suggests:
     sofa (>= 0.4.0),
-    elastic (>= 1.2.0),
+    elastic (>= 1.2.1),
     mongolite (>= 4.0.0),
     RSQLite (>= 2.4.0),
     duckdb (>= 1.4.0),
@@ -50,6 +50,7 @@ Suggests:
     knitr,
     rmarkdown,
     tibble
+Remotes: github::ropensci-archive/elastic
 RoxygenNote: 7.3.3
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents

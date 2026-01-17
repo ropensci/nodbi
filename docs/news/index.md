@@ -1,6 +1,12 @@
 # Changelog
 
+## nodbi 0.14.0.9000
+
+- Changes to address that package elastic was archived
+
 ## nodbi 0.14.0
+
+CRAN release: 2025-12-07
 
 - Fix `docdb_query` for `src_sqlite` when using `$in` with strings in
   query

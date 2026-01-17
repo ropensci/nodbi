@@ -41,7 +41,7 @@ src_elastic <- function(host = "127.0.0.1", port = 9200, path = NULL,
                         force = FALSE, ...) {
 
   # check minimum version
-  pkgNeeded("elastic", "1.2.0")
+  pkgNeeded("elastic", "1.2.1")
 
   # create connection
   x <- elastic::connect(

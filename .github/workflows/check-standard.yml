@@ -50,8 +50,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: 1
-          extra-packages: remotes, DBI, duckdb, sofa, elastic, rcmdcheck, covr, RSQLite
+          extra-packages: remotes, rcmdcheck, covr
 
       - uses: r-lib/actions/setup-pandoc@v2
 

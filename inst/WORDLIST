@@ -3,7 +3,7 @@ CouchDB
 DuckDB
 DuckDB's
 Elasticserch
-JSON
+Harmomise
 Javascript
 Lifecycle
 Mongo
@@ -14,7 +14,6 @@ README
 RPostgres
 RSQLite
 Sys
-URI
 UUID
 UUID's
 UseMethod
@@ -31,7 +30,6 @@ harmonised
 http
 https
 initialisation
-iteratively
 jq
 jqr
 json
@@ -47,6 +45,5 @@ programme
 redis
 reimplementation
 sqlite
-src
 subitems
 upserted

@@ -274,9 +274,18 @@ container if `query = "{}"` is specified).
 ``` r
 
 docdb_query(src, key, query = '{"_id": {"$regex": "^[0-9]"}}', listfields = TRUE)
-#>  [1] "about"        "age"          "balance"      "email"        "eyeColor"    
-#>  [6] "friends"      "friends.id"   "friends.name" "isActive"     "name"        
-#> [11] "registered"   "tags"
+#>  [1] "about"                            "age"                             
+#>  [3] "balance"                          "destination_addresses"           
+#>  [5] "email"                            "eyeColor"                        
+#>  [7] "friends"                          "friends.id"                      
+#>  [9] "friends.name"                     "isActive"                        
+#> [11] "name"                             "origin_addresses"                
+#> [13] "registered"                       "rows"                            
+#> [15] "rows.elements"                    "rows.elements.distance"          
+#> [17] "rows.elements.distance.somevalue" "rows.elements.distance.text"     
+#> [19] "rows.elements.duration"           "rows.elements.duration.somevalue"
+#> [21] "rows.elements.duration.text"      "rows.elements.status"            
+#> [23] "status"                           "tags"
 ```
 
 The dot notation is a path from a root field to the nested field, and
@@ -355,7 +364,7 @@ connections as specific to the database, for example for SQLite:
 
 src
 #> src: SQLite
-#> ver: 3.51.1
+#> ver: 3.51.0
 #> db(s): :memory:
 #> size(s): 0.00338 MB
 

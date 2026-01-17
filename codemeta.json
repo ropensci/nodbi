@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/ropensci/nodbi",
   "issueTracker": "https://github.com/ropensci/nodbi/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.14.0",
+  "version": "0.14.0.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.1 Patched (2025-09-12 r88822)",
+  "runtimePlatform": "R Under development (unstable) (2026-01-16 r89305)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -80,14 +80,8 @@
       "@type": "SoftwareApplication",
       "identifier": "elastic",
       "name": "elastic",
-      "version": ">= 1.2.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=elastic"
+      "version": ">= 1.2.1",
+      "sameAs": "https://github.com/ropensci-archive/elastic"
     },
     {
       "@type": "SoftwareApplication",
@@ -231,7 +225,7 @@
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
-      "version": ">= 3.4.0"
+      "version": ">= 3.5.0"
     },
     "2": {
       "@type": "SoftwareApplication",
@@ -322,7 +316,7 @@
   "applicationCategory": "Databases",
   "isPartOf": "https://ropensci.org",
   "keywords": ["database", "MongoDB", "Elasticsearch", "CouchDB", "SQLite", "PostgreSQL", "DuckDB", "NoSQL", "JSON", "documents", "rstats", "nosql", "couchdb", "mongodb", "elasticsearch", "r", "r-package", "sqlite", "postgresql"],
-  "fileSize": "669.157KB",
+  "fileSize": "669.266KB",
   "releaseNotes": "https://github.com/ropensci/nodbi/blob/main/NEWS.md",
   "readme": "https://github.com/ropensci/nodbi/blob/master/README.md",
   "contIntegration": ["https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check", "https://app.codecov.io/gh/rfhb/nodbi"],

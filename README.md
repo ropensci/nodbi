@@ -13,7 +13,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2025-12-04.
+updated 2026-01-17.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 |:---|:---|:---|
@@ -26,6 +26,9 @@ updated 2025-12-04.
 
 For speed comparisons of database backends, see [benchmark](#benchmark)
 and [testing](#testing) below.
+
+Plans for developing package `nodbi` in 2026 include to add MariaDB and
+MySQL as database backends.
 
 ## API overview
 
@@ -140,15 +143,24 @@ src <- nodbi::src_couchdb(
 ### Elasticsearch
 
 “Container” refers to an Elasticsearch index, in which `nodbi` creates
-JSON documents. Opensearch can equally be used. See also
-<https://CRAN.R-project.org/package=elastic>. Only lowercase is accepted
-for container names (in parameter `key` of `docdb_*` functions).
+JSON documents. Opensearch can equally be used. Only lowercase is
+accepted for container names (in parameter `key` of `docdb_*`
+functions).
 
 ``` r
 src <- nodbi::src_elastic(
   host = "127.0.0.1", port = 9200L, path = NULL,
   transport_schema = "http", user = NULL, pwd = NULL, ...
 )
+```
+
+As of 2026-01-17, the future availability and development of package
+elastic is not clear after it was recently archived, see also
+<https://github.com/opensci-archive/elastic>; at this time, it can still
+be installed as follows.
+
+``` r
+remotes::install_github("ropensci-archive/elastic")
 ```
 
 ### PostgreSQL
@@ -348,66 +360,66 @@ testFunction <- function(src) {
 }
 
 result <- rbenchmark::benchmark(
-  MongoDB = testFunction(src = srcMongo),
-  SQLite = testFunction(src = srcSqlite),
-  Elastic = testFunction(src = srcElastic),
   CouchDB = testFunction(src = srcCouchdb),
-  PostgreSQL = testFunction(src = srcPostgres),
   DuckDB = testFunction(src = srcDuckdb),
-  replications = 3L
+  Elastic = testFunction(src = srcElastic),
+  MongoDB = testFunction(src = srcMongo),
+  PostgreSQL = testFunction(src = srcPostgres),
+  SQLite = testFunction(src = srcSqlite),
+  replications = 3L,
+  order = "elapsed"
 )
 
-# 2025-11-30 with M3 hardware, databases via homebrew
-result[rev(order(result$elapsed)), c("test", "replications", "elapsed")]
+# 2026-01-17 with M3 hardware, databases via homebrew
+result[ , c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 4    CouchDB            3   52.94
-# 3    Elastic            3   26.89
-# 1    MongoDB            3    4.62
-# 5 PostgreSQL            3    1.57
-# 2     SQLite            3    0.95
-# 6     DuckDB            3    0.80
+# 4    CouchDB            3   36.78
+# 3    Elastic            3   25.60
+# 1    MongoDB            3    8.61
+# 5 PostgreSQL            3    1.12
+# 2     SQLite            3    0.66
+# 6     DuckDB            3    0.57
 
 message(R.version$version.string)
-# R version 4.5.1 Patched (2025-09-12 r88822)
+# R Under development (unstable) (2026-01-16 r89305)
 
 pkgs <- c("nodbi", "RSQLite", "duckdb", "RPostgres", "mongolite", "elastic", "sofa")
 for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
-# nodbi: 0.13.1.9000
-# RSQLite: 2.4.5
-# duckdb: 1.4.2
+# nodbi: 0.14.0
+# RSQLite: 2.4.4
+# duckdb: 1.4.3
 # RPostgres: 1.4.8
 # mongolite: 4.0.0
-# elastic: 1.2.0
+# elastic: 1.2.1.91
 # sofa: 0.4.0
 ```
 
 ## Testing
 
-Every database backend is subjected to identical tests, see
+Every database backend is subject to identical tests, see
 [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R).
 
 ``` r
-# 2025-12-04
+# 2026-01-17
 
 suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
-# ✔ |      2 184 | couchdb [80.7s]
-# ✔ |      1 183 | duckdb [3.1s]
-# ✔ |      2 181 | elastic [64.5s]
-# ✔ |      2 182 | mongodb [5.6s]
-# ✔ |        185 | postgres [6.0s]
-# ✔ |        186 | sqlite [4.4s]
+# ✔ |      2 184 | couchdb [72.7s]
+# ✔ |      1 183 | duckdb [1.8s]
+# ✔ |      2 181 | elastic [57.4s]
+# ✔ |      2 182 | mongodb [2.6s]
+# ✔ |        185 | postgres [3.5s]
+# ✔ |        186 | sqlite [1.9s]
 # 
-# ══ Results ══════════════════════════
-# Duration: 164.3 s
+# ══ Results ══════════════════════
+# Duration: 140.0 s
 # 
-# ── Skipped tests (7) ────────────────
+# ── Skipped tests (7) ────────────
 # • Testing for auto disconnect and shutdown not relevant (3): 
-#   test-couchdb.R:26:3, test-elastic.R:21:3,
-#   test-mongodb.R:24:3
+#   test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3
 # • Testing for parallel writes not possible or implemented (4): 
-#   test-couchdb.R:26:3, test-duckdb.R:22:3,
-#   test-elastic.R:21:3, test-mongodb.R:24:3
+#   test-couchdb.R:26:3, test-duckdb.R:22:3, test-elastic.R:21:3, 
+#   test-mongodb.R:24:3
 # 
 # [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1101 ]
 
