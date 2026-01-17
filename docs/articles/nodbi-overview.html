@@ -72,12 +72,12 @@
 NoSQL databases and SQL databases with JSON functionality, with the same
 function parameters and return values across all of:</p>
 <ul>
-<li>MongoDB</li>
 <li>SQLite</li>
-<li>PostgreSQL</li>
 <li>DuckDB</li>
-<li>Elasticsearch</li>
+<li>PostgreSQL</li>
+<li>MongoDB</li>
 <li>CouchDB</li>
+<li>Elasticsearch</li>
 </ul>
 <p>Package <code>nodbi</code> has been designed to use any specific SQL
 functions a database may have for <code>JSON</code> and has added
@@ -87,11 +87,8 @@ without changing user code.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/nodbi/">nodbi</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="functionality">Functionality<a class="anchor" aria-label="anchor" href="#functionality"></a>
+<h2 id="connect">Connect<a class="anchor" aria-label="anchor" href="#connect"></a>
 </h2>
-<div class="section level3">
-<h3 id="connect">Connect<a class="anchor" aria-label="anchor" href="#connect"></a>
-</h3>
 <p>First, a connection to a database is opened. In the example, no
 additional parameters are used such as database file or server; see the
 help page for the respective database.</p>
@@ -128,9 +125,9 @@ holds the name of the relevant container.</p>
 <span><span class="co"># for example for local or remote MongoDb:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="st">"src_mongo"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="docdb_create">docdb_create<a class="anchor" aria-label="anchor" href="#docdb_create"></a>
-</h3>
+<div class="section level2">
+<h2 id="docdb_create">docdb_create<a class="anchor" aria-label="anchor" href="#docdb_create"></a>
+</h2>
 <p>Create a container if it does not yet exist and fill with
 <code>value</code>. The return value is the number of created documents.
 “Documents” refers to the rows in a data frame such as
@@ -174,9 +171,9 @@ pointing to <code>NDJSON</code>.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/docdb_list.html">docdb_list</a></span><span class="op">(</span>src <span class="op">=</span> <span class="va">src</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "my_container"</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="identifiers">Identifiers<a class="anchor" aria-label="anchor" href="#identifiers"></a>
-</h3>
+<div class="section level2">
+<h2 id="identifiers">Identifiers<a class="anchor" aria-label="anchor" href="#identifiers"></a>
+</h2>
 <p>The unique document identifier is its <code>_id</code>, corresponding
 to a primary index with a constraint to be unique in SQL databases.</p>
 <p>The <code>_id</code>’s of an input <code>value</code> are either the
@@ -198,9 +195,9 @@ created.</p>
 <p>For updating existing documents, see below function
 <code><a href="../reference/docdb_update.html">docdb_update()</a></code>.</p>
 </div>
-<div class="section level3">
-<h3 id="docdb_get">docdb_get<a class="anchor" aria-label="anchor" href="#docdb_get"></a>
-</h3>
+<div class="section level2">
+<h2 id="docdb_get">docdb_get<a class="anchor" aria-label="anchor" href="#docdb_get"></a>
+</h2>
 <p>All documents in a container can now be retrieved with
 <code><a href="../reference/docdb_get.html">docdb_get()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -217,16 +214,15 @@ created.</p>
 <span>  </span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Loading required package: tibble</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
-<span><span class="co">#&gt;   `_id`       isActive balance   age eyeColor name  email about registered tags </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: friends &lt;list&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
+<span><span class="co">#&gt;   `_id`                      destination_addresses origin_addresses rows  status</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 37c6af06-f3b1-11f0-b13d-6… <span style="color: #949494;">&lt;chr [3]&gt;</span>             <span style="color: #949494;">&lt;chr [2]&gt;</span>        <span style="color: #949494;">&lt;df&gt;</span>  OK    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 37c6af10-f3b1-11f0-b13d-6… <span style="color: #949494;">&lt;chr [3]&gt;</span>             <span style="color: #949494;">&lt;chr [1]&gt;</span>        <span style="color: #949494;">&lt;df&gt;</span>  OK</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="docdb_query">docdb_query<a class="anchor" aria-label="anchor" href="#docdb_query"></a>
-</h3>
+<div class="section level2">
+<h2 id="docdb_query">docdb_query<a class="anchor" aria-label="anchor" href="#docdb_query"></a>
+</h2>
 <p>One of the most powerful functions of <code>nodbi</code> is
 <code><a href="../reference/docdb_query.html">docdb_query()</a></code> because it permits to combine a query to
 select documents and to filter for fields of interest.</p>
@@ -294,9 +290,9 @@ here.</p>
 <span><span class="co">#&gt; 6 5cd6785335b63cb19dfa8347 Williamson French   NA</span></span>
 <span><span class="co">#&gt; 7 5cd6785325ce3a94dfc54096         Pace Bell   NA</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="field-names">Field names<a class="anchor" aria-label="anchor" href="#field-names"></a>
-</h3>
+<div class="section level2">
+<h2 id="field-names">Field names<a class="anchor" aria-label="anchor" href="#field-names"></a>
+</h2>
 <p>The <code>JSON</code> data handled by package <code>nodbi</code> may
 have a large number of field included nested fields in objects (see for
 example <code>name</code> within array <code>friends</code> above).
@@ -322,9 +318,9 @@ documents selected with a query (or in all documents in the container if
 this notation can be used in <code>query</code> and <code>fields</code>
 parameters of <code><a href="../reference/docdb_query.html">docdb_query()</a></code>.</p>
 </div>
-<div class="section level3">
-<h3 id="docdb_update">docdb_update<a class="anchor" aria-label="anchor" href="#docdb_update"></a>
-</h3>
+<div class="section level2">
+<h2 id="docdb_update">docdb_update<a class="anchor" aria-label="anchor" href="#docdb_update"></a>
+</h2>
 <p>Queries can also be used for updating (patching) selected documents
 with a new <code>value</code>. The return value of
 <code><a href="../reference/docdb_update.html">docdb_update()</a></code> corresponds to the number of documents that
@@ -354,9 +350,9 @@ updated.</p>
 <span><span class="co">#&gt; 2  Merc 450SL 1, 2</span></span>
 <span><span class="co">#&gt; 3 Merc 450SLC   33</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="docdb_delete">docdb_delete<a class="anchor" aria-label="anchor" href="#docdb_delete"></a>
-</h3>
+<div class="section level2">
+<h2 id="docdb_delete">docdb_delete<a class="anchor" aria-label="anchor" href="#docdb_delete"></a>
+</h2>
 <p>Documents and containers can be deleted with
 <code><a href="../reference/docdb_delete.html">docdb_delete()</a></code>. Its return value corresponds to the success
 of the delete operation.</p>
@@ -377,9 +373,9 @@ of the delete operation.</p>
 <span><span class="fu"><a href="../reference/docdb_exists.html">docdb_exists</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="disconnect-and-shutdown">Disconnect and shutdown<a class="anchor" aria-label="anchor" href="#disconnect-and-shutdown"></a>
-</h3>
+<div class="section level2">
+<h2 id="disconnect-and-shutdown">Disconnect and shutdown<a class="anchor" aria-label="anchor" href="#disconnect-and-shutdown"></a>
+</h2>
 <p>Package <code>nodbi</code> includes an automatic mechanism for
 shutting down, at the time of <code><a href="https://rdrr.io/r/base/quit.html" class="external-link">quit()</a></code> or session restart,
 those databases that require it (SQLite, DuckDB, PostgreSQL).</p>
@@ -396,7 +392,6 @@ SQLite:</p>
 <span><span class="co"># shutdown</span></span>
 <span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">src</span><span class="op">$</span><span class="va">con</span>, shutdown <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">src</span><span class="op">)</span></span></code></pre></div>
-</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -6,12 +6,12 @@ R package `nodbi` provides a single interface for several NoSQL
 databases and SQL databases with JSON functionality, with the same
 function parameters and return values across all of:
 
-- MongoDB
 - SQLite
-- PostgreSQL
 - DuckDB
-- Elasticsearch
+- PostgreSQL
+- MongoDB
 - CouchDB
+- Elasticsearch
 
 Package `nodbi` has been designed to use any specific SQL functions a
 database may have for `JSON` and has added functionality tested for
@@ -22,9 +22,7 @@ performance to enable switching databases without changing user code.
 library(nodbi)
 ```
 
-## Functionality
-
-### Connect
+## Connect
 
 First, a connection to a database is opened. In the example, no
 additional parameters are used such as database file or server; see the
@@ -66,7 +64,7 @@ src <- src_sqlite()
 help("src_mongo")
 ```
 
-### docdb_create
+## docdb_create
 
 Create a container if it does not yet exist and fill with `value`. The
 return value is the number of created documents. “Documents” refers to
@@ -117,7 +115,7 @@ docdb_list(src = src)
 #> [1] "my_container"
 ```
 
-### Identifiers
+## Identifiers
 
 The unique document identifier is its `_id`, corresponding to a primary
 index with a constraint to be unique in SQL databases.
@@ -145,7 +143,7 @@ docdb_create(src, key, value = mtcars)
 For updating existing documents, see below function
 [`docdb_update()`](https://docs.ropensci.org/nodbi/reference/docdb_update.md).
 
-### docdb_get
+## docdb_get
 
 All documents in a container can now be retrieved with
 [`docdb_get()`](https://docs.ropensci.org/nodbi/reference/docdb_get.md).
@@ -165,15 +163,14 @@ if (require(tibble)) {
   
 }
 #> Loading required package: tibble
-#> # A tibble: 2 × 11
-#>   `_id`       isActive balance   age eyeColor name  email about registered tags 
-#>   <chr>       <lgl>    <chr>   <int> <chr>    <chr> <chr> <chr> <chr>      <lis>
-#> 1 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <chr>
-#> 2 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <chr>
-#> # ℹ 1 more variable: friends <list>
+#> # A tibble: 2 × 5
+#>   `_id`                      destination_addresses origin_addresses rows  status
+#>   <chr>                      <list>                <list>           <lis> <chr> 
+#> 1 37c6af06-f3b1-11f0-b13d-6… <chr [3]>             <chr [2]>        <df>  OK    
+#> 2 37c6af10-f3b1-11f0-b13d-6… <chr [3]>             <chr [1]>        <df>  OK
 ```
 
-### docdb_query
+## docdb_query
 
 One of the most powerful functions of `nodbi` is
 [`docdb_query()`](https://docs.ropensci.org/nodbi/reference/docdb_query.md)
@@ -261,7 +258,7 @@ docdb_query(
 #> 7 5cd6785325ce3a94dfc54096         Pace Bell   NA
 ```
 
-### Field names
+## Field names
 
 The `JSON` data handled by package `nodbi` may have a large number of
 field included nested fields in objects (see for example `name` within
@@ -292,7 +289,7 @@ The dot notation is a path from a root field to the nested field, and
 this notation can be used in `query` and `fields` parameters of
 [`docdb_query()`](https://docs.ropensci.org/nodbi/reference/docdb_query.md).
 
-### docdb_update
+## docdb_update
 
 Queries can also be used for updating (patching) selected documents with
 a new `value`. The return value of
@@ -326,7 +323,7 @@ docdb_query(src, key, query = '{"carb": 3}', fields = '{"xy": 1}')
 #> 3 Merc 450SLC   33
 ```
 
-### docdb_delete
+## docdb_delete
 
 Documents and containers can be deleted with
 [`docdb_delete()`](https://docs.ropensci.org/nodbi/reference/docdb_delete.md).
@@ -351,7 +348,7 @@ docdb_exists(src, key)
 #> [1] FALSE
 ```
 
-### Disconnect and shutdown
+## Disconnect and shutdown
 
 Package `nodbi` includes an automatic mechanism for shutting down, at
 the time of [`quit()`](https://rdrr.io/r/base/quit.html) or session

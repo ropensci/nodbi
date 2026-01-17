@@ -2,7 +2,8 @@
 
 ## nodbi 0.14.0.9000
 
-- Changes to address that package elastic was archived
+- Changes to address that package elastic was archived (CI,
+  documentation)
 
 ## nodbi 0.14.0
 

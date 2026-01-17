@@ -125,6 +125,24 @@ indexed on `_id`. See also <https://CRAN.R-project.org/package=RSQLite>.
 src <- nodbi::src_sqlite(dbname = ":memory:", ...)
 ```
 
+### PostgreSQL
+
+“Container” refers to a PostgreSQL table, with columns `_id` and `json`
+created and used by package `nodbi`, applying SQL functions and
+functions as per
+<https://www.postgresql.org/docs/current/functions-json.html> to the
+`json` column. With PostgreSQL, a custom `plpgsql` function
+[jsonb_merge_patch()](https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60)
+is used for `docdb_update()`. The order of variables in data frames
+returned by `docdb_get()` and `docdb_query()` can differ from their
+order the input to `docdb_create()`.
+
+``` r
+src <- nodbi::src_postgres(
+  dbname = "my_database", host = "127.0.0.1", port = 5432L, ...
+)
+```
+
 ### CouchDB
 
 “Container” refers to a CouchDB database, in which `nodbi` creates JSON
@@ -161,24 +179,6 @@ be installed as follows.
 
 ``` r
 remotes::install_github("ropensci-archive/elastic")
-```
-
-### PostgreSQL
-
-“Container” refers to a PostgreSQL table, with columns `_id` and `json`
-created and used by package `nodbi`, applying SQL functions and
-functions as per
-<https://www.postgresql.org/docs/current/functions-json.html> to the
-`json` column. With PostgreSQL, a custom `plpgsql` function
-[jsonb_merge_patch()](https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60)
-is used for `docdb_update()`. The order of variables in data frames
-returned by `docdb_get()` and `docdb_query()` can differ from their
-order the input to `docdb_create()`.
-
-``` r
-src <- nodbi::src_postgres(
-  dbname = "my_database", host = "127.0.0.1", port = 5432L, ...
-)
 ```
 
 ## Walk-through

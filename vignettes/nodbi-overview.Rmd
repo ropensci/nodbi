@@ -20,12 +20,12 @@ knitr::opts_chunk$set(
 
 R package `nodbi` provides a single interface for several NoSQL databases and SQL databases with JSON functionality, with the same function parameters and return values across all of: 
 
-- MongoDB 
 - SQLite 
-- PostgreSQL 
 - DuckDB 
-- Elasticsearch 
+- PostgreSQL 
+- MongoDB 
 - CouchDB 
+- Elasticsearch 
 
 Package `nodbi` has been designed to use any specific SQL functions a database may have for `JSON` and has added functionality tested for performance to enable switching databases without changing user code. 
 
@@ -33,9 +33,7 @@ Package `nodbi` has been designed to use any specific SQL functions a database m
 library(nodbi)
 ```
 
-## Functionality
-
-### Connect
+## Connect
 
 First, a connection to a database is opened. In the example, no additional parameters are used such as database file or server; see the help page for the respective database. 
 
@@ -66,7 +64,7 @@ src <- src_sqlite()
 help("src_mongo")
 ```
 
-### docdb_create
+## docdb_create
 
 Create a container if it does not yet exist and fill with `value`. The return value is the number of created documents. "Documents" refers to the rows in a data frame such as `mtcars`, or the number of `NDJSON` lines, or the number of list items, or the number of objects in an `JSON` array. 
 
@@ -102,7 +100,7 @@ Check and list any other containers exist in the database:
 docdb_list(src = src)
 ```
 
-### Identifiers
+## Identifiers
 
 The unique document identifier is its `_id`, corresponding to a primary index with a constraint to be unique in SQL databases. 
 
@@ -119,7 +117,7 @@ docdb_create(src, key, value = mtcars)
 
 For updating existing documents, see below function `docdb_update()`.
 
-### docdb_get
+## docdb_get
 
 All documents in a container can now be retrieved with `docdb_get()`. 
 
@@ -138,7 +136,7 @@ if (require(tibble)) {
 }
 ```
 
-### docdb_query
+## docdb_query
 
 One of the most powerful functions of `nodbi` is `docdb_query()` because it permits to combine a query to select documents and to filter for fields of interest. 
 
@@ -185,7 +183,7 @@ docdb_query(
 )
 ```
 
-### Field names
+## Field names
 
 The `JSON` data handled by package `nodbi` may have a large number of field included nested fields in objects (see for example `name` within array `friends` above). Thus, an argument is provided for `docdb_query()` so that the function returns only the comprehensive list of all field names in documents selected with a query (or in all documents in the container if `query = "{}"` is specified). 
 
@@ -195,7 +193,7 @@ docdb_query(src, key, query = '{"_id": {"$regex": "^[0-9]"}}', listfields = TRUE
 
 The dot notation is a path from a root field to the nested field, and this notation can be used in `query` and `fields` parameters of `docdb_query()`. 
 
-### docdb_update
+## docdb_update
 
 Queries can also be used for updating (patching) selected documents with a new `value`. The return value of `docdb_update()` corresponds to the number of documents that were updated. 
 
@@ -215,7 +213,7 @@ docdb_update(src, key, value = '{"_id": "Merc 450SLC", "xy": 33}', query = "{}")
 docdb_query(src, key, query = '{"carb": 3}', fields = '{"xy": 1}')
 ```
 
-### docdb_delete
+## docdb_delete
 
 Documents and containers can be deleted with `docdb_delete()`. Its return value corresponds to the success of the delete operation. 
 
@@ -233,7 +231,7 @@ docdb_delete(src, key)
 docdb_exists(src, key)
 ```
 
-### Disconnect and shutdown
+## Disconnect and shutdown
 
 Package `nodbi` includes an automatic mechanism for shutting down, at the time of `quit()` or session restart, those databases that require it (SQLite, DuckDB, PostgreSQL). 
 

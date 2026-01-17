@@ -66,7 +66,13 @@ in which `nodbi` creates JSON documents. Any root-level `_id` is
 extracted from the document(s) and used as document ID `_id`, otherwise
 a UUID is created as document ID `_id`. Only lowercase is accepted for
 container names (in parameter `key`). Opensearch can equally be used.
-For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>
+For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>.
+
+As of 2026-01-17, the future availability and development of package
+elastic is not clear after it was recently archived, see also
+<https://github.com/opensci-archive/elastic>; at this time, it can still
+be installed by calling
+`remotes::install_github("ropensci-archive/elastic")`
 
 ## Examples
 

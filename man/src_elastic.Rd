@@ -49,7 +49,12 @@ Any root-level \verb{_id} is extracted from the document(s) and used as
 document ID \verb{_id}, otherwise a UUID is created as document ID \verb{_id}.
 Only lowercase is accepted for container names (in parameter \code{key}).
 Opensearch can equally be used.
-For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}
+For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}.
+
+As of 2026-01-17, the future availability and development of package elastic
+is not clear after it was recently archived, see also
+\url{https://github.com/opensci-archive/elastic}; at this time, it can still be
+installed by calling \code{remotes::install_github("ropensci-archive/elastic")}
 }
 \examples{
 \dontrun{

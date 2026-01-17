@@ -95,12 +95,12 @@ jobs:
 
       # for nodbi:
 
-      - name: Install duckdb extension library
+      - name: Try installing duckdb extension library
         run: |
           library(duckdb)
           drv <- duckdb()
           con <- dbConnect(drv)
-          dbExecute(con, 'INSTALL json;')
+          try(dbExecute(con, 'INSTALL json;'), silent = TRUE)
           dbDisconnect(con)
           duckdb_shutdown(drv)
         shell: Rscript {0}

@@ -21,11 +21,11 @@ Source:
 [`DESCRIPTION`](https://github.com/ropensci/nodbi/blob/HEAD/DESCRIPTION)
 
 Herold R, Chamberlain S, FitzJohn R, Ooms J (2026). *nodbi: 'NoSQL'
-Database Connector*. R package version 0.14.0.9000,
+Database Interface*. R package version 0.14.0.9000,
 <https://docs.ropensci.org/nodbi/>.
 
     @Manual{,
-      title = {nodbi: 'NoSQL' Database Connector},
+      title = {nodbi: 'NoSQL' Database Interface},
       author = {Ralf Herold and Scott Chamberlain and Rich FitzJohn and Jeroen Ooms},
       year = {2026},
       note = {R package version 0.14.0.9000},
