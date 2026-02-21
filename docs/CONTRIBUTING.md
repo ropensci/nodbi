@@ -18,16 +18,15 @@ with a minimal [reprex](https://www.tidyverse.org/help/#reprex).
 
 ### Pull request process
 
-- We recommend that you create a Git branch for each pull request
-  (PR).  
+- We recommend that you create a Git branch for each pull request (PR).\
 - Look at the Travis and AppVeyor build status before and after making
   changes. The `README` should contain badges for any continuous
-  integration services used by the package.  
+  integration services used by the package.\
 - We have some style tips in our [developer
   guide](https://devguide.ropensci.org/building.html#code-style)
-- We use [roxygen2](https://cran.r-project.org/package=roxygen2).  
+- We use [roxygen2](https://cran.r-project.org/package=roxygen2).\
 - We use [testthat](https://cran.r-project.org/package=testthat).
-  Contributions with test cases included are easier to accept.  
+  Contributions with test cases included are easier to accept.\
 - For user-facing changes, add a bullet to the top of `NEWS.md` below
   the current development version header describing the changes made
   followed by your GitHub username, and links to relevant

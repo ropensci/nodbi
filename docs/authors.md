@@ -12,7 +12,7 @@
 
 - **Jeroen Ooms**. Author.
 
-- **Ivan Tarbakou**. Copyright holder.  
+- **Ivan Tarbakou**. Copyright holder.\
   mongo-to-sql-converter library
 
 ## Citation
@@ -20,12 +20,12 @@
 Source:
 [`DESCRIPTION`](https://github.com/ropensci/nodbi/blob/HEAD/DESCRIPTION)
 
-Herold R, Chamberlain S, FitzJohn R, Ooms J (2026). *nodbi: 'NoSQL'
-Database Interface*. R package version 0.14.0.9000,
+Herold R, Chamberlain S, FitzJohn R, Ooms J (2026). *nodbi: Document
+'NoSQL' Database DBI Connector*. R package version 0.14.0.9000,
 <https://docs.ropensci.org/nodbi/>.
 
     @Manual{,
-      title = {nodbi: 'NoSQL' Database Interface},
+      title = {nodbi: Document 'NoSQL' Database DBI Connector},
       author = {Ralf Herold and Scott Chamberlain and Rich FitzJohn and Jeroen Ooms},
       year = {2026},
       note = {R package version 0.14.0.9000},

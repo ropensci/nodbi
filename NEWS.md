@@ -1,6 +1,6 @@
 # nodbi 0.14.0.9000
 
-* Changes to address that package elastic was archived (CI, documentation)
+* development version
 
 # nodbi 0.14.0
 

@@ -30,11 +30,6 @@
 #' Opensearch can equally be used.
 #' For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>.
 #'
-#' As of 2026-01-17, the future availability and development of package elastic
-#' is not clear after it was recently archived, see also
-#' <https://github.com/ropensci-archive/elastic>; at this time, it can still be
-#' installed by calling `remotes::install_github("ropensci-archive/elastic")`
-#'
 #' @return A `nodbi` source object
 #'
 #' @examples \dontrun{

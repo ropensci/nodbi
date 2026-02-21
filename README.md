@@ -13,7 +13,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2026-01-17.
+updated 2026-02-21.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 |:---|:---|:---|
@@ -75,16 +75,21 @@ library("nodbi")
 
 ## Database connections
 
-Overview on parameters and aspects that are specific to the database
-backend. These are only needed once, for for `src_*()` to create a
-connection object. Any such connection object is subsequently used
-similarly across the `docdb_*` functions.
+The following subsections show those parameters and aspects that are
+specific to the database backend. These are only needed once, for
+`src_*()` to create a connection object. Any such connection object is
+subsequently used similarly across the `docdb_*` functions in package
+‘nodbi’.
 
-“Container” refers to how conceptually the backend holds the data. Data
-types are mapped from JSON to R objects by
+“Container” refers to how conceptually the database backend holds the
+data. Users specify the relevant container with parameter
+`key = <container_name>` in `docdb_*` functions, see
+[Walk-through](#walk-through) below).
+
+Data types are mapped from JSON to R objects by
 [jsonlite](https://CRAN.R-project.org/package=jsonlite). Any root-level
 `_id` is extracted from the document(s) and used for an index column
-`_id`, otherwise a UUID is created as `_id`.
+`_id`, otherwise an UUID is created as `_id`.
 
 ### DuckDB
 
@@ -170,15 +175,6 @@ src <- nodbi::src_elastic(
   host = "127.0.0.1", port = 9200L, path = NULL,
   transport_schema = "http", user = NULL, pwd = NULL, ...
 )
-```
-
-As of 2026-01-17, the future availability and development of package
-elastic is not clear after it was recently archived, see also
-<https://github.com/ropensci-archive/elastic>; at this time, it can
-still be installed as follows.
-
-``` r
-remotes::install_github("ropensci-archive/elastic")
 ```
 
 ## Walk-through
@@ -370,27 +366,27 @@ result <- rbenchmark::benchmark(
   order = "elapsed"
 )
 
-# 2026-01-17 with M3 hardware, databases via homebrew
+# 2026-02-21 with M3 hardware, databases via homebrew
 result[ , c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 4    CouchDB            3   36.78
-# 3    Elastic            3   25.60
-# 1    MongoDB            3    8.61
-# 5 PostgreSQL            3    1.12
-# 2     SQLite            3    0.66
-# 6     DuckDB            3    0.57
+# 2     DuckDB            3    0.60
+# 6     SQLite            3    0.71
+# 5 PostgreSQL            3    1.47
+# 4    MongoDB            3    2.28
+# 3    Elastic            3   26.00
+# 1    CouchDB            3   57.41
 
 message(R.version$version.string)
-# R Under development (unstable) (2026-01-16 r89305)
+# R Under development (unstable) (2026-02-02 r89367)
 
 pkgs <- c("nodbi", "RSQLite", "duckdb", "RPostgres", "mongolite", "elastic", "sofa")
 for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
-# nodbi: 0.14.0
-# RSQLite: 2.4.4
-# duckdb: 1.4.3
-# RPostgres: 1.4.8
+# nodbi: 0.14.0.9000
+# RSQLite: 2.4.6
+# duckdb: 1.4.4
+# RPostgres: 1.4.10
 # mongolite: 4.0.0
-# elastic: 1.2.1.91
+# elastic: 1.2.2
 # sofa: 0.4.0
 ```
 

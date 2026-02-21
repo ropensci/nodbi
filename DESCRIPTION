@@ -1,6 +1,6 @@
 Package: nodbi
-Title: 'NoSQL' Database Interface
-Description: R database interface for creating, reading (querying and listing 
+Title: Document 'NoSQL' Database DBI Connector
+Description: R database connector for creating, reading (querying and listing 
      fields), updating and deleting of individual or many JSON documents, 
      providing a common API across supported databases ('SQLite', 'PostgreSQL', 
      'DuckDB' and 'NoSQL' databases 'MongoDB', 'CouchDB' and 'Elasticsearch').
@@ -34,6 +34,7 @@ Imports:
     R.utils
 Suggests:
     sofa (>= 0.4.0),
+    elastic (>= 1.2.0), 
     mongolite (>= 4.0.0),
     RSQLite (>= 2.4.0),
     duckdb (>= 1.4.0),

@@ -37,7 +37,7 @@ docdb_create(src, key, value, ...)
 
   Passed to functions
   [`sofa::db_bulk_create()`](https://docs.ropensci.org/sofa/reference/db_bulk_create.html),
-  [`elastic::docs_bulk()`](https://rdrr.io/pkg/elastic/man/docs_bulk.html),
+  [`elastic::docs_bulk()`](https://rfhb.github.io/elastic/reference/docs_bulk.html),
   and
   [`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)\$insert()
 
