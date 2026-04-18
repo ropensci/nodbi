@@ -62,7 +62,7 @@ SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`), Elasticsearch
 ([`elastic::docs_bulk_update()`](https://rfhb.github.io/elastic/reference/docs_bulk_update.html));
 a `plpgsql` function added when calling
 [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md),
-and a [`jqr::jqr()`](https://docs.ropensci.org/jqr/reference/jqr.html)
+and a [`jqr::jq()`](https://docs.ropensci.org/jqr/reference/jq.html)
 programme for CouchDB.
 
 ## Examples

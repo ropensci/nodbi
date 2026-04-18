@@ -58,7 +58,7 @@ Uses sofa as backend. nodbi creates or uses a CouchDB database with JSON
 documents. If documents do not have root-level `_id`'s, UUID's are
 created as `_id`'s. Function
 [`docdb_update()`](https://docs.ropensci.org/nodbi/reference/docdb_update.md)
-uses [`jqr::jqr()`](https://docs.ropensci.org/jqr/reference/jqr.html) to
+uses [`jqr::jq()`](https://docs.ropensci.org/jqr/reference/jq.html) to
 implement patching JSON. For a benchmark, see
 <https://github.com/ropensci/nodbi#benchmark>.
 

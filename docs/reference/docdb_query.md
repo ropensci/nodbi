@@ -1,7 +1,7 @@
 # Get documents or parts with filtering query
 
 Complements the databases' native query and filtering functions by using
-[`jqr::jqr()`](https://docs.ropensci.org/jqr/reference/jqr.html). If
+[`jqr::jq()`](https://docs.ropensci.org/jqr/reference/jq.html). If
 `query = "{}"` and neither `fields` nor `listfields` is specified, runs
 [`docdb_get()`](https://docs.ropensci.org/nodbi/reference/docdb_get.md).
 
