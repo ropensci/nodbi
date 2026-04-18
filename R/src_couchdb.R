@@ -19,7 +19,7 @@
 #' @details Uses \pkg{sofa} as backend. \pkg{nodbi} creates or uses
 #' a CouchDB database with JSON documents. If documents do not have
 #' root-level `_id`'s, UUID's are created as `_id`'s. Function
-#' [docdb_update()] uses [jqr::jqr()] to implement patching JSON.
+#' [docdb_update()] uses [jqr::jq()] to implement patching JSON.
 #' For a benchmark, see <https://github.com/ropensci/nodbi#benchmark>.
 #'
 #' @return A `nodbi` source object

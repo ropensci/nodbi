@@ -41,6 +41,9 @@ src_postgres <- function(dbname = "test",
                          port = 5432L,
                          ...) {
 
+  # check minimum version
+  pkgNeeded("RPostgres", "1.4.8")
+
   # open connection
   con <- try(DBI::dbConnect(
     drv = RPostgres::Postgres(),
@@ -49,9 +52,6 @@ src_postgres <- function(dbname = "test",
     port = port,
     ...),
     silent = TRUE)
-
-  # check minimum version
-  pkgNeeded("RPostgres", "1.4.8")
 
   # inform user on missing database
   if (inherits(con, "try-error")) {

@@ -17,7 +17,7 @@ database backend (corresponds to \code{collection} for MongoDB,
 a table name for DuckDB, SQLite and PostgreSQL)}
 
 \item{...}{Passed to functions \code{\link[DBI:dbListTables]{DBI::dbListTables()}},
-\code{\link[elastic:indices]{elastic::index_exists()}}, and \code{\link[sofa:db_info]{sofa::db_info()}}}
+\code{\link[elastic:index_exists]{elastic::index_exists()}}, and \code{\link[sofa:db_info]{sofa::db_info()}}}
 }
 \value{
 (logical) \code{TRUE} or \code{FALSE} to indicate

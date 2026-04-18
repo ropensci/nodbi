@@ -46,8 +46,8 @@ Suggests:
     knitr,
     rmarkdown,
     tibble
-RoxygenNote: 7.3.3
 X-schema.org-applicationCategory: Databases
 X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org
 VignetteBuilder: knitr
+Config/roxygen2/version: 7.3.3.9000
