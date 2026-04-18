@@ -19,6 +19,13 @@
 # to be able to handle jq's 'inputs' and flag "-n".
 jqFieldNames <- '[ path(..) | map(select(type == "string")) | join(".") ] | unique[] '
 
+# pagesize for jsonlite::stream_in()
+# used for n in readLines() and for
+# if (length(page) < pagesize) break
+# thus cannot set to NA or -1L
+# and thus has to be large value
+# note all results are in memory
+jlps <- getOption("jsonlite.pagesize", default = 10^8L)
 
 
 #' doc_wrap
