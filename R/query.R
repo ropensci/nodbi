@@ -1,7 +1,7 @@
 #' Get documents or parts with filtering query
 #'
 #' Complements the databases' native query and filtering functions
-#' by using [jqr::jqr()].
+#' by using [jqr::jq()].
 #' If \code{query = "{}"} and neither `fields`
 #' nor `listfields` is specified, runs [docdb_get()].
 #'
@@ -568,8 +568,9 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
         # selective export using find
         src$con$find(
           query = query, fields = '{}', limit = n,
-          handler = function(x) jsonlite::stream_out(x, con = con, verbose = FALSE),
-          pagesize = 100L)
+          handler = function(x) jsonlite::stream_out(
+            x, con = con, pagesize = jlps, verbose = FALSE),
+          pagesize = jlps)
 
       }
 
@@ -665,6 +666,7 @@ docdb_query.src_mongo <- function(src, key, query, ...) {
     processExcludeFields(
       jsonlite::stream_in(
         file(tfname),
+        pagesize = jlps,
         verbose = FALSE),
       fldQ$excludeFields)
   )
@@ -1471,6 +1473,7 @@ processDbGetQuery <- function(
         jsonlite::stream_in(
           textConnection(
             eval.parent(parse(text = getData))),
+          pagesize = jlps,
           verbose = FALSE))
 
   # use duckdb internal function
@@ -1534,6 +1537,7 @@ processDbGetQuery <- function(
           jsonlite::stream_in(
             textConnection(
               jqr::jq(file(tfname), jqrWhere)),
+            pagesize = jlps,
             verbose = FALSE))
 
     # get another file name
@@ -1600,6 +1604,7 @@ processDbGetQuery <- function(
       processExcludeFields(
         jsonlite::stream_in(
           file(tfname),
+          pagesize = jlps,
           verbose = FALSE),
         excludeFields)
     )
@@ -1787,7 +1792,9 @@ processIncludeFields <- function(
     )
 
     fieldsSingleton <- jsonlite::stream_in(
-      textConnection(fieldsSingleton), verbose = FALSE)
+      textConnection(fieldsSingleton),
+      pagesize = jlps,
+      verbose = FALSE)
 
     # important determination for type of simplification
     fieldsSingleton <- sapply(fieldsSingleton, function(i)
@@ -1816,6 +1823,7 @@ processIncludeFields <- function(
       jsonlite::stream_in(
         textConnection(
           jqr::jq(file(txname), jqFields)),
+        pagesize = jlps,
         verbose = FALSE))
 
     # write data for further processing
@@ -1832,8 +1840,10 @@ processIncludeFields <- function(
 
     # early return
     if (is.null(tjname)) return(
-      jsonlite::stream_in(file(txname),
-                          verbose = FALSE))
+      jsonlite::stream_in(
+        file(txname),
+        pagesize = jlps,
+        verbose = FALSE))
 
     # early exit
     if (file.size(txname) <= 2L) return(NULL)

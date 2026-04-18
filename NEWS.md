@@ -1,6 +1,7 @@
 # nodbi 0.14.0.9000
 
-* development version
+* provide user option `jsonlite.pagesize` for `jsonlite::stream_{in,out}()`
+* increase default value of `pagesize` for `jsonlite::stream_{in,out}()`
 
 # nodbi 0.14.0
 

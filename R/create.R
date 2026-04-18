@@ -608,7 +608,7 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       con = tfnameCon,
       verbose = FALSE,
       auto_unbox = TRUE,
-      pagesize = 5000L,
+      pagesize = jlps,
       digits = NA)
 
     close(tfnameCon)
@@ -624,7 +624,7 @@ items2ndjson <- function(df, mergeIdCol = FALSE) {
       con = tfnameCon,
       verbose = FALSE,
       auto_unbox = TRUE,
-      pagesize = 5000L,
+      pagesize = jlps,
       digits = NA)
 
     close(tfnameCon)
@@ -661,9 +661,15 @@ appendTable <- function(src, key, value, ...) {
         (isUrl(value) || isFile(value))) {
 
       if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), verbose = FALSE)
+        value <- jsonlite::stream_in(
+          con = file(value),
+          pagesize = jlps,
+          verbose = FALSE)
       } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), verbose = FALSE)
+        value <- jsonlite::stream_in(
+          con = url(value),
+          pagesize = jlps,
+          verbose = FALSE)
       }
 
     } else {
@@ -742,9 +748,17 @@ value2list <- function(value) {
         (isUrl(value) || isFile(value))) {
       # read ndjson file or url
       if (isFile(value)) {
-        value <- jsonlite::stream_in(con = file(value), simplifyVector = FALSE, verbose = FALSE)
+        value <- jsonlite::stream_in(
+          con = file(value),
+          simplifyVector = FALSE,
+          pagesize = jlps,
+          verbose = FALSE)
       } else if (isUrl(value)) {
-        value <- jsonlite::stream_in(con = url(value), simplifyVector = FALSE, verbose = FALSE)
+        value <- jsonlite::stream_in(
+          con = url(value),
+          simplifyVector = FALSE,
+          pagesize = jlps,
+          verbose = FALSE)
       }
     } else {
       # read json string

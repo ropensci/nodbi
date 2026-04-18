@@ -215,6 +215,9 @@ sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
   }
 
   # stream in ndjson records
-  return(jsonlite::stream_in(file(tfname), verbose = FALSE))
+  return(jsonlite::stream_in(
+    file(tfname),
+    pagesize = jlps,
+    verbose = FALSE))
 
 }

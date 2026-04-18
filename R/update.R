@@ -10,7 +10,7 @@
 #' SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`),
 #' Elasticsearch (`elastic::docs_bulk_update()`);
 #' a `plpgsql` function added when calling `src_postgres()`,
-#' and a [jqr::jqr()] programme for CouchDB.
+#' and a [jqr::jq()] programme for CouchDB.
 #'
 #' @inheritParams docdb_create
 #'
@@ -148,7 +148,8 @@ docdb_update.src_couchdb <- function(src, key, value, query, ...) {
   #
   ndjson <- NULL
   jsonlite::stream_out(input, con = textConnection(
-    object = "ndjson", open = "w", local = TRUE), verbose = FALSE, digits = NA)
+    object = "ndjson", open = "w", local = TRUE),
+    pagesize = jlps, verbose = FALSE, digits = NA)
 
   # temporary file and connection
   tfname <- tempfile()
@@ -228,13 +229,22 @@ docdb_update.src_elastic <- function(src, key, value, query, ...) {
   # json to data frame
   if (any(class(value) == "character")) {
     if (isFile(value)) {
-      value <- jsonlite::stream_in(file(value), verbose = FALSE)
+      value <- jsonlite::stream_in(
+        file(value),
+        pagesize = jlps,
+        verbose = FALSE)
     } else {
       if (isUrl(value)) {
-        value <- jsonlite::stream_in(url(value), verbose = FALSE)
+        value <- jsonlite::stream_in(
+          url(value),
+          pagesize = jlps,
+          verbose = FALSE)
       } else {
         if (length(value) == 1L) value <- jsonlite::minify(value)
-        value <- jsonlite::stream_in(textConnection(value), verbose = FALSE)
+        value <- jsonlite::stream_in(
+          textConnection(value),
+          pagesize = jlps,
+          verbose = FALSE)
       }
     }
   }
