@@ -141,3 +141,12 @@ skip_if_no_duckdb <- function() {
     skip("duckdb or its JSON extension is not available")
   }
 }
+
+skip_if_no_mariadb <- function() {
+  testthat::skip_if_not_installed("RMariaDB")
+  if (inherits(try(
+    RMariaDB::dbDisconnect(src_mariadb()$con, shutdown = TRUE),
+    silent = TRUE), "try-error")) {
+    skip("mariadb is not available")
+  }
+}

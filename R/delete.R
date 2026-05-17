@@ -150,6 +150,11 @@ docdb_delete.src_duckdb <- function(src, key, ...) {
   return(sqlDelete(src = src, key = key, ...))
 }
 
+#' @export
+docdb_delete.src_mariadb <- function(src, key, ...) {
+  return(sqlDelete(src = src, key = key, ...))
+}
+
 ## helpers --------------------------------------
 
 #' @keywords internal
@@ -173,6 +178,15 @@ sqlDelete <- function(src, key, ...) {
     statement <- paste0(
       "DELETE FROM \"", key, "\" WHERE _id IN (",
       paste0("'", tmpids, "'", collapse = ","), ");")
+
+    # adjust statement
+    if (inherits(src, "src_mariadb")) {
+
+      statement <- sub(
+        'FROM "(.+)" WHERE ',
+        'FROM `\\1` WHERE ',
+        statement)
+    }
 
     # do delete
     return(

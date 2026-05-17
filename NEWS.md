@@ -1,5 +1,6 @@
 # nodbi 0.14.0.9000
 
+* develop use of MariaDB
 * provide user option `jsonlite.pagesize` for `jsonlite::stream_{in,out}()`
 * increase default value of `pagesize` for `jsonlite::stream_{in,out}()`
 

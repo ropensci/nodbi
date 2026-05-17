@@ -3,7 +3,8 @@ Title: Document 'NoSQL' Database DBI Connector
 Description: R database connector for creating, reading (querying and listing 
      fields), updating and deleting of individual or many JSON documents, 
      providing a common API across supported databases ('SQLite', 'PostgreSQL', 
-     'DuckDB' and 'NoSQL' databases 'MongoDB', 'CouchDB' and 'Elasticsearch').
+     'DuckDB', 'MariaDB' or 'MySQL' as well as 'NoSQL' databases 'MongoDB', 
+     'CouchDB' and 'Elasticsearch').
 Version: 0.14.0.9000
 Authors@R: c(
     person("Ralf", "Herold", role = c("aut", "cre"),
@@ -37,6 +38,7 @@ Suggests:
     elastic (>= 1.2.0), 
     mongolite (>= 4.0.0),
     RSQLite (>= 2.4.0),
+    RMariaDB (>= 1.3.0),
     duckdb (>= 1.4.0),
     RPostgres (>= 1.4.8),
     testthat,
@@ -47,7 +49,7 @@ Suggests:
     rmarkdown,
     tibble
 X-schema.org-applicationCategory: Databases
-X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, DuckDB, NoSQL, JSON, documents
+X-schema.org-keywords: database, MongoDB, Elasticsearch, CouchDB, SQLite, PostgreSQL, MariaDB, MySQL, DuckDB, NoSQL, JSON, documents
 X-schema.org-isPartOf: https://ropensci.org
 VignetteBuilder: knitr
-Config/roxygen2/version: 7.3.3.9000
+Config/roxygen2/version: 8.0.0

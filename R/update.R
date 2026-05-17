@@ -8,6 +8,7 @@
 #'
 #' Uses native functions in MongoDB ([mongolite::mongo()]$update()),
 #' SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`),
+#' MariaDB (`json_merge_patch()`),
 #' Elasticsearch (`elastic::docs_bulk_update()`);
 #' a `plpgsql` function added when calling `src_postgres()`,
 #' and a [jqr::jq()] programme for CouchDB.
@@ -514,6 +515,7 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
       statement = statement
     )
 
+    # early exit
     return(result)
   }
 
@@ -582,6 +584,7 @@ docdb_update.src_postgres <- function(src, key, value, query, ...) {
       statement = statement
     )
 
+    # early exit
     return(result)
 
   }
@@ -620,10 +623,124 @@ docdb_update.src_duckdb <- function(src, key, value, query, ...) {
       statement = statement
     )
 
+    # early exit
     return(result)
   }
 
   # see https://duckdb.org/docs/extensions/json#json-creation-functions
+  updFunction <- "json_merge_patch"
+
+  return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
+
+}
+
+#' @export
+docdb_update.src_mariadb <- function(src, key, value, query, ...) {
+
+  # handle parameters
+  if (query == "") query <- "{}"
+  query <- jsonlite::minify(query)
+
+    # comments see create.R
+
+  ## check features
+  if (isFile(value) &&
+      (query == "{}")) {
+
+    # file must be located on the server host
+    info <- attr(src$con, "host")
+    canLoadFile <- grepl("localhost|127[.]0[.]0[.]1", info)
+
+    # must specify full path name to the file
+    value <- normalizePath(value)
+
+    # must be less bytes than max_allowed_packet system variable
+    fileMax <- DBI::dbGetQuery(
+      conn = src$con,
+      statement = "SELECT @@GLOBAL.max_allowed_packet;")
+
+    # value
+    filePath <- DBI::dbGetQuery(
+      conn = src$con,
+      statement = "SHOW VARIABLES LIKE 'secure_file_priv';")
+
+    # finalise
+    canLoadFile <- canLoadFile & ifelse(
+      file.size(value) <= fileMax[[1]], TRUE, FALSE) &
+      grepl(filePath$Value[1], value)
+
+    # inform user
+    if (!canLoadFile) message(
+      "Parameter 'value' specified a file path, ",
+      "but this cannot directly be loaded, ",
+      "converting it to data frame for loading.")
+
+  } else {
+
+    canLoadFile <- FALSE
+  }
+
+  ## chose load method
+  if (canLoadFile) {
+
+    # import into temporary table
+    tblName <- uuid::UUIDgenerate()
+    try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
+    on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
+
+    # create table
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0(
+        "CREATE TEMPORARY TABLE `", tblName, "`",
+        " (json JSON NOT NULL);"))
+
+    # temporarily changing SQL mode
+    DBI::dbExecute(src$con, "SET @@SQL_MODE = CONCAT(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES');")
+    on.exit(try(DBI::dbExecute(
+      src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');"),
+      silent = TRUE), add = TRUE)
+
+    # load from ndjson file
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0(
+        "LOAD DATA LOCAL INFILE '", value, "' ",
+        "INTO TABLE `", tblName, "` CHARACTER SET utf8 ",
+        "FIELDS TERMINATED BY '#$%' LINES TERMINATED BY '\n' ",
+        "(@ndjsonline) SET json = @ndjsonline;")
+    )
+
+    # reset SQL mode
+    DBI::dbExecute(src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');")
+
+    # update main table
+    # TODO
+    statement <- paste0(
+      'UPDATE `', key, '`
+      INNER JOIN (
+        SELECT
+          JSON_VALUE(json, \'$._id\') AS in_id,
+          JSON_REMOVE(json, \'$._id\') AS injson
+        FROM `', tblName, '`
+      ) AS ndjson
+      ON `', key, '`._id = ndjson.in_id
+      SET `', key, '` .json = JSON_MERGE_PATCH(`', key, '`.json, ndjson.injson);'
+    )
+
+    # do update
+    result <- DBI::dbExecute(
+      conn = src$con,
+      statement = statement
+    )
+
+    # early exit
+    return(result)
+
+  } # if canLoadFile
+
+  # SQL for patching, see
+  # https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions/json_merge_patch
   updFunction <- "json_merge_patch"
 
   return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))

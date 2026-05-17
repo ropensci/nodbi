@@ -57,3 +57,8 @@ docdb_exists.src_postgres <- function(src, key, ...) {
 docdb_exists.src_duckdb <- function(src, key, ...) {
   return(any(key == DBI::dbListTables(src$con, ...)))
 }
+
+#' @export
+docdb_exists.src_mariadb <- function(src, key, ...) {
+  return(any(key == RMariaDB::dbListTables(src$con, ...)))
+}

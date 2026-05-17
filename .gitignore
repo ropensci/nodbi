@@ -16,3 +16,4 @@ CRAN-SUBMISSION
 inst/doc
 PACKAGES*
 *.Rcheck
+.positai

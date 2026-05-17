@@ -18,8 +18,8 @@
 #' SQLite and PostgreSQL, or using DuckDB's built-in `uuid()`).
 #'
 #' @param src Source object, result of call to any of functions
-#' [src_mongo()], [src_sqlite()], [src_elastic()], [src_couchdb()]
-#' [src_duckdb()] or [src_postgres()]
+#' [src_mongo()], [src_sqlite()], [src_duckdb()], [src_postgres()],
+#' [src_mariadb()], [src_elastic()] or [src_couchdb()]
 #'
 #' @param key (character) The name of the container in the
 #' database backend (corresponds to `collection` for MongoDB,
@@ -291,7 +291,9 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
         !grepl(" already exists", out)) stop(out)
 
   } else {
+
     existsMessage(key)
+
   }
 
 
@@ -326,7 +328,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
       DBI::dbExecute(
         conn = src$con,
         statement = paste0(
-          "INSERT INTO \"", key, "\"",
+          "INSERT OR IGNORE INTO \"", key, "\"",
           " SELECT CASE WHEN length(json->>'$._id') > 0 THEN",
           " json->>'$._id' ELSE uuid() END AS _id,",
           " jsonb_patch(json, '{\"_id\": null}') AS json",
@@ -336,7 +338,7 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
   } else {
 
-    # regular import using DBI::dbAppendTable
+    # regular import using helper function
     result <- appendTable(src, key, value, ...)
 
   } # if file
@@ -384,7 +386,9 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
         !grepl(" already exists", out)) stop(out)
 
   } else {
+
     existsMessage(key)
+
   }
 
   ## localhost may be able to import from file,
@@ -432,12 +436,13 @@ docdb_create.src_postgres <- function(src, key, value, ...) {
           " json->>'_id' ELSE gen_random_uuid()::TEXT END AS _id,",
           " CASE WHEN length(json->>'_id') > 0 THEN",
           " jsonb_patch(json, '{\"_id\": null}') ELSE json END AS json",
-          " FROM \"", tblName, "\";")
+          " FROM \"", tblName, "\"",
+          " ON CONFLICT DO NOTHING;")
       ), silent = TRUE)
 
   } else {
 
-    # regular import using DBI::dbAppendTable
+    # regular import using helper function
     result <- appendTable(src, key, value, ...)
 
   } # if localhost and file and copyWorked
@@ -485,7 +490,9 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
         !grepl(" already exists", out)) stop(out)
 
   } else {
+
     existsMessage(key)
+
   }
 
   # https://duckdb.org/docs/api/r.html
@@ -504,7 +511,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
       DBI::dbExecute(
         conn = src$con,
         statement = paste0(
-          "INSERT INTO \"", key, "\"",
+          "INSERT OR IGNORE INTO \"", key, "\"",
           " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
           " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
           " json_merge_patch(json, '{\"_id\": null}') AS json ",
@@ -515,7 +522,7 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
   } else {
 
-    # regular import using DBI::dbAppendTable
+    # regular import using helper function
     result <- appendTable(src, key, value, ...)
 
   } # if
@@ -530,6 +537,160 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
     result <- 0L
   }
   return(result)
+
+}
+
+#' @export
+docdb_create.src_mariadb <- function(src, key, value, ...) {
+
+  # https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions
+  # https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions/jsonpath-expressions
+
+  # if table does not exist, create one
+  if (!docdb_exists(src, key, ...)) {
+
+    # standard for a nodbi json table in sqlite
+    # standard: columns _id and json
+    out <- try(
+      DBI::dbWithTransaction(
+        conn = src$con,
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0(
+              "CREATE TABLE `", key, "`",
+              " ( _id VARCHAR(200) PRIMARY KEY NOT NULL,",
+              # JSON is an alias for
+              # LONGTEXT COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`...`))
+              "  json JSON);"))
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0(
+              "CREATE UNIQUE INDEX ",
+              "`", key, "_index` ON ",
+              "`", key, "` ( _id );"))
+        }), silent = TRUE)
+
+    if (inherits(out, "try-error") &&
+        !grepl(" already exists", out)) stop(out)
+
+  } else {
+
+    existsMessage(key)
+
+  }
+
+
+  ## check features
+  if (isFile(value)) {
+
+    # file must be located on the server host
+    info <- attr(src$con, "host")
+    canLoadFile <- grepl("localhost|127[.]0[.]0[.]1", info)
+
+    # must specify full path name to the file
+    value <- normalizePath(value)
+
+    # must be less bytes than max_allowed_packet system variable
+    fileMax <- DBI::dbGetQuery(
+      conn = src$con,
+      statement = "SELECT @@GLOBAL.max_allowed_packet;")
+
+    # value
+    filePath <- DBI::dbGetQuery(
+      conn = src$con,
+      statement = "SHOW VARIABLES LIKE 'secure_file_priv';")
+
+    # finalise
+    canLoadFile <- canLoadFile & ifelse(
+      file.size(value) <= fileMax[[1]], TRUE, FALSE) &
+      grepl(filePath$Value[1], value)
+
+    # inform user
+    if (!canLoadFile) message(
+      "Parameter 'value' specified a file path, ",
+      "but this cannot directly be loaded, ",
+      "converting it to data frame for loading.")
+
+  } else {
+
+    canLoadFile <- FALSE
+  }
+
+  ## chose load method
+  tmpTblLoaded <- NA
+  if (canLoadFile) {
+
+    # import into temporary table
+    tblName <- uuid::UUIDgenerate()
+    try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE)
+    on.exit(try(DBI::dbRemoveTable(src$con, tblName), silent = TRUE), add = TRUE)
+
+    # create table
+    DBI::dbExecute(
+      conn = src$con,
+      statement = paste0(
+        "CREATE TEMPORARY TABLE `", tblName, "`",
+        " (json JSON NOT NULL);"))
+
+    # client attempts to read the input file from its file system,
+    # and it sends the contents of the input file to the MariaDB
+    # Server. This allows you to load files from the client's local
+    # file system into the database.
+
+    # issue that prevents loading certain lines:
+    # escaped quotation marks such as {"a":"one\", two"}
+    # thus, temporarily changing SQL mode
+    DBI::dbExecute(src$con, "SET @@SQL_MODE = CONCAT(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES');")
+    on.exit(try(DBI::dbExecute(
+      src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');"),
+      silent = TRUE), add = TRUE)
+
+    # load from ndjson file
+    tmpTblLoaded <- DBI::dbExecute(
+      conn = src$con,
+      statement = paste0(
+        "LOAD DATA LOCAL INFILE '", value, "' ",
+        "INTO TABLE `", tblName, "` CHARACTER SET utf8 ",
+        "FIELDS TERMINATED BY '#$%' LINES TERMINATED BY '\n' ",
+        "(@ndjsonline) SET json = @ndjsonline;")
+    )
+
+    # reset SQL mode
+    DBI::dbExecute(src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');")
+
+    # copy into main table, result is
+    # number of newly added records
+    result <- try(
+      DBI::dbExecute(
+        conn = src$con,
+        statement = paste0(
+          "INSERT IGNORE INTO `", key, "`",
+          " SELECT CASE WHEN LENGTH(JSON_VALUE(json, '$._id')) > 0 THEN",
+          " JSON_VALUE(json, '$._id') ELSE UUID_SHORT() END AS _id,",
+          " JSON_REMOVE(json, '$._id') AS json",
+          " FROM `", tblName, "`;")
+      ), silent = TRUE)
+
+  } else {
+
+    # regular import using helper function
+    result <- appendTable(src, key, value, ...)
+
+  } # if file
+
+
+  # prepare returns
+  if (inherits(result, "try-error") ||
+      (!is.na(tmpTblLoaded) & (result < tmpTblLoaded))) {
+    error <- trimws(sub(".+: (.*?):.+", "\\1", result[[1]]))
+    if (error == "0") error <- "possibly duplicate _id's"
+    warning(
+      "Could not create some documents, reason: ",
+      unique(error), call. = FALSE, immediate. = TRUE)
+    result <- 0L
+  }
+  return(sum(result))
 
 }
 
@@ -556,6 +717,9 @@ isUrl <- function(x) {
 
 #' @keywords internal
 #' @noRd
+#'
+#' @importFrom R.utils countLines
+#'
 isFile <- function(x) {
 
   # check if x is the name of a readable file
@@ -564,7 +728,8 @@ isFile <- function(x) {
       !is.atomic(x) ||
       !inherits(x, "character")) return(FALSE)
 
-  if (!file.exists(x)) return(FALSE)
+  if (!file.exists(x) ||
+      file.info(x)$isdir) return(FALSE)
 
   out <- try(
     suppressWarnings(
@@ -572,6 +737,9 @@ isFile <- function(x) {
     silent = TRUE)
 
   if (inherits(out, "try-error") || !out) return(FALSE)
+
+  if (options()[["verbose"]]) message(
+    "NDJSON # lines: ", R.utils::countLines(x))
 
   return(file.size(x) > 5L)
 

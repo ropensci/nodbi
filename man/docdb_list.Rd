@@ -8,8 +8,8 @@ docdb_list(src, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
-\code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_duckdb]{src_duckdb()}}, \code{\link[=src_postgres]{src_postgres()}},
+\code{\link[=src_mariadb]{src_mariadb()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
 
 \item{...}{Passed to function \code{\link[DBI:dbListTables]{DBI::dbListTables()}}}
 }

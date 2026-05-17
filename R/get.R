@@ -147,6 +147,13 @@ docdb_get.src_duckdb <- function(src, key, limit = NULL, ...) {
   return(sqlGet(src = src, key = key, limit = limit, getFunction = getFunction, ...))
 }
 
+#' @export
+docdb_get.src_mariadb <- function(src, key, limit = NULL, ...) {
+
+  getFunction <- "json"
+  return(sqlGet(src = src, key = key, limit = limit, getFunction = getFunction, ...))
+}
+
 ## helpers --------------------------------------
 
 #' @keywords internal
@@ -160,21 +167,34 @@ sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
   n <- -1L
   if (!is.null(limit)) n <- limit
 
-  # compose query statment
+  # temporary file for streaming
+  tfname <- tempfile()
+  tfnameCon <- file(description = tfname, open = "wt")
+  # register to remove file after used for streaming
+  on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
+  on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+
+  # generic query statement
   statement <- paste0(
-    "SELECT '{\"_id\": \"' || _id || '\", ' || LTRIM(", getFunction, ", '{') ",
+    "SELECT '{\"_id\":\"' || _id || '\", ' || LTRIM(", getFunction, ", '{') ",
     "AS json FROM \"", key, "\" WHERE json != '{}' ",
     # canonical sorting in nodbi
     "ORDER BY _id ASC;")
 
+  # compose specific query statement
+  if (inherits(src, "src_mariadb")) {
+
+    statement <- paste0(
+      "SELECT CONCAT('{\"_id\":\"', _id, '\",',
+      TRIM(LEADING '{' FROM ", getFunction, ")) ",
+      "AS json FROM `", key, "` WHERE json != '{}' ",
+      "ORDER BY _id ASC;")
+  }
+
   # use duckdb internal function
   if (inherits(src, "src_duckdb")) {
 
-    # temporary file for streaming
-    tfname <- tempfile()
-    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
-
-    # modify statement to export as file
+    # modify query statement to include export as file
     statement <- paste0(
       "COPY (", sub(";$", "", statement),
       ifelse(n == -1L, "", paste0(" LIMIT ", n)),
@@ -186,14 +206,9 @@ sqlGet <- function(src, key, limit = NULL, getFunction, ...) {
       conn = src$con,
       statement = statement)
 
-  } else {
+  }
 
-    # temporary file for streaming
-    tfname <- tempfile()
-    tfnameCon <- file(description = tfname, open = "wt")
-    # register to remove file after used for streaming
-    on.exit(try(close(tfnameCon), silent = TRUE), add = TRUE)
-    on.exit(try(unlink(tfname), silent = TRUE), add = TRUE)
+  if (!inherits(src, "src_duckdb")) {
 
     # get data, write to file in ndjson format
     writeLines(

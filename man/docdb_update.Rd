@@ -8,8 +8,8 @@ docdb_update(src, key, value, query, ...)
 }
 \arguments{
 \item{src}{Source object, result of call to any of functions
-\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_elastic]{src_elastic()}}, \code{\link[=src_couchdb]{src_couchdb()}}
-\code{\link[=src_duckdb]{src_duckdb()}} or \code{\link[=src_postgres]{src_postgres()}}}
+\code{\link[=src_mongo]{src_mongo()}}, \code{\link[=src_sqlite]{src_sqlite()}}, \code{\link[=src_duckdb]{src_duckdb()}}, \code{\link[=src_postgres]{src_postgres()}},
+\code{\link[=src_mariadb]{src_mariadb()}}, \code{\link[=src_elastic]{src_elastic()}} or \code{\link[=src_couchdb]{src_couchdb()}}}
 
 \item{key}{(character) The name of the container in the
 database backend (corresponds to \code{collection} for MongoDB,
@@ -42,6 +42,7 @@ precedence. \code{value} can have multiple documents (with
 \details{
 Uses native functions in MongoDB (\code{\link[mongolite:mongo]{mongolite::mongo()}}$update()),
 SQLite (\code{jsonb_update()}), DuckDB (\code{jsonb_merge_patch()}),
+MariaDB (\code{json_merge_patch()}),
 Elasticsearch (\code{elastic::docs_bulk_update()});
 a \code{plpgsql} function added when calling \code{src_postgres()},
 and a \code{\link[jqr:jq]{jqr::jq()}} programme for CouchDB.

@@ -67,3 +67,8 @@ docdb_list.src_postgres <- function(src, ...) {
 docdb_list.src_duckdb <- function(src, ...) {
   return(DBI::dbListTables(src$con, ...))
 }
+
+#' @export
+docdb_list.src_mariadb <- function(src, ...) {
+  return(DBI::dbListTables(src$con, ...))
+}
