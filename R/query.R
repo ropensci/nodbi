@@ -1557,7 +1557,7 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
       # complicated handling as mariadb JSON_EXTRACT always returns array
       # but is needed since JSON_VALUE does not return 1-element arrays
       fldQ$queryCondition <- gsub(
-        paste0("(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
+        paste0("(?<![.])(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
         # compose conditional statement
         paste0(
           '(CASE JSON_TYPE(JSON_EXTRACT(`/** key **/`.json, \'$."',
@@ -1570,8 +1570,10 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
           'THEN JSON_EXTRACT(`/** key **/`.json, \'$."', gsub('"[.]"', '"**."', i), '"\') ',
           'ELSE JSON_VALUE(`/** key **/`.json, \'$."', i, '"\') ',
           "END) ",
-          "\\2  \\3"),
-        fldQ$queryCondition
+          "\\2\\3"
+        ),
+        fldQ$queryCondition,
+        perl = TRUE
       )
 
       # special handling of IN

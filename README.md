@@ -13,7 +13,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2026-02-21.
+updated 2026-06-17.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 |:---|:---|:---|
@@ -23,12 +23,15 @@ updated 2026-02-21.
 | DuckDB | file name of NDJSON records | Query |
 | Elasticsearch | URL of NDJSON records | Update |
 | CouchDB |  | Delete |
+| (MariaDB\*) |  |  |
 
 For speed comparisons of database backends, see [benchmark](#benchmark)
-and [testing](#testing) below.
-
-Plans for developing package `nodbi` in 2026 include to add MariaDB and
-MySQL as database backends.
+and [testing](#testing) below. \*MariaDB is largely supported but some
+complex queries and updates do not work and some return values are
+dissimilar to other database backends (e.g., returned in a quoted
+array), see the working [walk-through](#walk-through) below. While 104
+unit tests succeed, 24 fail; it is not yet clear if these issues can be
+resolved.
 
 ## API overview
 
@@ -200,6 +203,7 @@ src <- src_couchdb(
   user = Sys.getenv("COUCHDB_TEST_USER"),
   pwd = Sys.getenv("COUCHDB_TEST_PWD")
 )
+src <- src_mariadb()
 
 # check if container already exists
 docdb_exists(src, key)

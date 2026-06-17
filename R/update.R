@@ -741,7 +741,7 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
 
   # SQL for patching, see
   # https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions/json_merge_patch
-  updFunction <- "json_merge_patch"
+  updFunction <- "JSON_MERGE_PATCH"
 
   return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
 
@@ -828,7 +828,12 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
 
     # compose statement
     statement <- paste0(
-      'UPDATE "', key, '" SET json = ', updFunction, '(json,\'',
+      'UPDATE ', ifelse(
+        # special handing MariaDB
+        inherits(src, "src_mariadb"),
+        paste0('`', key, '`'),
+        paste0('"', key, '"')
+      ), ' SET json = ', updFunction, '(json,\'',
       value[i], '\') WHERE _id IN (\'', ids[i], '\');'
     )
 
