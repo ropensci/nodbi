@@ -651,15 +651,15 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
     info <- attr(src$con, "host")
     canLoadFile <- grepl("localhost|127[.]0[.]0[.]1", info)
 
-    # must specify full path name to the file
+    # file must have full path name
     value <- normalizePath(value)
 
-    # must be less bytes than max_allowed_packet system variable
+    # file must be smaller than max_allowed_packet
     fileMax <- DBI::dbGetQuery(
       conn = src$con,
       statement = "SELECT @@GLOBAL.max_allowed_packet;")
 
-    # value
+    # file path must be in secure_file_priv
     filePath <- DBI::dbGetQuery(
       conn = src$con,
       statement = "SHOW VARIABLES LIKE 'secure_file_priv';")
@@ -671,8 +671,8 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
 
     # inform user
     if (!canLoadFile) message(
-      "Parameter 'value' specified a file path, ",
-      "but this cannot directly be loaded, ",
+      "Parameter 'value' specified a file, ",
+      "but the file cannot directly be loaded, ",
       "converting it to data frame for loading.")
 
   } else {
@@ -695,7 +695,7 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
         "CREATE TEMPORARY TABLE `", tblName, "`",
         " (json JSON NOT NULL);"))
 
-    # temporarily changing SQL mode
+    # temporarily change SQL mode
     DBI::dbExecute(src$con, "SET @@SQL_MODE = CONCAT(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES');")
     on.exit(try(DBI::dbExecute(
       src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');"),
@@ -711,7 +711,7 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
         "(@ndjsonline) SET json = @ndjsonline;")
     )
 
-    # reset SQL mode
+    # reset SQL mode now
     DBI::dbExecute(src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');")
 
     # update main table

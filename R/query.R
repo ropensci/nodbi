@@ -782,7 +782,7 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
   }
 
 
-  # - fields in SQL query to reduce rows sent into jq
+  # - put fields in SQL query to reduce rows sent into jq
   fldQ$jsonWhere <- "TRUE"
   if (length(tmpFields)) {
 
@@ -1443,7 +1443,7 @@ docdb_query.src_duckdb <- function(src, key, query, ...) {
 
 
 #' @export
-docdb_query.src_mariadb <- function(src, key, query, ...) {
+docdb_query.src_mariadbOLD <- function(src, key, query, ...) {
 
   # handle parameters
   if (query == "") query <- "{}"
@@ -1554,49 +1554,49 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
   # - transform query to use relevant json function
   for (i in fldQ$queryPaths[fldQ$queryPaths != "_id"]) {
 
-      # complicated handling as mariadb JSON_EXTRACT always returns array
-      # but is needed since JSON_VALUE does not return 1-element arrays
-      fldQ$queryCondition <- gsub(
-        paste0("(?<![.])(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
-        # compose conditional statement
-        paste0(
-          '(CASE JSON_TYPE(JSON_EXTRACT(`/** key **/`.json, \'$."',
-          gsub(
-            '"."', '"**."',
-            # remove last path element
-            sub('^(.+)"[.]".+?$', "\\1", i)
-          ), '"\')) ',
-          "WHEN 'ARRAY' ",
-          'THEN JSON_EXTRACT(`/** key **/`.json, \'$."', gsub('"[.]"', '"**."', i), '"\') ',
-          'ELSE JSON_VALUE(`/** key **/`.json, \'$."', i, '"\') ',
-          "END) ",
-          "\\2\\3"
-        ),
-        fldQ$queryCondition,
-        perl = TRUE
+    # complicated handling as mariadb JSON_EXTRACT always returns array
+    # but is needed since JSON_VALUE does not return 1-element arrays
+    fldQ$queryCondition <- gsub(
+      paste0("(?<![.])(\"", i, "\") ([INOTREGXP=!<>']+ .+?)( AND | NOT | OR |\\)*$)"),
+      # compose conditional statement
+      paste0(
+        '(CASE JSON_TYPE(JSON_EXTRACT(`/** key **/`.json, \'$."',
+        gsub(
+          '"."', '"**."',
+          # remove last path element
+          sub('^(.+)"[.]".+?$', "\\1", i)
+        ), '"\')) ',
+        "WHEN 'ARRAY' ",
+        'THEN JSON_EXTRACT(`/** key **/`.json, \'$."', gsub('"[.]"', '"**."', i), '"\') ',
+        'ELSE JSON_VALUE(`/** key **/`.json, \'$."', i, '"\') ',
+        "END) ",
+        "\\2\\3"
+      ),
+      fldQ$queryCondition,
+      perl = TRUE
+    )
+
+    # special handling of IN
+    ins <- stringi::stri_extract_all_regex(
+      fldQ$queryCondition, paste0("'\\$.\"", i, "\"'\\) END\\) IN \\((.+?)\\)"))[[1]]
+
+    if (!is.na(ins)) {
+
+      isString <- grepl("\\('", ins) # "5, 4" or "'a ,b', 'd, f'"
+      ii <- stringi::stri_replace_all_regex(ins, "(.+?) IN \\((.+?)\\)", "$2")
+      ix <- stringi::stri_replace_all_regex(ins, "(.+?) IN \\((.+?)\\)", "$1")
+      ii <- trimws(ii)
+      ii <- stringi::stri_split_regex(ii, ifelse(isString, "', ", ", "))[[1]]
+      ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "") # start or end delimiters
+      # strings to be compared at their full length, because IN is about full elements
+      if (any(is.na(suppressWarnings(as.numeric(ii))))) ii <- paste0('(\\["|,"|^)', ii, '(",|"\\]|$)')
+
+      ii <- paste0(ix, " REGEXP '", paste0("(", ii, ")", collapse = "|"), "'")
+
+      fldQ$queryCondition <- stringi::stri_replace_all_fixed(
+        fldQ$queryCondition, ins, ii, vectorize_all = TRUE
       )
-
-      # special handling of IN
-      ins <- stringi::stri_extract_all_regex(
-        fldQ$queryCondition, paste0("'\\$.\"", i, "\"'\\) END\\) IN \\((.+?)\\)"))[[1]]
-
-      if (!is.na(ins)) {
-
-        isString <- grepl("\\('", ins) # "5, 4" or "'a ,b', 'd, f'"
-        ii <- stringi::stri_replace_all_regex(ins, "(.+?) IN \\((.+?)\\)", "$2")
-        ix <- stringi::stri_replace_all_regex(ins, "(.+?) IN \\((.+?)\\)", "$1")
-        ii <- trimws(ii)
-        ii <- stringi::stri_split_regex(ii, ifelse(isString, "', ", ", "))[[1]]
-        ii <- stringi::stri_replace_all_regex(ii, "^'|'$", "") # start or end delimiters
-        # strings to be compared at their full length, because IN is about full elements
-        if (any(is.na(suppressWarnings(as.numeric(ii))))) ii <- paste0('(\\["|,"|^)', ii, '(",|"\\]|$)')
-
-        ii <- paste0(ix, " REGEXP '", paste0("(", ii, ")", collapse = "|"), "'")
-
-        fldQ$queryCondition <- stringi::stri_replace_all_fixed(
-          fldQ$queryCondition, ins, ii, vectorize_all = TRUE
-        )
-      }
+    }
 
   }
 
@@ -1672,6 +1672,288 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
   return(processDbGetQuery(
     getData = 'paste0(DBI::dbGetQuery(conn = src$con,
                statement = statement, n = n)[["json"]], "")',
+    excludeFields = fldQ$excludeFields
+  ))
+
+}
+
+#' @export
+docdb_query.src_mariadb <- function(src, key, query, ...) {
+
+  # handle parameters
+  if (query == "") query <- "{}"
+  query <- jsonlite::minify(query)
+  params <- list(...)
+  n <- -1L
+  if (!is.null(params$limit)) n <- params$limit
+
+  # digest and mangle
+  fldQ <- digestFields(f = params$fields, q = query)
+
+  # - - - - - - - - -
+
+  # early return if only _id is requested
+  if (query == "{}" &&
+      length(fldQ$includeFields) == 1L &&
+      fldQ$includeFields == "_id") {
+
+    statement <- paste0(
+      "SELECT DISTINCT _id ",
+      "FROM `", key, "` GROUP BY _id;")
+
+    return(DBI::dbGetQuery(
+      conn = src$con,
+      n = n, statement = statement))
+
+  }
+
+  # - - - - - - - - -
+
+  # fields
+
+  # - select extracts or full json
+  if (length(fldQ$includeFields)) {
+
+    # handling that mariadb JSON_EXTRACT always returns array, but
+    # is needed since JSON_VALUE does not return 1-element arrays
+
+    # # TODO
+    # fldQ$selectFields <- gsub('[.]', '"."', c(
+    #   fldQ$includeFields, fldQ$queryFields))
+    origFields <- unique(c(fldQ$includeFields, fldQ$queryFields))
+    origFields <- origFields["_id" != origFields]
+    fldQ$selectFields <- gsub('[.]', '"."', origFields)
+
+    for (i in seq_along(fldQ$selectFields)) {
+
+      # TODO
+      # # do not mangle _id
+      # if (fldQ$selectFields[i] == "_id") next
+
+      # TODO
+      # compose
+      # fldQ$selectFields[i] <- paste0(
+      #   '(CASE JSON_TYPE(JSON_EXTRACT(`/** key **/`.json, \'$."',
+      #   gsub('"."', '"**."', sub('^(.+)"[.]".+?$', "\\1", fldQ$selectFields[i])), '"\')) ',
+      #   "WHEN 'ARRAY' ",
+      #   'THEN JSON_EXTRACT(`/** key **/`.json, \'$."', gsub('"[.]"', '"**."', fldQ$selectFields[i]), '"\') ',
+      #   'ELSE JSON_VALUE(`/** key **/`.json, \'$."', fldQ$selectFields[i], '"\') ',
+      #   "END) ")
+
+      # compose
+      # fldQ$selectFields[i] <- paste0(
+      #   'JSON_EXTRACT(`/** key **/`.json, \'$."', gsub('"[.]"', '"**."', fldQ$selectFields[i]), '"\')')
+
+      # compose
+      fldQ$selectFields[i] <- paste0(
+        '(CASE WHEN JSON_EXISTS(`/** key **/`.json, \'$."',
+        gsub('[.]', '[0].', fldQ$selectFields[i]), '"\') ',
+        'THEN JSON_EXTRACT(`/** key **/`.json, \'$."', gsub('"[.]"', '"**."', fldQ$selectFields[i]), '"\') ',
+        "ELSE 'null' END) ")
+
+      # # compose
+      # fldQ$selectFields[i] <- paste0(
+      #   'ExtractJsonWithParents(`/** key **/`.json, \'$.',
+      #   fldQ$selectFields[i], "')")
+    }
+
+    # construct json output
+
+    # TODO
+    # fldQ$composeJson <- paste0(
+    #   unique(sprintf(
+    #     "'%s', %s",
+    #     c(fldQ$includeFields, fldQ$queryFields),
+    #     fldQ$selectFields)),
+    #   collapse = ", ")
+    #
+    # if (!any("_id" == fldQ$excludeFields) &&
+    #     !any("_id" == fldQ$includeFields)) fldQ$composeJson <- paste0(
+    #       "'_id', _id, ", fldQ$composeJson)
+    #
+    # fldQ$composeJson <- paste0(
+    #   'JSON_OBJECT(', fldQ$composeJson, ')')
+
+    # TODO
+    # fldQ$composeJson <- paste0(
+    #   unique(sprintf(
+    #     "'\"%s\":', %s",
+    #     c(fldQ$includeFields, fldQ$queryFields),
+    #     fldQ$selectFields)),
+    #   collapse = ", ")
+
+    # TODO
+    # wrap in path components to make jqr work
+    for (i in seq_along(origFields)) {
+      pathParts <- strsplit(origFields[i], ".", fixed = TRUE)[[1]]
+      origFields[i] <- paste0(
+        "'",
+        paste0('{"', pathParts, '": ', collapse = ""),
+        "', ",
+        fldQ$selectFields[i],
+        ", '",
+        paste0(rep("}", length(pathParts)), collapse = ""),
+        "'"
+      )
+    }
+    # remove outermost brackets
+    origFields <- sub("'\\{(.+)\\}'", "'\\1'", origFields)
+    fldQ$composeJson <- paste0(origFields, collapse = ", ', ', ")
+
+
+    # TODO
+    # if (!any("_id" == fldQ$excludeFields) &&
+    #     !any("_id" == fldQ$includeFields)) fldQ$composeJson <- paste0(
+    #       "'_id', _id, ", fldQ$composeJson)
+
+    if ((!any("_id" == fldQ$excludeFields) &&
+         !any("_id" == fldQ$includeFields)) ||
+        any("_id" == fldQ$queryFields) ||
+        any("_id" == fldQ$includeFields)) fldQ$composeJson <- paste0(
+          "'\"_id\": \"', _id, '\"'",
+          ifelse(fldQ$composeJson == "", "", ", ', ', "),
+          fldQ$composeJson
+        )
+
+    fldQ$composeJson <- paste0(
+      "CONCAT('{', ", fldQ$composeJson, ", '}')")
+
+  } else {
+
+    fldQ$composeJson <-
+      "CONCAT('{\"_id\": \"', _id, '\", ', TRIM(LEADING '{' FROM json))"
+
+  }
+
+  # - put fields in SQL query to reduce rows sent into jq
+  fldQ$jsonWhere <- "TRUE"
+  fldQ$jsonWhere <- paste0(
+    sprintf("JSON_EXISTS(`/** key **/`.json, '$.\"%s\"')",
+            gsub('[.]', '"[0]."', unique(c(
+              fldQ$includeFields[fldQ$includeFields != "_id"],
+              fldQ$queryFields[fldQ$queryFields != "_id"]
+            )))),
+    collapse = " OR ")
+  if (fldQ$jsonWhere == "") fldQ$jsonWhere <- "TRUE"
+
+  # - - - - - - - - -
+
+  # - if query needs jqr, which for src_mariadb is
+  #   whenever there is a query specified by the
+  #   user, at any level of depth in the json structure,
+  #   since queries cannot sufficiently be translated
+  #   with SQ and JSON functions in MariaDB 12.
+  fldQ$jqrWhere <- character(0L)
+  if (length(fldQ$queryCondition)) fldQ$jqrWhere <- fldQ$queryJq
+  # special case: if no query and only includeFields, no need for jq
+  if (!length(fldQ$queryCondition) &&
+      !length(fldQ$excludeFields)) fldQ$includeFields <- character(0L)
+  # special case: jq needed, _id not in excludeFields,
+  # thus _id needs to be in includeFields
+  if (length(fldQ$queryCondition) &&
+      length(fldQ$includeFields) &&
+      length(fldQ$excludeFields) &&
+      !any("_id" == fldQ$includeFields) &&
+      !any("_id" == fldQ$excludeFields)) fldQ$includeFields <- c(
+        "_id", fldQ$includeFields)
+
+  # statement
+  statement <- insObj('
+      SELECT /** fldQ$composeJson **/
+      AS json FROM `/** key **/`
+      WHERE /** fldQ$jsonWhere **/
+      ;')
+
+  # - - - - - - - - -
+
+  # early return if listfields
+  if (!is.null(params$listfields)) {
+
+    # if (length(fldQ$jqrWhere)) {
+
+    # jq function to obtain dot paths
+    fldQ$jqrWhere <- paste0(
+      ifelse(
+        length(fldQ$jqrWhere),
+        fldQ$jqrWhere,
+        "."),
+      " | ", jqFieldNames)
+
+    # process
+    fields <- unique(processDbGetQuery(
+      getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+                   statement = statement, n = n)[["json"]], "")',
+      jqrWhere = fldQ$jqrWhere)[["out"]])
+
+    # TODO
+    # } else {
+    #
+    #   # parameter use
+    #   limit <- ""
+    #   if (n != -1L) limit <- paste0("LIMIT ", n)
+    #
+    #   # statement
+    #   statement <- insObj("
+    #     WITH RECURSIVE json_keys AS (
+    #     ( SELECT
+    #          _id,
+    #          CAST('$' AS VARCHAR(16383)) AS key_path,
+    #          j.key_name AS extracted_key,
+    #          JSON_EXTRACT(json, CONCAT('$.', j.key_name)) AS sub_json
+    #      FROM
+    #          `/** key **/`,
+    #          JSON_TABLE(
+    #              JSON_KEYS(json),
+    #              '$[*]' COLUMNS (key_name VARCHAR(16383) PATH '$')
+    #          ) AS j
+    #      /** limit **/
+    #     )
+    #     UNION ALL
+    #     SELECT
+    #         e._id,
+    #         CAST(CONCAT(e.key_path, '.', e.extracted_key) AS VARCHAR(16383)) AS key_path,
+    #         j.key_name AS extracted_key,
+    #         JSON_EXTRACT(e.sub_json, CONCAT('$.', j.key_name)) AS sub_json
+    #     FROM
+    #         json_keys e,
+    #         JSON_TABLE(
+    #             JSON_KEYS(e.sub_json),
+    #             '$[*]' COLUMNS (key_name VARCHAR(16383) PATH '$')
+    #         ) AS j
+    #     WHERE JSON_TYPE(e.sub_json) = 'OBJECT')
+    #     SELECT DISTINCT TRIM(LEADING '$.' FROM CONCAT(key_path, '.', extracted_key)) AS `key`
+    #     FROM json_keys
+    #     ORDER BY `key`;")
+    #
+    #   # debug
+    #   if (options()[["verbose"]]) {
+    #     message("\nSQL: ", statement)
+    #   }
+    #
+    #   # get all keys
+    #   fields <- DBI::dbGetQuery(
+    #     conn = src$con,
+    #     statement = statement,
+    #     n = -1L)[["key"]]
+    #
+    # }
+
+    # finalise
+    fields <- unique(fields[fields != "" & fields != "_id"])
+
+    # return field names
+    return(sort(fields))
+
+  }
+
+  # - - - - - - - - -
+
+  # regular processing
+  return(processDbGetQuery(
+    getData = 'paste0(DBI::dbGetQuery(conn = src$con,
+               statement = statement, n = n)[["json"]], "")',
+    jqrWhere = fldQ$jqrWhere,
+    includeFields = fldQ$includeFields,
     excludeFields = fldQ$excludeFields
   ))
 

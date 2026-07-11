@@ -22,7 +22,7 @@ LazyData: true
 URL: https://docs.ropensci.org/nodbi/, https://github.com/ropensci/nodbi
 BugReports: https://github.com/ropensci/nodbi/issues
 Roxygen: list(markdown = TRUE)
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.0.0)
 Encoding: UTF-8
 Language: en-US
 Imports:
