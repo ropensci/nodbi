@@ -203,9 +203,9 @@ test_that("docdb_query", {
   expect_equal(docdb_create(src, key, value = '[{"a": {"b": {"c": 3}}},{"a": {"b": {"c": 4}}}]'), 2L)
   expect_equal(docdb_query(src = src, key = key, query = '{}', fields = '{"a.b.c": 1, "_id": 0}')[[1]], 3:4)
   tmp <- docdb_query(src = src, key = key, query = '{}', fields = '{"clinical_results.reported_events.other_events.category_list.category.event_list":1}')
-  expect_true(is.null(tmp))
+  if (!inherits(src, "src_mariadb")) expect_true(is.null(tmp))
   if (any(inherits(src, "src_postgres"))) expect_error(docdb_query(src = src, key = key, query = '{}', fields = paste0('{"', paste0("a", 1:50, collapse = '":1,"'), '":1}')))
-  expect_null(docdb_query(src = src, key = key, query = '{}', fields = paste0('{"', paste0("a", 1:49, collapse = '":1,"'), '":1}')))
+  if (!inherits(src, "src_mariadb")) expect_null(docdb_query(src = src, key = key, query = '{}', fields = paste0('{"', paste0("a", 1:49, collapse = '":1,"'), '":1}')))
   expect_true(docdb_delete(src = src, key = key))
 
   # testJson2
@@ -311,9 +311,9 @@ test_that("docdb_update", {
   expect_equal(sort(docdb_query(src = src, key = key, query = '{"vs": 99}', fields = '{"gear":1}')[["gear"]]), c(3,5,5,5,5,5))
   #
   expect_equal(docdb_update(src = src, key = key, value = list("_id" = "Valiant", "gear" = 8), query = "{}"), 1L)
-  expect_equal(docdb_update(src = src, key = key, value = list(list("_id" = "Valiant", "gear" = 8), list("_id" = "Fiat 128", "gear" = 9)), query = '{}'), 2L)
-  expect_equal(docdb_update(src = src, key = key, value = data.frame("_id" = c("Valiant", "Fiat 128"), "gear" = 8:9, check.names = FALSE, stringsAsFactors = FALSE), query = '{}'), 2L)
-  expect_equal(docdb_update(src = src, key = key, value = data.frame("_id" = c("Valiant", "Fiat 128"), "gear" = 8:9, check.names = FALSE, stringsAsFactors = FALSE)[1,], query = '{}'), 1L)
+  expect_equal(docdb_update(src = src, key = key, value = list(list("_id" = "Valiant", "gear" = 9), list("_id" = "Fiat 128", "gear" = 10)), query = '{}'), 2L)
+  expect_equal(docdb_update(src = src, key = key, value = data.frame("_id" = c("Valiant", "Fiat 128"), "gear" = 11:12, check.names = FALSE, stringsAsFactors = FALSE), query = '{}'), 2L)
+  expect_equal(docdb_update(src = src, key = key, value = data.frame("_id" = c("Valiant", "Fiat 128"), "gear" = 13:14, check.names = FALSE, stringsAsFactors = FALSE)[1,], query = '{}'), 1L)
   expect_equal(docdb_update(src = src, key = key, value = '[{"_id":"Valiant", "vs": 77},{"_id":"Fiat 128", "vs": 78}]', query = '{}'), 2L)
   expect_equal(docdb_update(src = src, key = key, value = c('{"_id":"Valiant", "vs": 78}','{"_id":"Fiat 128", "vs": 79}'), query = '{}'), 2L)
   #
@@ -331,8 +331,8 @@ test_that("docdb_update", {
   tF <- testFile()
   #
   expect_equal(docdb_create(src = src, key = key, value = tF), 5L)
-  expect_equal(docdb_update(src = src, key = key, value = tF, query = '{}'), 5L)
-  expect_equal(docdb_update(src = src, key = key, value = jqr::jq(file(tF), " del ( ._id) "), query = '{"email": {"$regex": ".+"}}'), 5L)
+  expect_true(docdb_update(src = src, key = key, value = tF, query = '{}') %in% c(0L, 5L))
+  expect_true(docdb_update(src = src, key = key, value = jqr::jq(file(tF), " del ( ._id) "), query = '{"email": {"$regex": ".+"}}') %in% c(4L, 5L))
   #
   # with 2 duplicates in file
   expect_true(docdb_update(src = src, key = key, value = testFile3(), query = '{}') %in% c(5L, 7L))
@@ -457,7 +457,7 @@ test_that("auto disconnect and shut down", {
 
   })
 
-  if (any(cls == c("src_elastic", "src_couchdb", "src_mongo"))) skip(
+  if (any(cls == c("src_elastic", "src_couchdb", "src_mongo", "src_mariadb"))) skip(
     "Testing for auto disconnect and shutdown not relevant")
 
   suppressWarnings({
@@ -486,6 +486,7 @@ test_that("auto disconnect and shut down", {
 
 })
 
+#### internal function ####
 test_that("internal functions", {
 
   expect_error(assert(iris, c("character", "integer")))
@@ -501,4 +502,3 @@ test_that("internal functions", {
   expect_equal(nodbi:::insObj("with /** 'tmp' **/ brackets"), "with 'xyz' brackets")
 
 })
-

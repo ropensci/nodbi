@@ -19,6 +19,6 @@ test_that("Source", {
   rm(tmp)
 
   # run generic (database independent) tests
-  # source("core-nodbi.R", local = TRUE)
+  source("core-nodbi.R", local = TRUE)
 
 })

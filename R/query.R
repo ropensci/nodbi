@@ -1584,6 +1584,10 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
   # early return if listfields
   if (!is.null(params$listfields)) {
 
+    if (n != -1L) message(
+      "Cannot use parameter 'limit', have to ",
+      "analyse all documents in the collection.")
+
     # jq function to obtain dot paths
     fldQ$jqrWhere <- paste0(
       ifelse(
@@ -1595,7 +1599,7 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
     # process
     fields <- unique(processDbGetQuery(
       getData = 'paste0(DBI::dbGetQuery(conn = src$con,
-                   statement = statement, n = n)[["json"]], "")',
+                 statement = statement, n = -1)[["json"]], "")',
       jqrWhere = fldQ$jqrWhere)[["out"]])
 
     # finalise
