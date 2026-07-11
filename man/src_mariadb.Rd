@@ -21,15 +21,17 @@ A \code{nodbi} source object
 Setup a RMariaDB database connection
 }
 \details{
-Uses \pkg{RSQLite} as backend. \pkg{nodbi} creates or uses
-an SQLite table, with columns \verb{_id} and \code{json} created and used by
-package \code{nodbi}, applying SQL functions as per
-\url{https://www.sqlite.org/json1.html} to the \code{json} column.
+Uses \pkg{RSMariaDB} as backend; minimum MariaDB 12.3 required.
+\pkg{nodbi} creates or uses
+a table with columns \verb{_id} and \code{json}, created and used by
+package \code{nodbi}, applying SQL or JSON functions as per
+https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions
+to the \code{json} column.
 Each row in the table represents a \code{JSON} document.
 Any root-level \verb{_id} is extracted from the document(s) and used for
 column \verb{_id}, otherwise a UUID is created as \verb{_id}.
 The table is indexed on \verb{_id}.
-For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}
+For a benchmark, see \url{https://github.com/ropensci/nodbi#benchmark}.
 }
 \examples{
 \dontrun{

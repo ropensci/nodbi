@@ -715,7 +715,6 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
     DBI::dbExecute(src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');")
 
     # update main table
-    # TODO
     statement <- paste0(
       'UPDATE `', key, '`
       INNER JOIN (
