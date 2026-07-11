@@ -101,6 +101,7 @@ jobs:
 
       - name: Try installing duckdb extension library
         run: |
+          options(duckdb.extension_directory = "~/.duckdb_extensions")
           library(duckdb)
           drv <- duckdb()
           con <- dbConnect(drv)
