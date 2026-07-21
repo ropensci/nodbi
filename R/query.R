@@ -1562,8 +1562,8 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
   # special case: if no query and only root includeFields, no need for jq
   if (!length(fldQ$queryCondition) &&
       !length(fldQ$excludeFields) &&
-      any(length(fldQ$includeFields)) &&
-      !grepl(".", fldQ$includeFields, fixed = TRUE)) fldQ$includeFields <-
+      length(fldQ$includeFields) &&
+      !any(grepl(".", fldQ$includeFields, fixed = TRUE))) fldQ$includeFields <-
     character(0L)
   #
   # special case: jq needed, _id not in excludeFields,
