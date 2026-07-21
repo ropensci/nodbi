@@ -1492,7 +1492,8 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
       fldQ$selectFields[i] <- paste0(
         '(CASE WHEN JSON_EXISTS(`/** key **/`.json, \'$."',
         gsub('[.]', '[0].', fldQ$selectFields[i]), '"\') ',
-        'THEN JSON_EXTRACT(`/** key **/`.json, \'$."', gsub('"[.]"', '"**."', fldQ$selectFields[i]), '"\') ',
+        'THEN JSON_EXTRACT(`/** key **/`.json, \'$."',
+        gsub('"[.]"', '"**."', fldQ$selectFields[i]), '"\') ',
         "ELSE 'null' END) ")
 
     }
@@ -1550,9 +1551,6 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
 
   # - - - - - - - - -
 
-  # TODO if query concerns only _id and excludeField
-  # id empty, then could do query only as SQL
-
   # - if query needs jqr, which for src_mariadb is
   #   whenever there is a query specified by the
   #   user, at any level of depth in the json structure,
@@ -1560,9 +1558,14 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
   #   with SQ and JSON functions in MariaDB 12.
   fldQ$jqrWhere <- character(0L)
   if (length(fldQ$queryCondition)) fldQ$jqrWhere <- fldQ$queryJq
-  # special case: if no query and only includeFields, no need for jq
+  #
+  # special case: if no query and only root includeFields, no need for jq
   if (!length(fldQ$queryCondition) &&
-      !length(fldQ$excludeFields)) fldQ$includeFields <- character(0L)
+      !length(fldQ$excludeFields) &&
+      length(fldQ$includeFields) &&
+      !grepl(".", fldQ$includeFields, fixed = TRUE)) fldQ$includeFields <-
+    character(0L)
+  #
   # special case: jq needed, _id not in excludeFields,
   # thus _id needs to be in includeFields
   if (length(fldQ$queryCondition) &&

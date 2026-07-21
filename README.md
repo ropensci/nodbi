@@ -372,11 +372,11 @@ result <- rbenchmark::benchmark(
 # 2026-07-11 with M3 hardware, databases via homebrew
 result[ , c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 5     SQLite            3     1.1
-# 1     DuckDB            3     1.1
-# 3    MongoDB            3     2.0
-# 4 PostgreSQL            3     2.0
-# 2    MariaDB            3     3.0
+# 1     DuckDB            3    0.85
+# 5     SQLite            3    0.91
+# 4 PostgreSQL            3    1.94
+# 2    MariaDB            3    2.70
+# 3    MongoDB            3    2.86
 # 7    Elastic            3    29.0
 # 6    CouchDB            3    57.4
 
@@ -389,7 +389,7 @@ for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
 # RSQLite: 3.53.3
 # duckdb: 1.5.4.3
 # RPostgres: 1.4.10
-# mongolite: 4.0.0
+# mongolite: 4.1.0
 # elastic: 1.2.2
 # sofa: 0.4.0
 # RMariaDB: 1.3.5
