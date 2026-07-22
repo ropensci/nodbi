@@ -96,6 +96,11 @@ jobs:
         with:
           couchdb-version: '3.1'
 
+      # https://github.com/ankane/setup-mariadb
+      - uses: ankane/setup-mariadb@v1
+        with:
+          user: test
+
 
       # for nodbi:
 
