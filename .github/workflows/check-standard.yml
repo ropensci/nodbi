@@ -99,7 +99,7 @@ jobs:
       # https://github.com/ankane/setup-mariadb
       - uses: ankane/setup-mariadb@v1
         with:
-          user: test
+          database: test
 
 
       # for nodbi:
