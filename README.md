@@ -13,17 +13,17 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2026-07-11.
+updated 2026-07-22.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 |:---|:---|:---|
-| MongoDB | data.frame | List, Exists |
+| MongoDB | data.frame | List |
 | SQLite | list | Create |
 | PostgreSQL | JSON string | Get |
-| DuckDB | file name of NDJSON records | Query |
-| Elasticsearch | URL of NDJSON records | Update |
+| DuckDB | name of file with NDJSON records | Query |
+| Elasticsearch | URL to NDJSON records | Update |
 | CouchDB |  | Delete |
-| MariaDB |  |  |
+| MariaDB |  | Exists |
 
 For speed comparisons of database backends, see [benchmark](#benchmark)
 and [testing](#testing) below.
@@ -131,11 +131,10 @@ src <- nodbi::src_sqlite(dbname = ":memory:", ...)
 ### PostgreSQL
 
 “Container” refers to a PostgreSQL table, with columns `_id` and `json`
-created and used by package `nodbi`, applying SQL functions and
-functions as per
-<https://www.postgresql.org/docs/current/functions-json.html> to the
+created and used by package `nodbi`, applying SQL and JSON functions as
+per <https://www.postgresql.org/docs/current/functions-json.html> to the
 `json` column. With PostgreSQL, a custom `plpgsql` function
-[jsonb_merge_patch()](https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60)
+[jsonb_merge_patch()](https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L75)
 is used for `docdb_update()`. The order of variables in data frames
 returned by `docdb_get()` and `docdb_query()` can differ from their
 order the input to `docdb_create()`.
@@ -173,6 +172,26 @@ src <- nodbi::src_elastic(
   host = "127.0.0.1", port = 9200L, path = NULL,
   transport_schema = "http", user = NULL, pwd = NULL, ...
 )
+```
+
+### MariaDB
+
+“Container” refers to a MariaDB table, with columns `_id` and `json`
+created and used by package `nodbi`, applying SQL and JSON functions as
+per
+<https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions>
+to the `json` column. Functions `docdb_create()` and `docdb_update()`
+can import from an NDJSON file name if the MariaDB server is configured
+accordingly (typically if run on the same system); otherwise they fall
+back to a slower import method.
+
+``` r
+src <- nodbi::src_mariadb(
+  dbname = "my_database", ...
+)
+# by default, connects to MariaDB server on localhost
+# `...` any named parameters passed to RMariaDB::MariaDB(), see
+# help("MariaDB", "RMariaDB")
 ```
 
 ## Walk-through
@@ -369,14 +388,14 @@ result <- rbenchmark::benchmark(
   order = "elapsed"
 )
 
-# 2026-07-11 with M3 hardware, databases via homebrew
+# 2026-07-22 with M3 hardware, databases via homebrew
 result[ , c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 1     DuckDB            3    0.85
-# 5     SQLite            3    0.91
-# 4 PostgreSQL            3    1.94
-# 2    MariaDB            3    2.70
-# 3    MongoDB            3    2.86
+# 1     DuckDB            3    0.89
+# 5     SQLite            3    0.96
+# 3    MongoDB            3    1.71
+# 4 PostgreSQL            3    1.92
+# 2    MariaDB            3    2.90
 # 7    Elastic            3    29.0
 # 6    CouchDB            3    57.4
 
