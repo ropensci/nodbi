@@ -98,8 +98,8 @@ jobs:
 
       # https://github.com/ankane/setup-mariadb
       - uses: ankane/setup-mariadb@v1
-        with:
-          database: test
+        # with:
+        #   database: test
 
 
       # for nodbi:
