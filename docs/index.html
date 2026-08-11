@@ -7,12 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Document NoSQL Database DBI Connector • nodbi</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Document NoSQL Database DBI Connector">
-<meta name="description" content="R database connector for creating, reading (querying and listing fields), updating and deleting of individual or many JSON documents, providing a common API across supported databases (SQLite, PostgreSQL, DuckDB and NoSQL databases MongoDB, CouchDB and Elasticsearch).">
-<meta property="og:description" content="R database connector for creating, reading (querying and listing fields), updating and deleting of individual or many JSON documents, providing a common API across supported databases (SQLite, PostgreSQL, DuckDB and NoSQL databases MongoDB, CouchDB and Elasticsearch).">
+<meta name="description" content="R database connector for creating, reading (querying and listing fields), updating and deleting of individual or many JSON documents, providing a common API across supported databases (SQLite, PostgreSQL, DuckDB, MariaDB or MySQL as well as NoSQL databases MongoDB, CouchDB and Elasticsearch).">
+<meta property="og:description" content="R database connector for creating, reading (querying and listing fields), updating and deleting of individual or many JSON documents, providing a common API across supported databases (SQLite, PostgreSQL, DuckDB, MariaDB or MySQL as well as NoSQL databases MongoDB, CouchDB and Elasticsearch).">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -56,7 +56,7 @@
 <div class="page-header"><h1 id="nodbi">nodbi<a class="anchor" aria-label="anchor" href="#nodbi"></a>
 </h1></div>
 <p>⁠<!-- badges: start --> <a href="https://github.com/ropensci/nodbi/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/ropensci/nodbi/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/rfhb/nodbi" class="external-link"><img src="https://codecov.io/gh/rfhb/nodbi/branch/master/graph/badge.svg" alt="codecov"></a> <a href="https://CRAN.R-project.org/package=nodbi" class="external-link"><img src="https://www.r-pkg.org/badges/version/nodbi" alt="CRAN status"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a> ⁠<!-- badges: end --></p>
-<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2026-02-21.</p>
+<p><code>nodbi</code> is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2026-08-11.</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -72,7 +72,7 @@
 <tr>
 <td align="left">MongoDB</td>
 <td align="left">data.frame</td>
-<td align="left">List, Exists</td>
+<td align="left">List</td>
 </tr>
 <tr>
 <td align="left">SQLite</td>
@@ -86,12 +86,12 @@
 </tr>
 <tr>
 <td align="left">DuckDB</td>
-<td align="left">file name of NDJSON records</td>
+<td align="left">name of file with NDJSON records</td>
 <td align="left">Query</td>
 </tr>
 <tr>
 <td align="left">Elasticsearch</td>
-<td align="left">URL of NDJSON records</td>
+<td align="left">URL to NDJSON records</td>
 <td align="left">Update</td>
 </tr>
 <tr>
@@ -99,10 +99,14 @@
 <td align="left"></td>
 <td align="left">Delete</td>
 </tr>
+<tr>
+<td align="left">MariaDB</td>
+<td align="left"></td>
+<td align="left">Exists</td>
+</tr>
 </tbody>
 </table>
 <p>For speed comparisons of database backends, see <a href="#benchmark">benchmark</a> and <a href="#testing">testing</a> below.</p>
-<p>Plans for developing package <code>nodbi</code> in 2026 include to add MariaDB and MySQL as database backends.</p>
 <div class="section level2">
 <h2 id="api-overview">API overview<a class="anchor" aria-label="anchor" href="#api-overview"></a>
 </h2>
@@ -211,7 +215,7 @@
 <div class="section level3">
 <h3 id="postgresql">PostgreSQL<a class="anchor" aria-label="anchor" href="#postgresql"></a>
 </h3>
-<p>“Container” refers to a PostgreSQL table, with columns <code>_id</code> and <code>json</code> created and used by package <code>nodbi</code>, applying SQL functions and functions as per <a href="https://www.postgresql.org/docs/current/functions-json.html" class="external-link uri">https://www.postgresql.org/docs/current/functions-json.html</a> to the <code>json</code> column. With PostgreSQL, a custom <code>plpgsql</code> function <a href="https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L60" class="external-link">jsonb_merge_patch()</a> is used for <code><a href="reference/docdb_update.html">docdb_update()</a></code>. The order of variables in data frames returned by <code><a href="reference/docdb_get.html">docdb_get()</a></code> and <code><a href="reference/docdb_query.html">docdb_query()</a></code> can differ from their order the input to <code><a href="reference/docdb_create.html">docdb_create()</a></code>.</p>
+<p>“Container” refers to a PostgreSQL table, with columns <code>_id</code> and <code>json</code> created and used by package <code>nodbi</code>, applying SQL and JSON functions as per <a href="https://www.postgresql.org/docs/current/functions-json.html" class="external-link uri">https://www.postgresql.org/docs/current/functions-json.html</a> to the <code>json</code> column. With PostgreSQL, a custom <code>plpgsql</code> function <a href="https://github.com/ropensci/nodbi/blob/master/R/src_postgres.R#L75" class="external-link">jsonb_merge_patch()</a> is used for <code><a href="reference/docdb_update.html">docdb_update()</a></code>. The order of variables in data frames returned by <code><a href="reference/docdb_get.html">docdb_get()</a></code> and <code><a href="reference/docdb_query.html">docdb_query()</a></code> can differ from their order the input to <code><a href="reference/docdb_create.html">docdb_create()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span></span>
 <span>  dbname <span class="op">=</span> <span class="st">"my_database"</span>, host <span class="op">=</span> <span class="st">"127.0.0.1"</span>, port <span class="op">=</span> <span class="fl">5432L</span>, <span class="va">...</span></span>
@@ -237,12 +241,24 @@
 <span>  transport_schema <span class="op">=</span> <span class="st">"http"</span>, user <span class="op">=</span> <span class="cn">NULL</span>, pwd <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level3">
+<h3 id="mariadb">MariaDB<a class="anchor" aria-label="anchor" href="#mariadb"></a>
+</h3>
+<p>“Container” refers to a MariaDB table, with columns <code>_id</code> and <code>json</code> created and used by package <code>nodbi</code>, applying SQL and JSON functions as per <a href="https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions" class="external-link uri">https://mariadb.com/docs/server/reference/sql-functions/special-functions/json-functions</a> to the <code>json</code> column. Functions <code><a href="reference/docdb_create.html">docdb_create()</a></code> and <code><a href="reference/docdb_update.html">docdb_update()</a></code> can import from an NDJSON file name if the MariaDB server is configured accordingly (typically if run on the same system); otherwise they fall back to a slower import method.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu">nodbi</span><span class="fu">::</span><span class="fu"><a href="reference/src_mariadb.html">src_mariadb</a></span><span class="op">(</span></span>
+<span>  dbname <span class="op">=</span> <span class="st">"my_database"</span>, <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># by default, connects to MariaDB server on localhost</span></span>
+<span><span class="co"># `...` any named parameters passed to RMariaDB::MariaDB(), see</span></span>
+<span><span class="co"># help("MariaDB", "RMariaDB")</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="walk-through">Walk-through<a class="anchor" aria-label="anchor" href="#walk-through"></a>
 </h2>
 <p>This example is to show how functional <code>nodbi</code> is at this time: With any of the six database backends, the functions work in the same way and return the same values.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load nodbi</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/nodbi/">nodbi</a></span><span class="op">)</span></span>
 <span></span>
@@ -250,15 +266,18 @@
 <span><span class="va">key</span> <span class="op">&lt;-</span> <span class="st">"my_container"</span></span>
 <span></span>
 <span><span class="co"># connect any of these database backends</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>duckdb.extension_directory <span class="op">=</span> <span class="st">"~/.duckdb_extensions"</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span>collection <span class="op">=</span> <span class="va">key</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mariadb.html">src_mariadb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span></span>
 <span>  user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_USER"</span><span class="op">)</span>,</span>
 <span>  pwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_PWD"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mariadb.html">src_mariadb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># check if container already exists</span></span>
 <span><span class="fu"><a href="reference/docdb_exists.html">docdb_exists</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span><span class="op">)</span></span>
@@ -382,18 +401,19 @@
 <div class="section level2">
 <h2 id="benchmark">Benchmark<a class="anchor" aria-label="anchor" href="#benchmark"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://docs.ropensci.org/nodbi/">"nodbi"</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>duckdb.extension_directory <span class="op">=</span> <span class="st">"~/.duckdb_extensions"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">srcMongo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcSqlite</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcPostgres</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_postgres.html">src_postgres</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">srcMariadb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mariadb.html">src_mariadb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcDuckdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_duckdb.html">src_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcElastic</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_elastic.html">src_elastic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcCouchdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_couchdb.html">src_couchdb</a></span><span class="op">(</span></span>
 <span>  user <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_USER"</span><span class="op">)</span>,</span>
-<span>  pwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_PWD"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
+<span>  pwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"COUCHDB_TEST_PWD"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">key</span> <span class="op">&lt;-</span> <span class="st">"test2"</span></span>
 <span><span class="va">query</span> <span class="op">&lt;-</span> <span class="st">'{"clarity": {"$in": ["NOTME", "VS1"]}}'</span></span>
@@ -415,78 +435,71 @@
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">rbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rbenchmark/man/benchmark.html" class="external-link">benchmark</a></span><span class="op">(</span></span>
-<span>  CouchDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcCouchdb</span><span class="op">)</span>,</span>
 <span>  DuckDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcDuckdb</span><span class="op">)</span>,</span>
-<span>  Elastic <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcElastic</span><span class="op">)</span>,</span>
+<span>  MariaDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcMariadb</span><span class="op">)</span>,</span>
 <span>  MongoDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcMongo</span><span class="op">)</span>,</span>
 <span>  PostgreSQL <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcPostgres</span><span class="op">)</span>,</span>
 <span>  SQLite <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcSqlite</span><span class="op">)</span>,</span>
+<span>  CouchDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcCouchdb</span><span class="op">)</span>,</span>
+<span>  Elastic <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcElastic</span><span class="op">)</span>,</span>
 <span>  replications <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  order <span class="op">=</span> <span class="st">"elapsed"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2026-02-21 with M3 hardware, databases via homebrew</span></span>
+<span><span class="co"># 2026-08-11 with M3 hardware, databases via homebrew</span></span>
 <span><span class="va">result</span><span class="op">[</span> , <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"test"</span>, <span class="st">"replications"</span>, <span class="st">"elapsed"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#         test replications elapsed</span></span>
-<span><span class="co"># 2     DuckDB            3    0.60</span></span>
-<span><span class="co"># 6     SQLite            3    0.71</span></span>
-<span><span class="co"># 5 PostgreSQL            3    1.47</span></span>
-<span><span class="co"># 4    MongoDB            3    2.28</span></span>
-<span><span class="co"># 3    Elastic            3   26.00</span></span>
-<span><span class="co"># 1    CouchDB            3   57.41</span></span>
+<span><span class="co"># 1     DuckDB            3    0.89</span></span>
+<span><span class="co"># 5     SQLite            3    0.96</span></span>
+<span><span class="co"># 3    MongoDB            3    1.71</span></span>
+<span><span class="co"># 4 PostgreSQL            3    1.92</span></span>
+<span><span class="co"># 2    MariaDB            3    2.90</span></span>
+<span><span class="co"># 7    Elastic            3    29.0</span></span>
+<span><span class="co"># 6    CouchDB            3    57.4</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">R.version</span><span class="op">$</span><span class="va">version.string</span><span class="op">)</span></span>
-<span><span class="co"># R Under development (unstable) (2026-02-02 r89367)</span></span>
+<span><span class="co"># R Under development (unstable) (2026-06-24 r90190)</span></span>
 <span></span>
-<span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nodbi"</span>, <span class="st">"RSQLite"</span>, <span class="st">"duckdb"</span>, <span class="st">"RPostgres"</span>, <span class="st">"mongolite"</span>, <span class="st">"elastic"</span>, <span class="st">"sofa"</span><span class="op">)</span></span>
+<span><span class="va">pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nodbi"</span>, <span class="st">"RSQLite"</span>, <span class="st">"duckdb"</span>, <span class="st">"RPostgres"</span>, <span class="st">"mongolite"</span>, <span class="st">"elastic"</span>, <span class="st">"sofa"</span>, <span class="st">"RMariaDB"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">pkg</span> <span class="kw">in</span> <span class="va">pkgs</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">pkg</span>, <span class="st">": "</span>, <span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="va">pkg</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># nodbi: 0.14.0.9000</span></span>
-<span><span class="co"># RSQLite: 2.4.6</span></span>
-<span><span class="co"># duckdb: 1.4.4</span></span>
+<span><span class="co"># RSQLite: 3.53.3</span></span>
+<span><span class="co"># duckdb: 1.5.4.3</span></span>
 <span><span class="co"># RPostgres: 1.4.10</span></span>
-<span><span class="co"># mongolite: 4.0.0</span></span>
+<span><span class="co"># mongolite: 4.1.0</span></span>
 <span><span class="co"># elastic: 1.2.2</span></span>
-<span><span class="co"># sofa: 0.4.0</span></span></code></pre></div>
+<span><span class="co"># sofa: 0.4.0</span></span>
+<span><span class="co"># RMariaDB: 1.3.5</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
 </h2>
 <p>Every database backend is subject to identical tests, see <a href="https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R" class="external-link">core-nodbi.R</a>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 2026-01-17</span></span>
-<span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 2026-08-11</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>duckdb.home <span class="op">=</span> <span class="st">"~/.duckdb"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># ✔ | F W  S  OK | Context</span></span>
-<span><span class="co"># ✔ |      2 184 | couchdb [72.7s]</span></span>
-<span><span class="co"># ✔ |      1 183 | duckdb [1.8s]</span></span>
-<span><span class="co"># ✔ |      2 181 | elastic [57.4s]</span></span>
-<span><span class="co"># ✔ |      2 182 | mongodb [2.6s]</span></span>
-<span><span class="co"># ✔ |        185 | postgres [3.5s]</span></span>
-<span><span class="co"># ✔ |        186 | sqlite [1.9s]</span></span>
-<span><span class="co"># </span></span>
-<span><span class="co"># ══ Results ══════════════════════</span></span>
-<span><span class="co"># Duration: 140.0 s</span></span>
-<span><span class="co"># </span></span>
-<span><span class="co"># ── Skipped tests (7) ────────────</span></span>
-<span><span class="co"># • Testing for auto disconnect and shutdown not relevant (3): </span></span>
-<span><span class="co">#   test-couchdb.R:26:3, test-elastic.R:21:3, test-mongodb.R:24:3</span></span>
-<span><span class="co"># • Testing for parallel writes not possible or implemented (4): </span></span>
-<span><span class="co">#   test-couchdb.R:26:3, test-duckdb.R:22:3, test-elastic.R:21:3, </span></span>
-<span><span class="co">#   test-mongodb.R:24:3</span></span>
-<span><span class="co"># </span></span>
-<span><span class="co"># [ FAIL 0 | WARN 0 | SKIP 7 | PASS 1101 ]</span></span>
+<span><span class="co"># ✔ |      2 184 | couchdb [81.5s]</span></span>
+<span><span class="co"># ✔ |      1 183 | duckdb [4.2s]</span></span>
+<span><span class="co"># ✔ |      2 181 | elastic [75.0s]</span></span>
+<span><span class="co"># ✔ |      2 181 | mariadb [7.2s]</span></span>
+<span><span class="co"># ✔ |      2 182 | mongodb [4.8s]</span></span>
+<span><span class="co"># ✔ |        185 | postgres [7.3s]</span></span>
+<span><span class="co"># ✔ |        186 | sqlite [4.5s]</span></span>
 <span></span>
 <span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, type <span class="op">=</span> <span class="st">"tests"</span><span class="op">)</span></span>
-<span><span class="co"># nodbi Coverage: 94.01%</span></span>
+<span><span class="co"># nodbi Coverage: 94.11%</span></span>
 <span><span class="co"># R/src_postgres.R: 82.43%</span></span>
 <span><span class="co"># R/src_duckdb.R: 84.00%</span></span>
-<span><span class="co"># R/zzz.R: 85.56%</span></span>
-<span><span class="co"># R/update.R: 94.46%</span></span>
-<span><span class="co"># R/query.R: 94.67%</span></span>
+<span><span class="co"># R/zzz.R: 86.67%</span></span>
+<span><span class="co"># R/src_mariadb.R: 92.86%</span></span>
+<span><span class="co"># R/update.R: 94.49%</span></span>
+<span><span class="co"># R/create.R: 94.93%</span></span>
+<span><span class="co"># R/query.R: 94.96%</span></span>
 <span><span class="co"># R/src_mongo.R: 95.00%</span></span>
-<span><span class="co"># R/get.R: 95.79%</span></span>
-<span><span class="co"># R/create.R: 96.25%</span></span>
-<span><span class="co"># R/delete.R: 98.96%</span></span>
+<span><span class="co"># R/get.R: 96.19%</span></span>
+<span><span class="co"># R/delete.R: 99.02%</span></span>
 <span><span class="co"># R/exists.R: 100.00%</span></span>
 <span><span class="co"># R/list.R: 100.00%</span></span>
 <span><span class="co"># R/src_couchdb.R: 100.00%</span></span>
@@ -559,7 +572,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

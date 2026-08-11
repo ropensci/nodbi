@@ -30,6 +30,8 @@
   : Setup a DuckDB database connection
 - [`src_elastic()`](https://docs.ropensci.org/nodbi/reference/src_elastic.md)
   : Setup an Elasticsearch database connection
+- [`src_mariadb()`](https://docs.ropensci.org/nodbi/reference/src_mariadb.md)
+  : Setup a RMariaDB database connection
 - [`src_mongo()`](https://docs.ropensci.org/nodbi/reference/src_mongo.md)
   : Setup a MongoDB database connection
 - [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md)

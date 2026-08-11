@@ -18,11 +18,12 @@ docdb_update(src, key, value, query, ...)
   Source object, result of call to any of functions
   [`src_mongo()`](https://docs.ropensci.org/nodbi/reference/src_mongo.md),
   [`src_sqlite()`](https://docs.ropensci.org/nodbi/reference/src_sqlite.md),
-  [`src_elastic()`](https://docs.ropensci.org/nodbi/reference/src_elastic.md),
-  [`src_couchdb()`](https://docs.ropensci.org/nodbi/reference/src_couchdb.md)
-  [`src_duckdb()`](https://docs.ropensci.org/nodbi/reference/src_duckdb.md)
+  [`src_duckdb()`](https://docs.ropensci.org/nodbi/reference/src_duckdb.md),
+  [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md),
+  [`src_mariadb()`](https://docs.ropensci.org/nodbi/reference/src_mariadb.md),
+  [`src_elastic()`](https://docs.ropensci.org/nodbi/reference/src_elastic.md)
   or
-  [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md)
+  [`src_couchdb()`](https://docs.ropensci.org/nodbi/reference/src_couchdb.md)
 
 - key:
 
@@ -58,7 +59,8 @@ docdb_update(src, key, value, query, ...)
 
 Uses native functions in MongoDB
 ([`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)\$update()),
-SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`), Elasticsearch
+SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`), MariaDB
+(`json_merge_patch()`), Elasticsearch
 ([`elastic::docs_bulk_update()`](https://rfhb.github.io/elastic/reference/docs_bulk_update.html));
 a `plpgsql` function added when calling
 [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md),

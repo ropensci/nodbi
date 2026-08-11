@@ -24,6 +24,7 @@
 <url><loc>https://docs.ropensci.org/nodbi/reference/src_couchdb.html</loc></url>
 <url><loc>https://docs.ropensci.org/nodbi/reference/src_duckdb.html</loc></url>
 <url><loc>https://docs.ropensci.org/nodbi/reference/src_elastic.html</loc></url>
+<url><loc>https://docs.ropensci.org/nodbi/reference/src_mariadb.html</loc></url>
 <url><loc>https://docs.ropensci.org/nodbi/reference/src_mongo.html</loc></url>
 <url><loc>https://docs.ropensci.org/nodbi/reference/src_postgres.html</loc></url>
 <url><loc>https://docs.ropensci.org/nodbi/reference/src_sqlite.html</loc></url>

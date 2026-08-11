@@ -18,11 +18,12 @@ docdb_query(src, key, query, ...)
   Source object, result of call to any of functions
   [`src_mongo()`](https://docs.ropensci.org/nodbi/reference/src_mongo.md),
   [`src_sqlite()`](https://docs.ropensci.org/nodbi/reference/src_sqlite.md),
-  [`src_elastic()`](https://docs.ropensci.org/nodbi/reference/src_elastic.md),
-  [`src_couchdb()`](https://docs.ropensci.org/nodbi/reference/src_couchdb.md)
-  [`src_duckdb()`](https://docs.ropensci.org/nodbi/reference/src_duckdb.md)
+  [`src_duckdb()`](https://docs.ropensci.org/nodbi/reference/src_duckdb.md),
+  [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md),
+  [`src_mariadb()`](https://docs.ropensci.org/nodbi/reference/src_mariadb.md),
+  [`src_elastic()`](https://docs.ropensci.org/nodbi/reference/src_elastic.md)
   or
-  [`src_postgres()`](https://docs.ropensci.org/nodbi/reference/src_postgres.md)
+  [`src_couchdb()`](https://docs.ropensci.org/nodbi/reference/src_couchdb.md)
 
 - key:
 
@@ -59,8 +60,8 @@ docdb_query(src, key, query, ...)
     DuckDB.
 
   - Specify `listfields = TRUE` to return just the names of all fields,
-    from all documents or from the maximum number of documents as
-    specified in `limit`.
+    from all documents corresponding to `query` or from the maximum
+    number of documents as specified in `limit`.
 
 ## Value
 

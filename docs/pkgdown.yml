@@ -1,9 +1,9 @@
-pandoc: 3.9.0.2
-pkgdown: 2.2.0
+pandoc: 3.10.1
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   nodbi-overview: nodbi-overview.html
-last_built: 2026-04-18T08:24Z
+last_built: 2026-08-11T21:29Z
 urls:
   reference: https://docs.ropensci.org/nodbi/reference
   article: https://docs.ropensci.org/nodbi/articles
