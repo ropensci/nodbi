@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 ⁠<!-- badges: end -->
 
-`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2026-07-22.
+`nodbi` is an R package that provides a single interface for several NoSQL databases and databases with JSON functionality, with the same function parameters and return values across all database backends. Last updated 2026-08-11.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 | :--------------------- | :--------------------- | :--------------------- |
@@ -346,7 +346,7 @@ result <- rbenchmark::benchmark(
   order = "elapsed"
 )
 
-# 2026-07-22 with M3 hardware, databases via homebrew
+# 2026-08-11 with M3 hardware, databases via homebrew
 result[ , c("test", "replications", "elapsed")]
 #         test replications elapsed
 # 1     DuckDB            3    0.89
@@ -377,30 +377,17 @@ for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
 Every database backend is subject to identical tests, see [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R). 
 
 ```{r testing_and_coverage}
-# 2026-07-11
-options(duckdb.extension_directory = "~/.duckdb_extensions")
+# 2026-08-11
+options(duckdb.home = "~/.duckdb")
 suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
 # ✔ |      2 184 | couchdb [81.5s]
-# ✔ |      1 183 | duckdb [4.3s]
+# ✔ |      1 183 | duckdb [4.2s]
 # ✔ |      2 181 | elastic [75.0s]
-# ✔ |   4  2 180 | mariadb [8.0s] 
-# ✔ |      2 182 | mongodb [5.2s]
-# ✔ |        185 | postgres [8.4s]
-# ✔ |        186 | sqlite [4.9s]                                                                                            
-# ══ Results ════════════════════════════════════════════════════
-# Duration: 187.5 s
-# 
-# ── Skipped tests (9) ──────────────────────────────────────────
-# • empty test (1): test-mariadb.R:22:3
-# • Testing for auto disconnect and shutdown not relevant (4): 
-#   test-couchdb.R:26:3, test-elastic.R:21:3,
-#   test-mariadb.R:22:3, test-mongodb.R:24:3
-# • Testing for parallel writes not possible or implemented (4): 
-#   test-couchdb.R:26:3, test-duckdb.R:22:3,
-#   test-elastic.R:21:3, test-mongodb.R:24:3
-# 
-# [ FAIL 0 | WARN 4 | SKIP 9 | PASS 1281 ]
+# ✔ |      2 181 | mariadb [7.2s]
+# ✔ |      2 182 | mongodb [4.8s]
+# ✔ |        185 | postgres [7.3s]
+# ✔ |        186 | sqlite [4.5s]
 
 covr::package_coverage(path = ".", type = "tests")
 # nodbi Coverage: 94.11%

@@ -73,6 +73,8 @@ export(src_mongo)
 export(src_postgres)
 export(src_sqlite)
 importFrom(R.utils,countLines)
-importFrom(V8,JS)
-importFrom(V8,v8)
+importFrom(V8,
+  JS,
+  v8
+)
 importFrom(stringi,stri_match_all_regex)
