@@ -30,8 +30,8 @@
 #'  CouchDB, PostgreSQL, and DuckDB.
 #'
 #' - Specify `listfields = TRUE` to return just the names of
-#' all fields, from all documents or from the maximum number of
-#' documents as specified in `limit`.
+#' all fields, from all documents corresponding to `query` or
+#' from the maximum number of documents as specified in `limit`.
 #'
 #' @note A dot in `query` or `fields` is interpreted as a dot path,
 #' pointing to a field nested within another, e.g. `friends.id` in
@@ -708,7 +708,8 @@ docdb_query.src_sqlite <- function(src, key, query, ...) {
 
   # special case: return all fields
   # see below for handling queries
-  if (!is.null(params$listfields) & !length(fldQ$queryCondition)) {
+  if (!is.null(params$listfields) &
+      !length(fldQ$queryCondition)) {
 
     # statement
     statement <- insObj('
@@ -1474,6 +1475,83 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
 
   # - - - - - - - - -
 
+  # special case: return all fields
+  # see below for handling queries
+  if (!is.null(params$listfields) &
+      !length(fldQ$queryCondition)) {
+
+    # parameter use
+    limit <- ""
+    if (n != -1L) limit <- paste0("LIMIT ", n)
+
+    # statement
+    statement <- insObj('
+        WITH RECURSIVE
+            json_paths AS (
+           SELECT
+                t.json,
+                jt.key_name,
+                CONCAT (\'$.\', JSON_QUOTE (jt.key_name)) AS path,
+                jt.key_name AS full_key_path
+            FROM
+                (
+                SELECT DISTINCT json
+                FROM `/** key **/`
+                WHERE json IS NOT NULL
+                /** limit **/
+                ) AS t,
+            JSON_TABLE (
+                JSON_KEYS (t.json),
+                \'$[*]\' COLUMNS (key_name VARCHAR(255) PATH \'$\')
+            ) AS jt
+                UNION
+                SELECT
+                    jp.json,
+                    jt.key_name,
+                    CONCAT (jp.path, \'.\', JSON_QUOTE (jt.key_name)),
+                    CONCAT (jp.full_key_path, \'.\', jt.key_name)
+                FROM
+                    json_paths jp,
+                    JSON_TABLE (
+                        JSON_KEYS (JSON_EXTRACT (jp.json, jp.path)),
+                        \'$[*]\' COLUMNS (key_name VARCHAR(255) PATH \'$\')
+                    ) AS jt
+                WHERE JSON_TYPE (JSON_EXTRACT (jp.json, jp.path)) = \'OBJECT\'
+                UNION
+                SELECT
+                    jp.json,
+                    jt.key_name,
+                    CONCAT (jp.path, \'[*].\', JSON_QUOTE (jt.key_name)),
+                    CONCAT (jp.full_key_path, \'[*].\', jt.key_name)
+                FROM
+                    json_paths jp,
+                    JSON_TABLE (
+                        JSON_KEYS (JSON_EXTRACT (jp.json, CONCAT (jp.path, \'[0]\'))),
+                        \'$[*]\' COLUMNS (key_name VARCHAR(255) PATH \'$\')
+                    ) AS jt
+                WHERE JSON_TYPE (JSON_EXTRACT (jp.json, jp.path)) = \'ARRAY\'
+            )
+        SELECT DISTINCT full_key_path
+        FROM json_paths
+        ORDER BY full_key_path;
+   ')
+
+    # get all fullkeys and types
+    fields <- DBI::dbGetQuery(
+      conn = src$con,
+      statement = statement,
+      n = -1L)[["full_key_path"]]
+
+    # remove array elements "item[*].another"
+    fields <- unique(gsub("[*]", "", fields, fixed = TRUE))
+    fields <- fields[fields != "_id" & fields != ""]
+
+    # return field names
+    return(fields)
+  }
+
+  # - - - - - - - - -
+
   # fields
 
   # - select extracts or full json
@@ -1585,6 +1663,7 @@ docdb_query.src_mariadb <- function(src, key, query, ...) {
   # - - - - - - - - -
 
   # early return if listfields
+  # with a query
   if (!is.null(params$listfields)) {
 
     if (n != -1L) message(
