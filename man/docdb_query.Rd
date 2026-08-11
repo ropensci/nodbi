@@ -37,8 +37,8 @@ to be returned. If \code{NULL} or not set (default), 10,000 for
 Elasticsearch and all documents for MongoDB, SQLite,
 CouchDB, PostgreSQL, and DuckDB.
 \item Specify \code{listfields = TRUE} to return just the names of
-all fields, from all documents or from the maximum number of
-documents as specified in \code{limit}.
+all fields, from all documents corresponding to \code{query} or
+from the maximum number of documents as specified in \code{limit}.
 }}
 }
 \value{
