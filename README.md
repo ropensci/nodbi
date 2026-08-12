@@ -345,7 +345,6 @@ rm(src)
 
 ``` r
 library("nodbi")
-options(duckdb.extension_directory = "~/.duckdb_extensions")
 
 srcMongo <- src_mongo()
 srcSqlite <- src_sqlite()
@@ -393,9 +392,9 @@ result[ , c("test", "replications", "elapsed")]
 #         test replications elapsed
 # 1     DuckDB            3    0.89
 # 5     SQLite            3    0.96
-# 3    MongoDB            3    1.71
-# 4 PostgreSQL            3    1.92
-# 2    MariaDB            3    2.90
+# 4 PostgreSQL            3    2.12
+# 2    MariaDB            3    2.81
+# 3    MongoDB            3    3.11
 # 7    Elastic            3    29.0
 # 6    CouchDB            3    57.4
 
@@ -406,11 +405,11 @@ pkgs <- c("nodbi", "RSQLite", "duckdb", "RPostgres", "mongolite", "elastic", "so
 for (pkg in pkgs) message(pkg, ": ", packageVersion(pkg))
 # nodbi: 0.14.0.9000
 # RSQLite: 3.53.3
-# duckdb: 1.5.4.3
+# duckdb: 1.5.5
 # RPostgres: 1.4.10
 # mongolite: 4.1.0
 # elastic: 1.2.2
-# sofa: 0.4.0
+# sofa: 0.4.2
 # RMariaDB: 1.3.5
 ```
 

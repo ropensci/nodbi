@@ -403,7 +403,6 @@
 </h2>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://docs.ropensci.org/nodbi/">"nodbi"</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>duckdb.extension_directory <span class="op">=</span> <span class="st">"~/.duckdb_extensions"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">srcMongo</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_mongo.html">src_mongo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">srcSqlite</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/src_sqlite.html">src_sqlite</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -451,9 +450,9 @@
 <span><span class="co">#         test replications elapsed</span></span>
 <span><span class="co"># 1     DuckDB            3    0.89</span></span>
 <span><span class="co"># 5     SQLite            3    0.96</span></span>
-<span><span class="co"># 3    MongoDB            3    1.71</span></span>
-<span><span class="co"># 4 PostgreSQL            3    1.92</span></span>
-<span><span class="co"># 2    MariaDB            3    2.90</span></span>
+<span><span class="co"># 4 PostgreSQL            3    2.12</span></span>
+<span><span class="co"># 2    MariaDB            3    2.81</span></span>
+<span><span class="co"># 3    MongoDB            3    3.11</span></span>
 <span><span class="co"># 7    Elastic            3    29.0</span></span>
 <span><span class="co"># 6    CouchDB            3    57.4</span></span>
 <span></span>
@@ -464,11 +463,11 @@
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">pkg</span> <span class="kw">in</span> <span class="va">pkgs</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">pkg</span>, <span class="st">": "</span>, <span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="va">pkg</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># nodbi: 0.14.0.9000</span></span>
 <span><span class="co"># RSQLite: 3.53.3</span></span>
-<span><span class="co"># duckdb: 1.5.4.3</span></span>
+<span><span class="co"># duckdb: 1.5.5</span></span>
 <span><span class="co"># RPostgres: 1.4.10</span></span>
 <span><span class="co"># mongolite: 4.1.0</span></span>
 <span><span class="co"># elastic: 1.2.2</span></span>
-<span><span class="co"># sofa: 0.4.0</span></span>
+<span><span class="co"># sofa: 0.4.2</span></span>
 <span><span class="co"># RMariaDB: 1.3.5</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -488,7 +487,7 @@
 <span><span class="co"># ✔ |        185 | postgres [7.3s]</span></span>
 <span><span class="co"># ✔ |        186 | sqlite [4.5s]</span></span>
 <span></span>
-<span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, type <span class="op">=</span> <span class="st">"tests"</span><span class="op">)</span></span>
+<span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/covr/man/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"."</span>, type <span class="op">=</span> <span class="st">"tests"</span><span class="op">)</span></span>
 <span><span class="co"># nodbi Coverage: 94.11%</span></span>
 <span><span class="co"># R/src_postgres.R: 82.43%</span></span>
 <span><span class="co"># R/src_duckdb.R: 84.00%</span></span>
