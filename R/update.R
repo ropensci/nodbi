@@ -641,7 +641,13 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
   if (query == "") query <- "{}"
   query <- jsonlite::minify(query)
 
-    # comments see create.R
+  # comments see create.R
+
+  # temporarily change SQL mode to handle newlines
+  DBI::dbExecute(src$con, "SET @@SQL_MODE = CONCAT(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES');")
+  on.exit(try(DBI::dbExecute(
+    src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');"),
+    silent = TRUE), add = TRUE)
 
   ## check features
   if (isFile(value) &&
@@ -670,17 +676,29 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
       grepl(filePath$Value[1], value)
 
     # inform user
-    if (!canLoadFile) message(
+    if (!canLoadFile) {
+
+      message(
       "Parameter 'value' specified a file, ",
       "but the file cannot directly be loaded, ",
       "converting it to data frame for loading.")
 
+      # readin ndjson records
+      value <- jsonlite::stream_in(
+        con = file(value),
+        pagesize = jlps,
+        verbose = FALSE
+      )
+
+    }
+
   } else {
 
     canLoadFile <- FALSE
+
   }
 
-  ## chose load method
+  ## file load method
   if (canLoadFile) {
 
     # import into temporary table
@@ -694,12 +712,6 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
       statement = paste0(
         "CREATE TEMPORARY TABLE `", tblName, "`",
         " (json JSON NOT NULL);"))
-
-    # temporarily change SQL mode
-    DBI::dbExecute(src$con, "SET @@SQL_MODE = CONCAT(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES');")
-    on.exit(try(DBI::dbExecute(
-      src$con, "SET @@SQL_MODE = REPLACE(@@SQL_MODE, ',NO_BACKSLASH_ESCAPES', '');"),
-      silent = TRUE), add = TRUE)
 
     # load from ndjson file
     DBI::dbExecute(
