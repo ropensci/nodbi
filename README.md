@@ -13,7 +13,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 `nodbi` is an R package that provides a single interface for several
 NoSQL databases and databases with JSON functionality, with the same
 function parameters and return values across all database backends. Last
-updated 2026-08-11.
+updated 2026-08-23.
 
 | Currently, `nodbi` supports<br/>as database backends | for an `R` object of any<br/>of these data types | for these operations |
 |:---|:---|:---|
@@ -208,7 +208,7 @@ library(nodbi)
 key <- "my_container"
 
 # connect any of these database backends
-options(duckdb.extension_directory = "~/.duckdb_extensions")
+options(duckdb.home = "~/.duckdb")
 src <- src_duckdb()
 src <- src_mongo(collection = key)
 src <- src_sqlite()
@@ -219,7 +219,6 @@ src <- src_couchdb(
   user = Sys.getenv("COUCHDB_TEST_USER"),
   pwd = Sys.getenv("COUCHDB_TEST_PWD")
 )
-src <- src_mariadb()
 
 # check if container already exists
 docdb_exists(src, key)
@@ -260,7 +259,6 @@ dplyr::tibble(docdb_get(src, key))
 # #   id <int>, mpg <dbl>, cyl <int>, disp <dbl>, hp <int>, drat <dbl>, wt <dbl>,
 # #   qsec <dbl>, vs <int>, am <int>, gear <int>, carb <int>
 # # ℹ Use `print(n = ...)` to see more rows
-
 
 # query some documents
 docdb_query(src, key, query = '{"mpg": {"$gte": 30}}')
@@ -387,16 +385,16 @@ result <- rbenchmark::benchmark(
   order = "elapsed"
 )
 
-# 2026-08-11 with M3 hardware, databases via homebrew
+# 2026-08-23 with M3 hardware, databases via homebrew
 result[ , c("test", "replications", "elapsed")]
 #         test replications elapsed
-# 1     DuckDB            3    0.89
-# 5     SQLite            3    0.96
-# 4 PostgreSQL            3    2.12
-# 2    MariaDB            3    2.81
-# 3    MongoDB            3    3.11
-# 7    Elastic            3    29.0
-# 6    CouchDB            3    57.4
+# 1     DuckDB            3     1.0
+# 5     SQLite            3     1.0
+# 3    MongoDB            3     2.0
+# 4 PostgreSQL            3     2.2
+# 2    MariaDB            3     2.8
+# 7    Elastic            3    29.5
+# 6    CouchDB            3    55.0
 
 message(R.version$version.string)
 # R Under development (unstable) (2026-06-24 r90190)
@@ -419,29 +417,44 @@ Every database backend is subject to identical tests, see
 [core-nodbi.R](https://github.com/ropensci/nodbi/blob/master/tests/testthat/core-nodbi.R).
 
 ``` r
-# 2026-08-11
+# 2026-08-23
 options(duckdb.home = "~/.duckdb")
 suppressMessages(testthat::test_local())
 # ✔ | F W  S  OK | Context
-# ✔ |      2 184 | couchdb [81.5s]
-# ✔ |      1 183 | duckdb [4.2s]
-# ✔ |      2 181 | elastic [75.0s]
-# ✔ |      2 181 | mariadb [7.2s]
-# ✔ |      2 182 | mongodb [4.8s]
-# ✔ |        185 | postgres [7.3s]
-# ✔ |        186 | sqlite [4.5s]
+# ✔ |      2 184 | couchdb [77.7s]
+# ✔ |      1 183 | duckdb [3.6s]
+# ✔ |      2 181 | elastic [65.3s]
+# ✔ |      2 181 | mariadb-remote [17.2s]
+# ✔ |      2 181 | mariadb [6.6s]
+# ✔ |      2 182 | mongodb [4.6s]
+# ✔ |        185 | postgres [7.2s]
+# ✔ |        186 | sqlite [4.2s]
+# 
+# ══ Results ═══════════════════════════════
+# Duration: 186.3 s
+# 
+# ── Skipped tests (11) ────────────────────
+# • empty test (2): test-mariadb-remote.R:27:3, test-mariadb.R:22:3
+# • Testing for auto disconnect and shutdown not relevant (5): 
+#   test-couchdb.R:26:3, test-elastic.R:21:3,
+#   test-mariadb-remote.R:27:3, test-mariadb.R:22:3, test-mongodb.R:24:3
+# • Testing for parallel writes not possible or implemented (4): 
+#   test-couchdb.R:26:3, test-duckdb.R:22:3,
+#   test-elastic.R:21:3, test-mongodb.R:24:3
+# 
+# [ FAIL 0 | WARN 0 | SKIP 11 | PASS 1463 ]
 
 covr::package_coverage(path = ".", type = "tests")
-# nodbi Coverage: 94.11%
+# nodbi Coverage: 94.72%
 # R/src_postgres.R: 82.43%
 # R/src_duckdb.R: 84.00%
 # R/zzz.R: 86.67%
 # R/src_mariadb.R: 92.86%
-# R/update.R: 94.49%
-# R/create.R: 94.93%
-# R/query.R: 94.96%
 # R/src_mongo.R: 95.00%
+# R/query.R: 95.28%
+# R/update.R: 95.40%
 # R/get.R: 96.19%
+# R/create.R: 96.62%
 # R/delete.R: 99.02%
 # R/exists.R: 100.00%
 # R/list.R: 100.00%
