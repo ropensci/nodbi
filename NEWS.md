@@ -1,4 +1,4 @@
-# nodbi 0.14.0.9000
+# nodbi 0.15.0
 
 * Add support for MariaDB
 * Add user option `jsonlite.pagesize` for `jsonlite::stream_{in,out}()`

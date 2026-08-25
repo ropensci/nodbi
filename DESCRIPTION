@@ -5,7 +5,7 @@ Description: R database connector for creating, reading (querying and listing
      providing a common API across supported databases ('SQLite', 'PostgreSQL', 
      'DuckDB', 'MariaDB' or 'MySQL' as well as 'NoSQL' databases 'MongoDB', 
      'CouchDB' and 'Elasticsearch').
-Version: 0.14.0.9000
+Version: 0.15.0
 Authors@R: c(
     person("Ralf", "Herold", role = c("aut", "cre"),
            email = "ralf.herold@mailbox.org",

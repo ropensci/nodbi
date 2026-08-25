@@ -11,6 +11,7 @@ NDJSON
 NoSQL
 Opensearch
 README
+RMariaDB
 RPostgres
 RSQLite
 Sys
@@ -36,14 +37,17 @@ json
 jsonb
 jsonlite
 mapdata
+mariadb
 minify
 minimise
 mongodb
 mongolite
+nodbi’
 optimised
 programme
 redis
 reimplementation
+sql
 sqlite
 subitems
 upserted

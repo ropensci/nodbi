@@ -26,6 +26,7 @@ R package `nodbi` provides a single interface for several NoSQL databases and SQ
 - MongoDB 
 - CouchDB 
 - Elasticsearch 
+- MariaDB
 
 Package `nodbi` has been designed to use any specific SQL functions a database may have for `JSON` and has added functionality tested for performance to enable switching databases without changing user code. 
 
@@ -49,6 +50,7 @@ if (FALSE) {
   src <- src_mongo(collection = key)
   src <- src_sqlite()
   src <- src_postgres()
+  src <- src_mariadb()
   src <- src_elastic()
   src <- src_couchdb(
     user = Sys.getenv("COUCHDB_TEST_USER"),
