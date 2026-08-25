@@ -21,7 +21,7 @@ A \code{nodbi} source object
 Setup a RMariaDB database connection
 }
 \details{
-Uses \pkg{RSMariaDB} as backend; minimum MariaDB 12.3 required.
+Uses \pkg{RSMariaDB} as backend; requires MariaDB 12.3 or later.
 \pkg{nodbi} creates or uses
 a table with columns \verb{_id} and \code{json}, created and used by
 package \code{nodbi}, applying SQL or JSON functions as per

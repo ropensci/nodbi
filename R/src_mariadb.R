@@ -8,7 +8,7 @@
 #' @param ... additional named parameters passed
 #'   on to [RMariaDB::MariaDB()]
 #'
-#' @details Uses \pkg{RSMariaDB} as backend; minimum MariaDB 12.3 required.
+#' @details Uses \pkg{RSMariaDB} as backend; requires MariaDB 12.3 or later.
 #' \pkg{nodbi} creates or uses
 #' a table with columns `_id` and `json`, created and used by
 #' package `nodbi`, applying SQL or JSON functions as per

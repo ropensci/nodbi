@@ -675,6 +675,7 @@ docdb_create.src_mariadb <- function(src, key, value, ...) {
   } else {
 
     # regular import using helper function
+    # apparently does not need sql mode change
     result <- appendTable(src, key, value, ...)
 
   } # if file
