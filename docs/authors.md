@@ -24,7 +24,10 @@ Herold R, Chamberlain S, FitzJohn R, Ooms J (2026). *nodbi: Document
 'NoSQL' Database DBI Connector*. R package version 0.15.0.9000,
 <https://docs.ropensci.org/nodbi/>.
 
-@Manual{, title = {nodbi: Document 'NoSQL' Database DBI Connector},
-author = {Ralf Herold and Scott Chamberlain and Rich FitzJohn and Jeroen
-Ooms}, year = {2026}, note = {R package version 0.15.0.9000}, url =
-{https://docs.ropensci.org/nodbi/}, }
+@Manual{,\
+  title = {nodbi: Document 'NoSQL' Database DBI Connector},\
+  author = {Ralf Herold and Scott Chamberlain and Rich FitzJohn and Jeroen Ooms},\
+  year = {2026},\
+  note = {R package version 0.15.0.9000},\
+  url = {https://docs.ropensci.org/nodbi/},\
+}

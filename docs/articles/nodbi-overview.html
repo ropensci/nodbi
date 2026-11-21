@@ -156,12 +156,12 @@ pointing to <code>NDJSON</code>.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># load additionally mapdata as list</span></span>
-<span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">mapdata</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/docdb_create.html">docdb_create</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">mapdata</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: container 'my_container' already exists</span></span>
 <span><span class="co">#&gt; [1] 2</span></span>
 <span></span>
 <span><span class="co"># show JSON structure of contacts</span></span>
-<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/prettify.html" class="external-link">minify</a></span><span class="op">(</span><span class="va">contacts</span><span class="op">)</span></span>
+<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/prettify.html" class="external-link">minify</a></span><span class="op">(</span><span class="va">contacts</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [{"_id":"5cd67853f841025e65ce0ce2","isActive":false,"balance":"$3,808.45","age":23,"eyeColor":"green","name":"Lacy Chen","email":"lacychen@conjurica.com","about":"Sunt consequat ad dolore.\nExercitation nisi reprehenderit.","registered":"2014-08-03T12:11:54 -02:00","tags":["nulla","nisi","adipisicing","do","ad","ullamco","irure"],"friends":[{"id":0,"name":"Wooten Goodwin"},{"id":1,"name":"Brandie Woodward"},{"id":2,"name":"Angelique Britt"}]},{"_id":"5cd678531b423d5f04cfb0a1","isActive":false,"balance":"$3,400.50","age":20,"eyeColor":"brown","name":"Rae Colon","email":"raecolon@conjurica.com","about":"Nisi excepteur duis duis aliquip qui id consequat consequat.","registered":"2018-12-19T06:23:35 -01:00","tags":["nostrud","eu","consectetur","adipisicing","labore","ut","voluptate"],"friends":[{"id":0,"name":"Yang Yates"},{"id":1,"name":"Lacy Chen"}]},{"_id":"5cd6785335b63cb19dfa8347","isActive":false,"balance":"$2,579.09","age":30,"eyeColor":"brown","name":"Williamson French","email":"williamsonfrench@conjurica.com","about":"Nulla do sunt consectetur officia. Laboris pariatur incididunt.","registered":"2018-02-14T10:59:57 -01:00","tags":["exercitation","do","magna","ut","consectetur","ex","incididunt"],"friends":[{"id":0,"name":"Coleen Dunn"},{"id":1,"name":"Doris Phillips"},{"id":2,"name":"Concetta Turner"}]},{"_id":"5cd6785325ce3a94dfc54096","isActive":true,"balance":"$1,161.52","age":22,"eyeColor":"brown","name":"Pace Bell","email":"pacebell@conjurica.com","about":"Eiusmod sunt laborum ipsum do cupidatat qui id dolore do.","registered":"2018-08-17T12:23:42 -02:00","tags":["aliqua","consectetur","commodo","velit","cupidatat","duis","dolore"],"friends":[{"id":0,"name":"Baird Keller"},{"id":1,"name":"Francesca Reese"},{"id":2,"name":"Dona Bartlett"}]},{"_id":"5cd678530df22d3625ed8375","isActive":true,"balance":"$2,412.67","age":20,"eyeColor":"blue","name":"Krista Baxter","email":"kristabaxter@conjurica.com","about":"Sint quis nulla ea fugiat. Commodo nisi qui eu sit.","registered":"2017-07-19T05:03:47 -02:00","tags":["sit","cillum","commodo","labore","sint","in","exercitation"],"friends":[{"id":0,"name":"Pace Bell"}]}]</span></span>
 <span></span>
 <span><span class="co"># load additionally contacts JSON data</span></span>
@@ -216,11 +216,12 @@ created.</p>
 <span>  </span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Loading required package: tibble</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
-<span><span class="co">#&gt;   `_id`                      destination_addresses origin_addresses rows  status</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 15f694e6-a099-11f1-8b13-6… <span style="color: #949494;">&lt;chr [3]&gt;</span>             <span style="color: #949494;">&lt;chr [2]&gt;</span>        <span style="color: #949494;">&lt;df&gt;</span>  OK    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 15f694f0-a099-11f1-8b13-6… <span style="color: #949494;">&lt;chr [3]&gt;</span>             <span style="color: #949494;">&lt;chr [1]&gt;</span>        <span style="color: #949494;">&lt;df&gt;</span>  OK</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
+<span><span class="co">#&gt;   `_id`       isActive balance   age eyeColor name  email about registered tags </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lis&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 5cd678530d… TRUE     $2,412…    20 blue     Kris… kris… Sint… 2017-07-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 5cd678531b… FALSE    $3,400…    20 brown    Rae … raec… Nisi… 2018-12-1… <span style="color: #949494;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: friends &lt;list&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="docdb_query">docdb_query<a class="anchor" aria-label="anchor" href="#docdb_query"></a>
@@ -304,18 +305,9 @@ documents selected with a query (or in all documents in the container if
 <code>query = "{}"</code> is specified).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/docdb_query.html">docdb_query</a></span><span class="op">(</span><span class="va">src</span>, <span class="va">key</span>, query <span class="op">=</span> <span class="st">'{"_id": {"$regex": "^[0-9]"}}'</span>, listfields <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "about"                            "age"                             </span></span>
-<span><span class="co">#&gt;  [3] "balance"                          "destination_addresses"           </span></span>
-<span><span class="co">#&gt;  [5] "email"                            "eyeColor"                        </span></span>
-<span><span class="co">#&gt;  [7] "friends"                          "friends.id"                      </span></span>
-<span><span class="co">#&gt;  [9] "friends.name"                     "isActive"                        </span></span>
-<span><span class="co">#&gt; [11] "name"                             "origin_addresses"                </span></span>
-<span><span class="co">#&gt; [13] "registered"                       "rows"                            </span></span>
-<span><span class="co">#&gt; [15] "rows.elements"                    "rows.elements.distance"          </span></span>
-<span><span class="co">#&gt; [17] "rows.elements.distance.somevalue" "rows.elements.distance.text"     </span></span>
-<span><span class="co">#&gt; [19] "rows.elements.duration"           "rows.elements.duration.somevalue"</span></span>
-<span><span class="co">#&gt; [21] "rows.elements.duration.text"      "rows.elements.status"            </span></span>
-<span><span class="co">#&gt; [23] "status"                           "tags"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "about"        "age"          "balance"      "email"        "eyeColor"    </span></span>
+<span><span class="co">#&gt;  [6] "friends"      "friends.id"   "friends.name" "isActive"     "name"        </span></span>
+<span><span class="co">#&gt; [11] "registered"   "tags"</span></span></code></pre></div>
 <p>The dot notation is a path from a root field to the nested field, and
 this notation can be used in <code>query</code> and <code>fields</code>
 parameters of <code><a href="../reference/docdb_query.html">docdb_query()</a></code>.</p>

@@ -1,6 +1,6 @@
 # nodbi 0.15.0.9000
 
-* New development version
+* Wrap remaining calls in `DBI::dbWithTransaction()` 
 
 # nodbi 0.15.0
 

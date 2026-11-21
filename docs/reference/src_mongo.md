@@ -22,12 +22,12 @@ src_mongo(collection = "test", db = "test", url = "mongodb://localhost", ...)
 
   (character) Address of the MongoDB server in Mongo connection string
   URI format, see to
-  [`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)
+  [`mongolite::mongo()`](https://rdrr.io/pkg/mongolite/man/mongo.html)
 
 - ...:
 
   Additional named parameters passed on to
-  [`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)
+  [`mongolite::mongo()`](https://rdrr.io/pkg/mongolite/man/mongo.html)
 
 ## Value
 

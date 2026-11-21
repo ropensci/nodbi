@@ -40,7 +40,7 @@ docdb_get(src, key, limit = NULL, ...)
   Passed on to functions:
 
   - MongoDB: find() in
-    [`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)
+    [`mongolite::mongo()`](https://rdrr.io/pkg/mongolite/man/mongo.html)
 
   - SQLite: ignored
 

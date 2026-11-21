@@ -49,7 +49,7 @@ docdb_update(src, key, value, query, ...)
   Passed on to functions
   [`elastic::docs_bulk_update()`](https://rfhb.github.io/elastic/reference/docs_bulk_update.html),
   and
-  [`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)\$update().
+  [`mongolite::mongo()`](https://rdrr.io/pkg/mongolite/man/mongo.html)\$update().
 
 ## Value
 
@@ -58,7 +58,7 @@ docdb_update(src, key, value, query, ...)
 ## Details
 
 Uses native functions in MongoDB
-([`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)\$update()),
+([`mongolite::mongo()`](https://rdrr.io/pkg/mongolite/man/mongo.html)\$update()),
 SQLite (`jsonb_update()`), DuckDB (`jsonb_merge_patch()`), MariaDB
 (`json_merge_patch()`), Elasticsearch
 ([`elastic::docs_bulk_update()`](https://rfhb.github.io/elastic/reference/docs_bulk_update.html));

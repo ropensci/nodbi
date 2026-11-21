@@ -40,7 +40,7 @@ docdb_create(src, key, value, ...)
   [`sofa::db_bulk_create()`](https://docs.ropensci.org/sofa/reference/db_bulk_create.html),
   [`elastic::docs_bulk()`](https://rfhb.github.io/elastic/reference/docs_bulk.html),
   and
-  [`mongolite::mongo()`](https://jeroen.r-universe.dev/mongolite/reference/mongo.html)\$insert()
+  [`mongolite::mongo()`](https://rdrr.io/pkg/mongolite/man/mongo.html)\$insert()
 
 ## Value
 
