@@ -66,45 +66,13 @@
 <thead><tr>
 <th align="left">Currently, <code>nodbi</code> supports<br>as database backends</th>
 <th align="left">for an <code>R</code> object of any<br>of these data types</th>
-<th align="left">for these operations</th>
+<th align="left">for these operations on<br>collection(s) in a database</th>
 </tr></thead>
-<tbody>
-<tr>
-<td align="left">MongoDB</td>
-<td align="left">data.frame</td>
-<td align="left">List</td>
-</tr>
-<tr>
-<td align="left">SQLite</td>
-<td align="left">list</td>
-<td align="left">Create</td>
-</tr>
-<tr>
-<td align="left">PostgreSQL</td>
-<td align="left">JSON string</td>
-<td align="left">Get</td>
-</tr>
-<tr>
-<td align="left">DuckDB</td>
-<td align="left">name of file with NDJSON records</td>
-<td align="left">Query</td>
-</tr>
-<tr>
-<td align="left">Elasticsearch</td>
-<td align="left">URL to NDJSON records</td>
-<td align="left">Update</td>
-</tr>
-<tr>
-<td align="left">CouchDB</td>
-<td align="left"></td>
-<td align="left">Delete</td>
-</tr>
-<tr>
-<td align="left">MariaDB</td>
-<td align="left"></td>
-<td align="left">Exists</td>
-</tr>
-</tbody>
+<tbody><tr>
+<td align="left">- MongoDB<br>- SQLite<br>- PostgreSQL<br>- DuckDB<br>- MariaDB<br>- Elasticsearch<br>- CouchDB</td>
+<td align="left">- list<br>- data.frame<br>- JSON string<br>- name of file with NDJSON records<br>- URL to NDJSON records</td>
+<td align="left">- Exists<br>- List<br>- Create<br>- Get<br>- Query<br>- Update<br>- Delete</td>
+</tr></tbody>
 </table>
 <p>For speed comparisons of database backends, see <a href="#benchmark">benchmark</a> and <a href="#testing">testing</a> below.</p>
 <div class="section level2">
@@ -143,7 +111,7 @@
 <td align="left"><code>nodbi::docdb_query(src = src, key = "my_container", query = '{"age": {"$gt": 20}}', fields = '{"friends.name": 1, "_id": 0, "age": 1}', limit = 2L)</code></td>
 </tr>
 <tr>
-<td align="left">Update (patch) documents selected by query with new data <code>my_data</code> (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records)</td>
+<td align="left">Update (patch) documents, optionally selected by a query, with new data <code>my_data</code> (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records)</td>
 <td align="left"><code>nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')</code></td>
 </tr>
 <tr>
@@ -151,11 +119,11 @@
 <td align="left"><code>nodbi::docdb_exists(src = src, key = "my_container")</code></td>
 </tr>
 <tr>
-<td align="left">List all containers in database</td>
+<td align="left">List all containers in a database</td>
 <td align="left"><code>nodbi::docdb_list(src = src)</code></td>
 </tr>
 <tr>
-<td align="left">Delete document(s) in container</td>
+<td align="left">Delete document(s) in the container</td>
 <td align="left"><code>nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')</code></td>
 </tr>
 <tr>
@@ -439,20 +407,20 @@
 <span>  SQLite <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcSqlite</span><span class="op">)</span>,</span>
 <span>  CouchDB <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcCouchdb</span><span class="op">)</span>,</span>
 <span>  Elastic <span class="op">=</span> <span class="fu">testFunction</span><span class="op">(</span>src <span class="op">=</span> <span class="va">srcElastic</span><span class="op">)</span>,</span>
-<span>  replications <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  replications <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  order <span class="op">=</span> <span class="st">"elapsed"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 2026-11-21 with M3 hardware, databases via homebrew</span></span>
-<span><span class="va">result</span><span class="op">[</span> , <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"test"</span>, <span class="st">"replications"</span>, <span class="st">"elapsed"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#         test replications elapsed</span></span>
-<span><span class="co"># 1     DuckDB            3     1.1</span></span>
-<span><span class="co"># 5     SQLite            3     1.1</span></span>
-<span><span class="co"># 4 PostgreSQL            3     2.2</span></span>
-<span><span class="co"># 2    MariaDB            3     3.1</span></span>
-<span><span class="co"># 3    MongoDB            3     4.3</span></span>
-<span><span class="co"># 7    Elastic            3    26.4</span></span>
-<span><span class="co"># 6    CouchDB            3    50.9</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">result</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">test</span>, <span class="va">elapsed</span> <span class="op">/</span> <span class="va">replications</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#         test elapsed.replications</span></span>
+<span><span class="co"># 1     DuckDB                 0.36</span></span>
+<span><span class="co"># 2     SQLite                 0.39</span></span>
+<span><span class="co"># 3 PostgreSQL                 0.73</span></span>
+<span><span class="co"># 4    MariaDB                 1.05</span></span>
+<span><span class="co"># 5    MongoDB                 2.44</span></span>
+<span><span class="co"># 6    Elastic                 9.04</span></span>
+<span><span class="co"># 7    CouchDB                16.88</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">R.version</span><span class="op">$</span><span class="va">version.string</span><span class="op">)</span></span>
 <span><span class="co"># R version 4.6.2 (2026-10-29)</span></span>

@@ -36,10 +36,10 @@ The `key` parameter holds the name of a container.
 | Get all documents back into a data frame | `nodbi::docdb_get(src = src, key = "my_container")` |
 | Get documents selected with query (as MongoDB-compatible JSON) into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": 20}')` |
 | Get selected fields (in MongoDB compatible JSON) from documents selected by query into a data frame | `nodbi::docdb_query(src = src, key = "my_container", query = '{"age": {"$gt": 20}}', fields = '{"friends.name": 1, "_id": 0, "age": 1}', limit = 2L)` |
-| Update (patch) documents selected by query with new data `my_data` (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records) | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
+| Update (patch) documents, optionally selected by a query, with new data `my_data` (in a data frame, list, JSON string, or file name or URL pointing to NDJSON records) | `nodbi::docdb_update(src = src, key = "my_container", value = my_data, query = '{"age": 20}')` |
 | Check if container exists | `nodbi::docdb_exists(src = src, key = "my_container")` |
-| List all containers in database | `nodbi::docdb_list(src = src)` |
-| Delete document(s) in container | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')` |
+| List all containers in a database | `nodbi::docdb_list(src = src)` |
+| Delete document(s) in the container | `nodbi::docdb_delete(src = src, key = "my_container", query = '{"age": 20}')` |
 | Delete container | `nodbi::docdb_delete(src = src, key = "my_container")` |
 | Close and remove database connection manually (when restarting R, connections are automatically closed and removed by `nodbi`) | `rm(src)` |
 
@@ -371,20 +371,20 @@ return the same values.
 `  SQLite ``=`` ``testFunction``(``src ``=`` ``srcSqlite``)``,`\
 `  CouchDB ``=`` ``testFunction``(``src ``=`` ``srcCouchdb``)``,`\
 `  Elastic ``=`` ``testFunction``(``src ``=`` ``srcElastic``)``,`\
-`  replications ``=`` ``3L``,`\
+`  replications ``=`` ``5L``,`\
 `  order ``=`` ``"elapsed"`\
 `)`\
 \
 `# 2026-11-21 with M3 hardware, databases via homebrew`\
-`result``[`` , `[`c`](https://rdrr.io/r/base/c.html)`(``"test"``, ``"replications"``, ``"elapsed"``)``]`\
-`#         test replications elapsed`\
-`# 1     DuckDB            3     1.1`\
-`# 5     SQLite            3     1.1`\
-`# 4 PostgreSQL            3     2.2`\
-`# 2    MariaDB            3     3.1`\
-`# 3    MongoDB            3     4.3`\
-`# 7    Elastic            3    26.4`\
-`# 6    CouchDB            3    50.9`\
+[`with`](https://rdrr.io/r/base/with.html)`(``result``, `[`data.frame`](https://rdrr.io/r/base/data.frame.html)`(``test``, ``elapsed`` ``/`` ``replications``)``)`\
+`#         test elapsed.replications`\
+`# 1     DuckDB                 0.36`\
+`# 2     SQLite                 0.39`\
+`# 3 PostgreSQL                 0.73`\
+`# 4    MariaDB                 1.05`\
+`# 5    MongoDB                 2.44`\
+`# 6    Elastic                 9.04`\
+`# 7    CouchDB                16.88`\
 \
 [`message`](https://rdrr.io/r/base/message.html)`(``R.version``$``version.string``)`\
 `# R version 4.6.2 (2026-10-29)`\
