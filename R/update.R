@@ -510,21 +510,26 @@ docdb_update.src_sqlite <- function(src, key, value, query, ...) {
       ) WHERE "', key, '"._id = in_id;'
     )
 
-    result <- DBI::dbExecute(
-      conn = src$con,
-      statement = statement
-    )
+    result <- try(
+      DBI::dbWithTransaction(
+        conn = src$con,
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = statement
+          )}),
+      silent = TRUE)
 
-    # early exit
-    return(result)
-  }
+      # early exit
+      return(result)
+      }
 
   # SQL for patching, see https://www.sqlite.org/json1.html#jpatch
   updFunction <- "jsonb_patch"
 
   return(sqlUpdate(src = src, key = key, value = value, query = query, updFunction = updFunction))
 
-}
+  }
 
 #' @export
 docdb_update.src_postgres <- function(src, key, value, query, ...) {
@@ -679,9 +684,9 @@ docdb_update.src_mariadb <- function(src, key, value, query, ...) {
     if (!canLoadFile) {
 
       message(
-      "Parameter 'value' specified a file, ",
-      "but the file cannot directly be loaded, ",
-      "converting it to data frame for loading.")
+        "Parameter 'value' specified a file, ",
+        "but the file cannot directly be loaded, ",
+        "converting it to data frame for loading.")
 
       # readin ndjson records
       value <- jsonlite::stream_in(
@@ -849,28 +854,18 @@ sqlUpdate <- function(src, key, value, query, updFunction) {
     )
 
     # update data
-    if (inherits(src, "src_duckdb")) {
-      tmpRes <- try(
-        DBI::dbExecute(
-          conn = src$con,
-          statement = statement
-        ),
-        silent = TRUE
-      )
-    } else {
-      tmpRes <- try(
-        DBI::dbWithTransaction(
-          conn = src$con,
-          code = {
-            DBI::dbExecute(
-              conn = src$con,
-              statement = statement
-            )
-          }
-        ),
-        silent = TRUE
-      )
-    } # if
+    tmpRes <- try(
+      DBI::dbWithTransaction(
+        conn = src$con,
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = statement
+          )
+        }
+      ),
+      silent = TRUE
+    )
 
     if (!inherits(tmpRes, "try-error")) {
       result <- result + tmpRes

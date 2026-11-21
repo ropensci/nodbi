@@ -325,15 +325,18 @@ docdb_create.src_sqlite <- function(src, key, value, ...) {
 
     # import from ndjson file
     result <- try(
-      DBI::dbExecute(
+      DBI::dbWithTransaction(
         conn = src$con,
-        statement = paste0(
-          "INSERT OR IGNORE INTO \"", key, "\"",
-          " SELECT CASE WHEN length(json->>'$._id') > 0 THEN",
-          " json->>'$._id' ELSE uuid() END AS _id,",
-          " jsonb_patch(json, '{\"_id\": null}') AS json",
-          " FROM '", tblName, "';")
-      ), silent = TRUE)
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0(
+              "INSERT OR IGNORE INTO \"", key, "\"",
+              " SELECT CASE WHEN length(json->>'$._id') > 0 THEN",
+              " json->>'$._id' ELSE uuid() END AS _id,",
+              " jsonb_patch(json, '{\"_id\": null}') AS json",
+              " FROM '", tblName, "';"))
+        }), silent = TRUE)
 
 
   } else {
@@ -508,16 +511,19 @@ docdb_create.src_duckdb <- function(src, key, value, ...) {
 
     # import from ndjson file
     result <- try(
-      DBI::dbExecute(
+      DBI::dbWithTransaction(
         conn = src$con,
-        statement = paste0(
-          "INSERT OR IGNORE INTO \"", key, "\"",
-          " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
-          " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
-          " json_merge_patch(json, '{\"_id\": null}') AS json ",
-          " FROM read_ndjson_objects('",
-          value, "');")
-      ), silent = TRUE)
+        code = {
+          DBI::dbExecute(
+            conn = src$con,
+            statement = paste0(
+              "INSERT OR IGNORE INTO \"", key, "\"",
+              " SELECT CASE WHEN len(json->>'$._id') > 0 THEN",
+              " json->>'$._id' ELSE format('{}', uuid()) END AS _id,",
+              " json_merge_patch(json, '{\"_id\": null}') AS json ",
+              " FROM read_ndjson_objects('",
+              value, "');"))
+        }), silent = TRUE)
 
 
   } else {
@@ -879,13 +885,16 @@ appendTable <- function(src, key, value, ...) {
 
   # insert data
   return(try(
-    DBI::dbAppendTable(
+    DBI::dbWithTransaction(
       conn = src$con,
-      name = key,
-      # canonical 'value': a data frame
-      # with 2 columns, _id and json
-      value = value,
-      ...),
+      code = {
+        DBI::dbAppendTable(
+          conn = src$con,
+          name = key,
+          # canonical 'value': a data frame
+          # with 2 columns, _id and json
+          value = value,
+          ...)}),
     silent = TRUE))
 
 }
